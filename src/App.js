@@ -51,6 +51,9 @@ function App () {
 				Copyright &copy; 2019 {' '}
 				<a href="https://github.com/blacksmoke26"
 					rel="noopener noreferrer" target="_blank">Junaid Atari</a>
+				{' - '}
+				<a href="https://github.com/blacksmoke26/dawn-of-man-generator"
+					rel="noopener noreferrer" target="_blank">Source on GitHub</a>
 			</footer>
 		</Container>
 	);
