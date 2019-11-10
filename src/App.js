@@ -12,10 +12,11 @@ function App () {
 		<Container className="mt-4 mb-4">
 			<h2 className="font-weight-light mb-4 text-center">
 				<a href="https://store.steampowered.com/app/858810"
-				target="_blank">
+				target="_blank" rel="noopener noreferrer">
 					Dawn of Man
 				</a>
-				{' - '} <a href="https://steamcommunity.com/app/858810/discussions/1/" target="_blank">
+				{' - '} <a href="https://steamcommunity.com/app/858810/discussions/1/"
+				rel="noopener noreferrer" target="_blank">
 				Mod Data Generator
 			</a>
 			</h2>
@@ -48,7 +49,8 @@ function App () {
 			</Accordion>
 			<footer className="mt-3 mb-3 text-size-xs text-center">
 				Copyright &copy; 2019 {' '}
-				<a href="https://github.com/blacksmoke26" target="_blank">Junaid Atari</a>
+				<a href="https://github.com/blacksmoke26"
+					rel="noopener noreferrer" target="_blank">Junaid Atari</a>
 			</footer>
 		</Container>
 	);
