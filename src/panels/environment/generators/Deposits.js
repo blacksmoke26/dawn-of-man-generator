@@ -103,6 +103,8 @@ export class Deposits extends React.Component<Props, State> {
 									Random
 								</Button>
 								<Button disabled={!enable} className="button-reset-sm" variant="link"
+									onClick={() => this.setState({deposits: [...random.deposits]})}>All</Button>
+								<Button disabled={!enable} className="button-reset-sm" variant="link"
 									onClick={() => this.setState({deposits: []})}>None</Button>
 								<div className="text-size-xxs text-muted mt-1">
 									What types of deposit are present in the level.
