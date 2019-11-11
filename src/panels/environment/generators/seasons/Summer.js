@@ -331,8 +331,8 @@ export class Summer extends React.Component<Props, State> {
 								maxWindValue: defaultValues.max_wind.value,
 							})}>Default</Button>
 						<Range
-							min={1}
-							max={35}
+							min={0}
+							max={9}
 							disabled={!enabled}
 							value={[minWindValue, maxWindValue]}
 							onChange={([min, max]) => {
