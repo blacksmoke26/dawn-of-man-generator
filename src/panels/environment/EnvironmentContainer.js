@@ -59,7 +59,7 @@ const EnvironmentContainer = (): Node => {
 	
 	return (
 		<>
-			<Accordion>
+			<Accordion defaultActiveKey="environment_noise_amplitudes">
 				<Card>
 					<Card.Header>
 						<Accordion.Toggle as={Button} variant="link" eventKey="environment_noise_amplitudes">
