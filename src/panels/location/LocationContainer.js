@@ -15,6 +15,8 @@ import Locations from './generators/Locations';
 // Types
 import type { Node } from 'react';
 
+const LOCATIONS_MAX_COUNT: number = 9;
+
 /**
  * LocationContainer `props` type
  * @type {Object}
@@ -65,18 +67,21 @@ const LocationContainer = ( props: Props ): Node => {
 		return xmlFormatter(xml, {indentation: '  '});
 	};
 	
+	const totalLoc: number = Object.keys(locations).length;
+	
 	return (
 		<>
 			<div className="mb-3">
 				<ButtonGroup>
-					<Button variant="secondary" size="sm" disabled={loading} onClick={() => {
-						if ( Object.keys(locations).length <= 9 ) {
+					<Button variant="secondary" size="sm"
+						disabled={loading || totalLoc >= LOCATIONS_MAX_COUNT} onClick={() => {
+						if ( totalLoc <= LOCATIONS_MAX_COUNT  ) {
 							addNewLocation();
 							setLoading(true);
 							setTimeout(() => setLoading(false), 500);
 						}
 					}}>Add New</Button>
-					<Button variant="secondary" size="sm" disabled={loading} onClick={() => {
+					<Button variant="danger" size="sm" disabled={loading || totalLoc <= 1 } onClick={() => {
 						const key = Object.keys(locations)[0];
 						setLocations({[key]: locations[key]});
 						setActiveKey(key);
