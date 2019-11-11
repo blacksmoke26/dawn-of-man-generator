@@ -99,8 +99,9 @@ export class ResourceFactor extends React.Component<Props, State> {
 									Random
 								</Button>
 								<Button disabled={!enable} className="button-reset-sm" variant="link"
-									onClick={() => this.setState({resource: 0})}>Reset</Button>
-								
+									onClick={() => this.setState({resource: 1})}>Max</Button>
+								<Button disabled={!enable} className="button-reset-sm" variant="link"
+									onClick={() => this.setState({resource: 0})}>None</Button>
 								<div className="text-size-xxs text-muted mt-1">
 									The amount of resources in the map. 1.0 is the default.
 								</div>
