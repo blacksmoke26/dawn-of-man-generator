@@ -22,7 +22,7 @@ https://dawn-of-man-mod-gen.netlify.com/
 
 1. Clone this Repository.
 2. `npm i -D` to install required dependencies.
-3. `npm run start` to start server.
+3. `npm run start` to start the server.
 4. Extend as you please...
 5. Profit.
 
