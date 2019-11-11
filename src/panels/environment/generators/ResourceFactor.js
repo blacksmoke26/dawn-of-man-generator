@@ -15,7 +15,7 @@ import randomFloat from 'random-float';
 // Components
 import UiSlider from './../../../components/UiSlider';
 
-const randomize: () => number = (): number => Number(randomFloat(0, 30)).toFixed(2);
+const randomize: () => number = (): number => Number(randomFloat(0, 1)).toFixed(2);
 
 /**
  * ResourceFactor `props` type
@@ -118,7 +118,7 @@ export class ResourceFactor extends React.Component<Props, State> {
 						</Row>
 						<UiSlider step={0.01}
 							min={0}
-							max={30}
+							max={1}
 							disabled={!enable} value={Number(resource)}
 							onChange={v => this.setState({resource: v})}/>
 					</Card.Body>
