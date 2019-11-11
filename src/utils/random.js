@@ -14,23 +14,21 @@ import uniqueRandomArray from 'unique-random-array';
 
 /** Builtin environments */
 export const environments: Array<string> = [
-	'eurasia',
-	'eurasia_north',
-	'eurasia_conflict',
-	'eurasia_warm',
-	'eurasia_flatlands',
-	'eurasia_glacial',
+	'eurasia', 'eurasia_conflict', 'eurasia_flatlands',
+	'eurasia_glacial', 'eurasia_north', 'eurasia_warm', 'flat',
 ];
 
-/** Builtin deposits */
-export const deposits: Array<string>
-	= 'Flint Tin Copper Iron Steel'.split(' ');
+/** Deposits types */
+export const deposits: Array<string> = [
+	'Flint', 'Tin', 'Copper', 'Iron', 'Steel',
+];
 
-/** Builtin trees */
-export const trees: Array<string>
-	= ('Oak Birch Beech Rye Einkorn Emmer Flax BitterVetch'
-	+ ' Chickpeas Lentils Peas Blackberry Blueberry Raspberry'
-	+ ' Strawberry Chestnut Pear Cherry Service').split(' ');
+/** Trees types */
+export const trees: Array<string> = [
+	'Oak', 'Birch', 'Beech', 'Rye', 'Einkorn', 'Emmer', 'Flax', 'BitterVetch',
+	'Chickpeas', 'Lentils', 'Peas', 'Blackberry', 'Blueberry', 'Raspberry',
+	'Strawberry', 'Chestnut', 'Pear', 'Cherry', 'Service',
+];
 
 /**
  * @param {?number} value=null - Value to set / Set null for random values
