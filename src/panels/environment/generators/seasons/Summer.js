@@ -345,9 +345,9 @@ export class Summer extends React.Component<Props, State> {
 				</Form.Group>
 				<div className="mt-3">
 					<ButtonGroup>
-						<Button variant="secondary" size="sm"
+						<Button disabled={!enabled} variant="secondary" size="sm"
 							onClick={this.randomizeValues.bind(this)}>Randomize All</Button>
-						<Button variant="secondary" size="sm"
+						<Button disabled={!enabled} variant="secondary" size="sm"
 							onClick={() => this.setState({...this.toDefaultsValue()})}>
 							Set Defaults
 						</Button>
