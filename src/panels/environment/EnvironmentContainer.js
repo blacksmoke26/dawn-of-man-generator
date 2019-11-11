@@ -59,8 +59,19 @@ const EnvironmentContainer = (): Node => {
 	
 	return (
 		<>
-			<NoiseAmplitudes onChange={(v: string) => setNoiseAmplitudes(v)}/>
-			<Accordion className="environment_terrain">
+			<Accordion>
+				<Card>
+					<Card.Header>
+						<Accordion.Toggle as={Button} variant="link" eventKey="environment_noise_amplitudes">
+							Noise Amplitudes
+						</Accordion.Toggle>
+					</Card.Header>
+					<Accordion.Collapse eventKey="environment_noise_amplitudes">
+						<Card.Body>
+							<NoiseAmplitudes onChange={(v: string) => setNoiseAmplitudes(v)}/>
+						</Card.Body>
+					</Accordion.Collapse>
+				</Card>
 				<Card>
 					<Card.Header>
 						<Accordion.Toggle as={Button} variant="link" eventKey="environment_terrain_0">
