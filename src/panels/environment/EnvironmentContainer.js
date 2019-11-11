@@ -6,7 +6,7 @@
  * @since 2019-11-10
  */
 
-import React, { useState } from 'react';
+import React from 'react';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { Card, Accordion, Button } from 'react-bootstrap';
 import { githubGist } from 'react-syntax-highlighter/dist/esm/styles/hljs';
@@ -25,21 +25,55 @@ import ResourceFactor from './generators/ResourceFactor';
 import Deposits from './generators/Deposits';
 import Trees from './generators/Trees';
 import TreesEverywhere from './generators/TreesEverywhere';
+import Seasons from './generators/Seasons';
 
 /**
- * EnvironmentContainer functional component
+ * EnvironmentContainer `props` type
+ * @type {Object}
  */
-const EnvironmentContainer = (): Node => {
-	const [noiseAmplitudes, setNoiseAmplitudes] = useState('');
-	const [distanceHeightOffset, setDistanceHeightOffset] = useState('');
-	const [fordDistanceFactor, setFordDistanceFactor] = useState('');
-	const [sunAngleFactor, setSunAngleFactor] = useState('');
-	const [resourceFactor, setResourceFactor] = useState('');
-	const [deposits, setDeposits] = useState('');
-	const [trees, setTrees] = useState('');
-	const [treesEverywhere, setTreesEverywhere] = useState('');
+type Props = {
+}
+
+/**
+ * EnvironmentContainer `state` type
+ * @type {Object}
+ */
+type State = {
+	noiseAmplitudes: string,
+	distanceHeightOffset: string,
+	fordDistanceFactor: string,
+	sunAngleFactor: string,
+	resourceFactor: string,
+	deposits: string,
+	trees: string,
+	treesEverywhere: string,
+	seasons: string,
+};
+
+/**
+ * EnvironmentContainer component
+ */
+class EnvironmentContainer extends React.Component<Props, State> {
+	state: State = {
+		noiseAmplitudes: '',
+		distanceHeightOffset: '',
+		fordDistanceFactor: '',
+		sunAngleFactor: '',
+		resourceFactor: '',
+		deposits: '',
+		trees: '',
+		treesEverywhere: '',
+		seasons: '',
+	};
 	
-	const toTemplate: () => string = (): string => {
+	toTemplate (): string {
+		const {
+			noiseAmplitudes, distanceHeightOffset,
+			fordDistanceFactor, sunAngleFactor,
+			resourceFactor, deposits, trees,
+			treesEverywhere, seasons,
+		} = this.state;
+		
 		const xml: string = [
 			'<?xml version="1.0" encoding="utf-8"?>',
 			'<environment>',
@@ -49,60 +83,77 @@ const EnvironmentContainer = (): Node => {
 			fordDistanceFactor,
 			sunAngleFactor,
 			deposits,
-			treesEverywhere,
-			trees,
+			treesEverywhere, trees,
+			seasons,
 			'</environment>',
 		].join('');
 		
 		return xmlFormatter(xml, {indentation: '  '});
-	};
+	}
 	
-	return (
-		<>
-			<Accordion defaultActiveKey="environment_noise_amplitudes">
-				<Card>
-					<Card.Header>
-						<Accordion.Toggle as={Button} variant="link" eventKey="environment_noise_amplitudes">
-							Noise Amplitudes
-						</Accordion.Toggle>
-					</Card.Header>
-					<Accordion.Collapse eventKey="environment_noise_amplitudes">
-						<Card.Body>
-							<NoiseAmplitudes onChange={(v: string) => setNoiseAmplitudes(v)}/>
-						</Card.Body>
-					</Accordion.Collapse>
-				</Card>
-				<Card>
-					<Card.Header>
-						<Accordion.Toggle as={Button} variant="link" eventKey="environment_terrain_0">
-							Terrain Features
-						</Accordion.Toggle>
-					</Card.Header>
-					<Accordion.Collapse eventKey="environment_terrain_0">
-						<Card.Body>
-							<ResourceFactor onChange={(v: string) => setResourceFactor(v)}/>
-							<DistanceHeightOffset onChange={(v: string) => setDistanceHeightOffset(v)}/>
-							<FordDistanceFactor onChange={(v: string) => setFordDistanceFactor(v)}/>
-							<SunAngleFactor onChange={(v: string) => setSunAngleFactor(v)}/>
-							<Deposits onChange={(v: string) => setDeposits(v)}/>
-							<TreesEverywhere onChange={(v: string) => setTreesEverywhere(v)}/>
-							<Trees onChange={(v: string) => setTrees(v)}/>
-						</Card.Body>
-					</Accordion.Collapse>
-				</Card>
-			</Accordion>
-			<hr/>
-			<SyntaxHighlighter style={githubGist} language="xml">
-				{toTemplate()}
-			</SyntaxHighlighter>
-			<div className="mt-2">
-				<Button size="sm" variant="secondary"
-					onClick={() => copyClipboard(toTemplate())}>
-					Copy to Clipboard
-				</Button>
-			</div>
-		</>
-	);
-};
+	/**
+	 * @inheritDoc
+	 */
+	render (): Node {
+		return (
+			<>
+				<Accordion defaultActiveKey="environment_noise_amplitudes">
+					<Card>
+						<Card.Header className="pt-1 pb-1 pl-2 pl-2">
+							<Accordion.Toggle as={Button} variant="link" eventKey="environment_noise_amplitudes">
+								Noise Amplitudes
+							</Accordion.Toggle>
+						</Card.Header>
+						<Accordion.Collapse eventKey="environment_noise_amplitudes">
+							<Card.Body>
+								<NoiseAmplitudes onChange={( v: string ) => this.setState({noiseAmplitudes: v})}/>
+							</Card.Body>
+						</Accordion.Collapse>
+					</Card>
+					<Card>
+						<Card.Header className="pt-1 pb-1 pl-2 pl-2">
+							<Accordion.Toggle as={Button} variant="link" eventKey="environment_terrain">
+								Terrain Features
+							</Accordion.Toggle>
+						</Card.Header>
+						<Accordion.Collapse eventKey="environment_terrain">
+							<Card.Body>
+								<ResourceFactor onChange={( v: string ) => this.setState({resourceFactor: v})}/>
+								<DistanceHeightOffset onChange={( v: string ) => this.setState({distanceHeightOffset: v})}/>
+								<FordDistanceFactor onChange={( v: string ) => this.setState({fordDistanceFactor: v})}/>
+								<SunAngleFactor onChange={( v: string ) => this.setState({sunAngleFactor: v})}/>
+								<Deposits onChange={( v: string ) => this.setState({deposits: v})}/>
+								<TreesEverywhere onChange={( v: string ) => this.setState({treesEverywhere: v})}/>
+								<Trees onChange={( v: string ) => this.setState({trees: v})}/>
+							</Card.Body>
+						</Accordion.Collapse>
+					</Card>
+					<Card>
+						<Card.Header className="pt-1 pb-1 pl-2 pl-2">
+							<Accordion.Toggle as={Button} variant="link" eventKey="environment_seasons">
+								Seasons
+							</Accordion.Toggle>
+						</Card.Header>
+						<Accordion.Collapse eventKey="environment_seasons">
+							<Card.Body>
+								<Seasons onChange={( v: string ) => this.setState({seasons: v})}/>
+							</Card.Body>
+						</Accordion.Collapse>
+					</Card>
+				</Accordion>
+				<hr/>
+				<SyntaxHighlighter style={githubGist} language="xml">
+					{this.toTemplate()}
+				</SyntaxHighlighter>
+				<div className="mt-2">
+					<Button size="sm" variant="secondary"
+						onClick={() => copyClipboard(this.toTemplate())}>
+						Copy to Clipboard
+					</Button>
+				</div>
+			</>
+		);
+	}
+}
 
 export default EnvironmentContainer;
