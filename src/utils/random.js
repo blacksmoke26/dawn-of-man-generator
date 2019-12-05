@@ -20,7 +20,7 @@ export const environments: Array<string> = [
 
 /** Deposits types */
 export const deposits: Array<string> = [
-	'Flint', 'Tin', 'Copper', 'Iron', 'Steel',
+	'Flint', 'Tin', 'Copper', 'Iron',
 ];
 
 /** Trees types */
