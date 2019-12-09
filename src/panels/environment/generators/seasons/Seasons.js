@@ -165,7 +165,6 @@ export class Seasons extends React.Component<Props, State> {
 						</Accordion.Collapse>
 					</Card>
 				</Accordion>
-				
 			</>
 		);
 	};
