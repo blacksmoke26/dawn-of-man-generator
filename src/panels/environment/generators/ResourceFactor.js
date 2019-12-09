@@ -10,12 +10,12 @@ import React from 'react';
 import * as PropTypes from 'prop-types';
 import { Card, Button, Form, Row, Col } from 'react-bootstrap';
 import nanoid from 'nanoid';
-import randomFloat from 'random-float';
+import randomInt from 'random-int';
 
 // Components
 import UiSlider from './../../../components/UiSlider';
 
-const randomize: () => number = (): number => Number(randomFloat(0, 1)).toFixed(2);
+const randomize: () => number = (): number => randomInt(0, 100);
 
 /**
  * ResourceFactor `props` type
@@ -99,11 +99,13 @@ export class ResourceFactor extends React.Component<Props, State> {
 									Random
 								</Button>
 								<Button disabled={!enable} className="button-reset-sm" variant="link"
-									onClick={() => this.setState({resource: 1})}>Max</Button>
+									onClick={() => this.setState({resource: 1})}>Default</Button>
+								<Button disabled={!enable} className="button-reset-sm" variant="link"
+									onClick={() => this.setState({resource: 100})}>Max</Button>
 								<Button disabled={!enable} className="button-reset-sm" variant="link"
 									onClick={() => this.setState({resource: 0})}>None</Button>
 								<div className="text-size-xxs text-muted mt-1">
-									The amount of resources in the map. 1.0 is the default.
+									The amount of resources in the map. 1 is the default.
 								</div>
 							</Col>
 							<Col xs="2" className="text-right">
@@ -117,9 +119,9 @@ export class ResourceFactor extends React.Component<Props, State> {
 								/>
 							</Col>
 						</Row>
-						<UiSlider step={0.01}
+						<UiSlider step={1}
 							min={0}
-							max={1}
+							max={100}
 							disabled={!enable} value={Number(resource)}
 							onChange={v => this.setState({resource: v})}/>
 					</Card.Body>
