@@ -17,15 +17,14 @@ import copyClipboard from 'clipboard-copy';
 import type { Node } from 'react';
 
 // Components
-import NoiseAmplitudes from './generators/NoiseAmplitudes';
-import DistanceHeightOffset from './generators/DistanceHeightOffset';
-import FordDistanceFactor from './generators/FordDistanceFactor';
-import SunAngleFactor from './generators/SunAngleFactor';
-import ResourceFactor from './generators/ResourceFactor';
-import Deposits from './generators/Deposits';
-import Trees from './generators/Trees';
-import TreesEverywhere from './generators/TreesEverywhere';
-import Seasons from './generators/Seasons';
+import NoiseAmplitudes from './generators/amplitudes/NoiseAmplitudes';
+import DistanceHeightOffset from './generators/terrain/DistanceHeightOffset';
+import FordDistanceFactor from './generators/terrain/FordDistanceFactor';
+import SunAngleFactor from './generators/terrain/SunAngleFactor';
+import ResourceFactor from './generators/terrain/ResourceFactor';
+import Deposits from './generators/terrain/Deposits';
+import TreesPanel from './generators/trees/TreesPanel';
+import Seasons from './generators/seasons/Seasons';
 
 /**
  * EnvironmentContainer `props` type
@@ -46,7 +45,6 @@ type State = {
 	resourceFactor: string,
 	deposits: string,
 	trees: string,
-	treesEverywhere: string,
 	seasons: string,
 };
 
@@ -62,7 +60,6 @@ class EnvironmentContainer extends React.Component<Props, State> {
 		resourceFactor: '',
 		deposits: '',
 		trees: '',
-		treesEverywhere: '',
 		seasons: '',
 	};
 	
@@ -71,7 +68,7 @@ class EnvironmentContainer extends React.Component<Props, State> {
 			noiseAmplitudes, distanceHeightOffset,
 			fordDistanceFactor, sunAngleFactor,
 			resourceFactor, deposits, trees,
-			treesEverywhere, seasons,
+			seasons,
 		} = this.state;
 		
 		const xml: string = [
@@ -83,7 +80,7 @@ class EnvironmentContainer extends React.Component<Props, State> {
 			fordDistanceFactor,
 			sunAngleFactor,
 			deposits,
-			treesEverywhere, trees,
+			trees,
 			seasons,
 			'</environment>',
 		].join('');
@@ -123,8 +120,19 @@ class EnvironmentContainer extends React.Component<Props, State> {
 								<FordDistanceFactor onChange={( v: string ) => this.setState({fordDistanceFactor: v})}/>
 								<SunAngleFactor onChange={( v: string ) => this.setState({sunAngleFactor: v})}/>
 								<Deposits onChange={( v: string ) => this.setState({deposits: v})}/>
-								<TreesEverywhere onChange={( v: string ) => this.setState({treesEverywhere: v})}/>
-								<Trees onChange={( v: string ) => this.setState({trees: v})}/>
+								
+							</Card.Body>
+						</Accordion.Collapse>
+					</Card>
+					<Card>
+						<Card.Header className="pt-1 pb-1 pl-2 pl-2">
+							<Accordion.Toggle as={Button} variant="link" eventKey="environment_terrain_trees">
+								Trees (Terrain)
+							</Accordion.Toggle>
+						</Card.Header>
+						<Accordion.Collapse eventKey="environment_terrain_trees">
+							<Card.Body>
+								<TreesPanel onChange={( v: string ) => this.setState({trees: v})}/>
 							</Card.Body>
 						</Accordion.Collapse>
 					</Card>
