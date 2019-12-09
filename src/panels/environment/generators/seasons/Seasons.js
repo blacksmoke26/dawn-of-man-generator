@@ -12,10 +12,10 @@ import { Card, Button, Form, Accordion } from 'react-bootstrap';
 import nanoid from 'nanoid';
 
 // Components
-import Spring from './seasons/Spring';
-import Summer from './seasons/Summer';
-import Fall from './seasons/Fall';
-import Winter from './seasons/Winter';
+import Spring from './Spring';
+import Summer from './Summer';
+import Fall from './Fall';
+import Winter from './Winter';
 
 /**
  * TreesEverywhere `props` type

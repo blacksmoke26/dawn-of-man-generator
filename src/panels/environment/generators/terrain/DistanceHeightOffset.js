@@ -12,13 +12,13 @@ import { Card, Button, Form, Row, Col } from 'react-bootstrap';
 import nanoid from 'nanoid';
 
 // Components
-import UiSlider from './../../../components/UiSlider';
+import UiSlider from './../../../../components/UiSlider';
 
 // Utils
-import * as random from '../../../utils/random';
+import * as random from '../../../../utils/random';
 
 /**
- * SunAngleFactor `props` type
+ * DistanceHeightOffset `props` type
  * @type {Object}
  */
 type Props = {
@@ -26,25 +26,25 @@ type Props = {
 };
 
 /**
- * SunAngleFactor `state` type
+ * DistanceHeightOffset `state` type
  * @type {Object}
  */
 type State = {
-	angle: number,
+	distance: number,
 	enable: boolean,
 };
 
 const fraction: number = 2;
 
 /**
- * SunAngleFactor component class
+ * DistanceHeightOffset component class
  */
-export class SunAngleFactor extends React.Component<Props, State> {
+export class DistanceHeightOffset extends React.Component<Props, State> {
 	/**
 	 * @inheritDoc
 	 */
 	state: State = {
-		angle: random.randomFrequency(fraction),
+		distance: random.randomFrequency(fraction),
 		enable: true,
 	};
 	
@@ -55,7 +55,7 @@ export class SunAngleFactor extends React.Component<Props, State> {
 		const {onChange} = this.props;
 		setTimeout(() => {
 			typeof onChange === 'function'
-			&& onChange(this.toTemplateText(), this.getValues());
+				&& onChange(this.toTemplateText(), this.getValues());
 		}, 300);
 	}
 	
@@ -74,20 +74,20 @@ export class SunAngleFactor extends React.Component<Props, State> {
 	}
 	
 	toTemplateText (): string {
-		const { angle, enable } = this.state;
-		return enable ? `<sun_angle_factor value="${angle}"/>` : '';
+		const { distance, enable } = this.state;
+		return enable ? `<distance_height_offset value="${distance}"/>` : '';
 	}
 	
 	getValues (): {[string]: number} {
-		const { angle } = this.state;
-		return { angle: angle };
+		const { distance } = this.state;
+		return { distance };
 	}
 	
 	/**
 	 * @inheritDoc
 	 */
 	render () {
-		const { angle, enable } = this.state;
+		const { distance, enable } = this.state;
 		
 		return (
 			<>
@@ -95,15 +95,15 @@ export class SunAngleFactor extends React.Component<Props, State> {
 					<Card.Body>
 						<Row className="mb-1">
 							<Col xs="10">
-								Sun Angle Factor <code className="pl-2 text-size-xs">{angle}</code>
+								Distance Height Offset <code className="pl-2 text-size-xs">{distance}</code>
 								<Button disabled={!enable} className="button-reset-sm" variant="link"
-									onClick={() => this.setState({angle: random.randomFrequency(fraction)})}>
+									onClick={() => this.setState({distance: random.randomFrequency(fraction)})}>
 									Random
 								</Button>
 								<Button disabled={!enable} className="button-reset-sm" variant="link"
-									onClick={() => this.setState({angle: 0})}>Reset</Button>
+									onClick={() => this.setState({distance: 0})}>Reset</Button>
 								<div className="text-size-xxs text-muted mt-1">
-									How high is the sun in the sky, 1.0 is the default.
+									How much bigger are mountains at the edge of map.
 								</div>
 							</Col>
 							<Col xs="2" className="text-right">
@@ -117,7 +117,7 @@ export class SunAngleFactor extends React.Component<Props, State> {
 								/>
 							</Col>
 						</Row>
-						<UiSlider disabled={!enable} value={Number(angle)} onChange={v => this.setState({angle: v})}/>
+						<UiSlider disabled={!enable} value={Number(distance)} onChange={v => this.setState({distance: v})}/>
 					</Card.Body>
 				</Card>
 			</>
@@ -126,13 +126,13 @@ export class SunAngleFactor extends React.Component<Props, State> {
 }
 
 // Properties validation
-SunAngleFactor.defaultProps = {
+DistanceHeightOffset.defaultProps = {
 	onChange: () => {},
 };
 
 // Default properties
-SunAngleFactor.propTypes = {
+DistanceHeightOffset.propTypes = {
 	onChange: PropTypes.func,
 };
 
-export default SunAngleFactor;
+export default DistanceHeightOffset;

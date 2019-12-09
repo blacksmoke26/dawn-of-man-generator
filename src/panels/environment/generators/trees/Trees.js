@@ -12,13 +12,14 @@ import { Card, Button, Form, Row, Col } from 'react-bootstrap';
 import nanoid from 'nanoid';
 
 // Utils
-import * as random from '../../../utils/random';
+import * as random from '../../../../utils/random';
 
 /**
  * Trees `props` type
  * @type {Object}
  */
 type Props = {
+	enable: boolean,
 	onChange ( template: string, values?: {[string]: any} ): void,
 };
 
@@ -38,10 +39,13 @@ export class Trees extends React.Component<Props, State> {
 	/**
 	 * @inheritDoc
 	 */
-	state: State = {
-		trees: random.randomTrees(),
-		enable: true,
-	};
+	constructor ( props: Props ) {
+		super(props);
+		this.state = {
+			trees: random.randomTrees(),
+			enable: props.enable,
+		};
+	}
 	
 	/**
 	 * @inheritDoc
@@ -58,13 +62,17 @@ export class Trees extends React.Component<Props, State> {
 	 * @inheritDoc
 	 */
 	componentDidUpdate ( prevProps: Readonly<P>, prevState: Readonly<S>, snapshot: SS ): void {
+		const {enabled, onChange} = this.props;
+		
 		if ( JSON.stringify(this.state) !== JSON.stringify(prevState) ) {
-			const {onChange} = this.props;
-			
 			setTimeout(() => {
 				typeof onChange === 'function'
 				&& onChange(this.toTemplateText(), this.getValues());
 			}, 300);
+		}
+		
+		if ( enabled !== prevProps.enabled ) {
+			this.setState({enabled});
 		}
 	}
 	
@@ -81,7 +89,7 @@ export class Trees extends React.Component<Props, State> {
 	
 	getValues (): {[string]: number} {
 		const { trees } = this.state;
-		return { trees: trees };
+		return { trees };
 	}
 	
 	/**
@@ -89,7 +97,7 @@ export class Trees extends React.Component<Props, State> {
 	 */
 	render () {
 		const { trees, enable } = this.state;
-		const depositVal: string = trees.join(' ').trim();
+		const allTrees: string = trees.join(' ').trim();
 		
 		return (
 			<>
@@ -97,7 +105,7 @@ export class Trees extends React.Component<Props, State> {
 					<Card.Body>
 						<Row className="mb-1">
 							<Col xs="10">
-								Trees <code className="pl-2 text-size-xs">{!depositVal ? '<None>' : depositVal}</code>
+								Present Trees <code className="pl-2 text-size-xs">{!allTrees ? '<None>' : allTrees}</code>
 								<Button disabled={!enable} className="button-reset-sm" variant="link"
 									onClick={() => this.setState({trees: random.randomTrees()})}>
 									Random
@@ -114,7 +122,7 @@ export class Trees extends React.Component<Props, State> {
 								<Form.Check
 									className="pull-right"
 									type="switch"
-									id={`trees-switch-${nanoid(5)}`}
+									id={`trees-present-switch-${nanoid(5)}`}
 									label=""
 									checked={enable}
 									onChange={e => this.setState({enable: Boolean(e.target.checked)})}
@@ -149,11 +157,13 @@ export class Trees extends React.Component<Props, State> {
 
 // Properties validation
 Trees.defaultProps = {
+	enable: false,
 	onChange: () => {},
 };
 
 // Default properties
 Trees.propTypes = {
+	enable: PropTypes.bool,
 	onChange: PropTypes.func,
 };
 

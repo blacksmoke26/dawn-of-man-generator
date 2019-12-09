@@ -11,14 +11,11 @@ import * as PropTypes from 'prop-types';
 import { Card, Button, Form, Row, Col } from 'react-bootstrap';
 import nanoid from 'nanoid';
 
-// Components
-import UiSlider from './../../../components/UiSlider';
-
 // Utils
-import * as random from '../../../utils/random';
+import * as random from '../../../../utils/random';
 
 /**
- * DistanceHeightOffset `props` type
+ * TreesEverywhere `props` type
  * @type {Object}
  */
 type Props = {
@@ -26,25 +23,23 @@ type Props = {
 };
 
 /**
- * DistanceHeightOffset `state` type
+ * TreesEverywhere `state` type
  * @type {Object}
  */
 type State = {
-	distance: number,
+	trees: boolean,
 	enable: boolean,
 };
 
-const fraction: number = 2;
-
 /**
- * DistanceHeightOffset component class
+ * TreesEverywhere component class
  */
-export class DistanceHeightOffset extends React.Component<Props, State> {
+export class TreesEverywhere extends React.Component<Props, State> {
 	/**
 	 * @inheritDoc
 	 */
 	state: State = {
-		distance: random.randomFrequency(fraction),
+		trees: random.randomRiver(),
 		enable: true,
 	};
 	
@@ -55,7 +50,7 @@ export class DistanceHeightOffset extends React.Component<Props, State> {
 		const {onChange} = this.props;
 		setTimeout(() => {
 			typeof onChange === 'function'
-				&& onChange(this.toTemplateText(), this.getValues());
+			&& onChange(this.toTemplateText(), this.getValues());
 		}, 300);
 	}
 	
@@ -74,20 +69,20 @@ export class DistanceHeightOffset extends React.Component<Props, State> {
 	}
 	
 	toTemplateText (): string {
-		const { distance, enable } = this.state;
-		return enable ? `<distance_height_offset value="${distance}"/>` : '';
+		const { trees, enable } = this.state;
+		return enable ? `<trees_everywhere value="${trees ? 'true' : 'false'}"/>` : '';
 	}
 	
 	getValues (): {[string]: number} {
-		const { distance } = this.state;
-		return { distance };
+		const { trees } = this.state;
+		return { trees: trees };
 	}
 	
 	/**
 	 * @inheritDoc
 	 */
 	render () {
-		const { distance, enable } = this.state;
+		const { trees, enable } = this.state;
 		
 		return (
 			<>
@@ -95,29 +90,34 @@ export class DistanceHeightOffset extends React.Component<Props, State> {
 					<Card.Body>
 						<Row className="mb-1">
 							<Col xs="10">
-								Distance Height Offset <code className="pl-2 text-size-xs">{distance}</code>
+								Trees Everywhere <code className="pl-2 text-size-xs">{trees ? '<True>' : '<False>'}</code>
 								<Button disabled={!enable} className="button-reset-sm" variant="link"
-									onClick={() => this.setState({distance: random.randomFrequency(fraction)})}>
+									onClick={() => this.setState({trees: random.randomRiver()})}>
 									Random
 								</Button>
 								<Button disabled={!enable} className="button-reset-sm" variant="link"
-									onClick={() => this.setState({distance: 0})}>Reset</Button>
-								<div className="text-size-xxs text-muted mt-1">
-									How much bigger are mountains at the edge of map.
-								</div>
+									onClick={() => this.setState({trees: false})}>None</Button>
 							</Col>
 							<Col xs="2" className="text-right">
 								<Form.Check
 									className="pull-right"
 									type="switch"
-									id={`river-switch-${nanoid(5)}`}
+									id={`trees_everywhere-switch-${nanoid(5)}`}
 									label=""
 									checked={enable}
 									onChange={e => this.setState({enable: Boolean(e.target.checked)})}
 								/>
 							</Col>
 						</Row>
-						<UiSlider disabled={!enable} value={Number(distance)} onChange={v => this.setState({distance: v})}/>
+						<Form.Check
+							custom
+							className="pull-right"
+							disabled={!enable}
+							id={`trees_everywhere-${nanoid(5)}`}
+							label="Show everywhere?"
+							checked={trees}
+							onChange={e => this.setState({trees: Boolean(e.target.checked)})}
+						/>
 					</Card.Body>
 				</Card>
 			</>
@@ -126,13 +126,13 @@ export class DistanceHeightOffset extends React.Component<Props, State> {
 }
 
 // Properties validation
-DistanceHeightOffset.defaultProps = {
+TreesEverywhere.defaultProps = {
 	onChange: () => {},
 };
 
 // Default properties
-DistanceHeightOffset.propTypes = {
+TreesEverywhere.propTypes = {
 	onChange: PropTypes.func,
 };
 
-export default DistanceHeightOffset;
+export default TreesEverywhere;

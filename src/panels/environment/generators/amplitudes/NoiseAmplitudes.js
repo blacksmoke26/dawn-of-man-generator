@@ -11,10 +11,10 @@ import * as PropTypes from 'prop-types';
 import { Button, ButtonGroup } from 'react-bootstrap';
 
 // Components
-import UiSlider from './../../../components/UiSlider';
+import UiSlider from './../../../../components/UiSlider';
 
 // Utils
-import * as random from '../../../utils/random';
+import * as random from '../../../../utils/random';
 
 /**
  * NoiseAmplitudes `props` type

@@ -11,11 +11,14 @@ import * as PropTypes from 'prop-types';
 import { Card, Button, Form, Row, Col } from 'react-bootstrap';
 import nanoid from 'nanoid';
 
+// Components
+import UiSlider from './../../../../components/UiSlider';
+
 // Utils
-import * as random from '../../../utils/random';
+import * as random from '../../../../utils/random';
 
 /**
- * TreesEverywhere `props` type
+ * SunAngleFactor `props` type
  * @type {Object}
  */
 type Props = {
@@ -23,23 +26,25 @@ type Props = {
 };
 
 /**
- * TreesEverywhere `state` type
+ * SunAngleFactor `state` type
  * @type {Object}
  */
 type State = {
-	trees: boolean,
+	angle: number,
 	enable: boolean,
 };
 
+const fraction: number = 2;
+
 /**
- * TreesEverywhere component class
+ * SunAngleFactor component class
  */
-export class TreesEverywhere extends React.Component<Props, State> {
+export class SunAngleFactor extends React.Component<Props, State> {
 	/**
 	 * @inheritDoc
 	 */
 	state: State = {
-		trees: random.randomRiver(),
+		angle: random.randomFrequency(fraction),
 		enable: true,
 	};
 	
@@ -69,20 +74,20 @@ export class TreesEverywhere extends React.Component<Props, State> {
 	}
 	
 	toTemplateText (): string {
-		const { trees, enable } = this.state;
-		return enable ? `<trees_everywhere value="${trees ? 'true' : 'false'}"/>` : '';
+		const { angle, enable } = this.state;
+		return enable ? `<sun_angle_factor value="${angle}"/>` : '';
 	}
 	
 	getValues (): {[string]: number} {
-		const { trees } = this.state;
-		return { trees: trees };
+		const { angle } = this.state;
+		return { angle: angle };
 	}
 	
 	/**
 	 * @inheritDoc
 	 */
 	render () {
-		const { trees, enable } = this.state;
+		const { angle, enable } = this.state;
 		
 		return (
 			<>
@@ -90,34 +95,29 @@ export class TreesEverywhere extends React.Component<Props, State> {
 					<Card.Body>
 						<Row className="mb-1">
 							<Col xs="10">
-								Trees Everywhere <code className="pl-2 text-size-xs">{trees ? '<True>' : '<False>'}</code>
+								Sun Angle Factor <code className="pl-2 text-size-xs">{angle}</code>
 								<Button disabled={!enable} className="button-reset-sm" variant="link"
-									onClick={() => this.setState({trees: random.randomRiver()})}>
+									onClick={() => this.setState({angle: random.randomFrequency(fraction)})}>
 									Random
 								</Button>
 								<Button disabled={!enable} className="button-reset-sm" variant="link"
-									onClick={() => this.setState({trees: false})}>None</Button>
+									onClick={() => this.setState({angle: 0})}>Reset</Button>
+								<div className="text-size-xxs text-muted mt-1">
+									How high is the sun in the sky, 1.0 is the default.
+								</div>
 							</Col>
 							<Col xs="2" className="text-right">
 								<Form.Check
 									className="pull-right"
 									type="switch"
-									id={`trees_everywhere-switch-${nanoid(5)}`}
+									id={`river-switch-${nanoid(5)}`}
 									label=""
 									checked={enable}
 									onChange={e => this.setState({enable: Boolean(e.target.checked)})}
 								/>
 							</Col>
 						</Row>
-						<Form.Check
-							custom
-							className="pull-right"
-							disabled={!enable}
-							id={`trees_everywhere-${nanoid(5)}`}
-							label="Show everywhere?"
-							checked={trees}
-							onChange={e => this.setState({trees: Boolean(e.target.checked)})}
-						/>
+						<UiSlider disabled={!enable} value={Number(angle)} onChange={v => this.setState({angle: v})}/>
 					</Card.Body>
 				</Card>
 			</>
@@ -126,13 +126,13 @@ export class TreesEverywhere extends React.Component<Props, State> {
 }
 
 // Properties validation
-TreesEverywhere.defaultProps = {
+SunAngleFactor.defaultProps = {
 	onChange: () => {},
 };
 
 // Default properties
-TreesEverywhere.propTypes = {
+SunAngleFactor.propTypes = {
 	onChange: PropTypes.func,
 };
 
-export default TreesEverywhere;
+export default SunAngleFactor;

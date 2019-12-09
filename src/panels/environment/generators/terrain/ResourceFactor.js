@@ -13,7 +13,7 @@ import nanoid from 'nanoid';
 import randomInt from 'random-int';
 
 // Components
-import UiSlider from './../../../components/UiSlider';
+import UiSlider from './../../../../components/UiSlider';
 
 const randomize: () => number = (): number => randomInt(0, 100);
 

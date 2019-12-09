@@ -11,11 +11,14 @@ import * as PropTypes from 'prop-types';
 import { Card, Button, Form, Row, Col } from 'react-bootstrap';
 import nanoid from 'nanoid';
 
+// Components
+import UiSlider from './../../../../components/UiSlider';
+
 // Utils
-import * as random from '../../../utils/random';
+import * as random from '../../../../utils/random';
 
 /**
- * Deposits `props` type
+ * FordDistanceFactor `props` type
  * @type {Object}
  */
 type Props = {
@@ -23,23 +26,25 @@ type Props = {
 };
 
 /**
- * Deposits `state` type
+ * FordDistanceFactor `state` type
  * @type {Object}
  */
 type State = {
-	deposits: Array<string>,
+	distance: number,
 	enable: boolean,
 };
 
+const fraction: number = 2;
+
 /**
- * Deposits component class
+ * FordDistanceFactor component class
  */
-export class Deposits extends React.Component<Props, State> {
+export class FordDistanceFactor extends React.Component<Props, State> {
 	/**
 	 * @inheritDoc
 	 */
 	state: State = {
-		deposits: random.randomDeposits(),
+		distance: random.randomFrequency(fraction),
 		enable: true,
 	};
 	
@@ -69,27 +74,20 @@ export class Deposits extends React.Component<Props, State> {
 	}
 	
 	toTemplateText (): string {
-		const { deposits, enable } = this.state;
-		const val: string = deposits.join(' ').trim();
-		
-		if ( !val ) {
-			return '';
-		}
-		
-		return enable ? `<deposits values="${deposits.join(' ')}"/>` : '';
+		const { distance, enable } = this.state;
+		return enable ? `<ford_distance_factor value="${distance}"/>` : '';
 	}
 	
 	getValues (): {[string]: number} {
-		const { deposits } = this.state;
-		return { deposits: deposits };
+		const { distance } = this.state;
+		return { distance };
 	}
 	
 	/**
 	 * @inheritDoc
 	 */
 	render () {
-		const { deposits, enable } = this.state;
-		const depositVal: string = deposits.join(' ').trim();
+		const { distance, enable } = this.state;
 		
 		return (
 			<>
@@ -97,49 +95,29 @@ export class Deposits extends React.Component<Props, State> {
 					<Card.Body>
 						<Row className="mb-1">
 							<Col xs="10">
-								Deposits <code className="pl-2 text-size-xs">{!depositVal ? '<None>' : depositVal}</code>
+								Ford Distance Factor <code className="pl-2 text-size-xs">{distance}</code>
 								<Button disabled={!enable} className="button-reset-sm" variant="link"
-									onClick={() => this.setState({deposits: random.randomDeposits()})}>
+									onClick={() => this.setState({distance: random.randomFrequency(fraction)})}>
 									Random
 								</Button>
 								<Button disabled={!enable} className="button-reset-sm" variant="link"
-									onClick={() => this.setState({deposits: [...random.deposits]})}>All</Button>
-								<Button disabled={!enable} className="button-reset-sm" variant="link"
-									onClick={() => this.setState({deposits: []})}>None</Button>
+									onClick={() => this.setState({distance: 0})}>Reset</Button>
 								<div className="text-size-xxs text-muted mt-1">
-									What types of deposit are present in the level.
+									The average distance between river fords, 1.0 is the default.
 								</div>
 							</Col>
 							<Col xs="2" className="text-right">
 								<Form.Check
 									className="pull-right"
 									type="switch"
-									id={`deposit-switch-${nanoid(5)}`}
+									id={`river-switch-${nanoid(5)}`}
 									label=""
 									checked={enable}
 									onChange={e => this.setState({enable: Boolean(e.target.checked)})}
 								/>
 							</Col>
 						</Row>
-						<ul className="list-unstyled list-inline mb-0">
-							{random.deposits.map(v => (
-								<li key={v} className="list-inline-item">
-									<Form.Check
-										disabled={!enable}
-										custom
-										data-value={v}
-										checked={deposits.findIndex(val => v === val) !== -1}
-										id={`deposit_${v}`}
-										label={v}
-										onChange={(e: Event) => {
-											const list = deposits.filter(val => val !== e.target.getAttribute('data-value'));
-											e.target.checked && list.push(v);
-											this.setState({deposits: [...list]});
-										}}
-									/>
-								</li>
-							))}
-						</ul>
+						<UiSlider disabled={!enable} value={Number(distance)} onChange={v => this.setState({distance: v})}/>
 					</Card.Body>
 				</Card>
 			</>
@@ -148,13 +126,13 @@ export class Deposits extends React.Component<Props, State> {
 }
 
 // Properties validation
-Deposits.defaultProps = {
+FordDistanceFactor.defaultProps = {
 	onChange: () => {},
 };
 
 // Default properties
-Deposits.propTypes = {
+FordDistanceFactor.propTypes = {
 	onChange: PropTypes.func,
 };
 
-export default Deposits;
+export default FordDistanceFactor;
