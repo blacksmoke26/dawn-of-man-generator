@@ -10,7 +10,7 @@ import React from 'react';
 import * as PropTypes from 'prop-types';
 import { Card, Button, Form, Accordion, Row, Col } from 'react-bootstrap';
 import Select from 'react-select';
-import nanoid from 'nanoid';
+import { nanoid } from 'nanoid';
 import randomInt from 'random-int';
 import { Range } from 'rc-slider';
 

@@ -105,7 +105,7 @@ class EnvironmentContainer extends React.Component<Props, State> {
 							}}>
 								<a href="https://steamcommunity.com/sharedfiles/filedetails/?id=2087224377"
 									title="This guide explains how the <noise_amplitude> element works in Environment configuration files. It will help build your intuition for how amplitudes influence one another so you can more quickly achieve the results you're looking for."
-									target="_blank">
+									target="_blank" rel="noopener noreferrer">
 									Understanding Amplitudes in Environment
 								</a>
 							</span>

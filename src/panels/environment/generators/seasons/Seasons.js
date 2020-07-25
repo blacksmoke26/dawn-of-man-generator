@@ -9,7 +9,7 @@
 import React from 'react';
 import * as PropTypes from 'prop-types';
 import { Card, Button, Form, Accordion } from 'react-bootstrap';
-import nanoid from 'nanoid';
+import { nanoid } from 'nanoid';
 
 // Components
 import Spring from './Spring';

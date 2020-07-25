@@ -1,9 +1,10 @@
 // @flow
 
-import React, { useState, useCallback, useEffect} from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import * as PropTypes from 'prop-types';
 import { ButtonGroup, Button, Tabs, Tab, Card } from 'react-bootstrap';
-import generate from 'nanoid/generate';
+import { customAlphabet } from 'nanoid';
+
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { githubGist } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import xmlFormatter from 'xml-formatter';
@@ -21,9 +22,7 @@ const LOCATIONS_MAX_COUNT: number = 9;
  * LocationContainer `props` type
  * @type {Object}
  */
-type Props = {
-
-};
+type Props = {};
 
 const TabContentWrapper = ( props: Object ): Node => {
 	return (
@@ -47,7 +46,7 @@ const LocationContainer = ( props: Props ): Node => {
 	const [loading, setLoading] = useState(false);
 	
 	const addNewLocation = useCallback(() => {
-		const id: string = generate('1234567890abcdefghijklmnopqrstuvwxyz', 5);
+		const id: string = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyz', 5);
 		setLocations({...locations, [id]: ''});
 		setActiveKey(id);
 		

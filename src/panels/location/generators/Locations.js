@@ -10,7 +10,7 @@ import React from 'react';
 import * as PropTypes from 'prop-types';
 import { Form, Row, Col, Button, ButtonGroup, InputGroup } from 'react-bootstrap';
 import slugify from 'slugify';
-import nanoid from 'nanoid';
+import { nanoid } from 'nanoid';
 
 // Types
 import type { Node } from 'react';

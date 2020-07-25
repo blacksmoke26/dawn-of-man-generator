@@ -16,7 +16,7 @@ import faker from 'faker';
 
 // Components
 import UiSlider  from './../../../../components/UiSlider';
-import nanoid from 'nanoid';
+import { nanoid } from 'nanoid';
 
 const randFloat: ( fraction?: number ) => number
 	= ( fraction: number = 2 ): number => randomFloat(0, 1).toFixed(fraction);
