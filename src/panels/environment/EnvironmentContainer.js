@@ -96,10 +96,19 @@ class EnvironmentContainer extends React.Component<Props, State> {
 			<>
 				<Accordion defaultActiveKey="environment_noise_amplitudes">
 					<Card>
-						<Card.Header className="pt-1 pb-1 pl-2 pl-2">
+						<Card.Header className="pt-1 pb-1 pl-2 pl-2 position-relative">
 							<Accordion.Toggle as={Button} variant="link" eventKey="environment_noise_amplitudes">
 								Noise Amplitudes
 							</Accordion.Toggle>
+							<span style={{
+								position: 'absolute', right: '1.2rem', top: '.8rem', fontSize: '.76rem',
+							}}>
+								<a href="https://steamcommunity.com/sharedfiles/filedetails/?id=2087224377"
+									title="This guide explains how the <noise_amplitude> element works in Environment configuration files. It will help build your intuition for how amplitudes influence one another so you can more quickly achieve the results you're looking for."
+									target="_blank">
+									Understanding Amplitudes in Environment
+								</a>
+							</span>
 						</Card.Header>
 						<Accordion.Collapse eventKey="environment_noise_amplitudes">
 							<Card.Body>
