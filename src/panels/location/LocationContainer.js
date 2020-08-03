@@ -16,6 +16,8 @@ import Locations from './generators/Locations';
 // Types
 import type { Node } from 'react';
 
+const randAlpha: Function = customAlphabet('abcdefghijklmnopqrstuvwxyz', 5);
+
 const LOCATIONS_MAX_COUNT: number = 9;
 
 /**
@@ -46,10 +48,9 @@ const LocationContainer = ( props: Props ): Node => {
 	const [loading, setLoading] = useState(false);
 	
 	const addNewLocation = useCallback(() => {
-		const id: string = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyz', 5);
+		const id: string = randAlpha();
 		setLocations({...locations, [id]: ''});
 		setActiveKey(id);
-		
 	}, [locations, setLocations, setActiveKey]);
 	
 	useEffect(() => {
