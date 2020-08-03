@@ -3,6 +3,9 @@
  * @link http://junaidatari.com Author Website
  * @since 2019-11-07
  */
+.card-header-tabs {
+	margin-bottom: -1rem;
+}
 
 .text-size-sm {
 	font-size: .89rem;
