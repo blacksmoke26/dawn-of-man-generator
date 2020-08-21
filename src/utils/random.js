@@ -78,6 +78,15 @@ export function randomHumidity (): [number, number] {
 	];
 }
 
+/** Random backdrop Scale */
+export function randomBackdropScale (): [number, number, number] {
+	return [
+		Number(randomFloat(0, 1)).toFixed(2),
+		Number(randomFloat(0, 1)).toFixed(2),
+		Number(randomFloat(0, 1)).toFixed(2),
+	];
+}
+
 /** Random Altitude */
 export function randomAltitude (): [number, number] {
 	return [
