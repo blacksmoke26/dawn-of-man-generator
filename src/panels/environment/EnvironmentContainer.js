@@ -24,6 +24,8 @@ import SunAngleFactor from './generators/terrain/SunAngleFactor';
 import ResourceFactor from './generators/terrain/ResourceFactor';
 import TreesPanel from './generators/trees/TreesPanel';
 import DepositPanel from './generators/deposit/DepositPanel';
+import DetailPanel from './generators/detail/DetailPanel';
+import PropPanel from './generators/prop/PropPanel';
 import Seasons from './generators/seasons/Seasons';
 
 /**
@@ -46,6 +48,8 @@ type State = {
 	deposits: string,
 	trees: string,
 	seasons: string,
+	detail: string,
+	props: string,
 };
 
 /**
@@ -61,6 +65,8 @@ class EnvironmentContainer extends React.Component<Props, State> {
 		deposits: '',
 		trees: '',
 		seasons: '',
+		detail: '',
+		props: '',
 	};
 	
 	toTemplate (): string {
@@ -68,7 +74,7 @@ class EnvironmentContainer extends React.Component<Props, State> {
 			noiseAmplitudes, distanceHeightOffset,
 			fordDistanceFactor, sunAngleFactor,
 			resourceFactor, deposits, trees,
-			seasons,
+			seasons, detail, props,
 		} = this.state;
 		
 		const xml: string = [
@@ -80,6 +86,8 @@ class EnvironmentContainer extends React.Component<Props, State> {
 			fordDistanceFactor,
 			sunAngleFactor,
 			deposits,
+			detail,
+			props,
 			trees,
 			seasons,
 			'</environment>',
@@ -140,6 +148,30 @@ class EnvironmentContainer extends React.Component<Props, State> {
 						<Accordion.Collapse eventKey="environment_terrain_deposit">
 							<Card.Body>
 								<DepositPanel onChange={( v: string ) => this.setState({deposits: v})}/>
+							</Card.Body>
+						</Accordion.Collapse>
+					</Card>
+					<Card>
+						<Card.Header className="pt-1 pb-1 pl-2 pl-2">
+							<Accordion.Toggle as={Button} variant="link" eventKey="environment_terrain_detail">
+								Detail (Terrain)
+							</Accordion.Toggle>
+						</Card.Header>
+						<Accordion.Collapse eventKey="environment_terrain_detail">
+							<Card.Body>
+								<DetailPanel onChange={( v: string ) => this.setState({detail: v})}/>
+							</Card.Body>
+						</Accordion.Collapse>
+					</Card>
+					<Card>
+						<Card.Header className="pt-1 pb-1 pl-2 pl-2">
+							<Accordion.Toggle as={Button} variant="link" eventKey="environment_terrain_props">
+								Props (Terrain)
+							</Accordion.Toggle>
+						</Card.Header>
+						<Accordion.Collapse eventKey="environment_terrain_props">
+							<Card.Body>
+								<PropPanel onChange={( v: string ) => this.setState({props: v})}/>
 							</Card.Body>
 						</Accordion.Collapse>
 					</Card>
