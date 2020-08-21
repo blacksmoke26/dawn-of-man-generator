@@ -10,6 +10,7 @@ import React from 'react';
 import * as PropTypes from 'prop-types';
 import { Card, Button, Form, Row, Col } from 'react-bootstrap';
 import { nanoid } from 'nanoid';
+import cn from 'classname';
 
 // Components
 import UiSlider from './../../../../components/UiSlider';
@@ -51,7 +52,7 @@ export class BackdropScale extends React.Component<Props, State> {
 	 */
 	state: State = {
 		...defaultValues,
-		enable: true,
+		enable: false,
 	};
 	
 	/**
@@ -100,7 +101,7 @@ export class BackdropScale extends React.Component<Props, State> {
 				<Card className="mb-2">
 					<Card.Body>
 						<Row className="mb-1">
-							<Col xs="10">
+							<Col xs="10" className={cn({'text-muted': !enable})}>
 								Backdrop Scale <code className="pl-2 text-size-xs">{angle1}, {angle2}, {angle3}</code>
 								<Button disabled={!enable} className="button-reset-sm" variant="link"
 									onClick={() => {
