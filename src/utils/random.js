@@ -26,11 +26,25 @@ export const deposits: Array<string> = [
 	'Flint', 'Tin', 'Copper', 'Iron',
 ];
 
+/** Props types */
+export const props: Array<string> = [
+	'BigRocks', 'MediumRocks', 'Megalith',
+	'Flint', 'SmallRocks', 'RiverRocks',
+];
+
+/** Details types */
+export const details: Array<string> = [
+	'DetailGrass', 'DetailReeds', 'DetailFlowers',
+	'GroundPlant', 'DetailStick',
+];
+
 /** Trees types */
 export const trees: Array<string> = [
-	'Oak', 'Birch', 'Beech', 'Rye', 'Einkorn', 'Emmer', 'Flax', 'BitterVetch',
-	'Chickpeas', 'Lentils', 'Peas', 'Blackberry', 'Blueberry', 'Raspberry',
-	'Strawberry', 'Chestnut', 'Pear', 'Cherry', 'Service',
+	'Pear', 'Cherry', 'Service', 'Chestnut', 'Oak',
+	'Fir', 'Pine', 'Spruce', 'Beech', 'Birch',
+	'Barley', 'Rye', 'Einkorn', 'Emmer', 'Flax',
+	'BitterVetch', 'Chickpeas', 'Lentils', 'Peas', 'Blackberry',
+	'Blueberry', 'Raspberry', 'Strawberry',
 ];
 
 /** Random Frequency */
