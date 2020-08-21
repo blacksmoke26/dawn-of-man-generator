@@ -49,7 +49,7 @@ export class Seasons extends React.Component<Props, State> {
 		summer: '',
 		fall: '',
 		winter: '',
-		override: true,
+		override: false,
 	};
 	
 	/**
