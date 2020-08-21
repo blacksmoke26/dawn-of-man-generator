@@ -11,22 +11,14 @@ import * as PropTypes from 'prop-types';
 import { Card, Button, Form, Accordion, Row, Col } from 'react-bootstrap';
 import Select from 'react-select';
 import { nanoid } from 'nanoid';
-import randomInt from 'random-int';
-import randomFloat from 'random-float';
 import { Range } from 'rc-slider';
 
 // Components
 import UiSlider from './../../../../components/UiSlider';
 
 // Utils
-import * as random from '../../../../utils/random';
-
-const CONFIG_MIN_ALTITUDE: number = -20;
-const CONFIG_MAX_ALTITUDE: number = 100;
-const CONFIG_MIN_ANGLE: number = -10;
-const CONFIG_MAX_ANGLE: number = 90;
-const CONFIG_MIN_DENSITY: number = 0;
-const CONFIG_MAX_DENSITY: number = 1;
+import * as random from './../../../../utils/random';
+import * as Defaults from './../../../../utils/defaults';
 
 type TreeAttr = {
 	density_enabled?: boolean,
@@ -45,12 +37,12 @@ type TreeSelection = {
 
 const treeAttrDefaults: TreeAttr = {
 	density_enabled: false,
-	density: 1,
+	density: Defaults.DENSITY_DEFAULT,
 	angle_enabled: false,
-	min_angle: 40,
-	max_angle: 55,
-	min_altitude: 5,
-	max_altitude: 10,
+	min_angle: Defaults.ANGLE_MIN_DEFAULT,
+	max_angle: Defaults.ANGLE_MAX_DEFAULT,
+	min_altitude: Defaults.ALTITUDE_MIN_DEFAULT,
+	max_altitude: Defaults.ALTITUDE_MAX_DEFAULT,
 	_enabled: true,
 };
 
@@ -239,31 +231,25 @@ export class TreesOverride extends React.Component<Props, State> {
 										id={`tree_override_angle-switch-${nanoid(5)}`}
 										label="Density:"
 										checked={attr.density_enabled}
-										onChange={e => {
-											this.modifySelection(name, {
-												density_enabled: Boolean(e.target.checked),
-											});
-										}}
+										onChange={e => this.modifySelection(name, {density_enabled: Boolean(e.target.checked)})}
 									/>
 								</Form.Label>
 								<Col sm="10">
 									<span className="text-size-xs font-family-code">
 										Value: <code>{attr.density}</code>
 									</span>
-									<Button disabled={!enabled || !attr.density_enabled} className="button-reset-sm" variant="link"
-										onClick={() => this.modifySelection(name, {
-											density: randomFloat(CONFIG_MIN_DENSITY, CONFIG_MAX_DENSITY).toFixed(2),
-										})}>
+									<Button disabled={!enabled || !attr.density_enabled}
+										className="button-reset-sm" variant="link"
+										onClick={() => this.modifySelection(name, {density: random.randomDensity()})}>
 										Random
 									</Button>
-									<Button disabled={!enabled || !attr.density_enabled} className="button-reset-sm" variant="link"
-										onClick={() => {
-											this.modifySelection(name, {
-												density: 1,
-											})
-										}}>Reset</Button>
+									<Button disabled={!enabled || !attr.density_enabled}
+										className="button-reset-sm" variant="link"
+										onClick={() => this.modifySelection(name, {density: Defaults.DENSITY_DEFAULT})}>
+										Reset
+									</Button>
 									<UiSlider disabled={!enabled || !attr.density_enabled}
-										step={0.01} min={CONFIG_MIN_DENSITY} max={CONFIG_MAX_DENSITY}
+										step={0.01} min={Defaults.DENSITY_MIN} max={Defaults.DENSITY_MAX}
 										value={Number(attr.density)} onChange={v => this.modifySelection(name, {density: v})}/>
 								</Col>
 							</Form.Group>
@@ -275,11 +261,8 @@ export class TreesOverride extends React.Component<Props, State> {
 										type="switch"
 										id={`tree_override_angle-switch-${nanoid(5)}`}
 										label="Angle:"
-										checked={attr.angle_enabled} onChange={e => {
-										this.modifySelection(name, {
-											angle_enabled: Boolean(e.target.checked),
-										});
-									}}
+										checked={attr.angle_enabled}
+										onChange={e => this.modifySelection(name, {angle_enabled: Boolean(e.target.checked)})}
 									/>
 								</Form.Label>
 								<Col sm="10">
@@ -289,20 +272,22 @@ export class TreesOverride extends React.Component<Props, State> {
 											{' / '}
 										Max: <code>{attr.max_angle}</code>
 									</span>
-										<Button disabled={!enabled || !attr.angle_enabled} className="button-reset-sm" variant="link"
+										<Button disabled={!enabled || !attr.angle_enabled}
+											className="button-reset-sm" variant="link"
+											onClick={() => {
+												const [min_angle, max_angle] = random.randomAngle();
+												this.modifySelection(name, {min_angle, max_angle});
+											}}>Random</Button>
+										<Button disabled={!enabled || !attr.angle_enabled}
+											className="button-reset-sm" variant="link"
 											onClick={() => this.modifySelection(name, {
-												min_angle: randomInt(CONFIG_MIN_ANGLE, 40),
-												max_angle: randomInt(41, CONFIG_MAX_ANGLE),
-											})}>Random</Button>
-										<Button disabled={!enabled || !attr.angle_enabled} className="button-reset-sm" variant="link"
-											onClick={() => this.modifySelection(name, {
-												min_angle: treeAttrDefaults.min_angle,
-												max_angle: treeAttrDefaults.max_angle,
+												min_angle: Defaults.ANGLE_MIN_DEFAULT,
+												max_angle: Defaults.ANGLE_MAX_DEFAULT,
 											})}>Default</Button>
 									</div>
 									<Range
-										min={CONFIG_MIN_ANGLE}
-										max={CONFIG_MAX_ANGLE}
+										min={Defaults.ANGLE_MIN}
+										max={Defaults.ANGLE_MAX}
 										disabled={!enabled || !attr.angle_enabled}
 										value={[attr.min_angle, attr.max_angle]}
 										onChange={([min_angle, max_angle]) => {
@@ -322,19 +307,19 @@ export class TreesOverride extends React.Component<Props, State> {
 										Max: <code>{attr.max_altitude}</code>
 									</span>
 										<Button disabled={!enabled} className="button-reset-sm" variant="link"
-											onClick={() => this.modifySelection(name, {
-												min_altitude: randomInt(CONFIG_MIN_ALTITUDE, 10),
-												max_altitude: randomInt(11, CONFIG_MAX_ALTITUDE),
-											})}>Random</Button>
+											onClick={() => {
+												const [min_altitude, max_altitude] = random.randomAltitude();
+												this.modifySelection(name, {min_altitude, max_altitude});
+											}}>Random</Button>
 										<Button disabled={!enabled} className="button-reset-sm" variant="link"
 											onClick={() => this.modifySelection(name, {
-												min_altitude: treeAttrDefaults.min_altitude,
-												max_altitude: treeAttrDefaults.max_altitude,
+												min_altitude: Defaults.ALTITUDE_MIN_DEFAULT,
+												max_altitude: Defaults.ALTITUDE_MAX_DEFAULT,
 											})}>Default</Button>
 									</div>
 									<Range
-										min={CONFIG_MIN_ALTITUDE}
-										max={CONFIG_MAX_ALTITUDE}
+										min={Defaults.ALTITUDE_MIN}
+										max={Defaults.ALTITUDE_MAX}
 										disabled={!enabled}
 										value={[attr.min_altitude, attr.max_altitude]}
 										onChange={([min_altitude, max_altitude]) => {

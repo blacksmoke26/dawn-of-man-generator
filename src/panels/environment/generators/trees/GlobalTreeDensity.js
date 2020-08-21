@@ -10,13 +10,13 @@ import React from 'react';
 import * as PropTypes from 'prop-types';
 import { Card, Button, Form, Row, Col } from 'react-bootstrap';
 import { nanoid } from 'nanoid';
-import randomFloat from 'random-float';
 
 // Components
 import UiSlider from './../../../../components/UiSlider';
 
-const CONFIG_MIN_DENSITY: number = 0;
-const CONFIG_MAX_DENSITY: number = 1;
+// Utils
+import * as random from './../../../../utils/random';
+import * as Defaults from './../../../../utils/defaults';
 
 /**
  * GlobalTreeDensity `props` type
@@ -46,7 +46,7 @@ export class GlobalTreeDensity extends React.Component<Props, State> {
 	constructor ( props: Props ) {
 		super(props);
 		this.state = {
-			value: randomFloat(CONFIG_MIN_DENSITY, CONFIG_MAX_DENSITY).toFixed(2),
+			value: random.randomDensity(),
 			enable: props.enable,
 		};
 	}
@@ -111,24 +111,22 @@ export class GlobalTreeDensity extends React.Component<Props, State> {
 									type="switch"
 									id={`global_tree_density-switch-${nanoid(5)}`}
 									label="Global Tree Density"
-									onChange={e => {
-										this.setState({enable: Boolean(e.target.checked)})
-									}}
+									onChange={e => this.setState({enable: Boolean(e.target.checked)})}
 								/>
 							</Form.Label>
 							<Col sm="9">
-									<span className="text-size-xs font-family-code">
-										Value: <code>{value}</code>
-									</span>
+								<span className="text-size-xs font-family-code">
+									Value: <code>{value}</code>
+								</span>
 								<Button disabled={!enable} className="button-reset-sm" variant="link"
-									onClick={() => this.setState({
-										value: randomFloat(CONFIG_MIN_DENSITY, CONFIG_MAX_DENSITY).toFixed(2),
-									})}>
+									onClick={() => this.setState({value: random.randomDensity()})}>
 									Random
 								</Button>
 								<Button disabled={!enable} className="button-reset-sm" variant="link"
-									onClick={() => this.setState({value: 1})}>Reset</Button>
-								<UiSlider step={0.01} disabled={!enable} min={CONFIG_MIN_DENSITY} max={CONFIG_MAX_DENSITY}
+									onClick={() => this.setState({value: Defaults.DENSITY_DEFAULT})}>
+									Reset
+								</Button>
+								<UiSlider step={0.01} disabled={!enable} min={Defaults.DENSITY_MIN} max={Defaults.DENSITY_MAX}
 									value={Number(value)} onChange={v => this.setState({value: v})}/>
 							</Col>
 						</Form.Group>
