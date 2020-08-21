@@ -262,12 +262,9 @@ export class TreesOverride extends React.Component<Props, State> {
 												density: 1,
 											})
 										}}>Reset</Button>
-									<UiSlider disabled={!enabled || !attr.density_enabled} min={CONFIG_MIN_DENSITY} max={CONFIG_MAX_DENSITY}
-										value={Number(attr.density)} onChange={v => {
-										this.modifySelection(name, {
-											density: v,
-										})
-									}}/>
+									<UiSlider disabled={!enabled || !attr.density_enabled}
+										step={0.01} min={CONFIG_MIN_DENSITY} max={CONFIG_MAX_DENSITY}
+										value={Number(attr.density)} onChange={v => this.modifySelection(name, {density: v})}/>
 								</Col>
 							</Form.Group>
 							<Form.Group as={Row} className="mb-2">
