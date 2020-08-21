@@ -10,6 +10,7 @@ import React from 'react';
 import * as PropTypes from 'prop-types';
 import { Card, Button, Form, Accordion } from 'react-bootstrap';
 import { nanoid } from 'nanoid';
+import cn from 'classname';
 
 // Components
 import Spring from './Spring';
@@ -115,10 +116,10 @@ export class Seasons extends React.Component<Props, State> {
 						onChange={e => this.setState({override: Boolean(e.target.checked)})}
 					/>
 				</div>
-				<Accordion defaultActiveKey="seasons_spring">
+				<Accordion className={(cn({'text-muted': !override}))}>
 					<Card>
 						<Card.Header className="pt-1 pb-1 pl-2 pl-2">
-							<Accordion.Toggle as={Button} variant="link" eventKey="seasons_spring">
+							<Accordion.Toggle disabled={!override} as={Button} variant="link" eventKey="seasons_spring">
 								Spring
 							</Accordion.Toggle>
 						</Card.Header>
@@ -130,7 +131,7 @@ export class Seasons extends React.Component<Props, State> {
 					</Card>
 					<Card>
 						<Card.Header className="pt-1 pb-1 pl-2 pl-2">
-							<Accordion.Toggle as={Button} variant="link" eventKey="seasons_summer">
+							<Accordion.Toggle disabled={!override} as={Button} variant="link" eventKey="seasons_summer">
 								Summer
 							</Accordion.Toggle>
 						</Card.Header>
@@ -142,7 +143,7 @@ export class Seasons extends React.Component<Props, State> {
 					</Card>
 					<Card>
 						<Card.Header className="pt-1 pb-1 pl-2 pl-2">
-							<Accordion.Toggle as={Button} variant="link" eventKey="seasons_fall">
+							<Accordion.Toggle disabled={!override} as={Button} variant="link" eventKey="seasons_fall">
 								Fall
 							</Accordion.Toggle>
 						</Card.Header>
@@ -154,7 +155,7 @@ export class Seasons extends React.Component<Props, State> {
 					</Card>
 					<Card>
 						<Card.Header className="pt-1 pb-1 pl-2 pl-2">
-							<Accordion.Toggle as={Button} variant="link" eventKey="seasons_winter">
+							<Accordion.Toggle disabled={!override} as={Button} variant="link" eventKey="seasons_winter">
 								Winter
 							</Accordion.Toggle>
 						</Card.Header>
