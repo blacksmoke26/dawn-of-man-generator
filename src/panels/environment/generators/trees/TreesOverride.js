@@ -12,6 +12,7 @@ import { Card, Button, Form, Accordion, Row, Col } from 'react-bootstrap';
 import Select from 'react-select';
 import { nanoid } from 'nanoid';
 import randomInt from 'random-int';
+import randomFloat from 'random-float';
 import { Range } from 'rc-slider';
 
 // Components
@@ -24,8 +25,8 @@ const CONFIG_MIN_ALTITUDE: number = -20;
 const CONFIG_MAX_ALTITUDE: number = 100;
 const CONFIG_MIN_ANGLE: number = -10;
 const CONFIG_MAX_ANGLE: number = 90;
-const CONFIG_MIN_DENSITY: number = 1;
-const CONFIG_MAX_DENSITY: number = 100;
+const CONFIG_MIN_DENSITY: number = 0;
+const CONFIG_MAX_DENSITY: number = 1;
 
 type TreeAttr = {
 	density_enabled?: boolean,
@@ -251,7 +252,7 @@ export class TreesOverride extends React.Component<Props, State> {
 									</span>
 									<Button disabled={!enabled || !attr.density_enabled} className="button-reset-sm" variant="link"
 										onClick={() => this.modifySelection(name, {
-											density: randomInt(CONFIG_MIN_DENSITY, CONFIG_MAX_DENSITY),
+											density: randomFloat(CONFIG_MIN_DENSITY, CONFIG_MAX_DENSITY).toFixed(2),
 										})}>
 										Random
 									</Button>
@@ -261,7 +262,7 @@ export class TreesOverride extends React.Component<Props, State> {
 												density: 1,
 											})
 										}}>Reset</Button>
-									<UiSlider disabled={!enabled || !attr.density_enabled} steps={1} min={CONFIG_MIN_DENSITY} max={CONFIG_MAX_DENSITY}
+									<UiSlider disabled={!enabled || !attr.density_enabled} min={CONFIG_MIN_DENSITY} max={CONFIG_MAX_DENSITY}
 										value={Number(attr.density)} onChange={v => {
 										this.modifySelection(name, {
 											density: v,
