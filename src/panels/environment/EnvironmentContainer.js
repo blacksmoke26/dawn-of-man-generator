@@ -18,6 +18,7 @@ import type { Node } from 'react';
 
 // Components
 import NoiseAmplitudes from './generators/amplitudes/NoiseAmplitudes';
+import BackdropScale from './generators/terrain/BackdropScale';
 import DistanceHeightOffset from './generators/terrain/DistanceHeightOffset';
 import FordDistanceFactor from './generators/terrain/FordDistanceFactor';
 import SunAngleFactor from './generators/terrain/SunAngleFactor';
@@ -60,6 +61,7 @@ class EnvironmentContainer extends React.Component<Props, State> {
 		noiseAmplitudes: '',
 		distanceHeightOffset: '',
 		fordDistanceFactor: '',
+		backdropScale: '',
 		sunAngleFactor: '',
 		resourceFactor: '',
 		deposits: '',
@@ -72,7 +74,7 @@ class EnvironmentContainer extends React.Component<Props, State> {
 	toTemplate (): string {
 		const {
 			noiseAmplitudes, distanceHeightOffset,
-			fordDistanceFactor, sunAngleFactor,
+			fordDistanceFactor, sunAngleFactor, backdropScale,
 			resourceFactor, deposits, trees,
 			seasons, detail, props,
 		} = this.state;
@@ -84,6 +86,7 @@ class EnvironmentContainer extends React.Component<Props, State> {
 			resourceFactor,
 			distanceHeightOffset,
 			fordDistanceFactor,
+			backdropScale,
 			sunAngleFactor,
 			deposits,
 			detail,
@@ -136,6 +139,7 @@ class EnvironmentContainer extends React.Component<Props, State> {
 								<DistanceHeightOffset onChange={( v: string ) => this.setState({distanceHeightOffset: v})}/>
 								<FordDistanceFactor onChange={( v: string ) => this.setState({fordDistanceFactor: v})}/>
 								<SunAngleFactor onChange={( v: string ) => this.setState({sunAngleFactor: v})}/>
+								<BackdropScale onChange={( v: string ) => this.setState({backdropScale: v})}/>
 							</Card.Body>
 						</Accordion.Collapse>
 					</Card>
