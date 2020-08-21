@@ -14,15 +14,27 @@ import { nanoid } from 'nanoid';
 import randomInt from 'random-int';
 import { Range } from 'rc-slider';
 
+// Components
+import UiSlider from './../../../../components/UiSlider';
+
 // Utils
 import * as random from '../../../../utils/random';
 
-const CONFIG_MIN_ALTITUDE = -20;
-const CONFIG_MAX_ALTITUDE = 100;
+const CONFIG_MIN_ALTITUDE: number = -20;
+const CONFIG_MAX_ALTITUDE: number = 100;
+const CONFIG_MIN_ANGLE: number = -10;
+const CONFIG_MAX_ANGLE: number = 90;
+const CONFIG_MIN_DENSITY: number = 1;
+const CONFIG_MAX_DENSITY: number = 100;
 
 type TreeAttr = {
-	min_altitude: number,
-	max_altitude: number,
+	density_enabled?: boolean,
+	density?: number,
+	angle_enabled?: boolean,
+	min_angle?: number,
+	max_angle?: number,
+	min_altitude?: number,
+	max_altitude?: number,
 	_enabled: boolean,
 };
 
@@ -30,7 +42,12 @@ type TreeSelection = {
 	[string]: TreeAttr
 };
 
-const treeAttrDefaults: Object = {
+const treeAttrDefaults: TreeAttr = {
+	density_enabled: false,
+	density: 1,
+	angle_enabled: false,
+	min_angle: 40,
+	max_angle: 55,
 	min_altitude: 5,
 	max_altitude: 10,
 	_enabled: true,
@@ -106,9 +123,19 @@ export class TreesOverride extends React.Component<Props, State> {
 				continue;
 			}
 			
+			 const densityTpl: string = attr.density_enabled
+			 	? `<density value="${attr.density}" />`
+			 	: '';
+			
+			 const angleTpl: string = attr.angle_enabled
+			 	? `<min_angle value="${attr.min_angle}" /><max_angle value="${attr.max_angle}"/>`
+			 	: '';
+			
 			templateOverride.push(
 				'<tree_override_prototype>'
 				+ `<id value="${name}"/>`
+				+ densityTpl
+				+ angleTpl
 				+ `<min_altitude value="${attr.min_altitude}" />`
 				+ `<max_altitude value="${attr.max_altitude}"/>`
 				+ '</tree_override_prototype>'
@@ -204,24 +231,109 @@ export class TreesOverride extends React.Component<Props, State> {
 						<Card.Body className="pt-2 pb-2">
 							<Form.Group as={Row} className="mb-2">
 								<Form.Label className="text-size-sm" column={true} sm="2">
-									Altitude
+									<Form.Check
+										disabled={!override}
+										className="text-size-xs"
+										type="switch"
+										id={`tree_override_angle-switch-${nanoid(5)}`}
+										label="Density:"
+										checked={attr.density_enabled}
+										onChange={e => {
+											this.modifySelection(name, {
+												density_enabled: Boolean(e.target.checked),
+											});
+										}}
+									/>
 								</Form.Label>
 								<Col sm="10">
 									<span className="text-size-xs font-family-code">
+										Value: <code>{attr.density}</code>
+									</span>
+									<Button disabled={!enabled || !attr.density_enabled} className="button-reset-sm" variant="link"
+										onClick={() => this.modifySelection(name, {
+											density: randomInt(CONFIG_MIN_DENSITY, CONFIG_MAX_DENSITY),
+										})}>
+										Random
+									</Button>
+									<Button disabled={!enabled || !attr.density_enabled} className="button-reset-sm" variant="link"
+										onClick={() => {
+											this.modifySelection(name, {
+												density: 1,
+											})
+										}}>Reset</Button>
+									<UiSlider disabled={!enabled || !attr.density_enabled} steps={1} min={CONFIG_MIN_DENSITY} max={CONFIG_MAX_DENSITY}
+										value={Number(attr.density)} onChange={v => {
+										this.modifySelection(name, {
+											density: v,
+										})
+									}}/>
+								</Col>
+							</Form.Group>
+							<Form.Group as={Row} className="mb-2">
+								<Form.Label className="text-size-sm" column={true} sm="2">
+									<Form.Check
+										disabled={!override}
+										className="text-size-xs"
+										type="switch"
+										id={`tree_override_angle-switch-${nanoid(5)}`}
+										label="Angle:"
+										checked={attr.angle_enabled} onChange={e => {
+										this.modifySelection(name, {
+											angle_enabled: Boolean(e.target.checked),
+										});
+									}}
+									/>
+								</Form.Label>
+								<Col sm="10">
+									<div>
+										<span className="text-size-xs font-family-code">
+										Min: <code>{attr.min_angle}</code>
+											{' / '}
+										Max: <code>{attr.max_angle}</code>
+									</span>
+										<Button disabled={!enabled || !attr.angle_enabled} className="button-reset-sm" variant="link"
+											onClick={() => this.modifySelection(name, {
+												min_angle: randomInt(CONFIG_MIN_ANGLE, 40),
+												max_angle: randomInt(41, CONFIG_MAX_ANGLE),
+											})}>Random</Button>
+										<Button disabled={!enabled || !attr.angle_enabled} className="button-reset-sm" variant="link"
+											onClick={() => this.modifySelection(name, {
+												min_angle: treeAttrDefaults.min_angle,
+												max_angle: treeAttrDefaults.max_angle,
+											})}>Default</Button>
+									</div>
+									<Range
+										min={CONFIG_MIN_ANGLE}
+										max={CONFIG_MAX_ANGLE}
+										disabled={!enabled || !attr.angle_enabled}
+										value={[attr.min_angle, attr.max_angle]}
+										onChange={([min_angle, max_angle]) => {
+											this.modifySelection(name, {min_angle, max_angle});
+										}}/>
+								</Col>
+							</Form.Group>
+							<Form.Group as={Row} className="mb-2">
+								<Form.Label className="text-size-sm" column={true} sm="2">
+									Altitude
+								</Form.Label>
+								<Col sm="10">
+									<div>
+										<span className="text-size-xs font-family-code">
 										Min: <code>{attr.min_altitude}</code>
 											{' / '}
 										Max: <code>{attr.max_altitude}</code>
 									</span>
-									<Button disabled={!enabled} className="button-reset-sm" variant="link"
-										onClick={() => this.modifySelection(name, {
-											min_altitude: randomInt(CONFIG_MIN_ALTITUDE, 10),
-											max_altitude: randomInt(11, CONFIG_MAX_ALTITUDE),
-										})}>Random</Button>
-									<Button disabled={!enabled} className="button-reset-sm" variant="link"
-										onClick={() => this.modifySelection(name, {
-											min_altitude: treeAttrDefaults.min_altitude,
-											max_altitude: treeAttrDefaults.max_altitude,
-										})}>Default</Button>
+										<Button disabled={!enabled} className="button-reset-sm" variant="link"
+											onClick={() => this.modifySelection(name, {
+												min_altitude: randomInt(CONFIG_MIN_ALTITUDE, 10),
+												max_altitude: randomInt(11, CONFIG_MAX_ALTITUDE),
+											})}>Random</Button>
+										<Button disabled={!enabled} className="button-reset-sm" variant="link"
+											onClick={() => this.modifySelection(name, {
+												min_altitude: treeAttrDefaults.min_altitude,
+												max_altitude: treeAttrDefaults.max_altitude,
+											})}>Default</Button>
+									</div>
 									<Range
 										min={CONFIG_MIN_ALTITUDE}
 										max={CONFIG_MAX_ALTITUDE}
