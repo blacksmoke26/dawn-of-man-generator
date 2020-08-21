@@ -16,6 +16,7 @@ import type { Node } from 'react';
 import Trees from './Trees';
 import TreesEverywhere from './TreesEverywhere';
 import TreesOverride from './TreesOverride';
+import GlobalTreeDensity from './GlobalTreeDensity';
 
 /**
  * TreesPanel `props` type
@@ -43,6 +44,7 @@ class TreesPanel extends React.Component<Props, State> {
 	 * @inheritDoc
 	 */
 	state: State = {
+		globalTreeDensity: '',
 		treesEverywhere: '',
 		trees: '',
 		treesOverride: '',
@@ -75,19 +77,19 @@ class TreesPanel extends React.Component<Props, State> {
 	
 	toTemplateText (): string {
 		const {
-			trees, treesEverywhere,
-			treesOverride,
+			treesOverride, trees,
+			treesEverywhere, globalTreeDensity,
 		} = this.state;
 		
 		return [
-			trees, treesEverywhere,
-			treesOverride,
+			treesOverride, trees,
+			globalTreeDensity, treesEverywhere,
 		].join('');
 	}
 	
 	getValues (): {[string]: number} {
-		const { trees, treesEverywhere, treesOverride } = this.state;
-		return {trees, treesEverywhere, treesOverride};
+		const {trees, treesEverywhere, treesOverride, globalTreeDensity} = this.state;
+		return {trees, treesEverywhere, treesOverride, globalTreeDensity};
 	}
 	
 	/**
@@ -97,6 +99,7 @@ class TreesPanel extends React.Component<Props, State> {
 		return (
 			<>
 				<Trees onChange={( v: string ) => this.setState({trees: v})} />
+				<GlobalTreeDensity onChange={( v: string ) => this.setState({globalTreeDensity: v})} />
 				<TreesEverywhere onChange={( v: string ) => this.setState({treesEverywhere: v})} />
 				<TreesOverride onChange={( v: string ) => this.setState({treesOverride: v})} />
 			</>
