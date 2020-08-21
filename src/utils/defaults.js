@@ -6,6 +6,11 @@
  * @since 2020-08-21
  */
 
+export const HUMIDITY_MIN: number = 0;
+export const HUMIDITY_MAX: number = 1;
+export const HUMIDITY_MIN_DEFAULT: number = 0;
+export const HUMIDITY_MAX_DEFAULT: number = 1;
+
 export const ALTITUDE_MIN: number = -20;
 export const ALTITUDE_MAX: number = 100;
 export const ALTITUDE_MIN_DEFAULT: number = 5;
