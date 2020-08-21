@@ -22,8 +22,8 @@ import DistanceHeightOffset from './generators/terrain/DistanceHeightOffset';
 import FordDistanceFactor from './generators/terrain/FordDistanceFactor';
 import SunAngleFactor from './generators/terrain/SunAngleFactor';
 import ResourceFactor from './generators/terrain/ResourceFactor';
-import Deposits from './generators/terrain/Deposits';
 import TreesPanel from './generators/trees/TreesPanel';
+import DepositPanel from './generators/deposit/DepositPanel';
 import Seasons from './generators/seasons/Seasons';
 
 /**
@@ -128,8 +128,18 @@ class EnvironmentContainer extends React.Component<Props, State> {
 								<DistanceHeightOffset onChange={( v: string ) => this.setState({distanceHeightOffset: v})}/>
 								<FordDistanceFactor onChange={( v: string ) => this.setState({fordDistanceFactor: v})}/>
 								<SunAngleFactor onChange={( v: string ) => this.setState({sunAngleFactor: v})}/>
-								<Deposits onChange={( v: string ) => this.setState({deposits: v})}/>
-								
+							</Card.Body>
+						</Accordion.Collapse>
+					</Card>
+					<Card>
+						<Card.Header className="pt-1 pb-1 pl-2 pl-2">
+							<Accordion.Toggle as={Button} variant="link" eventKey="environment_terrain_deposit">
+								Deposit (Terrain)
+							</Accordion.Toggle>
+						</Card.Header>
+						<Accordion.Collapse eventKey="environment_terrain_deposit">
+							<Card.Body>
+								<DepositPanel onChange={( v: string ) => this.setState({deposits: v})}/>
 							</Card.Body>
 						</Accordion.Collapse>
 					</Card>
