@@ -10,6 +10,7 @@ import React from 'react';
 import * as PropTypes from 'prop-types';
 import { Card, Button, Form, Row, Col } from 'react-bootstrap';
 import { nanoid } from 'nanoid';
+import cn from 'classname';
 
 // Components
 import UiSlider from './../../../../components/UiSlider';
@@ -103,7 +104,7 @@ export class GlobalTreeDensity extends React.Component<Props, State> {
 		
 		return (
 			<>
-				<Card className="mb-2">
+				<Card className={cn('mb-2', {'text-muted': !enable})}>
 					<Card.Body>
 						<Form.Group as={Row} className="mb-2">
 							<Form.Label column={true} sm="3">

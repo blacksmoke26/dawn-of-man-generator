@@ -10,6 +10,7 @@ import React from 'react';
 import * as PropTypes from 'prop-types';
 import { Card, Button, Form, Row, Col } from 'react-bootstrap';
 import { nanoid } from 'nanoid';
+import cn from 'classname';
 
 // Utils
 import * as random from '../../../../utils/random';
@@ -101,7 +102,7 @@ export class Trees extends React.Component<Props, State> {
 		
 		return (
 			<>
-				<Card className="mb-2">
+				<Card className={cn('mb-2', {'text-muted': !enable})}>
 					<Card.Body>
 						<Row className="mb-1">
 							<Col xs="10">
