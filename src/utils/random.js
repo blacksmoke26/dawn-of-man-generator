@@ -73,8 +73,8 @@ export function randomAngle (): [number, number] {
 /** Random Humidity */
 export function randomHumidity (): [number, number] {
 	return [
-		Number(randomFloat(0, 1)).toFixed(2),
-		Number(randomFloat(0, 1)).toFixed(2)
+		Number(randomFloat(Defaults.HUMIDITY_MIN, Defaults.HUMIDITY_MAX)).toFixed(2),
+		Number(randomFloat(Defaults.HUMIDITY_MIN, Defaults.HUMIDITY_MAX)).toFixed(2)
 	];
 }
 
