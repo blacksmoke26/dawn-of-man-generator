@@ -126,16 +126,18 @@ export function randomRiver (): boolean {
  * @returns {{[string]: number}}
  */
 export function randomFrequencies ( value: ?number = null, fraction: number = 2 ): {[string]: number} {
-	return {
-		freq1: value === null ? randomFrequency(fraction) : Number(value),
-		freq2: value === null ? randomFrequency(fraction) : Number(value),
-		freq3: value === null ? randomFrequency(fraction) : Number(value),
-		freq4: value === null ? randomFrequency(fraction) : Number(value),
-		freq5: value === null ? randomFrequency(fraction) : Number(value),
-		freq6: value === null ? randomFrequency(fraction) : Number(value),
-		freq7: value === null ? randomFrequency(fraction) : Number(value),
-		freq8: value === null ? randomFrequency(fraction) : Number(value),
-	};
+	const frequencies: Array<string> = [
+		'freq1', 'freq2', 'freq3', 'freq4',
+		'freq5', 'freq6', 'freq7', 'freq8',
+	];
+	
+	const finalObj: {[string]: number} = {};
+	
+	for ( let f of frequencies ) {
+		finalObj[f] = Number(value) || randomFrequency(fraction);
+	}
+	
+	return finalObj;
 }
 
 /** Random Deposits */
