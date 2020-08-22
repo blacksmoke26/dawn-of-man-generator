@@ -199,9 +199,15 @@ export class DepositOverride extends React.Component<Props, State> {
 					</Card.Header>
 					<Accordion.Collapse eventKey={`deposit_${name}`}>
 						<Card.Body className="pt-2 pb-2">
-							<Form.Group as={Row} className="mb-2">
-								<Form.Label className={(cn('text-size-sm', {'text-muted': !enabled}))} column={true} sm="2">
-									Angle:
+							<Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled})}>
+								<Form.Label className="text-size-sm" column={true} sm="2">
+									<span style={{textDecoration: 'underline dotted'}}
+										title="The min and max slope angles in degrees at which this object
+											is placed. Values range from 0 (flat), to 60 (very steep). Negative
+											values of up to -10 are allowed to ensure you get max density at 0
+											degrees, as there is a transition zone.">
+										Angle:
+									</span>
 								</Form.Label>
 								<Col sm="10">
 									<div>

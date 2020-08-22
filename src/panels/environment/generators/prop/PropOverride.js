@@ -19,6 +19,7 @@ import UiSlider from './../../../../components/UiSlider';
 // Utils
 import * as random from './../../../../utils/random';
 import * as Defaults from './../../../../utils/defaults';
+import cn from 'classname';
 
 type PropAttr = {
 	density_enabled?: boolean,
@@ -222,14 +223,17 @@ export class PropOverride extends React.Component<Props, State> {
 					</Card.Header>
 					<Accordion.Collapse eventKey={`prop_${name}`}>
 						<Card.Body className="pt-2 pb-2">
-							<Form.Group as={Row} className="mb-2">
+							<Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled || !attr.density_enabled})}>
 								<Form.Label className="text-size-sm" column={true} sm="2">
 									<Form.Check
 										disabled={!override}
 										className="text-size-xs"
 										type="switch"
 										id={`prop_override_angle-switch-${nanoid(5)}`}
-										label="Density:"
+										label={<span style={{textDecoration: 'underline dotted'}}
+											title="The amount of objects of this type to place, has to be in the range.">
+											Density:
+										</span>}
 										checked={attr.density_enabled}
 										onChange={e => this.modifySelection(name, {density_enabled: Boolean(e.target.checked)})}
 									/>
@@ -253,14 +257,20 @@ export class PropOverride extends React.Component<Props, State> {
 										value={Number(attr.density)} onChange={v => this.modifySelection(name, {density: v})}/>
 								</Col>
 							</Form.Group>
-							<Form.Group as={Row} className="mb-2">
+							<Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled || !attr.angle_enabled})}>
 								<Form.Label className="text-size-sm" column={true} sm="2">
 									<Form.Check
 										disabled={!override}
 										className="text-size-xs"
 										type="switch"
 										id={`prop_override_angle-switch-${nanoid(5)}`}
-										label="Angle:"
+										label={<span style={{textDecoration: 'underline dotted'}}
+											title="The min and max slope angles in degrees at which this object
+											is placed. Values range from 0 (flat), to 60 (very steep). Negative
+											values of up to -10 are allowed to ensure you get max density at 0
+											degrees, as there is a transition zone.">
+											Angle:
+										</span>}
 										checked={attr.angle_enabled}
 										onChange={e => this.modifySelection(name, {angle_enabled: Boolean(e.target.checked)})}
 									/>
@@ -295,9 +305,15 @@ export class PropOverride extends React.Component<Props, State> {
 										}}/>
 								</Col>
 							</Form.Group>
-							<Form.Group as={Row} className="mb-2">
+							<Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled})}>
 								<Form.Label className="text-size-sm" column={true} sm="2">
-									Altitude
+									<span style={{textDecoration: 'underline dotted'}}
+										title="The min and max altitudes at which this object is
+										placed, in meters. 0 means water level, negative values
+										might make sense for certain objects like reeds or rocks
+										that are placed underwater.">
+											Altitude:
+										</span>
 								</Form.Label>
 								<Col sm="10">
 									<div>

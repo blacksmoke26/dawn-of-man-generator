@@ -111,7 +111,10 @@ export class GlobalTreeDensity extends React.Component<Props, State> {
 								<Form.Check
 									type="switch"
 									id={`global_tree_density-switch-${nanoid(5)}`}
-									label="Global Tree Density"
+									label={<span style={{textDecoration: 'underline dotted'}}
+										title="The global tree density in the environment.">
+											Global Tree Density:
+										</span>}
 									onChange={e => this.setState({enable: Boolean(e.target.checked)})}
 								/>
 							</Form.Label>
