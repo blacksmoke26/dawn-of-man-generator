@@ -36,15 +36,20 @@ type TreeSelection = {
 	[string]: TreeAttr
 };
 
-const treeAttrDefaults: TreeAttr = {
-	density_enabled: false,
-	density: Defaults.DENSITY_DEFAULT,
-	angle_enabled: false,
-	min_angle: Defaults.ANGLE_MIN_DEFAULT,
-	max_angle: Defaults.ANGLE_MAX_DEFAULT,
-	min_altitude: Defaults.ALTITUDE_MIN_DEFAULT,
-	max_altitude: Defaults.ALTITUDE_MAX_DEFAULT,
-	_enabled: true,
+const getInitialValues = (): TreeAttr => {
+	let angleRand = random.randomAngle();
+	let altitudeRand = random.randomAltitude();
+	
+	return {
+		density_enabled: false,
+		density: random.randomDensity(),
+		angle_enabled: false,
+		min_angle: angleRand[0],
+		max_angle: angleRand[1],
+		min_altitude: altitudeRand[0],
+		max_altitude: altitudeRand[1],
+		_enabled: true,
+	};
 };
 
 /**
@@ -386,7 +391,7 @@ export class TreesOverride extends React.Component<Props, State> {
 										placeholder="Choose tree to override"
 										onChange={( selected: ?Object, {action}: Object ) => {
 											if ( action === 'select-option' && selected ) {
-												this.modifySelection(selected.value, treeAttrDefaults);
+												this.modifySelection(selected.value, getInitialValues());
 												this.setState({activeKey: selected.value});
 											}
 										}}

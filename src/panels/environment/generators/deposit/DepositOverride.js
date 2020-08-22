@@ -28,10 +28,13 @@ type DepositSelection = {
 	[string]: DepositAttr
 };
 
-const depositAttrDefaults: DepositAttr = {
-	min_angle: Defaults.ANGLE_MIN_DEFAULT,
-	max_angle: Defaults.ANGLE_MAX_DEFAULT,
-	_enabled: true,
+const getInitialValues = (): DepositAttr => {
+	let angleRand = random.randomAngle();
+	return {
+		min_angle: angleRand[0],
+		max_angle: angleRand[1],
+		_enabled: true,
+	}
 };
 
 /**
@@ -280,7 +283,7 @@ export class DepositOverride extends React.Component<Props, State> {
 										placeholder="Choose deposit to override"
 										onChange={( selected: ?Object, {action}: Object ) => {
 											if ( action === 'select-option' && selected ) {
-												this.modifySelection(selected.value, depositAttrDefaults);
+												this.modifySelection(selected.value, getInitialValues());
 												this.setState({activeKey: selected.value});
 											}
 										}}
