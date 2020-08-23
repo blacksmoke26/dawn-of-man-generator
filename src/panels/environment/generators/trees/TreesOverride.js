@@ -12,6 +12,10 @@ import { Card, Button, Form, Accordion, Row, Col } from 'react-bootstrap';
 import Select from 'react-select';
 import { nanoid } from 'nanoid';
 import { Range } from 'rc-slider';
+import cn from 'classname';
+
+// Types
+import type { Node } from 'react';
 
 // Components
 import UiSlider from './../../../../components/UiSlider';
@@ -19,9 +23,10 @@ import UiSlider from './../../../../components/UiSlider';
 // Utils
 import * as random from './../../../../utils/random';
 import * as Defaults from './../../../../utils/defaults';
-import cn from 'classname';
 
+/** @type {Object} */
 type TreeAttr = {
+	_enabled: boolean,
 	density_enabled?: boolean,
 	density?: number,
 	angle_enabled?: boolean,
@@ -29,27 +34,11 @@ type TreeAttr = {
 	max_angle?: number,
 	min_altitude?: number,
 	max_altitude?: number,
-	_enabled: boolean,
 };
 
+/** @type {Object} */
 type TreeSelection = {
 	[string]: TreeAttr
-};
-
-const getInitialValues = (): TreeAttr => {
-	let angleRand = random.randomAngle();
-	let altitudeRand = random.randomAltitude();
-	
-	return {
-		density_enabled: false,
-		density: random.randomDensity(),
-		angle_enabled: false,
-		min_angle: angleRand[0],
-		max_angle: angleRand[1],
-		min_altitude: altitudeRand[0],
-		max_altitude: altitudeRand[1],
-		_enabled: true,
-	};
 };
 
 /**
@@ -57,63 +46,52 @@ const getInitialValues = (): TreeAttr => {
  * @type {Object}
  */
 type Props = {
-	onChange ( template: string, values?: {[string]: any} ): void,
+	enabled?: boolean,
+	selection?: TreeSelection,
+	onChange ( template: string, value: TreeSelection ): void,
 };
 
 /**
- * TreesOverride `state` type
- * @type {Object}
+ * @private
+ * Get randomized tree values
  */
-type State = {
-	override: boolean,
-	selection: TreeSelection,
-	activeKey: string,
-};
-
-/**
- * TreesOverride component class
- */
-export class TreesOverride extends React.Component<Props, State> {
-	/**
-	 * @inheritDoc
-	 */
-	state: State = {
-		override: true,
-		selection: {},
-		activeKey: '',
+const getInitialValues = (): TreeAttr => {
+	let [min_angle, max_angle] = random.randomAngle();
+	let [min_altitude, max_altitude] = random.randomAltitude();
+	
+	return {
+		_enabled: true,
+		density_enabled: false,
+		density: random.randomDensity(),
+		angle_enabled: false,
+		min_angle, max_angle,
+		min_altitude, max_altitude,
 	};
+};
+
+/** TreesOverride functional component */
+function TreesOverride ( props: Props ): Node {
+	const [enabled, setEnabled] = React.useState<boolean>(props.enabled);
+	const [selection, setSelection] = React.useState<TreeSelection>(props.selection);
+	const [activeKey, setActiveKey] = React.useState<string>('');
+
+	// Reflect attributes changes
+	React.useEffect(() => {
+		setEnabled(props.enabled);
+		setSelection(props.selection);
+	}, [props.enabled, props.selection]);
 	
-	/**
-	 * @inheritDoc
-	 */
-	componentDidMount (): void {
-		const {onChange} = this.props;
-		setTimeout(() => {
-			typeof onChange === 'function'
-			&& onChange(this.toTemplateText(), this.getValues());
-		}, 300);
-	}
+	// Reflect state changes
+	React.useEffect(() => {
+		typeof props.onChange === 'function' && props.onChange(toTemplateText(), selection);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [selection, enabled]);
 	
-	/**
-	 * @inheritDoc
-	 */
-	componentDidUpdate ( prevProps: Readonly<P>, prevState: Readonly<S>, snapshot: SS ): void {
-		if ( JSON.stringify(this.state) !== JSON.stringify(prevState) ) {
-			const {onChange} = this.props;
-			
-			setTimeout(() => {
-				typeof onChange === 'function'
-				&& onChange(this.toTemplateText(), this.getValues());
-			}, 300);
-		}
-	}
-	
-	toTemplateText (): string {
-		const { override, selection } = this.state;
-		
+	/** Generate xml code */
+	const toTemplateText = React.useCallback((): string => {
 		const templateOverride: Array<string> = [];
 		
-		if ( !override ) {
+		if ( !enabled ) {
 			return '';
 		}
 		
@@ -122,84 +100,74 @@ export class TreesOverride extends React.Component<Props, State> {
 				continue;
 			}
 			
-			 const densityTpl: string = attr.density_enabled
-			 	? `<density value="${attr.density}" />`
-			 	: '';
+			const densityTpl: string = attr.density_enabled
+				? `<density value="${attr.density}"/>`
+				: '';
 			
-			 const angleTpl: string = attr.angle_enabled
-			 	? `<min_angle value="${attr.min_angle}" /><max_angle value="${attr.max_angle}"/>`
-			 	: '';
+			const angleTpl: string = attr.angle_enabled
+				? `<min_angle value="${attr.min_angle}"/><max_angle value="${attr.max_angle}"/>`
+				: '';
 			
 			templateOverride.push(
-				'<tree_override_prototype>'
-				+ `<id value="${name}"/>`
-				+ densityTpl
-				+ angleTpl
-				+ `<min_altitude value="${attr.min_altitude}" />`
-				+ `<max_altitude value="${attr.max_altitude}"/>`
-				+ '</tree_override_prototype>'
+				`<tree_override_prototype>
+					<id value="${name}"/>
+					${densityTpl}
+					${angleTpl}
+					<min_altitude value="${attr.min_altitude}"/>
+					<max_altitude value="${attr.max_altitude}"/>
+				</tree_override_prototype>`
 			);
 		}
 		
-		if ( !templateOverride.length ) {
-			return '';
-		}
-		
-		return [
-			'<tree_override_prototypes>',
-			templateOverride.join(''),
-			'</tree_override_prototypes>',
-		].join('');
-	}
+		return templateOverride.length
+			? (
+				`<tree_override_prototypes>
+				${templateOverride.join('')}
+				</tree_override_prototypes>`
+			) : '';
+	}, [enabled, selection]);
 	
-	getValues (): {[string]: number} {
-		const { selection } = this.state;
-		return { selection: selection };
-	}
-	
-	selectOptions (): Array<Object> {
-		const {selection} = this.state;
+	/** Get react-select options */
+	const renderSelectOptions = React.useCallback((): Array<Object> => {
 		const excludes: Array<string> = Object.keys(selection);
 		
 		return random.trees
 			.filter(v => !excludes.includes(v))
-			.map(v => ({
-				label: v,
-				value: v,
-			}));
-	}
+			.map(v => ({label: v, value: v}));
+	}, [selection]);
 	
-	modifySelection ( name: string, attr: TreeAttr ): void {
-		this.setState(({selection}) => ({
-			selection: {
-				...selection,
-				[name]: {...selection[name], ...attr},
-			}
-		}));
-	}
+	/** Update given selection name data */
+	const modifySelection = ( name: string, attr: TreeAttr ): void => {
+		const newSelection: TreeSelection = {...selection};
+		newSelection[name] = {...(newSelection[name] ?? {}), ...attr};
+		setSelection({...newSelection});
+	};
 	
-	removeFromSelection ( name: string ): void {
-		const selection = {...this.state.selection};
+	/** Remove existing selection */
+	const removeFromSelection = ( name: string ): void => {
+		const newSelection: TreeSelection = {...selection};
 		
-		if ( selection.hasOwnProperty(name) ) {
-			delete selection[name];
-			this.setState({selection: {...selection}});
+		if ( newSelection.hasOwnProperty(name) ) {
+			delete newSelection[name];
+			setSelection({...newSelection});
 		}
-	}
+	};
 	
-	selectionNodes (): Array<Node> {
-		const {selection, override} = this.state;
+	/** Generate selection based nodes */
+	const selectionNodes = React.useCallback((): Array<Node> => {
 		const nodes: Array<Node> = [];
 		
 		for ( let [name: string, attr: TreeAttr] of Object.entries(selection) ) {
-			const enabled: boolean = attr._enabled && override;
+			const isEnabled: boolean = attr._enabled && enabled;
+			const isDensityEnabled: boolean = isEnabled && attr.density_enabled;
+			const isAngleEnabled: boolean = isEnabled && attr.angle_enabled;
 			
 			nodes.push(
 				<Card key={name}>
 					<Card.Header className="pt-0 pb-0 pl-2 pl-2">
 						<div className="clearfix">
 							<div className="float-left">
-								<Accordion.Toggle disabled={!enabled} as={Button}
+								<Accordion.Toggle disabled={!isEnabled} as={Button}
 									variant="link" eventKey={`tree_${name}`}
 									onClick={() => this.setState(({activeKey}) => ({activeKey: activeKey === name ? '': name}))}>
 									{name}
@@ -207,18 +175,18 @@ export class TreesOverride extends React.Component<Props, State> {
 							</div>
 							<div className="float-right">
 								<Form.Check
-									disabled={!override}
+									disabled={!enabled}
 									className="d-inline-block position-relative"
 									style={{top: '6px'}}
 									type="switch"
 									id={`enable-tree-${name}`}
 									label=""
 									checked={attr._enabled}
-									onChange={e => this.modifySelection(name,{_enabled: Boolean(e.target.checked)})}
+									onChange={e => modifySelection(name,{_enabled: e.target.checked})}
 								/>
 								{' '}
-								<Button variant="link" disabled={!enabled}
-									onClick={() => this.removeFromSelection(name)}
+								<Button variant="link" disabled={!isEnabled}
+									onClick={() => removeFromSelection(name)}
 									style={{fontSize: '1.2rem', top: '1px'}}
 									className="p-0 text-decoration-none position-relative text-dark" size="sm">
 									&times;
@@ -228,44 +196,44 @@ export class TreesOverride extends React.Component<Props, State> {
 					</Card.Header>
 					<Accordion.Collapse eventKey={`tree_${name}`}>
 						<Card.Body className="pt-2 pb-2">
-							<Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled || !attr.density_enabled})}>
+							<Form.Group as={Row} className={cn('mb-2', {'text-muted': !isEnabled || !attr.density_enabled})}>
 								<Form.Label className="text-size-sm" column={true} sm="2">
 									<Form.Check
-										disabled={!override}
+										disabled={!isEnabled}
 										className="text-size-xs"
 										type="switch"
 										id={`tree_override_density-switch-${nanoid(5)}`}
 										label={<span style={{textDecoration: 'underline dotted'}}
 											title="The amount of objects of this type to place, has to be in the range.">
-											Density:
-										</span>}
+												Density:
+											</span>}
 										checked={attr.density_enabled}
-										onChange={e => this.modifySelection(name, {density_enabled: Boolean(e.target.checked)})}
+										onChange={e => modifySelection(name, {density_enabled: Boolean(e.target.checked)})}
 									/>
 								</Form.Label>
 								<Col sm="10">
 									<span className="text-size-xs font-family-code">
-										Value: <code>{attr.density}</code>
+										Value: <code className={cn({'text-muted': !isDensityEnabled})}>{attr.density}</code>
 									</span>
-									<Button disabled={!enabled || !attr.density_enabled}
+									<Button disabled={!isDensityEnabled}
 										className="button-reset-sm" variant="link"
-										onClick={() => this.modifySelection(name, {density: random.randomDensity()})}>
+										onClick={() => modifySelection(name, {density: random.randomDensity()})}>
 										Random
 									</Button>
-									<Button disabled={!enabled || !attr.density_enabled}
+									<Button disabled={!isDensityEnabled}
 										className="button-reset-sm" variant="link"
-										onClick={() => this.modifySelection(name, {density: Defaults.DENSITY_DEFAULT})}>
+										onClick={() => modifySelection(name, {density: Defaults.DENSITY_DEFAULT})}>
 										Reset
 									</Button>
-									<UiSlider disabled={!enabled || !attr.density_enabled}
+									<UiSlider disabled={!isDensityEnabled}
 										step={0.01} min={Defaults.DENSITY_MIN} max={Defaults.DENSITY_MAX}
-										value={Number(attr.density)} onChange={v => this.modifySelection(name, {density: v})}/>
+										value={Number(attr.density)} onChange={v => modifySelection(name, {density: v})}/>
 								</Col>
 							</Form.Group>
-							<Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled || !attr.angle_enabled})}>
+							<Form.Group as={Row} className={cn('mb-2', {'text-muted': !isEnabled || !attr.angle_enabled})}>
 								<Form.Label className="text-size-sm" column={true} sm="2">
 									<Form.Check
-										disabled={!override}
+										disabled={!isEnabled}
 										className="text-size-xs"
 										type="switch"
 										id={`tree_override_angle-switch-${nanoid(5)}`}
@@ -277,25 +245,29 @@ export class TreesOverride extends React.Component<Props, State> {
 											Angle:
 										</span>}
 										checked={attr.angle_enabled}
-										onChange={e => this.modifySelection(name, {angle_enabled: Boolean(e.target.checked)})}
+										onChange={e => modifySelection(name, {angle_enabled: e.target.checked})}
 									/>
 								</Form.Label>
 								<Col sm="10">
 									<div>
 										<span className="text-size-xs font-family-code">
-										Min: <code>{attr.min_angle}</code>
+										Min: <code className={cn({'text-muted': !isAngleEnabled})}>
+											{attr.min_angle}
+										</code>
 											{' / '}
-										Max: <code>{attr.max_angle}</code>
+										Max: <code className={cn({'text-muted': !isAngleEnabled})}>
+											{attr.max_angle}
+										</code>
 									</span>
-										<Button disabled={!enabled || !attr.angle_enabled}
+										<Button disabled={!isAngleEnabled}
 											className="button-reset-sm" variant="link"
 											onClick={() => {
 												const [min_angle, max_angle] = random.randomAngle();
-												this.modifySelection(name, {min_angle, max_angle});
+												modifySelection(name, {min_angle, max_angle});
 											}}>Random</Button>
 										<Button disabled={!enabled || !attr.angle_enabled}
 											className="button-reset-sm" variant="link"
-											onClick={() => this.modifySelection(name, {
+											onClick={() => modifySelection(name, {
 												min_angle: Defaults.ANGLE_MIN_DEFAULT,
 												max_angle: Defaults.ANGLE_MAX_DEFAULT,
 											})}>Default</Button>
@@ -303,14 +275,14 @@ export class TreesOverride extends React.Component<Props, State> {
 									<Range
 										min={Defaults.ANGLE_MIN}
 										max={Defaults.ANGLE_MAX}
-										disabled={!enabled || !attr.angle_enabled}
+										disabled={!isAngleEnabled}
 										value={[attr.min_angle, attr.max_angle]}
 										onChange={([min_angle, max_angle]) => {
-											this.modifySelection(name, {min_angle, max_angle});
+											modifySelection(name, {min_angle, max_angle});
 										}}/>
 								</Col>
 							</Form.Group>
-							<Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled})}>
+							<Form.Group as={Row} className={cn('mb-2', {'text-muted': !isEnabled})}>
 								<Form.Label className="text-size-sm" column={true} sm="2">
 									<span style={{textDecoration: 'underline dotted'}}
 										title="The min and max altitudes at which this object is
@@ -323,17 +295,17 @@ export class TreesOverride extends React.Component<Props, State> {
 								<Col sm="10">
 									<div>
 										<span className="text-size-xs font-family-code">
-										Min: <code>{attr.min_altitude}</code>
+										Min: <code className={cn({'text-muted': !isEnabled})}>{attr.min_altitude}</code>
 											{' / '}
-										Max: <code>{attr.max_altitude}</code>
+										Max: <code className={cn({'text-muted': !isEnabled})}>{attr.max_altitude}</code>
 									</span>
-										<Button disabled={!enabled} className="button-reset-sm" variant="link"
+										<Button disabled={!isEnabled} className="button-reset-sm" variant="link"
 											onClick={() => {
 												const [min_altitude, max_altitude] = random.randomAltitude();
-												this.modifySelection(name, {min_altitude, max_altitude});
+												modifySelection(name, {min_altitude, max_altitude});
 											}}>Random</Button>
-										<Button disabled={!enabled} className="button-reset-sm" variant="link"
-											onClick={() => this.modifySelection(name, {
+										<Button disabled={!isEnabled} className="button-reset-sm" variant="link"
+											onClick={() => modifySelection(name, {
 												min_altitude: Defaults.ALTITUDE_MIN_DEFAULT,
 												max_altitude: Defaults.ALTITUDE_MAX_DEFAULT,
 											})}>Default</Button>
@@ -341,10 +313,10 @@ export class TreesOverride extends React.Component<Props, State> {
 									<Range
 										min={Defaults.ALTITUDE_MIN}
 										max={Defaults.ALTITUDE_MAX}
-										disabled={!enabled}
+										disabled={!isEnabled}
 										value={[attr.min_altitude, attr.max_altitude]}
 										onChange={([min_altitude, max_altitude]) => {
-											this.modifySelection(name, {min_altitude, max_altitude});
+											modifySelection(name, {min_altitude, max_altitude});
 										}}/>
 								</Col>
 							</Form.Group>
@@ -355,68 +327,66 @@ export class TreesOverride extends React.Component<Props, State> {
 		}
 		
 		return nodes;
-	}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [enabled, selection]);
 	
-	/**
-	 * @inheritDoc
-	 */
-	render () {
-		const { override } = this.state;
-		
-		return (
-			<Accordion>
-				<Card className="mb-2">
-					<Card.Header className="pt-1 pb-1 pl-2 pl-2">
-						<Accordion.Toggle as={Button} variant="link" eventKey="tree_override_panel">
-							Override Tree Prototypes
-						</Accordion.Toggle>
-					</Card.Header>
-					<Accordion.Collapse eventKey="tree_override_panel">
-						<Card.Body>
-							<div className="mb-3">
-								<Form.Check
-									className="pull-right"
-									type="switch"
-									id={`tree_override-switch-${nanoid(5)}`}
-									label="Override trees"
-									checked={override}
-									onChange={e => this.setState({override: Boolean(e.target.checked)})}
+	return (
+		<Accordion>
+			<Card className="mb-2">
+				<Card.Header className="pt-1 pb-1 pl-2 pl-2">
+					<Accordion.Toggle as={Button} variant="link" eventKey="tree_override_panel">
+						Override Tree Prototypes
+					</Accordion.Toggle>
+				</Card.Header>
+				<Accordion.Collapse eventKey="tree_override_panel">
+					<Card.Body>
+						<div className="mb-3">
+							<Form.Check
+								className="pull-right"
+								type="switch"
+								id={`tree_override-switch-${nanoid(5)}`}
+								label="Override trees"
+								checked={enabled}
+								onChange={e => setEnabled(e.target.checked)}
+							/>
+							<div className="mt-2 mt-2">
+								<Select
+									isDisabled={!enabled}
+									menuPortalTarget={document.body}
+									styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
+									options={renderSelectOptions()}
+									placeholder="Choose tree to override"
+									onChange={( selected: ?Object, {action}: Object ) => {
+										if ( action === 'select-option' && selected ) {
+											modifySelection(selected.value, getInitialValues());
+											setActiveKey(selected.value);
+										}
+									}}
 								/>
-								<div className="mt-2 mt-2">
-									<Select
-										isDisabled={!override}
-										menuPortalTarget={document.body}
-										styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
-										options={this.selectOptions()}
-										placeholder="Choose tree to override"
-										onChange={( selected: ?Object, {action}: Object ) => {
-											if ( action === 'select-option' && selected ) {
-												this.modifySelection(selected.value, getInitialValues());
-												this.setState({activeKey: selected.value});
-											}
-										}}
-									/>
-								</div>
 							</div>
-							<Accordion activeKey={`tree_${this.state.activeKey}`}>
-								{this.selectionNodes()}
-							</Accordion>
-						</Card.Body>
-					</Accordion.Collapse>
-				</Card>
-			</Accordion>
-		);
-	};
+						</div>
+						<Accordion activeKey={`tree_${activeKey}`}>
+							{selectionNodes()}
+						</Accordion>
+					</Card.Body>
+				</Accordion.Collapse>
+			</Card>
+		</Accordion>
+	);
 }
 
 // Properties validation
 TreesOverride.propTypes = {
-	onChange: () => {},
+	enabled: PropTypes.bool,
+	selection: PropTypes.object,
+	onChange: PropTypes.func,
 };
 
 // Default properties
 TreesOverride.defaultProps = {
-	onChange: PropTypes.func,
+	enabled: true,
+	selection: {},
+	onChange: () => {},
 };
 
 export default TreesOverride;
