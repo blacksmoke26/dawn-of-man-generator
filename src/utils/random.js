@@ -120,10 +120,13 @@ export function randomRiver (): boolean {
 	return faker.random.arrayElement([true, false]);
 }
 
+/** Random Trees Everywhere */
+export function randomTreesEverywhere (): boolean {
+	return faker.random.arrayElement([true, false]);
+}
+
 /**
- * @param {?number} value=null - Value to set / Set null for random values
- * @param {number} fraction=2 - Fraction digits
- * @returns {{[string]: number}}
+ * Random Frequencies
  */
 export function randomFrequencies ( value: ?number = null, fraction: number = 2 ): {[string]: number} {
 	const frequencies: Array<string> = [
