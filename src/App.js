@@ -48,10 +48,10 @@ function App () {
 				</Card>
 			</Accordion>
 			<footer className="mt-3 mb-3 text-size-xs text-center">
-				Copyright &copy; 2019 {' '}
+				Copyright &copy; 2019-{(new Date()).getFullYear()} {' '}
 				<a href="https://github.com/blacksmoke26"
 					rel="noopener noreferrer" target="_blank">Junaid Atari</a>
-				{' - '}
+				<br/>
 				<a href="https://www.nexusmods.com/dawnofman/mods/11"
 					rel="noopener noreferrer" target="_blank">View on Nexus</a>
 				{' - '}
