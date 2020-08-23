@@ -25,120 +25,69 @@ import * as Defaults from './../../../../utils/defaults';
  */
 type Props = {
 	enable: boolean,
-	onChange ( template: string, values?: {[string]: any} ): void,
+	onChange ( template: string, value: number ): void,
 };
 
-/**
- * GlobalTreeDensity `state` type
- * @type {Object}
- */
-type State = {
-	value: number,
-	enable: boolean,
-};
-
-/**
- * GlobalTreeDensity component class
- */
-export class GlobalTreeDensity extends React.Component<Props, State> {
-	/**
-	 * @inheritDoc
-	 */
-	constructor ( props: Props ) {
-		super(props);
-		this.state = {
-			value: random.randomDensity(),
-			enable: props.enable,
-		};
+/** GlobalTreeDensity functional component */
+function GlobalTreeDensity ( props: Props ): Node {
+	const [value, setValue] = React.useState<number>(random.randomDensity());
+	const [enabled, setEnabled] = React.useState<boolean>(props.enable);
+	
+	// Reflect attributes changes
+	React.useEffect(() => {
+		setEnabled(props.enable);
+	}, [props.enable]);
+	
+	// Reflect state changes
+	React.useEffect(() => {
+		typeof props.onChange === 'function' && props.onChange(toTemplateText(), value);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [value, enabled]);
+	
+	const toTemplateText = (): string => {
+		return !value || !enabled
+			? ''
+			: `<global_tree_density value="${value}"/>`;
 	}
 	
-	/**
-	 * @inheritDoc
-	 */
-	componentDidMount (): void {
-		const {onChange} = this.props;
-		setTimeout(() => {
-			typeof onChange === 'function'
-			&& onChange(this.toTemplateText(), this.getValue());
-		}, 300);
-	}
-	
-	/**
-	 * @inheritDoc
-	 */
-	componentDidUpdate ( prevProps: Readonly<P>, prevState: Readonly<S>, snapshot: SS ): void {
-		const {enabled, onChange} = this.props;
-		
-		if ( JSON.stringify(this.state) !== JSON.stringify(prevState) ) {
-			setTimeout(() => {
-				typeof onChange === 'function'
-				&& onChange(this.toTemplateText(), this.getValue());
-			}, 300);
-		}
-		
-		if ( enabled !== prevProps.enabled ) {
-			this.setState({enabled});
-		}
-	}
-	
-	toTemplateText (): string {
-		const { value, enable } = this.state;
-		
-		if ( !value ) {
-			return '';
-		}
-		
-		return enable ? `<global_tree_density value="${value}"/>` : '';
-	}
-	
-	getValue (): {[string]: number} {
-		const { value } = this.state;
-		return { value };
-	}
-	
-	/**
-	 * @inheritDoc
-	 */
-	render () {
-		const { value, enable } = this.state;
-		
-		return (
-			<>
-				<Card className={cn('mb-2', {'text-muted': !enable})}>
-					<Card.Body>
-						<Form.Group as={Row} className="mb-2">
-							<Form.Label column={true} sm="3">
-								<Form.Check
-									type="switch"
-									id={`global_tree_density-switch-${nanoid(5)}`}
-									label={<span style={{textDecoration: 'underline dotted'}}
-										title="The global tree density in the environment.">
-											Global Tree Density:
-										</span>}
-									onChange={e => this.setState({enable: Boolean(e.target.checked)})}
-								/>
-							</Form.Label>
-							<Col sm="9">
+	return (
+		<>
+			<Card className={cn('mb-2', {'text-muted': !enabled})}>
+				<Card.Body>
+					<Form.Group as={Row} className="mb-2">
+						<Form.Label column={true} sm="3">
+							<Form.Check
+								type="switch"
+								id={`global_tree_density-switch-${nanoid(5)}`}
+								label={
+									<span style={{textDecoration: 'underline dotted'}}
+									 title="The global tree density in the environment.">
+										Global Tree Density:
+									</span>
+								}
+								onChange={e => setEnabled(Boolean(e.target.checked))}
+							/>
+						</Form.Label>
+						<Col sm="9">
 								<span className="text-size-xs font-family-code">
 									Value: <code>{value}</code>
 								</span>
-								<Button disabled={!enable} className="button-reset-sm" variant="link"
-									onClick={() => this.setState({value: random.randomDensity()})}>
-									Random
-								</Button>
-								<Button disabled={!enable} className="button-reset-sm" variant="link"
-									onClick={() => this.setState({value: Defaults.DENSITY_DEFAULT})}>
-									Reset
-								</Button>
-								<UiSlider step={0.01} disabled={!enable} min={Defaults.DENSITY_MIN} max={Defaults.DENSITY_MAX}
-									value={Number(value)} onChange={v => this.setState({value: v})}/>
-							</Col>
-						</Form.Group>
-					</Card.Body>
-				</Card>
-			</>
-		);
-	};
+							<Button disabled={!enabled} className="button-reset-sm" variant="link"
+								onClick={() => setValue(random.randomDensity())}>
+								Random
+							</Button>
+							<Button disabled={!enabled} className="button-reset-sm" variant="link"
+								onClick={() => setValue(Defaults.DENSITY_DEFAULT)}>
+								Reset
+							</Button>
+							<UiSlider step={0.01} disabled={!enabled} min={Defaults.DENSITY_MIN} max={Defaults.DENSITY_MAX}
+								value={Number(value)} onChange={v => setValue(v)}/>
+						</Col>
+					</Form.Group>
+				</Card.Body>
+			</Card>
+		</>
+	);
 }
 
 // Properties validation
