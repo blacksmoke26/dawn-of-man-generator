@@ -18,104 +18,60 @@ import TreesEverywhere from './TreesEverywhere';
 import TreesOverride from './TreesOverride';
 import GlobalTreeDensity from './GlobalTreeDensity';
 
+type ExportValues = {
+	globalTreeDensity: string,
+	treesEverywhere: string,
+	trees: string,
+	treesOverride: string
+};
+
 /**
  * TreesPanel `props` type
  * @type {Object}
  */
 type Props = {
-	onChange ( template: string, values?: {[string]: any} ): void,
+	onChange ( template: string, values: ExportValues ): void,
 };
 
-/**
- * TreesPanel `state` type
- * @type {Object}
- */
-type State = {
-	trees: string,
-	treesEverywhere: string,
-	treesOverride: string,
-};
-
-/**
- * TreesPanel functional component
- */
-class TreesPanel extends React.Component<Props, State> {
-	/**
-	 * @inheritDoc
-	 */
-	state: State = {
-		globalTreeDensity: '',
-		treesEverywhere: '',
-		trees: '',
-		treesOverride: '',
-	};
+/** TreesPanel functional component */
+function TreesPanel ( props: Props ): Node {
+	const [globalTreeDensity, setGlobalTreeDensity] = React.useState<string>('');
+	const [treesEverywhere, setTreesEverywhere] = React.useState<string>('');
+	const [trees, setTrees] = React.useState<string>('');
+	const [treesOverride, setTreesOverride] = React.useState<string>('');
 	
-	/**
-	 * @inheritDoc
-	 */
-	componentDidMount (): void {
-		const {onChange} = this.props;
-		setTimeout(() => {
-			typeof onChange === 'function'
-			&& onChange(this.toTemplateText(), this.getValues());
-		}, 300);
-	}
-	
-	/**
-	 * @inheritDoc
-	 */
-	componentDidUpdate ( prevProps: Readonly<P>, prevState: Readonly<S>, snapshot: SS ): void {
-		if ( JSON.stringify(this.state) !== JSON.stringify(prevState) ) {
-			const {onChange} = this.props;
-			
-			setTimeout(() => {
-				typeof onChange === 'function'
-				&& onChange(this.toTemplateText(), this.getValues());
-			}, 300);
-		}
-	}
-	
-	toTemplateText (): string {
-		const {
-			treesOverride, trees,
-			treesEverywhere, globalTreeDensity,
-		} = this.state;
-		
+	const toTemplateText = (): string => {
 		return [
-			treesOverride, trees,
-			globalTreeDensity, treesEverywhere,
+			globalTreeDensity, treesEverywhere, trees, treesOverride,
 		].join('');
 	}
 	
-	getValues (): {[string]: number} {
-		const {trees, treesEverywhere, treesOverride, globalTreeDensity} = this.state;
-		return {trees, treesEverywhere, treesOverride, globalTreeDensity};
-	}
+	// Reflect state changes
+	React.useEffect(() => {
+		typeof props.onChange === 'function' && props.onChange(toTemplateText(), {
+			globalTreeDensity, treesEverywhere, trees, treesOverride,
+		});
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [globalTreeDensity, treesEverywhere, trees, treesOverride]);
 	
-	/**
-	 * @inheritDoc
-	 */
-	render (): Node {
-		return (
-			<>
-				<Trees onChange={( v: string ) => this.setState({trees: v})} />
-				<GlobalTreeDensity onChange={( v: string ) => this.setState({globalTreeDensity: v})} />
-				<TreesEverywhere onChange={( v: string ) => this.setState({treesEverywhere: v})} />
-				<TreesOverride onChange={( v: string ) => this.setState({treesOverride: v})} />
-			</>
-		);
-	}
+	return (
+		<>
+			<GlobalTreeDensity onChange={v => setGlobalTreeDensity(v)}/>
+			<TreesEverywhere onChange={v => setTreesEverywhere(v)}/>
+			<Trees onChange={v => setTrees(v)}/>
+			<TreesOverride onChange={v => setTreesOverride(v)}/>
+		</>
+	);
 }
-
-// Default properties
-TreesPanel.defaultProps = {
-	onChange: () => {},
-};
-
 
 // Properties validation
 TreesPanel.propTypes = {
 	onChange: PropTypes.func,
+};
+
+// Default properties
+TreesPanel.defaultProps = {
+	onChange: () => {},
 };
 
 export default TreesPanel;

@@ -24,136 +24,84 @@ type Props = {
 	onChange ( template: string, values?: {[string]: any} ): void,
 };
 
-/**
- * Trees `state` type
- * @type {Object}
- */
-type State = {
-	trees: Array<string>,
-	enable: boolean,
-};
-
-/**
- * Trees component class
- */
-export class Trees extends React.Component<Props, State> {
-	/**
-	 * @inheritDoc
-	 */
-	constructor ( props: Props ) {
-		super(props);
-		this.state = {
-			trees: random.randomTrees(),
-			enable: props.enable,
-		};
+/** Trees functional component */
+function Trees ( props: Props ) {
+	const [trees, setTrees] = React.useState<string[]>(random.randomTrees());
+	const [enable, setEnable] = React.useState<boolean>(props.enable);
+	
+	// Reflect attributes changes
+	React.useEffect(() => {
+		setEnable(props.enable);
+	}, [props.enable]);
+	
+	// Reflect state changes
+	React.useEffect(() => {
+		typeof props.onChange === 'function' && props.onChange(toTemplateText(), trees);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [trees, enable]);
+	
+	const toTemplateText = (): string => {
+		return !trees.length || !enable
+			? ''
+			: `<trees values="${trees.join(' ')}"/>`;
 	}
 	
-	/**
-	 * @inheritDoc
-	 */
-	componentDidMount (): void {
-		const {onChange} = this.props;
-		setTimeout(() => {
-			typeof onChange === 'function'
-			&& onChange(this.toTemplateText(), this.getValues());
-		}, 300);
-	}
-	
-	/**
-	 * @inheritDoc
-	 */
-	componentDidUpdate ( prevProps: Readonly<P>, prevState: Readonly<S>, snapshot: SS ): void {
-		const {enabled, onChange} = this.props;
-		
-		if ( JSON.stringify(this.state) !== JSON.stringify(prevState) ) {
-			setTimeout(() => {
-				typeof onChange === 'function'
-				&& onChange(this.toTemplateText(), this.getValues());
-			}, 300);
-		}
-		
-		if ( enabled !== prevProps.enabled ) {
-			this.setState({enabled});
-		}
-	}
-	
-	toTemplateText (): string {
-		const { trees, enable } = this.state;
-		const val: string = trees.join(' ').trim();
-		
-		if ( !val ) {
-			return '';
-		}
-		
-		return enable ? `<trees values="${trees.join(' ')}"/>` : '';
-	}
-	
-	getValues (): {[string]: number} {
-		const { trees } = this.state;
-		return { trees };
-	}
-	
-	/**
-	 * @inheritDoc
-	 */
-	render () {
-		const { trees, enable } = this.state;
-		const allTrees: string = trees.join(' ').trim();
-		
-		return (
-			<>
-				<Card className={cn('mb-2', {'text-muted': !enable})}>
-					<Card.Body>
-						<Row className="mb-1">
-							<Col xs="10">
-								Present Trees <code className="pl-2 text-size-xs">{!allTrees ? '<None>' : allTrees}</code>
-								<Button disabled={!enable} className="button-reset-sm" variant="link"
-									onClick={() => this.setState({trees: random.randomTrees()})}>
-									Random
-								</Button>
-								<Button disabled={!enable} className="button-reset-sm" variant="link"
-									onClick={() => this.setState({trees: [...random.trees]})}>All</Button>
-								<Button disabled={!enable} className="button-reset-sm" variant="link"
-									onClick={() => this.setState({trees: []})}>None</Button>
-								<div className="text-size-xxs text-muted mt-1">
-									What trees are present in the level.
-								</div>
-							</Col>
-							<Col xs="2" className="text-right">
+	return (
+		<>
+			<Card className={cn('mb-2', {'text-muted': !enable})}>
+				<Card.Body>
+					<Row className="mb-1">
+						<Col xs="10">
+							Present Trees {' '}
+							<code className="pl-2 text-size-xs">
+								{!trees.length ? '<None>' : trees.join(' ').trim()}
+						</code>
+							<Button disabled={!enable} className="button-reset-sm" variant="link"
+								onClick={() => setTrees(random.randomTrees())}>
+								Random
+							</Button>
+							<Button disabled={!enable} className="button-reset-sm" variant="link"
+								onClick={() => setTrees([...random.trees])}>All</Button>
+							<Button disabled={!enable} className="button-reset-sm" variant="link"
+								onClick={() => setTrees([])}>None</Button>
+							<div className="text-size-xxs text-muted mt-1">
+								What trees are present in the level.
+							</div>
+						</Col>
+						<Col xs="2" className="text-right">
+							<Form.Check
+								className="pull-right"
+								type="switch"
+								id={`trees-present-switch-${nanoid(5)}`}
+								label=""
+								checked={enable}
+								onChange={e => setEnable(e.target.checked)}
+							/>
+						</Col>
+					</Row>
+					<ul className="list-unstyled list-inline mb-0">
+						{random.trees.map(v => (
+							<li key={v} className="list-inline-item mb-1">
 								<Form.Check
-									className="pull-right"
-									type="switch"
-									id={`trees-present-switch-${nanoid(5)}`}
-									label=""
-									checked={enable}
-									onChange={e => this.setState({enable: Boolean(e.target.checked)})}
+									disabled={!enable}
+									custom
+									data-value={v}
+									checked={trees.findIndex(val => v === val) !== -1}
+									id={`trees_${v}`}
+									label={v}
+									onChange={(e: Event) => {
+										const list = trees.filter(val => val !== e.target.getAttribute('data-value'));
+										e.target.checked && list.push(v);
+										setTrees([...list]);
+									}}
 								/>
-							</Col>
-						</Row>
-						<ul className="list-unstyled list-inline mb-0">
-							{random.trees.map(v => (
-								<li key={v} className="list-inline-item mb-1">
-									<Form.Check
-										disabled={!enable}
-										custom
-										data-value={v}
-										checked={trees.findIndex(val => v === val) !== -1}
-										id={`trees_${v}`}
-										label={v}
-										onChange={(e: Event) => {
-											const list = trees.filter(val => val !== e.target.getAttribute('data-value'));
-											e.target.checked && list.push(v);
-											this.setState({trees: [...list]});
-										}}
-									/>
-								</li>
-							))}
-						</ul>
-					</Card.Body>
-				</Card>
-			</>
-		);
-	};
+							</li>
+						))}
+					</ul>
+				</Card.Body>
+			</Card>
+		</>
+	);
 }
 
 // Properties validation

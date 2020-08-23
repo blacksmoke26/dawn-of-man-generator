@@ -20,120 +20,82 @@ import * as random from '../../../../utils/random';
  * @type {Object}
  */
 type Props = {
-	onChange ( template: string, values?: {[string]: any} ): void,
-};
-
-/**
- * TreesEverywhere `state` type
- * @type {Object}
- */
-type State = {
-	trees: boolean,
 	enable: boolean,
+	onChange ( template: string, value: boolean ): void,
 };
 
-/**
- * TreesEverywhere component class
- */
-export class TreesEverywhere extends React.Component<Props, State> {
-	/**
-	 * @inheritDoc
-	 */
-	state: State = {
-		trees: random.randomRiver(),
-		enable: false,
+/** TreesEverywhere functional component */
+function TreesEverywhere ( props: Props ): Node {
+	const [value, setValue] = React.useState<boolean>(random.randomTreesEverywhere());
+	const [enable, setEnable] = React.useState<boolean>(props.enable);
+	
+	// Reflect attributes changes
+	React.useEffect(() => {
+		setEnable(props.enable);
+	}, [props.enable]);
+	
+	// Reflect state changes
+	React.useEffect(() => {
+		typeof props.onChange === 'function' && props.onChange(toTemplateText(), value);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [value, enable]);
+	
+	const toTemplateText = (): string => {
+		return !enable
+			? ''
+			: `<trees_everywhere value="${value ? 'true' : 'false'}"/>`;
 	};
 	
-	/**
-	 * @inheritDoc
-	 */
-	componentDidMount (): void {
-		const {onChange} = this.props;
-		setTimeout(() => {
-			typeof onChange === 'function'
-			&& onChange(this.toTemplateText(), this.getValues());
-		}, 300);
-	}
-	
-	/**
-	 * @inheritDoc
-	 */
-	componentDidUpdate ( prevProps: Readonly<P>, prevState: Readonly<S>, snapshot: SS ): void {
-		if ( JSON.stringify(this.state) !== JSON.stringify(prevState) ) {
-			const {onChange} = this.props;
-			
-			setTimeout(() => {
-				typeof onChange === 'function'
-				&& onChange(this.toTemplateText(), this.getValues());
-			}, 300);
-		}
-	}
-	
-	toTemplateText (): string {
-		const { trees, enable } = this.state;
-		return enable ? `<trees_everywhere value="${trees ? 'true' : 'false'}"/>` : '';
-	}
-	
-	getValues (): {[string]: number} {
-		const { trees } = this.state;
-		return { trees: trees };
-	}
-	
-	/**
-	 * @inheritDoc
-	 */
-	render () {
-		const { trees, enable } = this.state;
-		
-		return (
-			<>
-				<Card className={cn('mb-2', {'text-muted': !enable})}>
-					<Card.Body>
-						<Row className="mb-1">
-							<Col xs="10">
-								Trees Everywhere <code className="pl-2 text-size-xs">{trees ? '<True>' : '<False>'}</code>
-								<Button disabled={!enable} className="button-reset-sm" variant="link"
-									onClick={() => this.setState({trees: random.randomRiver()})}>
-									Random
-								</Button>
-								<Button disabled={!enable} className="button-reset-sm" variant="link"
-									onClick={() => this.setState({trees: false})}>None</Button>
-							</Col>
-							<Col xs="2" className="text-right">
-								<Form.Check
-									className="pull-right"
-									type="switch"
-									id={`trees_everywhere-switch-${nanoid(5)}`}
-									label=""
-									checked={enable}
-									onChange={e => this.setState({enable: Boolean(e.target.checked)})}
-								/>
-							</Col>
-						</Row>
-						<Form.Check
-							custom
-							className="pull-right"
-							disabled={!enable}
-							id={`trees_everywhere-${nanoid(5)}`}
-							label="Show everywhere?"
-							checked={trees}
-							onChange={e => this.setState({trees: Boolean(e.target.checked)})}
-						/>
-					</Card.Body>
-				</Card>
-			</>
-		);
-	};
+	return (
+		<>
+			<Card className={cn('mb-2', {'text-muted': !enable})}>
+				<Card.Body>
+					<Row className="mb-1">
+						<Col xs="10">
+							Trees Everywhere <code className="pl-2 text-size-xs">{value ? '<True>' : '<False>'}</code>
+							<Button disabled={!enable} className="button-reset-sm" variant="link"
+								onClick={() => setValue(random.randomTreesEverywhere())}>
+								Random
+							</Button>
+							<Button disabled={!enable} className="button-reset-sm" variant="link"
+								onClick={() => setValue(false)}>None</Button>
+						</Col>
+						<Col xs="2" className="text-right">
+							<Form.Check
+								className="pull-right"
+								type="switch"
+								id={`trees_everywhere-switch-${nanoid(5)}`}
+								label=""
+								checked={enable}
+								onChange={e => setEnable(e.target.checked)}
+							/>
+						</Col>
+					</Row>
+					<Form.Check
+						custom
+						className="pull-right"
+						disabled={!enable}
+						id={`trees_everywhere-${nanoid(5)}`}
+						label="Show everywhere?"
+						checked={value}
+						onChange={e => setValue(e.target.checked)}
+					/>
+				</Card.Body>
+			</Card>
+		</>
+	);
 }
-
-// Properties validation
-TreesEverywhere.defaultProps = {
-	onChange: () => {},
-};
 
 // Default properties
 TreesEverywhere.propTypes = {
+	enable: PropTypes.bool,
 	onChange: PropTypes.func,
+};
+
+// Properties validation
+TreesEverywhere.defaultProps = {
+	enable: false,
+	onChange: () => {},
 };
 
 export default TreesEverywhere;
