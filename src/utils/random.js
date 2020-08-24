@@ -8,7 +8,7 @@
 
 import slugify from 'slugify';
 import faker from 'faker';
-import randomFloat from 'random-float';
+import randomFloatMod from 'random-float';
 import randomInt from 'random-int';
 import uniqueRandomArray from 'unique-random-array';
 
@@ -47,19 +47,29 @@ export const trees: Array<string> = [
 	'Blueberry', 'Raspberry', 'Strawberry',
 ];
 
+/** Random float number  */
+export function randomFloat ( fraction: number = 2 ): number {
+	return Number(randomFloatMod(0, 1).toFixed(fraction));
+}
+
 /** Random Frequency */
 export function randomFrequency ( fraction: number = 2 ): number {
-	return Number(randomFloat(0, 1)).toFixed(fraction);
+	return randomFloat(fraction);
+}
+
+/** Random Resource */
+export function randomResource (): number {
+	return randomInt(Defaults.RESOURCE_FACTOR_MIN, Defaults.RESOURCE_FACTOR_MAX);
 }
 
 /** Random Density */
 export function randomDensity ( fraction: number = 2 ): number {
-	return Number(randomFloat(Defaults.DENSITY_MIN, Defaults.DENSITY_MAX)).toFixed(fraction);
+	return Number(randomFloatMod(Defaults.DENSITY_MIN, Defaults.DENSITY_MAX)).toFixed(fraction);
 }
 
 /** Random Coordinates */
 export function randomCord ( fraction: number = 2 ): number {
-	return Number(randomFloat(0, 1)).toFixed(fraction);
+	return Number(randomFloatMod(0, 1)).toFixed(fraction);
 }
 
 /** Random Angle */
@@ -73,17 +83,17 @@ export function randomAngle (): [number, number] {
 /** Random Humidity */
 export function randomHumidity (): [number, number] {
 	return [
-		Number(randomFloat(Defaults.HUMIDITY_MIN, Defaults.HUMIDITY_MAX)).toFixed(2),
-		Number(randomFloat(Defaults.HUMIDITY_MIN, Defaults.HUMIDITY_MAX)).toFixed(2)
+		Number(randomFloatMod(Defaults.HUMIDITY_MIN, Defaults.HUMIDITY_MAX)).toFixed(2),
+		Number(randomFloatMod(Defaults.HUMIDITY_MIN, Defaults.HUMIDITY_MAX)).toFixed(2)
 	];
 }
 
 /** Random backdrop Scale */
 export function randomBackdropScale (): [number, number, number] {
 	return [
-		Number(randomFloat(0, 1)).toFixed(2),
-		Number(randomFloat(0, 1)).toFixed(2),
-		Number(randomFloat(0, 1)).toFixed(2),
+		Number(randomFloatMod(0, 1)).toFixed(2),
+		Number(randomFloatMod(0, 1)).toFixed(2),
+		Number(randomFloatMod(0, 1)).toFixed(2),
 	];
 }
 
