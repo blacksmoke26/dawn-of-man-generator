@@ -14,14 +14,17 @@ import { nanoid } from 'nanoid';
 import cn from 'classname';
 import { Range } from 'rc-slider';
 
+// Types
+import { Node } from 'react';
+
 // Utils
 import * as random from './../../../../utils/random';
 import * as Defaults from './../../../../utils/defaults';
 
 type DepositAttr = {
+	_enabled: boolean,
 	min_angle?: number,
 	max_angle?: number,
-	_enabled: boolean,
 };
 
 type DepositSelection = {
@@ -29,11 +32,11 @@ type DepositSelection = {
 };
 
 const getInitialValues = (): DepositAttr => {
-	let angleRand = random.randomAngle();
+	let [min_angle, max_angle] = random.randomAngle();
+	
 	return {
-		min_angle: angleRand[0],
-		max_angle: angleRand[1],
 		_enabled: true,
+		min_angle, max_angle,
 	}
 };
 
@@ -42,157 +45,119 @@ const getInitialValues = (): DepositAttr => {
  * @type {Object}
  */
 type Props = {
+	enabled?: boolean,
+	selection?: DepositSelection,
 	onChange ( template: string, values?: {[string]: any} ): void,
 };
 
-/**
- * DepositOverride `state` type
- * @type {Object}
- */
-type State = {
-	override: boolean,
-	selection: DepositSelection,
-	activeKey: string,
-};
-
-/**
- * DepositOverride component class
- */
-export class DepositOverride extends React.Component<Props, State> {
-	/**
-	 * @inheritDoc
-	 */
-	state: State = {
-		override: true,
-		selection: {},
-		activeKey: '',
-	};
+/** DepositOverride functional component */
+function DepositOverride ( props: Props ) {
+	const [enabled, setEnabled] = React.useState<boolean>(props.enabled);
+	const [selection, setSelection] = React.useState<DepositSelection>(props.selection);
+	const [activeKey, setActiveKey] = React.useState<string>('');
 	
-	/**
-	 * @inheritDoc
-	 */
-	componentDidMount (): void {
-		const {onChange} = this.props;
-		setTimeout(() => {
-			typeof onChange === 'function'
-			&& onChange(this.toTemplateText(), this.getValues());
-		}, 300);
-	}
+	// Reflect attributes changes
+	React.useEffect(() => {
+		setEnabled(props.enabled);
+		setSelection(props.selection);
+	}, [props.enabled, props.selection]);
 	
-	/**
-	 * @inheritDoc
-	 */
-	componentDidUpdate ( prevProps: Readonly<P>, prevState: Readonly<S>, snapshot: SS ): void {
-		if ( JSON.stringify(this.state) !== JSON.stringify(prevState) ) {
-			const {onChange} = this.props;
-			
-			setTimeout(() => {
-				typeof onChange === 'function'
-				&& onChange(this.toTemplateText(), this.getValues());
-			}, 300);
-		}
-	}
+	// Reflect state changes
+	React.useEffect(() => {
+		typeof props.onChange === 'function' && props.onChange(toTemplateText(), selection);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [selection, enabled]);
 	
-	toTemplateText (): string {
-		const { override, selection } = this.state;
-		
+	/** Generate xml code */
+	const toTemplateText = React.useCallback((): string => {
 		const templateOverride: Array<string> = [];
 		
-		if ( !override ) {
+		if ( !enabled ) {
 			return '';
 		}
 		
-		for ( let [name: string, attr: DepositAttr] of Object.entries(selection) ) {
+		for ( let [name: string, attr: TreeAttr] of Object.entries(selection) ) {
 			if ( !attr._enabled ) {
 				continue;
 			}
 			
 			templateOverride.push(
-				'<deposit_override_prototype>'
-				+ `<id value="${name}"/>`
-				+ `<min_angle value="${attr.min_angle}" /><max_angle value="${attr.max_angle}"/>`
-				+ '</deposit_override_prototype>'
+				`<deposit_override_prototype>
+					<id value="${name}"/>
+					<min_angle value="${attr.min_angle}"/>
+					<min_angle value="${attr.max_angle}"/>
+				</deposit_override_prototype>`
 			);
 		}
 		
-		if ( !templateOverride.length ) {
-			return '';
-		}
-		
-		return [
-			'<deposit_override_prototypes>',
-			templateOverride.join(''),
-			'</deposit_override_prototypes>',
-		].join('');
-	}
+		return templateOverride.length
+			? (
+				`<deposit_override_prototypes>
+				${templateOverride.join('')}
+				</deposit_override_prototypes>`
+			) : '';
+	}, [enabled, selection]);
 	
-	getValues (): {[string]: number} {
-		const { selection } = this.state;
-		return { selection: selection };
-	}
-	
-	selectOptions (): Array<Object> {
-		const {selection} = this.state;
+	/** Get react-select options */
+	const renderSelectOptions = React.useCallback((): Array<Object> => {
 		const excludes: Array<string> = Object.keys(selection);
 		
 		return random.deposits
 			.filter(v => !excludes.includes(v))
-			.map(v => ({
-				label: v,
-				value: v,
-			}));
-	}
+			.map(v => ({label: v, value: v}));
+	}, [selection]);
 	
-	modifySelection ( name: string, attr: DepositAttr ): void {
-		this.setState(({selection}) => ({
-			selection: {
-				...selection,
-				[name]: {...selection[name], ...attr},
-			}
-		}));
-	}
+	/** Update given selection data */
+	const modifySelection = ( name: string, attr: DepositAttr ): void => {
+		const newSelection: DepositSelection = {...selection};
+		setSelection(current => ({
+			...current,
+			[name]: {...(newSelection[name] ?? {}), ...attr}
+		}))
+	};
 	
-	removeFromSelection ( name: string ): void {
-		const selection = {...this.state.selection};
+	/** Remove existing selection */
+	const removeFromSelection = ( name: string ): void => {
+		const newSelection: DepositSelection = {...selection};
 		
-		if ( selection.hasOwnProperty(name) ) {
-			delete selection[name];
-			this.setState({selection: {...selection}});
+		if ( newSelection.hasOwnProperty(name) ) {
+			delete newSelection[name];
+			setSelection({...newSelection});
 		}
-	}
+	};
 	
-	selectionNodes (): Array<Node> {
-		const {selection, override} = this.state;
+	/** Generate selection based nodes */
+	const selectionNodes = React.useCallback((): Array<Node> => {
 		const nodes: Array<Node> = [];
 		
 		for ( let [name: string, attr: DepositAttr] of Object.entries(selection) ) {
-			const enabled: boolean = attr._enabled && override;
+			const isEnabled: boolean = attr._enabled && enabled;
 			
 			nodes.push(
 				<Card key={name}>
 					<Card.Header className="pt-0 pb-0 pl-2 pl-2">
 						<div className="clearfix">
 							<div className="float-left">
-								<Accordion.Toggle disabled={!enabled} as={Button}
+								<Accordion.Toggle disabled={!isEnabled} as={Button}
 									variant="link" eventKey={`deposit_${name}`}
-									onClick={() => this.setState(({activeKey}) => ({activeKey: activeKey === name ? '': name}))}>
+									onClick={() => setActiveKey(name)}>
 									{name}
 								</Accordion.Toggle>
 							</div>
 							<div className="float-right">
 								<Form.Check
-									disabled={!override}
+									disabled={!enabled}
 									className="d-inline-block position-relative"
 									style={{top: '6px'}}
 									type="switch"
 									id={`enable-deposit-${name}`}
 									label=""
 									checked={attr._enabled}
-									onChange={e => this.modifySelection(name,{_enabled: Boolean(e.target.checked)})}
+									onChange={e => modifySelection(name,{_enabled: e.target.checked})}
 								/>
 								{' '}
-								<Button variant="link" disabled={!enabled}
-									onClick={() => this.removeFromSelection(name)}
+								<Button variant="link" disabled={!isEnabled}
+									onClick={() => removeFromSelection(name)}
 									style={{fontSize: '1.2rem', top: '1px'}}
 									className="p-0 text-decoration-none position-relative text-dark" size="sm">
 									&times;
@@ -202,7 +167,7 @@ export class DepositOverride extends React.Component<Props, State> {
 					</Card.Header>
 					<Accordion.Collapse eventKey={`deposit_${name}`}>
 						<Card.Body className="pt-2 pb-2">
-							<Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled})}>
+							<Form.Group as={Row} className={cn('mb-2', {'text-muted': !isEnabled})}>
 								<Form.Label className="text-size-sm" column={true} sm="2">
 									<span style={{textDecoration: 'underline dotted'}}
 										title="The min and max slope angles in degrees at which this object
@@ -215,17 +180,17 @@ export class DepositOverride extends React.Component<Props, State> {
 								<Col sm="10">
 									<div>
 										<span className="text-size-xs font-family-code">
-										Min: <code>{attr.min_angle}</code>
+											Min: <code className={cn({'text-muted': !isEnabled})}>{attr.min_angle}</code>
 											{' / '}
-										Max: <code>{attr.max_angle}</code>
-									</span>
-										<Button disabled={!enabled} className="button-reset-sm" variant="link"
+											Max: <code className={cn({'text-muted': !isEnabled})}>{attr.max_angle}</code>
+										</span>
+										<Button disabled={!isEnabled} className="button-reset-sm" variant="link"
 											onClick={() => {
 												const [min_angle, max_angle] = random.randomAngle();
-												this.modifySelection(name, {min_angle, max_angle});
+												modifySelection(name, {min_angle, max_angle});
 											}}>Random</Button>
-										<Button disabled={!enabled} className="button-reset-sm" variant="link"
-											onClick={() => this.modifySelection(name, {
+										<Button disabled={!isEnabled} className="button-reset-sm" variant="link"
+											onClick={() => modifySelection(name, {
 												min_angle: Defaults.ANGLE_MIN_DEFAULT,
 												max_angle: Defaults.ANGLE_MAX_DEFAULT,
 											})}>Default</Button>
@@ -233,10 +198,10 @@ export class DepositOverride extends React.Component<Props, State> {
 									<Range
 										min={Defaults.ANGLE_MIN}
 										max={Defaults.ANGLE_MAX}
-										disabled={!enabled}
+										disabled={!isEnabled}
 										value={[attr.min_angle, attr.max_angle]}
 										onChange={([min_angle, max_angle]) => {
-											this.modifySelection(name, {min_angle, max_angle});
+											modifySelection(name, {min_angle, max_angle});
 										}}/>
 								</Col>
 							</Form.Group>
@@ -247,68 +212,66 @@ export class DepositOverride extends React.Component<Props, State> {
 		}
 		
 		return nodes;
-	}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [enabled, selection]);
 	
-	/**
-	 * @inheritDoc
-	 */
-	render () {
-		const { override } = this.state;
-		
-		return (
-			<Accordion>
-				<Card className="mb-2">
-					<Card.Header className="pt-1 pb-1 pl-2 pl-2">
-						<Accordion.Toggle as={Button} variant="link" eventKey="deposit_override_panel">
-							Override Deposit Prototypes
-						</Accordion.Toggle>
-					</Card.Header>
-					<Accordion.Collapse eventKey="deposit_override_panel">
-						<Card.Body>
-							<div className="mb-3">
-								<Form.Check
-									className="pull-right"
-									type="switch"
-									id={`deposit_override-switch-${nanoid(5)}`}
-									label="Override deposit"
-									checked={override}
-									onChange={e => this.setState({override: Boolean(e.target.checked)})}
+	return (
+		<Accordion>
+			<Card className="mb-2">
+				<Card.Header className="pt-1 pb-1 pl-2 pl-2">
+					<Accordion.Toggle as={Button} variant="link" eventKey="deposit_override_panel">
+						Override Deposit Prototypes
+					</Accordion.Toggle>
+				</Card.Header>
+				<Accordion.Collapse eventKey="deposit_override_panel">
+					<Card.Body>
+						<div className="mb-3">
+							<Form.Check
+								className="pull-right"
+								type="switch"
+								id={`deposit_override-switch-${nanoid(5)}`}
+								label="Override deposit"
+								checked={enabled}
+								onChange={e => setEnabled(e.target.checked)}
+							/>
+							<div className="mt-2 mt-2">
+								<Select
+									isDisabled={!enabled}
+									menuPortalTarget={document.body}
+									styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
+									options={renderSelectOptions()}
+									placeholder="Choose deposit to override"
+									onChange={( selected: ?Object, {action}: Object ) => {
+										if ( action === 'select-option' && selected ) {
+											modifySelection(selected.value, getInitialValues());
+											setActiveKey(selected.value);
+										}
+									}}
 								/>
-								<div className="mt-2 mt-2">
-									<Select
-										isDisabled={!override}
-										menuPortalTarget={document.body}
-										styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
-										options={this.selectOptions()}
-										placeholder="Choose deposit to override"
-										onChange={( selected: ?Object, {action}: Object ) => {
-											if ( action === 'select-option' && selected ) {
-												this.modifySelection(selected.value, getInitialValues());
-												this.setState({activeKey: selected.value});
-											}
-										}}
-									/>
-								</div>
 							</div>
-							<Accordion activeKey={`deposit_${this.state.activeKey}`}>
-								{this.selectionNodes()}
-							</Accordion>
-						</Card.Body>
-					</Accordion.Collapse>
-				</Card>
-			</Accordion>
-		);
-	};
+						</div>
+						<Accordion activeKey={`deposit_${activeKey}`}>
+							{selectionNodes()}
+						</Accordion>
+					</Card.Body>
+				</Accordion.Collapse>
+			</Card>
+		</Accordion>
+	);
 }
 
 // Properties validation
 DepositOverride.propTypes = {
-	onChange: () => {},
+	enabled: PropTypes.bool,
+	selection: PropTypes.object,
+	onChange: PropTypes.func,
 };
 
 // Default properties
 DepositOverride.defaultProps = {
-	onChange: PropTypes.func,
+	enabled: true,
+	selection: {},
+	onChange: () => {},
 };
 
 export default DepositOverride;

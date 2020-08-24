@@ -20,142 +20,103 @@ import * as random from '../../../../utils/random';
  * @type {Object}
  */
 type Props = {
-	onChange ( template: string, values?: {[string]: any} ): void,
+	enabled?: boolean,
+	deposits?: Array<string>,
+	onChange ( template: string, value?: Array<string> ): void,
 };
 
-/**
- * Deposits `state` type
- * @type {Object}
- */
-type State = {
-	deposits: Array<string>,
-	enable: boolean,
-};
-
-/**
- * Deposits component class
- */
-export class Deposits extends React.Component<Props, State> {
-	/**
-	 * @inheritDoc
-	 */
-	state: State = {
-		deposits: random.randomDeposits(),
-		enable: false,
-	};
+/** Deposits functional component */
+function Deposits ( props: Props ) {
+	const [enabled, setEnabled] = React.useState<boolean>(props.enabled);
+	const [deposits, setDeposits] = React.useState<string[]>(props.deposits);
 	
-	/**
-	 * @inheritDoc
-	 */
-	componentDidMount (): void {
-		const {onChange} = this.props;
-		setTimeout(() => {
-			typeof onChange === 'function'
-			&& onChange(this.toTemplateText(), this.getValues());
-		}, 300);
-	}
+	// Reflect attributes changes
+	React.useEffect(() => {
+		setEnabled(props.enabled);
+		setDeposits([...props.deposits]);
+	}, [props.enabled, props.deposits]);
 	
-	/**
-	 * @inheritDoc
-	 */
-	componentDidUpdate ( prevProps: Readonly<P>, prevState: Readonly<S>, snapshot: SS ): void {
-		if ( JSON.stringify(this.state) !== JSON.stringify(prevState) ) {
-			const {onChange} = this.props;
-			
-			setTimeout(() => {
-				typeof onChange === 'function'
-				&& onChange(this.toTemplateText(), this.getValues());
-			}, 300);
-		}
-	}
+	// Reflect state changes
+	React.useEffect(() => {
+		typeof props.onChange === 'function' && props.onChange(toTemplateText(), deposits);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [deposits, enabled]);
 	
-	toTemplateText (): string {
-		const { deposits, enable } = this.state;
-		const val: string = deposits.join(' ').trim();
-		
-		if ( !val ) {
-			return '';
-		}
-		
-		return enable ? `<deposits values="${deposits.join(' ')}"/>` : '';
-	}
+	/** Generate xml code */
+	const toTemplateText = React.useCallback((): string => {
+		return enabled && deposits.length
+			? `<deposits values="${deposits.join(' ')}"/>`
+			: '';
+	}, [deposits, enabled]);
 	
-	getValues (): {[string]: number} {
-		const { deposits } = this.state;
-		return { deposits: deposits };
-	}
-	
-	/**
-	 * @inheritDoc
-	 */
-	render () {
-		const { deposits, enable } = this.state;
-		const depositVal: string = deposits.join(' ').trim();
-		
-		return (
-			<>
-				<Card className={cn('mb-2', {'text-muted': !enable})}>
-					<Card.Body>
-						<Row className="mb-1">
-							<Col xs="10">
-								Deposits <code className="pl-2 text-size-xs">{!depositVal ? '<None>' : depositVal}</code>
-								<Button disabled={!enable} className="button-reset-sm" variant="link"
-									onClick={() => this.setState({deposits: random.randomDeposits()})}>
-									Random
-								</Button>
-								<Button disabled={!enable} className="button-reset-sm" variant="link"
-									onClick={() => this.setState({deposits: [...random.deposits]})}>All</Button>
-								<Button disabled={!enable} className="button-reset-sm" variant="link"
-									onClick={() => this.setState({deposits: []})}>None</Button>
-								<div className="text-size-xxs text-muted mt-1">
-									What types of deposit are present in the level.
-								</div>
-							</Col>
-							<Col xs="2" className="text-right">
-								<Form.Check
-									className="pull-right"
-									type="switch"
-									id={`deposit-switch-${nanoid(5)}`}
-									label=""
-									checked={enable}
-									onChange={e => this.setState({enable: Boolean(e.target.checked)})}
-								/>
-							</Col>
-						</Row>
-						<ul className="list-unstyled list-inline mb-0">
-							{random.deposits.map(v => (
-								<li key={v} className="list-inline-item">
-									<Form.Check
-										disabled={!enable}
-										custom
-										data-value={v}
-										checked={deposits.findIndex(val => v === val) !== -1}
-										id={`deposit_${v}`}
-										label={v}
-										onChange={(e: Event) => {
-											const list = deposits.filter(val => val !== e.target.getAttribute('data-value'));
-											e.target.checked && list.push(v);
-											this.setState({deposits: [...list]});
-										}}
-									/>
-								</li>
-							))}
-						</ul>
-					</Card.Body>
-				</Card>
-			</>
-		);
-	};
+	return (
+		<Card className={cn('mb-2', {'text-muted': !enabled})}>
+			<Card.Body>
+				<Row className="mb-1">
+					<Col xs="10">
+						Deposits <code className={cn('pl-2 text-size-xs', {'text-muted': !enabled})}>
+							{!deposits.length ? '<None>' : deposits.join(', ')}
+						</code>
+						<Button disabled={!enabled} className="button-reset-sm" variant="link"
+							onClick={() => setDeposits(random.randomDeposits())}>
+							Random
+						</Button>
+						<Button disabled={!enabled} className="button-reset-sm" variant="link"
+							onClick={() => setDeposits([...random.deposits])}>All</Button>
+						<Button disabled={!enabled} className="button-reset-sm" variant="link"
+							onClick={() => setDeposits([])}>None</Button>
+						<div className="text-size-xxs text-muted mt-1">
+							What types of deposit are present in the level.
+						</div>
+					</Col>
+					<Col xs="2" className="text-right">
+						<Form.Check
+							className="pull-right"
+							type="switch"
+							id={`deposit-switch-${nanoid(5)}`}
+							label=""
+							checked={enabled}
+							onChange={e => setEnabled(e.target.checked)}
+						/>
+					</Col>
+				</Row>
+				<ul className="list-unstyled list-inline mb-0">
+					{random.deposits.map(v => (
+						<li key={v} className="list-inline-item">
+							<Form.Check
+								disabled={!enabled}
+								custom
+								data-value={v}
+								checked={deposits.findIndex(val => v === val) !== -1}
+								id={`deposit_${v}`}
+								label={v}
+								onChange={( e: Event ) => {
+									const list = deposits.filter(val => val !== e.target.getAttribute('data-value'));
+									console.log({list});
+									e.target.checked && list.push(v);
+									setDeposits([...list]);
+								}}
+							/>
+						</li>
+					))}
+				</ul>
+			</Card.Body>
+		</Card>
+	);
 }
-
-// Properties validation
-Deposits.defaultProps = {
-	onChange: () => {},
-};
 
 // Default properties
 Deposits.propTypes = {
+	enabled: PropTypes.bool,
+	deposits: PropTypes.arrayOf(PropTypes.string),
 	onChange: PropTypes.func,
+};
+
+// Properties validation
+Deposits.defaultProps = {
+	enabled: false,
+	deposits: random.randomDeposits(),
+	onChange: () => {},
 };
 
 export default Deposits;
