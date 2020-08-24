@@ -10,18 +10,16 @@ import React from 'react';
 import * as PropTypes from 'prop-types';
 import { Row, Col, Button, Form, ButtonGroup } from 'react-bootstrap';
 import { Range }  from 'rc-slider';
-import randomFloat from 'random-float';
-import randomInt from 'random-int';
-import faker from 'faker';
+import cn from 'classname';
+
+// Components
+import * as random from './../../../../utils/random';
+import * as Defaults from './../../../../utils/defaults';
 
 // Components
 import UiSlider  from './../../../../components/UiSlider';
-import { nanoid } from 'nanoid';
 
-const randFloat: ( fraction?: number ) => number
-	= ( fraction: number = 2 ): number => randomFloat(0, 1).toFixed(fraction);
-
-const defaultValues: {[string]: any} = {
+const defaultValues = {
 	id: 'Winter',
 	setup_id: 'Winter',
 	duration: 0.25,
@@ -37,20 +35,7 @@ const defaultValues: {[string]: any} = {
 	},
 };
 
-/**
- * Winter `props` type
- * @type {Object}
- */
-type Props = {
-	enabled: boolean,
-	onChange ( template: string, values?: {[string]: any} ): void,
-};
-
-/**
- * Winter `state` type
- * @type {Object}
- */
-type State = {
+type SeasonValue = {
 	duration: number,
 	precipitationChance: number,
 	windyChance: number,
@@ -58,326 +43,312 @@ type State = {
 	reducedFauna: boolean,
 	minTemperatureValue: number,
 	maxTemperatureValue: number,
-	enabled: boolean,
-};
+}
 
 /**
- * Winter component class
+ * Winter `props` type
+ * @type {Object}
  */
-export class Winter extends React.Component<Props, State> {
-	/**
-	 * @inheritDoc
-	 */
-	constructor ( props: Props ) {
-		super(props);
-		this.state = {
-			...this.toDefaultsValue(),
-			enabled: props.enabled,
-		};
-	}
+type Props = {
+	enabled?: boolean,
+	season?: SeasonValue,
+	onChange ( template: string, values?: {[string]: any} ): void,
+};
+
+/** Winter functional component */
+function Winter ( props: Props ) {
+	const [enabled, setEnabled] = React.useState<boolean>(props.enabled);
+	const [season, setSeason] = React.useState<SeasonValue>(props.season);
 	
-	toDefaultsValue (): {[string]: any} {
-		const {
-			reduced_fauna, duration, max_temperature,
-			precipitation_chance, very_windy_chance,
-			windy_chance, min_temperature,
-		} = defaultValues;
-		
-		return {
-			duration: duration,
-			precipitationChance: precipitation_chance,
-			windyChance: windy_chance,
-			veryWindyChance: very_windy_chance,
-			reducedFauna: reduced_fauna,
-			minTemperatureValue: min_temperature.value,
-			maxTemperatureValue: max_temperature.value,
-		};
-	}
+	// Reflect attributes changes
+	React.useEffect(() => {
+		setEnabled(props.enabled);
+		setSeason(props.season);
+	}, [props.enabled, props.season]);
 	
-	/**
-	 * @inheritDoc
-	 */
-	componentDidMount (): void {
-		const {onChange} = this.props;
-		setTimeout(() => {
-			typeof onChange === 'function'
-			&& onChange(this.toTemplateText(), this.getValues());
-		}, 300);
-	}
-	/**
-	 * @inheritDoc
-	 */
-	componentDidUpdate ( prevProps: Readonly<P>, prevState: Readonly<S>, snapshot: SS ): void {
-		const {enabled, onChange} = this.props;
-		
-		if ( JSON.stringify(this.state) !== JSON.stringify(prevState) ) {
-			setTimeout(() => {
-				typeof onChange === 'function'
-				&& onChange(this.toTemplateText(), this.getValues());
-			}, 300);
-		}
-		
-		if ( enabled !== prevProps.enabled ) {
-			this.setState({enabled});
-		}
-	}
+	// Reflect state changes
+	React.useEffect(() => {
+		typeof props.onChange === 'function' && props.onChange(toTemplateText(), season);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [season, enabled]);
 	
-	toTemplateText (): string {
-		const {enabled} = this.props;
-		const {
-			duration,
-			precipitationChance,
-			windyChance,
-			veryWindyChance,
-			reducedFauna,
+	/** Generate xml code */
+	const toTemplateText = React.useCallback((): string => {
+		return enabled ? (
+			`<season id="Winter" setup_id="Winter" snow_setup_id="WinterSnow"
+				duration="${season.duration}"
+				precipitation_chance="${season.precipitationChance}"
+				windy_chance="${season.windyChance}"
+				very_windy_chance="${season.veryWindyChance}"
+				reduced_fauna="${season.reducedFauna ? 'true' : 'false'}">
+					<min_temperature value="${season.minTemperatureValue}"/>
+					<max_temperature value="${season.maxTemperatureValue}"/>
+			</season>`
+		): '';
+	}, [season, enabled]);
+	
+	/** Randomize season values */
+	const randomizeValues = (): void => {
+		const [minTemperatureValue, maxTemperatureValue] = random.randomSeasonTemperature();
+		setSeason({
+			duration: random.randomFloat(),
+			precipitationChance: random.randomFloat(),
+			windyChance: random.randomFloat(),
+			veryWindyChance: random.randomFloat(),
+			reducedFauna: random.randomArray([true, false], 1)[0],
 			minTemperatureValue,
 			maxTemperatureValue,
-		} = this.state;
-		
-		if ( !enabled ) {
-			return '';
-		}
-		
-		const attributes: Array<string> = [
-			`id="Winter"`,
-			`setup_id="Winter"`,
-			`snow_setup_id="WinterSnow"`,
-			`duration="${duration}"`,
-			`precipitation_chance="${precipitationChance}"`,
-			`windy_chance="${windyChance}"`,
-			`very_windy_chance="${veryWindyChance}"`,
-			`reduced_fauna="${reducedFauna ? 'true' : 'false'}"`,
-		];
-		
-		const metaTags: Array<string> = [
-			`<min_temperature value="${minTemperatureValue}"/>`,
-			`<max_temperature value="${maxTemperatureValue}"/>`,
-		];
-		
-		// noinspection CheckTagEmptyBody
-		return (
-			`<season ${attributes.join(' ')}>`
-			+ metaTags.join('')
-			+`</season>`
-		);
-	}
-	
-	getValues (): {[string]: number} {
-		const { value } = this.state;
-		return { spring: value };
-	}
-	
-	randomizeValues (): void {
-		this.setState({
-			duration: randFloat(),
-			precipitationChance: randFloat(),
-			windyChance: randFloat(),
-			veryWindyChance: randFloat(),
-			reducedFauna: faker.random.arrayElement([true, false]),
-			minTemperatureValue: randomInt(-20, -1),
-			maxTemperatureValue: randomInt(0, 15),
 		});
 	}
 	
-	render () {
-		const {enabled} = this.props;
-		const {
-			duration,
-			precipitationChance,
-			windyChance,
-			veryWindyChance,
-			reducedFauna,
-			minTemperatureValue,
-			maxTemperatureValue,
-		} = this.state;
-		
-		return (
-			<>
-				<Form.Group as={Row} className="mb-3">
-					<Form.Label className="text-size-sm" column={true} sm="2">
-						Duration
-					</Form.Label>
-					<Col sm="10">
-						<code className="text-size-xs">{Number(duration).toFixed(2)}</code>
-						<Button disabled={!enabled} className="button-reset-sm" variant="link"
-							onClick={() => this.setState({duration: randFloat()})}>Random</Button>
-						<Button disabled={!enabled} className="button-reset-sm" variant="link"
-							onClick={() => this.setState({duration: defaultValues.duration})}>Default</Button>
-						<Button disabled={!enabled} className="button-reset-sm" variant="link"
-							onClick={() => this.setState({duration: 0})}>0%</Button>
-						<Button disabled={!enabled} className="button-reset-sm" variant="link"
-							onClick={() => this.setState({duration: 0.25})}>25%</Button>
-						<Button disabled={!enabled} className="button-reset-sm" variant="link"
-							onClick={() => this.setState({duration: 0.50})}>50%</Button>
-						<Button disabled={!enabled} className="button-reset-sm" variant="link"
-							onClick={() => this.setState({duration: 0.75})}>75%</Button>
-						<Button disabled={!enabled} className="button-reset-sm" variant="link"
-							onClick={() => this.setState({duration: 1})}>100%</Button>
-						<UiSlider
-							disabled={!enabled}
-							min={0} max={1} step={0.01}
-							value={Number(duration)}
-							onChange={duration => this.setState({duration})}/>
-					</Col>
-				</Form.Group>
-				<Form.Group as={Row} className="mb-2">
-					<Form.Label className="text-size-sm" column={true} sm="2">
-						Precipitation Chance
-					</Form.Label>
-					<Col sm="10">
-						<code className="text-size-xs">{Number(precipitationChance).toFixed(2)}</code>
-						<Button disabled={!enabled} className="button-reset-sm" variant="link"
-							onClick={() => this.setState({precipitationChance: randFloat()})}>Random</Button>
-						<Button disabled={!enabled} className="button-reset-sm" variant="link"
-							onClick={() => this.setState({precipitationChance: defaultValues.precipitation_chance})}>Default</Button>
-						<Button disabled={!enabled} className="button-reset-sm" variant="link"
-							onClick={() => this.setState({precipitationChance: 0})}>0%</Button>
-						<Button disabled={!enabled} className="button-reset-sm" variant="link"
-							onClick={() => this.setState({precipitationChance: 0.25})}>25%</Button>
-						<Button disabled={!enabled} className="button-reset-sm" variant="link"
-							onClick={() => this.setState({precipitationChance: 0.50})}>50%</Button>
-						<Button disabled={!enabled} className="button-reset-sm" variant="link"
-							onClick={() => this.setState({precipitationChance: 0.75})}>75%</Button>
-						<Button disabled={!enabled} className="button-reset-sm" variant="link"
-							onClick={() => this.setState({precipitationChance: 1})}>100%</Button>
-						<UiSlider
-							disabled={!enabled}
-							min={0} max={1} step={0.01}
-							value={Number(precipitationChance)}
-							onChange={precipitationChance => this.setState({precipitationChance})}/>
-					</Col>
-				</Form.Group>
-				<Form.Group as={Row} className="mb-2">
-					<Form.Label className="text-size-sm" column={true} sm="2">
-						Windy Chance
-					</Form.Label>
-					<Col sm="10">
-						<code className="text-size-xs">{Number(windyChance).toFixed(2)}</code>
-						<Button disabled={!enabled} className="button-reset-sm" variant="link"
-							onClick={() => this.setState({windyChance: randFloat()})}>Random</Button>
-						<Button disabled={!enabled} className="button-reset-sm" variant="link"
-							onClick={() => this.setState({windyChance: defaultValues.windy_chance})}>Default</Button>
-						<Button disabled={!enabled} className="button-reset-sm" variant="link"
-							onClick={() => this.setState({windyChance: 0})}>0%</Button>
-						<Button disabled={!enabled} className="button-reset-sm" variant="link"
-							onClick={() => this.setState({windyChance: 0.25})}>25%</Button>
-						<Button disabled={!enabled} className="button-reset-sm" variant="link"
-							onClick={() => this.setState({windyChance: 0.50})}>50%</Button>
-						<Button disabled={!enabled} className="button-reset-sm" variant="link"
-							onClick={() => this.setState({windyChance: 0.75})}>75%</Button>
-						<Button disabled={!enabled} className="button-reset-sm" variant="link"
-							onClick={() => this.setState({windyChance: 1})}>100%</Button>
-						<UiSlider
-							disabled={!enabled}
-							min={0} max={1} step={0.01}
-							value={Number(windyChance)}
-							onChange={windyChance => this.setState({windyChance})}/>
-					</Col>
-				</Form.Group>
-				<Form.Group as={Row} className="mb-2">
-					<Form.Label className="text-size-sm" column={true} sm="2">
-						Very Windy Chance
-					</Form.Label>
-					<Col sm="10">
-						<code className="text-size-xs">{Number(veryWindyChance).toFixed(2)}</code>
-						<Button disabled={!enabled} className="button-reset-sm" variant="link"
-							onClick={() => this.setState({veryWindyChance: randFloat()})}>Random</Button>
-						<Button disabled={!enabled} className="button-reset-sm" variant="link"
-							onClick={() => this.setState({veryWindyChance: defaultValues.very_windy_chance})}>Default</Button>
-						<Button disabled={!enabled} className="button-reset-sm" variant="link"
-							onClick={() => this.setState({veryWindyChance: 0})}>0%</Button>
-						<Button disabled={!enabled} className="button-reset-sm" variant="link"
-							onClick={() => this.setState({veryWindyChance: 0.25})}>25%</Button>
-						<Button disabled={!enabled} className="button-reset-sm" variant="link"
-							onClick={() => this.setState({veryWindyChance: 0.50})}>50%</Button>
-						<Button disabled={!enabled} className="button-reset-sm" variant="link"
-							onClick={() => this.setState({veryWindyChance: 0.75})}>75%</Button>
-						<Button disabled={!enabled} className="button-reset-sm" variant="link"
-							onClick={() => this.setState({veryWindyChance: 1})}>100%</Button>
-						<UiSlider
-							disabled={!enabled}
-							min={0} max={1} step={0.01}
-							value={Number(veryWindyChance)}
-							onChange={veryWindyChance => this.setState({veryWindyChance})}/>
-					</Col>
-				</Form.Group>
-				<Form.Group as={Row} className="mb-2">
-					<Form.Label className="text-size-sm" column={true} sm="2">
-						Reduced Fauna
-					</Form.Label>
-					<Col sm="10">
-						<code className="text-size-xs">{reducedFauna ? '<Yes>' : '<No>'}</code>
-						<Button disabled={!enabled} className="button-reset-sm" variant="link"
-							onClick={() => this.setState({reducedFauna: faker.random.arrayElement([true, false])})}>Random</Button>
-						<Button disabled={!enabled} className="button-reset-sm" variant="link"
-							onClick={() => this.setState({reducedFauna: defaultValues.reduced_fauna})}>Default</Button>
-						<Form.Check
-							type="switch"
-							disabled={!enabled}
-							id={`reduced_fauna-${nanoid(5)}`}
-							label={""}
-							checked={reducedFauna}
-							onChange={e => this.setState({reducedFauna: Boolean(e.target.checked)})}
-						/>
-					</Col>
-				</Form.Group>
-				<Form.Group as={Row} className="mb-2">
-					<Form.Label className="text-size-sm" column={true} sm="2">
-						Temperature
-					</Form.Label>
-					<Col sm="10">
-								<span className="text-size-xs font-family-code">
-									Min: <code>{minTemperatureValue}</code>
-									{' / '}
-									Max: <code>{maxTemperatureValue}</code>
-								</span>
-						<Button disabled={!enabled} className="button-reset-sm" variant="link"
-							onClick={() => this.setState({
-								minTemperatureValue: randomInt(-20, -1),
-								maxTemperatureValue: randomInt(0, 15),
-							})}>Random</Button>
-						<Button disabled={!enabled} className="button-reset-sm" variant="link"
-							onClick={() => this.setState({
-								minTemperatureValue: defaultValues.min_temperature.value,
-								maxTemperatureValue: defaultValues.max_temperature.value,
-							})}>Default</Button>
-						<Range
-							min={-20}
-							max={15}
-							disabled={!enabled}
-							value={[minTemperatureValue, maxTemperatureValue]}
-							onChange={([min, max]) => {
-								this.setState({
-									minTemperatureValue: min,
-									maxTemperatureValue: max,
-								});
-							}}/>
-					</Col>
-				</Form.Group>
-				<div className="mt-3">
-					<ButtonGroup>
-						<Button disabled={!enabled} variant="secondary" size="sm"
-							onClick={this.randomizeValues.bind(this)}>Randomize All</Button>
-						<Button disabled={!enabled} variant="secondary" size="sm"
-							onClick={() => this.setState({...this.toDefaultsValue()})}>
-							Set Defaults
-						</Button>
-					</ButtonGroup>
-				</div>
-			</>
-		);
+	/** Update season */
+	const setValuesDefault = (): void => {
+		setSeason({
+			duration: defaultValues.duration,
+			precipitationChance: defaultValues.precipitation_chance,
+			windyChance: defaultValues.windy_chance,
+			veryWindyChance: defaultValues.very_windy_chance,
+			reducedFauna: defaultValues.reduced_fauna,
+			minTemperatureValue: defaultValues.min_temperature.value,
+			maxTemperatureValue: defaultValues.max_temperature.value,
+		});
 	};
+	
+	/** Update season */
+	const updateValue = ( name: string, value: any ): void => {
+		setSeason(current => ({
+			...current,
+			[name]: value
+		}));
+	};
+	
+	return (
+		<>
+			<Form.Group as={Row} className="mb-2">
+				<Form.Label className="text-size-sm" column={true} sm="2">
+					<span style={{textDecoration: 'underline dotted'}}
+						title="How long this season is, in terms of a fraction of a
+						year, all season durations have to add up to 1.">
+						Duration
+					</span>
+				</Form.Label>
+				<Col sm="10">
+					<code className={cn('text-size-xs', {'text-muted': !enabled})}>{season.duration}</code>
+					<Button disabled={!enabled} className="button-reset-sm" variant="link"
+						onClick={() => updateValue('duration', random.randomFloat())}>Random</Button>
+					<Button disabled={!enabled} className="button-reset-sm" variant="link"
+						onClick={() => updateValue('duration', defaultValues.duration)}>Default</Button>
+					<Button disabled={!enabled} className="button-reset-sm" variant="link"
+						onClick={() => updateValue('duration', 0)}>%</Button>
+					<Button disabled={!enabled} className="button-reset-sm" variant="link"
+						onClick={() => updateValue('duration', 0.25)}>25%</Button>
+					<Button disabled={!enabled} className="button-reset-sm" variant="link"
+						onClick={() => updateValue('duration' ,0.50)}>50%</Button>
+					<Button disabled={!enabled} className="button-reset-sm" variant="link"
+						onClick={() => updateValue('duration' ,0.75)}>75%</Button>
+					<Button disabled={!enabled} className="button-reset-sm" variant="link"
+						onClick={() => updateValue('duration' ,1)}>100%</Button>
+					<UiSlider
+						disabled={!enabled}
+						min={0} max={1} step={0.01}
+						value={season.duration}
+						onChange={v => updateValue('duration' ,v)}/>
+				</Col>
+			</Form.Group>
+			<Form.Group as={Row} className="mb-2">
+				<Form.Label className="text-size-sm" column={true} sm="2">
+					<span style={{textDecoration: 'underline dotted'}}
+						title="How likely it is to rain/snow in this season.">
+						Precipitation Chance
+					</span>
+				</Form.Label>
+				<Col sm="10">
+					<code className={cn('text-size-xs', {'text-muted': !enabled})}>{season.precipitationChance}</code>
+					<Button disabled={!enabled} className="button-reset-sm" variant="link"
+						onClick={() => updateValue('precipitationChance', random.randomFloat())}>Random</Button>
+					<Button disabled={!enabled} className="button-reset-sm" variant="link"
+						onClick={() => updateValue('precipitationChance', defaultValues.precipitation_chance)}>Default</Button>
+					<Button disabled={!enabled} className="button-reset-sm" variant="link"
+						onClick={() => updateValue('precipitationChance', 0)}>0%</Button>
+					<Button disabled={!enabled} className="button-reset-sm" variant="link"
+						onClick={() => updateValue('precipitationChance', 0.25)}>25%</Button>
+					<Button disabled={!enabled} className="button-reset-sm" variant="link"
+						onClick={() => updateValue('precipitationChance', 0.50)}>50%</Button>
+					<Button disabled={!enabled} className="button-reset-sm" variant="link"
+						onClick={() => updateValue('precipitationChance', 0.75)}>75%</Button>
+					<Button disabled={!enabled} className="button-reset-sm" variant="link"
+						onClick={() => updateValue('precipitationChance', 1)}>100%</Button>
+					<UiSlider
+						disabled={!enabled}
+						min={0} max={1} step={0.01}
+						value={season.precipitationChance}
+						onChange={v => updateValue('precipitationChance' ,v)}/>
+				</Col>
+			</Form.Group>
+			<Form.Group as={Row} className="mb-2">
+				<Form.Label className="text-size-sm" column={true} sm="2">
+					<span style={{textDecoration: 'underline dotted'}}
+					title="How likely it is for it to be windy in this season.">
+						Windy Chance
+					</span>
+				</Form.Label>
+				<Col sm="10">
+					<code className={cn('text-size-xs', {'text-muted': !enabled})}>{season.windyChance}</code>
+					<Button disabled={!enabled} className="button-reset-sm" variant="link"
+						onClick={() => updateValue('windyChance', random.randomFloat())}>Random</Button>
+					<Button disabled={!enabled} className="button-reset-sm" variant="link"
+						onClick={() => updateValue('windyChance', defaultValues.windy_chance)}>Default</Button>
+					<Button disabled={!enabled} className="button-reset-sm" variant="link"
+						onClick={() => updateValue('windyChance', 0.0)}>0%</Button>
+					<Button disabled={!enabled} className="button-reset-sm" variant="link"
+						onClick={() => updateValue('windyChance', 0.25)}>25%</Button>
+					<Button disabled={!enabled} className="button-reset-sm" variant="link"
+						onClick={() => updateValue('windyChance', 0.50)}>50%</Button>
+					<Button disabled={!enabled} className="button-reset-sm" variant="link"
+						onClick={() => updateValue('windyChance', 0.75)}>75%</Button>
+					<Button disabled={!enabled} className="button-reset-sm" variant="link"
+						onClick={() => updateValue('windyChance', 1.0)}>100%</Button>
+					<UiSlider
+						disabled={!enabled}
+						min={0} max={1} step={0.01}
+						value={season.windyChance}
+						onChange={v => updateValue('windyChance', v)}/>
+				</Col>
+			</Form.Group>
+			<Form.Group as={Row} className="mb-2">
+				<Form.Label className="text-size-sm" column={true} sm="2">
+					<span style={{textDecoration: 'underline dotted'}}
+						title="How likely it is for it to be very windy in this season.">
+						Very Windy Chance
+					</span>
+				</Form.Label>
+				<Col sm="10">
+					<code className={cn('text-size-xs', {'text-muted': !enabled})}>{season.veryWindyChance}</code>
+					<Button disabled={!enabled} className="button-reset-sm" variant="link"
+						onClick={() => updateValue('veryWindyChance', random.randomFloat())}>Random</Button>
+					<Button disabled={!enabled} className="button-reset-sm" variant="link"
+						onClick={() => updateValue('veryWindyChance', defaultValues.very_windy_chance)}>Default</Button>
+					<Button disabled={!enabled} className="button-reset-sm" variant="link"
+						onClick={() => updateValue('veryWindyChance', 0)}>0%</Button>
+					<Button disabled={!enabled} className="button-reset-sm" variant="link"
+						onClick={() => updateValue('veryWindyChance', 0.25)}>25%</Button>
+					<Button disabled={!enabled} className="button-reset-sm" variant="link"
+						onClick={() => updateValue('veryWindyChance', 0.50)}>50%</Button>
+					<Button disabled={!enabled} className="button-reset-sm" variant="link"
+						onClick={() => updateValue('veryWindyChance', 0.75)}>75%</Button>
+					<Button disabled={!enabled} className="button-reset-sm" variant="link"
+						onClick={() => updateValue('veryWindyChance', 1)}>100%</Button>
+					<UiSlider
+						disabled={!enabled}
+						min={0} max={1} step={0.01}
+						value={season.veryWindyChance}
+						onChange={n => updateValue('veryWindyChance', n)}/>
+				</Col>
+			</Form.Group>
+			<Form.Group as={Row} className="mb-2">
+				<Form.Label className="text-size-sm" column={true} sm="2">
+					<span style={{textDecoration: 'underline dotted'}}
+						title="Define whether this season has reduced fauna, in which case
+						the number of animals will match the min value defined in scenario,
+						or not, in which case the number of animals will be the max value
+						defined in scenario.">
+						Reduced Fauna
+					</span>
+				</Form.Label>
+				<Col sm="10">
+					<code className={cn('text-size-xs', {'text-muted': !enabled})}>
+						{season.reducedFauna ? '<Yes>' : '<No>'}
+					</code>
+					<Button disabled={!enabled} className="button-reset-sm" variant="link"
+						onClick={() => updateValue('reducedFauna', random.randomArray([true, false], 1)[0])}>Random</Button>
+					<Button disabled={!enabled} className="button-reset-sm" variant="link"
+						onClick={() => updateValue('reducedFauna', defaultValues.reduced_fauna)}>Default</Button>
+					<Form.Check
+						type="switch"
+						disabled={!enabled}
+						id={`reduced_fauna-winter}`}
+						label={""}
+						checked={season.reducedFauna}
+						onChange={e => updateValue('reducedFauna', e.target.checked)}
+					/>
+				</Col>
+			</Form.Group>
+			<Form.Group as={Row} className="mb-2">
+				<Form.Label className="text-size-sm" column={true} sm="2">
+					<span style={{textDecoration: 'underline dotted'}}
+						title="Temperature will randomly oscillate between these 2 values (in Celsius)">
+						Temperature
+					</span>
+				</Form.Label>
+				<Col sm="10">
+					<span className="text-size-xs font-family-code">
+						Min: <code className={cn({'text-muted': !enabled})}>{season.minTemperatureValue}°</code>
+						{' / '}
+						Max: <code className={cn({'text-muted': !enabled})}>{season.maxTemperatureValue}°</code>
+					</span>
+					<Button disabled={!enabled} className="button-reset-sm" variant="link"
+						onClick={() => {
+							const [min, max] = random.randomSeasonTemperature();
+							updateValue('minTemperatureValue', min);
+							updateValue('maxTemperatureValue', max);
+						}}>Random</Button>
+					<Button disabled={!enabled} className="button-reset-sm" variant="link"
+						onClick={() => {
+							updateValue('minTemperatureValue', defaultValues.min_temperature.value);
+							updateValue('maxTemperatureValue', defaultValues.max_temperature.value);
+						}}>Default</Button>
+					<Range
+						min={Defaults.SEASON_TEMPERATURE_MIN}
+						max={Defaults.SEASON_TEMPERATURE_MAX}
+						disabled={!enabled}
+						value={[season.minTemperatureValue, season.maxTemperatureValue]}
+						onChange={([min, max]) => {
+							updateValue('minTemperatureValue', min);
+							updateValue('maxTemperatureValue', max);
+						}}/>
+				</Col>
+			</Form.Group>
+			<div className="mt-3">
+				<ButtonGroup>
+					<Button disabled={!enabled} variant="secondary" size="sm"
+						onClick={() => randomizeValues()}>Randomize All</Button>
+					<Button disabled={!enabled} variant="secondary" size="sm"
+						onClick={() => setValuesDefault()}>
+						Set Defaults
+					</Button>
+				</ButtonGroup>
+			</div>
+		</>
+	);
 }
 
 // Properties validation
 Winter.propTypes = {
 	enabled: PropTypes.bool,
+	season: PropTypes.shape({
+		duration: PropTypes.number,
+		precipitationChance: PropTypes.number,
+		windyChance: PropTypes.number,
+		veryWindyChance: PropTypes.number,
+		reducedFauna: PropTypes.bool,
+		minTemperatureValue: PropTypes.number,
+		maxTemperatureValue: PropTypes.number,
+	}),
 	onChange: PropTypes.func,
 };
 
 // Default properties
 Winter.defaultProps = {
 	enabled: true,
+	season: {
+		duration: defaultValues.duration,
+		precipitationChance: defaultValues.precipitation_chance,
+		windyChance: defaultValues.windy_chance,
+		veryWindyChance: defaultValues.very_windy_chance,
+		reducedFauna: defaultValues.reduced_fauna,
+		minTemperatureValue: defaultValues.min_temperature.value,
+		maxTemperatureValue: defaultValues.max_temperature.value,
+	},
 	onChange: () => {},
 };
 
