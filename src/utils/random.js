@@ -52,6 +52,19 @@ export function randomFloat ( fraction: number = 2 ): number {
 	return Number(randomFloatMod(0, 1).toFixed(fraction));
 }
 
+/** Random array */
+export function randomArray ( list: Array<any>, counts: number ): list {
+	const rand: Function = uniqueRandomArray(list);
+	
+	const newList: Array<string> = [];
+	
+	for ( let i = 1; i <= counts; i++ ) {
+		newList.push(rand());
+	}
+	
+	return newList;
+}
+
 /** Random Frequency */
 export function randomFrequency (): number {
 	return Number(randomFloatMod(0, 1).toFixed(3));
@@ -77,6 +90,14 @@ export function randomAngle (): [number, number] {
 	return [
 		randomInt(Defaults.ANGLE_MIN, 40),
 		randomInt(41, Defaults.ANGLE_MAX)
+	];
+}
+
+/** Random season temperature */
+export function randomSeasonTemperature (): [number, number] {
+	return [
+		randomInt(Defaults.SEASON_TEMPERATURE_MIN, -1),
+		randomInt(0, Defaults.SEASON_TEMPERATURE_MAX)
 	];
 }
 
