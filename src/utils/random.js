@@ -53,8 +53,8 @@ export function randomFloat ( fraction: number = 2 ): number {
 }
 
 /** Random Frequency */
-export function randomFrequency ( fraction: number = 2 ): number {
-	return randomFloat(fraction);
+export function randomFrequency (): number {
+	return Number(randomFloatMod(0, 1).toFixed(3));
 }
 
 /** Random Resource */
@@ -138,7 +138,7 @@ export function randomTreesEverywhere (): boolean {
 /**
  * Random Frequencies
  */
-export function randomFrequencies ( value: ?number = null, fraction: number = 2 ): {[string]: number} {
+export function randomFrequencies ( value: ?number = null ): {[string]: number} {
 	const frequencies: Array<string> = [
 		'freq1', 'freq2', 'freq3', 'freq4',
 		'freq5', 'freq6', 'freq7', 'freq8',
@@ -147,7 +147,7 @@ export function randomFrequencies ( value: ?number = null, fraction: number = 2 
 	const finalObj: {[string]: number} = {};
 	
 	for ( let f of frequencies ) {
-		finalObj[f] = Number(value) || randomFrequency(fraction);
+		finalObj[f] = value ?? randomFrequency();
 	}
 	
 	return finalObj;
