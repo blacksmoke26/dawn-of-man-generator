@@ -1,3 +1,5 @@
+// @flow
+
 /**
  * @author Junaid Atari <mj.atari@gmail.com>
  * @link http://junaidatari.com Author Website
@@ -7,95 +9,53 @@
 import React from 'react';
 import * as PropTypes from 'prop-types';
 
-// Types
-import type { Node } from 'react';
-
 // Components
 import DetailOverride from './DetailOverride';
+
+/** ExportValues export values */
+type ExportValues = {
+	detailOverride: string,
+};
 
 /**
  * DetailPanel `props` type
  * @type {Object}
  */
 type Props = {
-	onChange ( template: string, values?: {[string]: any} ): void,
+	onChange ( template: string, values?: ExportValues ): void,
 };
 
-/**
- * DetailPanel `state` type
- * @type {Object}
- */
-type State = {
-	detailOverride: string,
-};
-
-/**
- * DetailPanel functional component
- */
-class DetailPanel extends React.Component<Props, State> {
-	/**
-	 * @inheritDoc
-	 */
-	state: State = {
-		detailOverride: '',
-	};
+/** DetailPanel functional component */
+function DetailPanel ( props: Props ) {
+	const [detailOverride, setDetailOverride] = React.useState<string>('');
 	
-	/**
-	 * @inheritDoc
-	 */
-	componentDidMount (): void {
-		const {onChange} = this.props;
-		setTimeout(() => {
-			typeof onChange === 'function'
-			&& onChange(this.toTemplateText(), this.getValues());
-		}, 300);
-	}
+	// Reflect state changes
+	React.useEffect(() => {
+		typeof props.onChange === 'function'
+			&& props.onChange(toTemplateText(), {detailOverride});
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [detailOverride]);
 	
-	/**
-	 * @inheritDoc
-	 */
-	componentDidUpdate ( prevProps: Readonly<P>, prevState: Readonly<S>, snapshot: SS ): void {
-		if ( JSON.stringify(this.state) !== JSON.stringify(prevState) ) {
-			const {onChange} = this.props;
-			
-			setTimeout(() => {
-				typeof onChange === 'function'
-				&& onChange(this.toTemplateText(), this.getValues());
-			}, 300);
-		}
-	}
+	/** Generate xml code */
+	const toTemplateText = React.useCallback((): string => {
+		return detailOverride;
+	}, [detailOverride]);
 	
-	toTemplateText (): string {
-		const {detailOverride} = this.state;
-		return [detailOverride].join('');
-	}
-	
-	getValues (): {[string]: string} {
-		const {detailOverride} = this.state;
-		return {detailOverride};
-	}
-	
-	/**
-	 * @inheritDoc
-	 */
-	render (): Node {
-		return (
-			<>
-				<DetailOverride onChange={( v: string ) => this.setState({detailOverride: v})}/>
-			</>
-		);
-	}
+	return (
+		<>
+			<DetailOverride onChange={v => setDetailOverride(v)}/>
+		</>
+	);
 }
-
-// Default properties
-DetailPanel.defaultProps = {
-	onChange: () => {},
-};
-
 
 // Properties validation
 DetailPanel.propTypes = {
 	onChange: PropTypes.func,
+};
+
+// Default properties
+DetailPanel.defaultProps = {
+	onChange: () => {},
 };
 
 export default DetailPanel;
