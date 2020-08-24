@@ -10,136 +10,104 @@ import React from 'react';
 import * as PropTypes from 'prop-types';
 import { Card, Button, Form, Row, Col } from 'react-bootstrap';
 import { nanoid } from 'nanoid';
-import randomInt from 'random-int';
 import cn from 'classname';
 
 // Components
 import UiSlider from './../../../../components/UiSlider';
 
-const randomize: () => number = (): number => randomInt(0, 100);
+// Utils
+import * as random from './../../../../utils/random';
+import * as Defaults from './../../../../utils/defaults';
 
 /**
  * ResourceFactor `props` type
  * @type {Object}
  */
 type Props = {
-	onChange ( template: string, values?: {[string]: any} ): void,
+	enabled?: boolean,
+	resource?: number,
+	onChange ( template: string, value: number ): void,
 };
 
-/**
- * ResourceFactor `state` type
- * @type {Object}
- */
-type State = {
-	resource: number,
-	enable: boolean,
-};
-
-/**
- * ResourceFactor component class
- */
-export class ResourceFactor extends React.Component<Props, State> {
-	/**
-	 * @inheritDoc
-	 */
-	state: State = {
-		resource: randomize(),
-		enable: false,
-	};
+/** ResourceFactor functional component */
+function ResourceFactor ( props: Props ) {
+	const [enabled, setEnabled] = React.useState<boolean>(props.enabled);
+	const [resource, setResource] = React.useState<number>(props.resource);
 	
-	/**
-	 * @inheritDoc
-	 */
-	componentDidMount (): void {
-		const {onChange} = this.props;
-		setTimeout(() => {
-			typeof onChange === 'function'
-			&& onChange(this.toTemplateText(), this.getValues());
-		}, 300);
-	}
+	// Reflect attributes changes
+	React.useEffect(() => {
+		setEnabled(props.enabled);
+		setResource(props.resource);
+	}, [props.enabled, props.resource]);
 	
-	/**
-	 * @inheritDoc
-	 */
-	componentDidUpdate ( prevProps: Readonly<P>, prevState: Readonly<S>, snapshot: SS ): void {
-		if ( JSON.stringify(this.state) !== JSON.stringify(prevState) ) {
-			const {onChange} = this.props;
-			
-			setTimeout(() => {
-				typeof onChange === 'function'
-				&& onChange(this.toTemplateText(), this.getValues());
-			}, 300);
-		}
-	}
+	// Reflect state changes
+	React.useEffect(() => {
+		typeof props.onChange === 'function' && props.onChange(toTemplateText(), resource);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [resource, enabled]);
 	
-	toTemplateText (): string {
-		const { resource, enable } = this.state;
-		return enable ? `<resource_factor value="${resource}"/>` : '';
-	}
+	/** Generate xml code */
+	const toTemplateText = React.useCallback((): string => {
+		return enabled
+			? `<resource_factor value="${resource}"/>`
+			: '';
+	}, [resource, enabled]);
 	
-	getValues (): {[string]: number} {
-		const { resource } = this.state;
-		return { resource: resource };
-	}
-	
-	/**
-	 * @inheritDoc
-	 */
-	render () {
-		const { resource, enable } = this.state;
-		
-		return (
-			<>
-				<Card className={cn('mb-2', {'text-muted': !enable})}>
-					<Card.Body>
-						<Row className="mb-1">
-							<Col xs="10">
-								Resource Factor <code className="pl-2 text-size-xs">{resource}</code>
-								<Button disabled={!enable} className="button-reset-sm" variant="link"
-									onClick={() => this.setState({resource: randomize()})}>
-									Random
-								</Button>
-								<Button disabled={!enable} className="button-reset-sm" variant="link"
-									onClick={() => this.setState({resource: 1})}>Default</Button>
-								<Button disabled={!enable} className="button-reset-sm" variant="link"
-									onClick={() => this.setState({resource: 100})}>Max</Button>
-								<Button disabled={!enable} className="button-reset-sm" variant="link"
-									onClick={() => this.setState({resource: 0})}>None</Button>
-								<div className="text-size-xxs text-muted mt-1">
-									The amount of resources in the map. 1 is the default.
-								</div>
-							</Col>
-							<Col xs="2" className="text-right">
-								<Form.Check
-									className="pull-right"
-									type="switch"
-									id={`river-switch-${nanoid(5)}`}
-									label=""
-									checked={enable}
-									onChange={e => this.setState({enable: Boolean(e.target.checked)})}
-								/>
-							</Col>
-						</Row>
-						<UiSlider step={1}
-							min={0}
-							max={100}
-							disabled={!enable} value={Number(resource)}
-							onChange={v => this.setState({resource: v})}/>
-					</Card.Body>
-				</Card>
-			</>
-		);
-	};
+	return (
+		<Card className={cn('mb-2', {'text-muted': !enabled})}>
+			<Card.Body>
+				<Row className="mb-1">
+					<Col xs="10">
+						Resource Factor <code className={cn('pl-2 text-size-xs', {'text-muted': !enabled})}>
+							{resource}
+						</code>
+						<Button disabled={!enabled} className="button-reset-sm" variant="link"
+							onClick={() => setResource(random.randomResource())}>
+							Random
+						</Button>
+						<Button disabled={!enabled} className="button-reset-sm" variant="link"
+							onClick={() => setResource(Defaults.RESOURCE_FACTOR_DEFAULT)}>Default</Button>
+						<Button disabled={!enabled} className="button-reset-sm" variant="link"
+							onClick={() => setResource(Defaults.RESOURCE_FACTOR_MAX)}>Max</Button>
+						<Button disabled={!enabled} className="button-reset-sm" variant="link"
+							onClick={() => setResource(Defaults.RESOURCE_FACTOR_MIN)}>None</Button>
+						<div className="text-size-xxs text-muted mt-1">
+							The amount of resources in the map. 1 is the default.
+						</div>
+					</Col>
+					<Col xs="2" className="text-right">
+						<Form.Check
+							className="pull-right"
+							type="switch"
+							id={`river-switch-${nanoid(5)}`}
+							label=""
+							checked={enabled}
+							onChange={e => setEnabled(e.target.checked)}
+						/>
+					</Col>
+				</Row>
+				<UiSlider step={1}
+					min={0}
+					max={100}
+					disabled={!enabled} value={Number(resource)}
+					onChange={v => setResource(v)}/>
+			</Card.Body>
+		</Card>
+	);
 }
 
 // Properties validation
-ResourceFactor.defaultProps = {
-	onChange: () => {},
+ResourceFactor.propTypes = {
+	enabled: PropTypes.bool,
+	resource: PropTypes.number,
+	onChange: PropTypes.func,
 };
 
 // Default properties
-ResourceFactor.propTypes = {
-	onChange: PropTypes.func,
+ResourceFactor.defaultProps = {
+	enabled: false,
+	resource: random.randomResource(),
+	onChange: () => {},
 };
 
 export default ResourceFactor;

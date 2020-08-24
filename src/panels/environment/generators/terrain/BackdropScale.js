@@ -23,134 +23,113 @@ import * as random from '../../../../utils/random';
  * @type {Object}
  */
 type Props = {
-	onChange ( template: string, values?: {[string]: any} ): void,
-};
-
-/**
- * BackdropScale `state` type
- * @type {Object}
- */
-type State = {
+	enabled: boolean,
 	angle1: number,
 	angle2: number,
 	angle3: number,
-	enable: boolean,
+	onChange ( template: string, values?: {[string]: any} ): void,
 };
 
+/** Default values */
 const defaultValues: Object = {
 	angle1: 1.0,
 	angle2: 0.25,
 	angle3: 1.0,
 }
 
-/**
- * BackdropScale component class
- */
-export class BackdropScale extends React.Component<Props, State> {
-	/**
-	 * @inheritDoc
-	 */
-	state: State = {
-		...defaultValues,
-		enable: false,
-	};
+/** BackdropScale functional component */
+function BackdropScale ( props: Props ) {
+	const [enabled, setEnabled] = React.useState<number>(props.enabled);
+	const [angle1, setAngle1] = React.useState<number>(props.angle1);
+	const [angle2, setAngle2] = React.useState<number>(props.angle2);
+	const [angle3, setAngle3] = React.useState<number>(props.angle3);
 	
-	/**
-	 * @inheritDoc
-	 */
-	componentDidMount (): void {
-		const {onChange} = this.props;
-		setTimeout(() => {
-			typeof onChange === 'function'
-			&& onChange(this.toTemplateText(), this.getValues());
-		}, 300);
-	}
+	// Reflect attributes changes
+	React.useEffect(() => {
+		setEnabled(props.enabled);
+		setAngle1(props.angle1);
+		setAngle2(props.angle2);
+		setAngle3(props.angle3);
+	}, [props.enabled, props.angle1, props.angle2, props.angle3]);
 	
-	/**
-	 * @inheritDoc
-	 */
-	componentDidUpdate ( prevProps: Readonly<P>, prevState: Readonly<S>, snapshot: SS ): void {
-		if ( JSON.stringify(this.state) !== JSON.stringify(prevState) ) {
-			const {onChange} = this.props;
-			
-			setTimeout(() => {
-				typeof onChange === 'function'
-				&& onChange(this.toTemplateText(), this.getValues());
-			}, 300);
-		}
-	}
+	// Reflect state changes
+	React.useEffect(() => {
+		typeof props.onChange === 'function' && props.onChange(toTemplateText(), {angle1, angle2, angle3});
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [enabled, angle1, angle2, angle3]);
 	
-	toTemplateText (): string {
-		const { angle1, angle2, angle3, enable } = this.state;
-		return enable ? `<backdrop_scale value="${angle1}, ${angle2}, ${angle3}"/>` : '';
-	}
+	/** Generate xml code */
+	const toTemplateText = React.useCallback((): string => {
+		return enabled
+			? `<backdrop_scale value="${angle1}, ${angle2}, ${angle3}"/>`
+			: '';
+	}, [enabled, angle1, angle2, angle3]);
 	
-	getValues (): {[string]: number} {
-		const { angle1, angle2, angle3 } = this.state;
-		return { angle1, angle2, angle3 };
-	}
-	
-	/**
-	 * @inheritDoc
-	 */
-	render () {
-		const { angle1, angle2, angle3, enable } = this.state;
-		
-		return (
-			<>
-				<Card className="mb-2">
-					<Card.Body>
-						<Row className="mb-1">
-							<Col xs="10" className={cn({'text-muted': !enable})}>
-								Backdrop Scale <code className="pl-2 text-size-xs">{angle1}, {angle2}, {angle3}</code>
-								<Button disabled={!enable} className="button-reset-sm" variant="link"
-									onClick={() => {
-										const rand = random.randomBackdropScale();
-										this.setState({angle1: rand[0], angle2: rand[1], angle3: rand[2]});
-									}}>
-									Random
-								</Button>
-								<Button disabled={!enable} className="button-reset-sm" variant="link"
-									onClick={() => this.setState({...defaultValues})}>Reset</Button>
-								<div className="text-size-xxs text-muted mt-1">
-									Change the size of backdrops (the mountains you see beyond the map).
-								</div>
-							</Col>
-							<Col xs="2" className="text-right">
-								<Form.Check
-									className="pull-right"
-									type="switch"
-									id={`backdrop_scale-switch-${nanoid(5)}`}
-									label=""
-									checked={enable}
-									onChange={e => this.setState({enable: Boolean(e.target.checked)})}
-								/>
-							</Col>
-						</Row>
-						<div className="mb-2">
-							<UiSlider disabled={!enable} step={0.01} value={Number(angle1)} onChange={v => this.setState({angle1: v})}/>
-						</div>
-						<div className="mb-2">
-							<UiSlider disabled={!enable} step={0.01} value={Number(angle2)} onChange={v => this.setState({angle2: v})}/>
-						</div>
-						<div className="mb-2">
-							<UiSlider disabled={!enable} step={0.01} value={Number(angle3)} onChange={v => this.setState({angle3: v})}/>
-						</div>
-					</Card.Body>
-				</Card>
-			</>
-		);
-	};
+	return (
+		<>
+			<Card className="mb-2">
+				<Card.Body>
+					<Row className="mb-1">
+						<Col xs="10" className={cn({'text-muted': !enabled})}>
+							Backdrop Scale <code className={cn('pl-2 text-size-xs', {'text-muted': !enabled})}>
+							{angle1}, {angle2}, {angle3}
+						</code>
+							<Button disabled={!enabled} className="button-reset-sm" variant="link"
+								onClick={() => {
+									const rand = random.randomBackdropScale();
+									setAngle1(rand[0]); setAngle2(rand[1]); setAngle3(rand[2]);
+								}}>
+								Random
+							</Button>
+							<Button disabled={!enabled} className="button-reset-sm" variant="link"
+								onClick={() => this.setState({...defaultValues})}>Reset</Button>
+							<div className="text-size-xxs text-muted mt-1">
+								Change the size of backdrops (the mountains you see beyond the map).
+							</div>
+						</Col>
+						<Col xs="2" className="text-right">
+							<Form.Check
+								className="pull-right"
+								type="switch"
+								id={`backdrop_scale-switch-${nanoid(5)}`}
+								label=""
+								checked={enabled}
+								onChange={e => setEnabled(e.target.checked)}
+							/>
+						</Col>
+					</Row>
+					<div className="mb-2">
+						<UiSlider disabled={!enabled} step={0.01} value={Number(angle1)}
+							onChange={v => setAngle1({angle1: v})}/>
+					</div>
+					<div className="mb-2">
+						<UiSlider disabled={!enabled} step={0.01} value={Number(angle2)}
+							onChange={v => setAngle2({angle2: v})}/>
+					</div>
+					<div className="mb-2">
+						<UiSlider disabled={!enabled} step={0.01} value={Number(angle3)}
+							onChange={v => setAngle3({angle3: v})}/>
+					</div>
+				</Card.Body>
+			</Card>
+		</>
+	);
 }
-
-// Properties validation
-BackdropScale.defaultProps = {
-	onChange: () => {},
-};
 
 // Default properties
 BackdropScale.propTypes = {
+	enabled: PropTypes.bool,
+	angle1: PropTypes.number,
+	angle2: PropTypes.number,
+	angle3: PropTypes.number,
 	onChange: PropTypes.func,
+};
+
+// Properties validation
+BackdropScale.defaultProps = {
+	enabled: false,
+	...defaultValues,
+	onChange: () => {},
 };
 
 export default BackdropScale;

@@ -18,122 +18,95 @@ import UiSlider from './../../../../components/UiSlider';
 // Utils
 import * as random from '../../../../utils/random';
 
+const DISTANCE_DEFAULT: number = 0;
+const DISTANCE_MAX: number = 1;
+
 /**
  * DistanceHeightOffset `props` type
  * @type {Object}
  */
 type Props = {
-	onChange ( template: string, values?: {[string]: any} ): void,
+	enabled?: boolean,
+	distance?: number,
+	onChange ( template: string, value: number ): void,
 };
 
-/**
- * DistanceHeightOffset `state` type
- * @type {Object}
- */
-type State = {
-	distance: number,
-	enable: boolean,
-};
-
-const fraction: number = 2;
-
-/**
- * DistanceHeightOffset component class
- */
-export class DistanceHeightOffset extends React.Component<Props, State> {
-	/**
-	 * @inheritDoc
-	 */
-	state: State = {
-		distance: random.randomFrequency(fraction),
-		enable: false,
-	};
+/** DistanceHeightOffset functional component */
+function DistanceHeightOffset ( props: Props ) {
+	const [enabled, setEnabled] = React.useState<boolean>(props.enabled);
+	const [distance, setDistance] = React.useState<number>(props.distance);
 	
-	/**
-	 * @inheritDoc
-	 */
-	componentDidMount (): void {
-		const {onChange} = this.props;
-		setTimeout(() => {
-			typeof onChange === 'function'
-				&& onChange(this.toTemplateText(), this.getValues());
-		}, 300);
-	}
+	// Reflect attributes changes
+	React.useEffect(() => {
+		setEnabled(props.enabled);
+		setDistance(props.distance);
+	}, [props.enabled, props.distance]);
 	
-	/**
-	 * @inheritDoc
-	 */
-	componentDidUpdate ( prevProps: Readonly<P>, prevState: Readonly<S>, snapshot: SS ): void {
-		if ( JSON.stringify(this.state) !== JSON.stringify(prevState) ) {
-			const {onChange} = this.props;
-			
-			setTimeout(() => {
-				typeof onChange === 'function'
-				&& onChange(this.toTemplateText(), this.getValues());
-			}, 300);
-		}
-	}
+	// Reflect state changes
+	React.useEffect(() => {
+		typeof props.onChange === 'function' && props.onChange(toTemplateText(), distance);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [distance, enabled]);
 	
-	toTemplateText (): string {
-		const { distance, enable } = this.state;
-		return enable ? `<distance_height_offset value="${distance}"/>` : '';
-	}
+	/** Generate xml code */
+	const toTemplateText = React.useCallback((): string => {
+		return enabled
+			? `<distance_height_offset value="${distance}"/>`
+			: '';
+	}, [distance, enabled]);
 	
-	getValues (): {[string]: number} {
-		const { distance } = this.state;
-		return { distance };
-	}
-	
-	/**
-	 * @inheritDoc
-	 */
-	render () {
-		const { distance, enable } = this.state;
-		
-		return (
-			<>
-				<Card className={cn('mb-2', {'text-muted': !enable})}>
-					<Card.Body>
-						<Row className="mb-1">
-							<Col xs="10">
-								Distance Height Offset <code className="pl-2 text-size-xs">{distance}</code>
-								<Button disabled={!enable} className="button-reset-sm" variant="link"
-									onClick={() => this.setState({distance: random.randomFrequency(fraction)})}>
-									Random
-								</Button>
-								<Button disabled={!enable} className="button-reset-sm" variant="link"
-									onClick={() => this.setState({distance: 0})}>Reset</Button>
-								<div className="text-size-xxs text-muted mt-1">
-									How much bigger are mountains at the edge of map.
-								</div>
-							</Col>
-							<Col xs="2" className="text-right">
-								<Form.Check
-									className="pull-right"
-									type="switch"
-									id={`river-switch-${nanoid(5)}`}
-									label=""
-									checked={enable}
-									onChange={e => this.setState({enable: Boolean(e.target.checked)})}
-								/>
-							</Col>
-						</Row>
-						<UiSlider disabled={!enable} value={Number(distance)} onChange={v => this.setState({distance: v})}/>
-					</Card.Body>
-				</Card>
-			</>
-		);
-	};
+	return (
+		<>
+			<Card className={cn('mb-2', {'text-muted': !enabled})}>
+				<Card.Body>
+					<Row className="mb-1">
+						<Col xs="10">
+							Distance Height Offset <code className={cn('pl-2 text-size-xs', {'text-muted': !enabled})}>
+								{distance}
+							</code>
+							<Button disabled={!enabled} className="button-reset-sm" variant="link"
+								onClick={() => setDistance(random.randomFloat())}>
+								Random
+							</Button>
+							<Button disabled={!enabled} className="button-reset-sm" variant="link"
+								onClick={() => setDistance(DISTANCE_MAX)}>Max</Button>
+							<Button disabled={!enabled} className="button-reset-sm" variant="link"
+								onClick={() => setDistance(DISTANCE_DEFAULT)}>Reset</Button>
+							<div className="text-size-xxs text-muted mt-1">
+								How much bigger are mountains at the edge of map.
+							</div>
+						</Col>
+						<Col xs="2" className="text-right">
+							<Form.Check
+								className="pull-right"
+								type="switch"
+								id={`river-switch-${nanoid(5)}`}
+								label=""
+								checked={enabled}
+								onChange={e => setEnabled(e.target.checked)}
+							/>
+						</Col>
+					</Row>
+					<UiSlider step={0.01} disabled={!enabled}
+						value={Number(distance)} onChange={v => setDistance(v)}/>
+				</Card.Body>
+			</Card>
+		</>
+	);
 }
-
-// Properties validation
-DistanceHeightOffset.defaultProps = {
-	onChange: () => {},
-};
 
 // Default properties
 DistanceHeightOffset.propTypes = {
+	enabled: PropTypes.bool,
+	distance: PropTypes.number,
 	onChange: PropTypes.func,
+};
+
+// Properties validation
+DistanceHeightOffset.defaultProps = {
+	enabled: false,
+	distance: random.randomFloat(),
+	onChange: () => {},
 };
 
 export default DistanceHeightOffset;

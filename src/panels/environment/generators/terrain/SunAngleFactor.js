@@ -18,122 +18,91 @@ import UiSlider from './../../../../components/UiSlider';
 // Utils
 import * as random from '../../../../utils/random';
 
+const ANGLE_DEFAULT: number = 0;
+const ANGLE_MAX: number = 1;
+
 /**
  * SunAngleFactor `props` type
  * @type {Object}
  */
 type Props = {
-	onChange ( template: string, values?: {[string]: any} ): void,
+	enabled?: boolean,
+	angle?: number,
+	onChange ( template: string, value: number ): void,
 };
 
-/**
- * SunAngleFactor `state` type
- * @type {Object}
- */
-type State = {
-	angle: number,
-	enable: boolean,
-};
-
-const fraction: number = 2;
-
-/**
- * SunAngleFactor component class
- */
-export class SunAngleFactor extends React.Component<Props, State> {
-	/**
-	 * @inheritDoc
-	 */
-	state: State = {
-		angle: random.randomFrequency(fraction),
-		enable: false,
-	};
+/** SunAngleFactor functional component */
+function SunAngleFactor ( props: Props ) {
+	const [enabled, setEnabled] = React.useState<boolean>(props.enabled);
+	const [angle, setAngle] = React.useState<number>(props.angle);
 	
-	/**
-	 * @inheritDoc
-	 */
-	componentDidMount (): void {
-		const {onChange} = this.props;
-		setTimeout(() => {
-			typeof onChange === 'function'
-			&& onChange(this.toTemplateText(), this.getValues());
-		}, 300);
-	}
+	// Reflect attributes changes
+	React.useEffect(() => {
+		setEnabled(props.enabled);
+		setAngle(props.angle);
+	}, [props.enabled, props.angle]);
 	
-	/**
-	 * @inheritDoc
-	 */
-	componentDidUpdate ( prevProps: Readonly<P>, prevState: Readonly<S>, snapshot: SS ): void {
-		if ( JSON.stringify(this.state) !== JSON.stringify(prevState) ) {
-			const {onChange} = this.props;
-			
-			setTimeout(() => {
-				typeof onChange === 'function'
-				&& onChange(this.toTemplateText(), this.getValues());
-			}, 300);
-		}
-	}
+	// Reflect state changes
+	React.useEffect(() => {
+		typeof props.onChange === 'function' && props.onChange(toTemplateText(), angle);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [angle, enabled]);
 	
-	toTemplateText (): string {
-		const { angle, enable } = this.state;
-		return enable ? `<sun_angle_factor value="${angle}"/>` : '';
-	}
+	/** Generate xml code */
+	const toTemplateText = React.useCallback((): string => {
+		return enabled
+			? `<sun_angle_factor value="${angle}"/>`
+			: '';
+	}, [angle, enabled]);
 	
-	getValues (): {[string]: number} {
-		const { angle } = this.state;
-		return { angle: angle };
-	}
-	
-	/**
-	 * @inheritDoc
-	 */
-	render () {
-		const { angle, enable } = this.state;
-		
-		return (
-			<>
-				<Card className={cn('mb-2', {'text-muted': !enable})}>
-					<Card.Body>
-						<Row className="mb-1">
-							<Col xs="10">
-								Sun Angle Factor <code className="pl-2 text-size-xs">{angle}</code>
-								<Button disabled={!enable} className="button-reset-sm" variant="link"
-									onClick={() => this.setState({angle: random.randomFrequency(fraction)})}>
-									Random
-								</Button>
-								<Button disabled={!enable} className="button-reset-sm" variant="link"
-									onClick={() => this.setState({angle: 0})}>Reset</Button>
-								<div className="text-size-xxs text-muted mt-1">
-									How high is the sun in the sky, 1.0 is the default.
-								</div>
-							</Col>
-							<Col xs="2" className="text-right">
-								<Form.Check
-									className="pull-right"
-									type="switch"
-									id={`river-switch-${nanoid(5)}`}
-									label=""
-									checked={enable}
-									onChange={e => this.setState({enable: Boolean(e.target.checked)})}
-								/>
-							</Col>
-						</Row>
-						<UiSlider disabled={!enable} value={Number(angle)} onChange={v => this.setState({angle: v})}/>
-					</Card.Body>
-				</Card>
-			</>
-		);
-	};
+	return (
+		<Card className={cn('mb-2', {'text-muted': !enabled})}>
+			<Card.Body>
+				<Row className="mb-1">
+					<Col xs="10">
+						Sun Angle Factor <code className={cn('pl-2 text-size-xs', {'text-muted': !enabled})}>
+							{angle}
+						</code>
+						<Button disabled={!enabled} className="button-reset-sm" variant="link"
+							onClick={() => setAngle(random.randomFloat())}>Random</Button>
+						<Button disabled={!enabled} className="button-reset-sm" variant="link"
+							onClick={() => setAngle(ANGLE_MAX)}>Max</Button>
+						<Button disabled={!enabled} className="button-reset-sm" variant="link"
+							onClick={() => setAngle(ANGLE_DEFAULT)}>Reset</Button>
+						<div className="text-size-xxs text-muted mt-1">
+							How high is the sun in the sky, 1.0 is the default.
+						</div>
+					</Col>
+					<Col xs="2" className="text-right">
+						<Form.Check
+							className="pull-right"
+							type="switch"
+							id={`river-switch-${nanoid(5)}`}
+							label=""
+							checked={enabled}
+							onChange={e => setEnabled(e.target.checked)}
+						/>
+					</Col>
+				</Row>
+				<UiSlider step={0.1} disabled={!enabled}
+					value={Number(angle)} onChange={v => setAngle(v)}/>
+			</Card.Body>
+		</Card>
+	);
 }
-
-// Properties validation
-SunAngleFactor.defaultProps = {
-	onChange: () => {},
-};
 
 // Default properties
 SunAngleFactor.propTypes = {
+	enabled: PropTypes.bool,
+	angle: PropTypes.number,
 	onChange: PropTypes.func,
+};
+
+// Properties validation
+SunAngleFactor.defaultProps = {
+	enabled: false,
+	angle: random.randomFloat(),
+	onChange: () => {},
 };
 
 export default SunAngleFactor;
