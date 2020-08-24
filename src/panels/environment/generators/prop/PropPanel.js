@@ -1,3 +1,5 @@
+// @flow
+
 /**
  * @author Junaid Atari <mj.atari@gmail.com>
  * @link http://junaidatari.com Author Website
@@ -7,95 +9,53 @@
 import React from 'react';
 import * as PropTypes from 'prop-types';
 
-// Types
-import type { Node } from 'react';
-
 // Components
 import PropOverride from './PropOverride';
+
+/** ExportValues export values */
+type ExportValues = {
+	propOverride: string,
+};
 
 /**
  * PropPanel `props` type
  * @type {Object}
  */
 type Props = {
-	onChange ( template: string, values?: {[string]: any} ): void,
+	onChange ( template: string, values?: ExportValues ): void,
 };
 
-/**
- * PropPanel `state` type
- * @type {Object}
- */
-type State = {
-	propOverride: string,
-};
-
-/**
- * PropPanel functional component
- */
-class PropPanel extends React.Component<Props, State> {
-	/**
-	 * @inheritDoc
-	 */
-	state: State = {
-		propOverride: '',
-	};
+/** PropPanel functional component */
+function PropPanel ( props: Props ) {
+	const [propOverride, setPropOverride] = React.useState<string>('');
 	
-	/**
-	 * @inheritDoc
-	 */
-	componentDidMount (): void {
-		const {onChange} = this.props;
-		setTimeout(() => {
-			typeof onChange === 'function'
-			&& onChange(this.toTemplateText(), this.getValues());
-		}, 300);
-	}
+	// Reflect state changes
+	React.useEffect(() => {
+		typeof props.onChange === 'function'
+		&& props.onChange(toTemplateText(), {propOverride});
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [propOverride]);
 	
-	/**
-	 * @inheritDoc
-	 */
-	componentDidUpdate ( prevProps: Readonly<P>, prevState: Readonly<S>, snapshot: SS ): void {
-		if ( JSON.stringify(this.state) !== JSON.stringify(prevState) ) {
-			const {onChange} = this.props;
-			
-			setTimeout(() => {
-				typeof onChange === 'function'
-				&& onChange(this.toTemplateText(), this.getValues());
-			}, 300);
-		}
-	}
+	/** Generate xml code */
+	const toTemplateText = React.useCallback((): string => {
+		return propOverride;
+	}, [propOverride]);
 	
-	toTemplateText (): string {
-		const {propOverride} = this.state;
-		return [propOverride].join('');
-	}
-	
-	getValues (): {[string]: string} {
-		const {propOverride} = this.state;
-		return {propOverride};
-	}
-	
-	/**
-	 * @inheritDoc
-	 */
-	render (): Node {
-		return (
-			<>
-				<PropOverride onChange={( v: string ) => this.setState({propOverride: v})}/>
-			</>
-		);
-	}
+	return (
+		<>
+			<PropOverride onChange={v => setPropOverride(v)}/>
+		</>
+	);
 }
-
-// Default properties
-PropPanel.defaultProps = {
-	onChange: () => {},
-};
-
 
 // Properties validation
 PropPanel.propTypes = {
 	onChange: PropTypes.func,
+};
+
+// Default properties
+PropPanel.defaultProps = {
+	onChange: () => {},
 };
 
 export default PropPanel;
