@@ -28,3 +28,9 @@ export const DENSITY_DEFAULT: number = 1;
 export const RESOURCE_FACTOR_MIN: number = 0;
 export const RESOURCE_FACTOR_MAX: number = 100;
 export const RESOURCE_FACTOR_DEFAULT: number = 1;
+
+export const SEASON_TEMPERATURE_MIN = -50;
+export const SEASON_TEMPERATURE_MAX = 50;
+
+export const SEASON_WIND_MIN = 0;
+export const SEASON_WIND_MAX = 9;
