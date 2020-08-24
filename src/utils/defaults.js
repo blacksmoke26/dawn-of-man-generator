@@ -24,3 +24,7 @@ export const ANGLE_MAX_DEFAULT: number = 55;
 export const DENSITY_MIN: number = 0;
 export const DENSITY_MAX: number = 1;
 export const DENSITY_DEFAULT: number = 1;
+
+export const RESOURCE_FACTOR_MIN: number = 0;
+export const RESOURCE_FACTOR_MAX: number = 100;
+export const RESOURCE_FACTOR_DEFAULT: number = 1;
