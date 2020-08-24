@@ -169,7 +169,7 @@ function TreesOverride ( props: Props ): Node {
 							<div className="float-left">
 								<Accordion.Toggle disabled={!isEnabled} as={Button}
 									variant="link" eventKey={`tree_${name}`}
-									onClick={() => this.setState(({activeKey}) => ({activeKey: activeKey === name ? '': name}))}>
+									onClick={() => setActiveKey(name)}>
 									{name}
 								</Accordion.Toggle>
 							</div>
