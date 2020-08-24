@@ -138,19 +138,18 @@ function TreesOverride ( props: Props ): Node {
 	
 	/** Update given selection name data */
 	const modifySelection = ( name: string, attr: TreeAttr ): void => {
-		const newSelection: TreeSelection = {...selection};
-		newSelection[name] = {...(newSelection[name] ?? {}), ...attr};
-		setSelection({...newSelection});
+		setSelection(current => ({
+			...current,
+			[name]: {...(current[name] ?? {}), ...attr}
+		}))
 	};
 	
 	/** Remove existing selection */
 	const removeFromSelection = ( name: string ): void => {
-		const newSelection: TreeSelection = {...selection};
-		
-		if ( newSelection.hasOwnProperty(name) ) {
-			delete newSelection[name];
-			setSelection({...newSelection});
-		}
+		setSelection(current => {
+			current.hasOwnProperty(name) && (delete current[name]);
+			return {...current};
+		});
 	};
 	
 	/** Generate selection based nodes */

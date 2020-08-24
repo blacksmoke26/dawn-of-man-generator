@@ -109,21 +109,18 @@ function DepositOverride ( props: Props ) {
 	
 	/** Update given selection data */
 	const modifySelection = ( name: string, attr: DepositAttr ): void => {
-		const newSelection: DepositSelection = {...selection};
 		setSelection(current => ({
 			...current,
-			[name]: {...(newSelection[name] ?? {}), ...attr}
+			[name]: {...(current[name] ?? {}), ...attr}
 		}))
 	};
 	
 	/** Remove existing selection */
 	const removeFromSelection = ( name: string ): void => {
-		const newSelection: DepositSelection = {...selection};
-		
-		if ( newSelection.hasOwnProperty(name) ) {
-			delete newSelection[name];
-			setSelection({...newSelection});
-		}
+		setSelection(current => {
+			current.hasOwnProperty(name) && (delete current[name]);
+			return {...current};
+		});
 	};
 	
 	/** Generate selection based nodes */
