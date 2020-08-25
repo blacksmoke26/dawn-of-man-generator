@@ -361,6 +361,7 @@ export class DetailOverride extends React.Component<Props, State> {
 									<Range
 										min={Defaults.HUMIDITY_MIN}
 										max={Defaults.HUMIDITY_MAX}
+										step={0.01}
 										disabled={!enabled || !attr.humidity_enabled}
 										value={[attr.min_humidity, attr.max_humidity]}
 										onChange={([min_humidity, max_humidity]) => {
