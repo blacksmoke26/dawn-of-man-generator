@@ -179,15 +179,12 @@ function DetailOverride ( props: Props ): Node {
 			`);
 		}
 		
-		if ( !templateOverride.length ) {
-			return '';
-		}
-		
-		return [
-			'<detail_override_prototypes>',
-			templateOverride.join(''),
-			'</detail_override_prototypes>',
-		].join('');
+		return templateOverride.length
+			? (
+				`<detail_override_prototypes>
+					${templateOverride.join('')}
+				</detail_override_prototypes>`
+			) : '';
 	}, [enabled, selection]);
 	
 	/** Get react-select options */
