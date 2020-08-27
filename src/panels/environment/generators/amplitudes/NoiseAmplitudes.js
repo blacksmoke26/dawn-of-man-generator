@@ -50,7 +50,10 @@ function NoiseAmplitudes ( props: Props ) {
 	
 	/** Generate xml code */
 	const toTemplateText = React.useCallback((): string => {
-		return `<noise_amplitudes values="${Object.values(frequencies).join(' ')}"/>`;
+		const values: string = Object.values(frequencies)
+			.map(c => Number(c).toFixed(3))
+			.join(' ');
+		return `<noise_amplitudes values="${values}"/>`;
 	}, [frequencies]);
 	
 	/** Update frequency value */
@@ -76,7 +79,7 @@ function NoiseAmplitudes ( props: Props ) {
 				</p>
 			</div>
 			<div className="mb-2">
-				Frequency 1: <code className="pl-2 text-size-xs">{frequencies.freq1}</code>
+				Frequency 1: <code className="pl-2 text-size-xs">{frequencies.freq1.toFixed(3)}</code>
 				<Button className="button-reset-sm" variant="link"
 					onClick={() => setFrequency('freq1', random.randomFrequency())}>
 					Random
@@ -85,10 +88,10 @@ function NoiseAmplitudes ( props: Props ) {
 					onClick={() => setFrequency('freq1', 0)}>Min</Button>
 				<Button className="button-reset-sm" variant="link"
 					onClick={() => setFrequency('freq1', 1)}>Max</Button>
-				<UiSlider step={0.001} value={frequencies.freq1} onChange={v => setFrequency('freq1', v)}/>
+				<UiSlider step={0.001} value={frequencies.freq1.toFixed(3)} onChange={v => setFrequency('freq1', v)}/>
 			</div>
 			<div className="mb-2">
-				Frequency 2: <code className="pl-2 text-size-xs">{frequencies.freq2}</code>
+				Frequency 2: <code className="pl-2 text-size-xs">{frequencies.freq2.toFixed(3)}</code>
 				<Button className="button-reset-sm" variant="link"
 					onClick={() => setFrequency('freq2', random.randomFrequency())}>
 					Random
