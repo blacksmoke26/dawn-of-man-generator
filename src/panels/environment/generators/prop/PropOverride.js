@@ -8,10 +8,13 @@
 
 import React from 'react';
 import * as PropTypes from 'prop-types';
-import { Card, Button, Form, Accordion, Row, Col } from 'react-bootstrap';
+import { Card, Button, Form, Accordion, Row, Col, ButtonGroup } from 'react-bootstrap';
 import Select from 'react-select';
 import { nanoid } from 'nanoid';
 import { Range } from 'rc-slider';
+
+// Types
+import { Node } from 'react';
 
 // Components
 import UiSlider from './../../../../components/UiSlider';
@@ -36,6 +39,21 @@ type PropSelection = {
 	[string]: PropAttr
 };
 
+/**
+ * PropOverride `props` type
+ * @type {Object}
+ */
+type Props = {
+	enabled?: boolean,
+	selection?: PropSelection,
+	onChange ( template: string, values: PropSelection ): void,
+};
+
+/**
+ * @private
+ * @static
+ * Get selection initial values
+ */
 const getInitialValues = (): PropAttr => {
 	let angleRand = random.randomAngle();
 	let altitudeRand = random.randomAltitude();
@@ -53,67 +71,70 @@ const getInitialValues = (): PropAttr => {
 };
 
 /**
- * PropOverride `props` type
- * @type {Object}
+ * @private
+ * @static
+ * Get randomized values
  */
-type Props = {
-	onChange ( template: string, values?: {[string]: any} ): void,
+const getRandomizeValues = ( attr: DetailAttr ): Object => {
+	const node: DetailAttr = {};
+	attr.density_enabled && (node.density = random.randomDensity());
+	
+	if ( attr.angle_enabled ) {
+		const [mi, mx] = random.randomAngle();
+		node.min_angle = mi;
+		node.max_angle = mx;
+	}
+	
+	const [mi, mx] = random.randomAltitude();
+	node.min_altitude = mi;
+	node.max_altitude = mx;
+	
+	return node;
 };
 
 /**
- * PropOverride `state` type
- * @type {Object}
+ * @private
+ * @static
+ * Get default values
  */
-type State = {
-	override: boolean,
-	selection: PropSelection,
-	activeKey: string,
+const getDefaultValues = ( attr: DetailAttr ): Object => {
+	const node: DetailAttr = {};
+	attr.density_enabled && (node.density = Defaults.DENSITY_DEFAULT);
+	
+	if ( attr.angle_enabled ) {
+		node.min_angle = Defaults.ANGLE_MIN_DEFAULT;
+		node.max_angle = Defaults.ANGLE_MAX_DEFAULT;
+	}
+	
+	node.min_altitude = Defaults.ALTITUDE_MIN_DEFAULT;
+	node.max_altitude = Defaults.ALTITUDE_MAX_DEFAULT;
+	
+	return node;
 };
 
-/**
- * PropOverride component class
- */
-export class PropOverride extends React.Component<Props, State> {
-	/**
-	 * @inheritDoc
-	 */
-	state: State = {
-		override: true,
-		selection: {},
-		activeKey: '',
-	};
+/** PropOverride functional component */
+function PropOverride ( props: Props ): Node {
+	const [enabled, setEnabled] = React.useState<boolean>(props.enabled);
+	const [selection, setSelection] = React.useState<DetailSelection>(props.selection);
+	const [activeKey, setActiveKey] = React.useState<string>('');
 	
-	/**
-	 * @inheritDoc
-	 */
-	componentDidMount (): void {
-		const {onChange} = this.props;
-		setTimeout(() => {
-			typeof onChange === 'function'
-			&& onChange(this.toTemplateText(), this.getValues());
-		}, 300);
-	}
+	// Reflect attributes changes
+	React.useEffect(() => {
+		setEnabled(props.enabled);
+		setSelection(props.selection);
+	}, [props.enabled, props.selection]);
 	
-	/**
-	 * @inheritDoc
-	 */
-	componentDidUpdate ( prevProps: Readonly<P>, prevState: Readonly<S>, snapshot: SS ): void {
-		if ( JSON.stringify(this.state) !== JSON.stringify(prevState) ) {
-			const {onChange} = this.props;
-			
-			setTimeout(() => {
-				typeof onChange === 'function'
-				&& onChange(this.toTemplateText(), this.getValues());
-			}, 300);
-		}
-	}
+	// Reflect state changes
+	React.useEffect(() => {
+		typeof props.onChange === 'function' && props.onChange(toTemplateText(), selection);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [selection, enabled]);
 	
-	toTemplateText (): string {
-		const { override, selection } = this.state;
-		
+	/** Generate xml code */
+	const toTemplateText = React.useCallback((): string => {
 		const templateOverride: Array<string> = [];
 		
-		if ( !override ) {
+		if ( !enabled ) {
 			return '';
 		}
 		
@@ -130,95 +151,83 @@ export class PropOverride extends React.Component<Props, State> {
 				? `<min_angle value="${attr.min_angle}" /><max_angle value="${attr.max_angle}"/>`
 				: '';
 			
-			templateOverride.push(
-				'<prop_override_prototype>'
-				+ `<id value="${name}"/>`
-				+ densityTpl
-				+ `<min_altitude value="${attr.min_altitude}" />`
-				+ `<max_altitude value="${attr.max_altitude}"/>`
-				+ angleTpl
-				+ '</prop_override_prototype>'
-			);
+			templateOverride.push(`
+				<prop_override_prototype>
+					<id value="${name}"/>
+					${densityTpl} ${angleTpl}
+					<min_altitude value="${attr.min_altitude}" />
+					<max_altitude value="${attr.max_altitude}"/>
+				</prop_override_prototype>
+			`);
 		}
 		
-		if ( !templateOverride.length ) {
-			return '';
-		}
-		
-		return [
-			'<prop_override_prototypes>',
-			templateOverride.join(''),
-			'</prop_override_prototypes>',
-		].join('');
-	}
+		return templateOverride.length
+			? (
+				`<prop_override_prototypes>
+					${templateOverride.join('')}
+				</detail_override_prototypes>`
+			) : '';
+	}, [enabled, selection]);
 	
-	getValues (): {[string]: number} {
-		const { selection } = this.state;
-		return { selection: selection };
-	}
-	
-	selectOptions (): Array<Object> {
-		const {selection} = this.state;
+	/** Get react-select options */
+	const renderSelectOptions = React.useCallback((): Array<Object> => {
 		const excludes: Array<string> = Object.keys(selection);
 		
-		return random.props
+		return random.details
 			.filter(v => !excludes.includes(v))
-			.map(v => ({
-				label: v,
-				value: v,
-			}));
-	}
+			.map(v => ({label: v, value: v}));
+	}, [selection]);
 	
-	modifySelection ( name: string, attr: PropAttr ): void {
-		this.setState(({selection}) => ({
-			selection: {
-				...selection,
-				[name]: {...selection[name], ...attr},
-			}
-		}));
-	}
+	/** Update given selection name data */
+	const modifySelection = ( name: string, attr: TreeAttr ): void => {
+		setSelection(current => ({
+			...current,
+			[name]: {...(current[name] ?? {}), ...attr}
+		}))
+	};
 	
-	removeFromSelection ( name: string ): void {
-		const selection = {...this.state.selection};
-		
-		if ( selection.hasOwnProperty(name) ) {
-			delete selection[name];
-			this.setState({selection: {...selection}});
-		}
-	}
+	/** Remove existing selection */
+	const removeFromSelection = ( name: string ): void => {
+		setSelection(current => {
+			current.hasOwnProperty(name) && (delete current[name]);
+			return {...current};
+		});
+	};
 	
-	selectionNodes (): Array<Node> {
-		const {selection, override} = this.state;
+	/** Generate selection based nodes */
+	const selectionNodes = React.useCallback((): Array<Node> => {
 		const nodes: Array<Node> = [];
 		
 		for ( let [name: string, attr: PropAttr] of Object.entries(selection) ) {
-			const enabled: boolean = attr._enabled && override;
+			const isEnabled: boolean = attr._enabled && enabled;
+			const isDensityEnabled: boolean = isEnabled && attr.density_enabled;
+			const isAngleEnabled: boolean = isEnabled && attr.angle_enabled;
 			
 			nodes.push(
 				<Card key={name}>
 					<Card.Header className="pt-0 pb-0 pl-2 pl-2">
 						<div className="clearfix">
 							<div className="float-left">
-								<Accordion.Toggle disabled={!enabled} as={Button}
+								<Accordion.Toggle disabled={!isEnabled} as={Button}
 									variant="link" eventKey={`prop_${name}`}
-									onClick={() => this.setState(({activeKey}) => ({activeKey: activeKey === name ? '': name}))}>
+									onClick={() => setActiveKey(name)}>
 									{name}
 								</Accordion.Toggle>
 							</div>
 							<div className="float-right">
 								<Form.Check
-									disabled={!override}
+									disabled={!enabled}
 									className="d-inline-block position-relative"
 									style={{top: '6px'}}
 									type="switch"
-									id={`enable-prop-${name}`}
+									id={`enable-detail-${name}`}
 									label=""
-									checked={attr._enabled}
-									onChange={e => this.modifySelection(name,{_enabled: Boolean(e.target.checked)})}
+									checked={isEnabled}
+									onChange={e => modifySelection(name,{_enabled: e.target.checked})}
 								/>
 								{' '}
-								<Button variant="link" disabled={!enabled}
-									onClick={() => this.removeFromSelection(name)}
+								<Button variant="link" disabled={!isEnabled}
+									onClick={() => removeFromSelection(name)}
 									style={{fontSize: '1.2rem', top: '1px'}}
 									className="p-0 text-decoration-none position-relative text-dark" size="sm">
 									&times;
@@ -228,47 +237,47 @@ export class PropOverride extends React.Component<Props, State> {
 					</Card.Header>
 					<Accordion.Collapse eventKey={`prop_${name}`}>
 						<Card.Body className="pt-2 pb-2">
-							<Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled || !attr.density_enabled})}>
+							<Form.Group as={Row} className={cn('mb-2', {'text-muted': !isDensityEnabled})}>
 								<Form.Label className="text-size-sm" column={true} sm="2">
 									<Form.Check
-										disabled={!override}
+										disabled={!isEnabled}
 										className="text-size-xs"
 										type="switch"
-										id={`prop_override_angle-switch-${nanoid(5)}`}
+										id={`switch-${nanoid(5)}`}
 										label={<span style={{textDecoration: 'underline dotted'}}
 											title="The amount of objects of this type to place, has to be in the range.">
 											Density:
 										</span>}
 										checked={attr.density_enabled}
-										onChange={e => this.modifySelection(name, {density_enabled: Boolean(e.target.checked)})}
+										onChange={e => modifySelection(name, {density_enabled: Boolean(e.target.checked)})}
 									/>
 								</Form.Label>
 								<Col sm="10">
 									<span className="text-size-xs font-family-code">
-										Value: <code>{attr.density}</code>
+										Value: <code className={cn({'text-muted': !isDensityEnabled})}>{attr.density}</code>
 									</span>
-									<Button disabled={!enabled || !attr.density_enabled}
+									<Button disabled={!isDensityEnabled}
 										className="button-reset-sm" variant="link"
-										onClick={() => this.modifySelection(name, {density: random.randomDensity()})}>
+										onClick={() => modifySelection(name, {density: random.randomDensity()})}>
 										Random
 									</Button>
-									<Button disabled={!enabled || !attr.density_enabled}
+									<Button disabled={!isDensityEnabled}
 										className="button-reset-sm" variant="link"
-										onClick={() => this.modifySelection(name, {density: Defaults.DENSITY_DEFAULT})}>
+										onClick={() => modifySelection(name, {density: Defaults.DENSITY_DEFAULT})}>
 										Reset
 									</Button>
-									<UiSlider disabled={!enabled || !attr.density_enabled}
+									<UiSlider disabled={!isDensityEnabled}
 										step={0.01} min={Defaults.DENSITY_MIN} max={Defaults.DENSITY_MAX}
-										value={Number(attr.density)} onChange={v => this.modifySelection(name, {density: v})}/>
+										value={Number(attr.density)} onChange={v => modifySelection(name, {density: v})}/>
 								</Col>
 							</Form.Group>
-							<Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled || !attr.angle_enabled})}>
+							<Form.Group as={Row} className={cn('mb-2', {'text-muted': !isAngleEnabled})}>
 								<Form.Label className="text-size-sm" column={true} sm="2">
 									<Form.Check
-										disabled={!override}
+										disabled={!isEnabled}
 										className="text-size-xs"
 										type="switch"
-										id={`prop_override_angle-switch-${nanoid(5)}`}
+										id={`detail_override_angle-switch-${nanoid(5)}`}
 										label={<span style={{textDecoration: 'underline dotted'}}
 											title="The min and max slope angles in degrees at which this object
 											is placed. Values range from 0 (flat), to 60 (very steep). Negative
@@ -277,25 +286,29 @@ export class PropOverride extends React.Component<Props, State> {
 											Angle:
 										</span>}
 										checked={attr.angle_enabled}
-										onChange={e => this.modifySelection(name, {angle_enabled: Boolean(e.target.checked)})}
+										onChange={e => modifySelection(name, {angle_enabled: e.target.checked})}
 									/>
 								</Form.Label>
 								<Col sm="10">
 									<div>
 										<span className="text-size-xs font-family-code">
-										Min: <code>{attr.min_angle}</code>
+											Min: <code className={cn({'text-muted': !isAngleEnabled})}>
+												{attr.min_angle}
+											</code>
 											{' / '}
-										Max: <code>{attr.max_angle}</code>
-									</span>
-										<Button disabled={!enabled || !attr.angle_enabled}
+											Max: <code className={cn({'text-muted': !isAngleEnabled})}>
+												{attr.max_angle}
+											</code>
+										</span>
+										<Button disabled={!isAngleEnabled}
 											className="button-reset-sm" variant="link"
 											onClick={() => {
 												const [min_angle, max_angle] = random.randomAngle();
-												this.modifySelection(name, {min_angle, max_angle});
+												modifySelection(name, {min_angle, max_angle});
 											}}>Random</Button>
-										<Button disabled={!enabled || !attr.angle_enabled}
+										<Button disabled={!isAngleEnabled}
 											className="button-reset-sm" variant="link"
-											onClick={() => this.modifySelection(name, {
+											onClick={() => modifySelection(name, {
 												min_angle: Defaults.ANGLE_MIN_DEFAULT,
 												max_angle: Defaults.ANGLE_MAX_DEFAULT,
 											})}>Default</Button>
@@ -303,14 +316,14 @@ export class PropOverride extends React.Component<Props, State> {
 									<Range
 										min={Defaults.ANGLE_MIN}
 										max={Defaults.ANGLE_MAX}
-										disabled={!enabled || !attr.angle_enabled}
+										disabled={!isAngleEnabled}
 										value={[attr.min_angle, attr.max_angle]}
 										onChange={([min_angle, max_angle]) => {
-											this.modifySelection(name, {min_angle, max_angle});
+											modifySelection(name, {min_angle, max_angle});
 										}}/>
 								</Col>
 							</Form.Group>
-							<Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled})}>
+							<Form.Group as={Row} className={cn('mb-2', {'text-muted': !isEnabled})}>
 								<Form.Label className="text-size-sm" column={true} sm="2">
 									<span style={{textDecoration: 'underline dotted'}}
 										title="The min and max altitudes at which this object is
@@ -323,17 +336,17 @@ export class PropOverride extends React.Component<Props, State> {
 								<Col sm="10">
 									<div>
 										<span className="text-size-xs font-family-code">
-										Min: <code>{attr.min_altitude}</code>
+											Min: <code className={cn({'text-muted': !isEnabled})}>{attr.min_altitude}</code>
 											{' / '}
-										Max: <code>{attr.max_altitude}</code>
-									</span>
-										<Button disabled={!enabled} className="button-reset-sm" variant="link"
+											Max: <code className={cn({'text-muted': !isEnabled})}>{attr.max_altitude}</code>
+										</span>
+										<Button disabled={!isEnabled} className="button-reset-sm" variant="link"
 											onClick={() => {
 												const [min_altitude, max_altitude] = random.randomAltitude();
-												this.modifySelection(name, {min_altitude, max_altitude});
+												modifySelection(name, {min_altitude, max_altitude});
 											}}>Random</Button>
-										<Button disabled={!enabled} className="button-reset-sm" variant="link"
-											onClick={() => this.modifySelection(name, {
+										<Button disabled={!isEnabled} className="button-reset-sm" variant="link"
+											onClick={() => modifySelection(name, {
 												min_altitude: Defaults.ALTITUDE_MIN_DEFAULT,
 												max_altitude: Defaults.ALTITUDE_MAX_DEFAULT,
 											})}>Default</Button>
@@ -341,82 +354,90 @@ export class PropOverride extends React.Component<Props, State> {
 									<Range
 										min={Defaults.ALTITUDE_MIN}
 										max={Defaults.ALTITUDE_MAX}
-										disabled={!enabled}
+										disabled={!isEnabled}
 										value={[attr.min_altitude, attr.max_altitude]}
 										onChange={([min_altitude, max_altitude]) => {
-											this.modifySelection(name, {min_altitude, max_altitude});
+											modifySelection(name, {min_altitude, max_altitude});
 										}}/>
 								</Col>
 							</Form.Group>
+							<div className="mt-2">
+								<ButtonGroup>
+									<Button disabled={!isEnabled} variant="secondary" size="sm"
+										onClick={() => modifySelection(name, getRandomizeValues(attr))}>
+										Randomize
+									</Button>
+									<Button disabled={!isEnabled} variant="secondary" size="sm"
+										onClick={() => modifySelection(name, getDefaultValues(attr))}>
+										Restore
+									</Button>
+								</ButtonGroup>
+							</div>
 						</Card.Body>
 					</Accordion.Collapse>
 				</Card>
 			);
 		}
-		
 		return nodes;
-	}
+	}, [selection, enabled]);
 	
-	/**
-	 * @inheritDoc
-	 */
-	render () {
-		const { override } = this.state;
-		
-		return (
-			<Accordion>
-				<Card className="mb-2">
-					<Card.Header className="pt-1 pb-1 pl-2 pl-2">
-						<Accordion.Toggle as={Button} variant="link" eventKey="prop_override_panel">
-							Override Prop Prototypes
-						</Accordion.Toggle>
-					</Card.Header>
-					<Accordion.Collapse eventKey="prop_override_panel">
-						<Card.Body>
-							<div className="mb-3">
-								<Form.Check
-									className="pull-right"
-									type="switch"
-									id={`prop_override-switch-${nanoid(5)}`}
-									label="Override prop"
-									checked={override}
-									onChange={e => this.setState({override: Boolean(e.target.checked)})}
+	return (
+		<Accordion>
+			<Card className="mb-2">
+				<Card.Header className="pt-1 pb-1 pl-2 pl-2">
+					<Accordion.Toggle as={Button} variant="link" eventKey="prop_override_panel">
+						Override Prop Prototypes
+					</Accordion.Toggle>
+				</Card.Header>
+				<Accordion.Collapse eventKey="prop_override_panel">
+					<Card.Body>
+						<div className="mb-3">
+							<Form.Check
+								className="pull-right"
+								type="switch"
+								id={`prop_override-switch-${nanoid(5)}`}
+								label="Override prop"
+								checked={enabled}
+								onChange={e => setEnabled(e.target.checked)}
+							/>
+							<div className="mt-2 mt-2">
+								<Select
+									isDisabled={!enabled}
+									menuPortalTarget={document.body}
+									styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
+									options={renderSelectOptions()}
+									placeholder="Choose prop to override"
+									onChange={( selected: ?Object, {action}: Object ) => {
+										if ( action === 'select-option' && selected ) {
+											modifySelection(selected.value, getInitialValues());
+											setActiveKey(selected.value);
+										}
+									}}
 								/>
-								<div className="mt-2 mt-2">
-									<Select
-										isDisabled={!override}
-										menuPortalTarget={document.body}
-										styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
-										options={this.selectOptions()}
-										placeholder="Choose prop to override"
-										onChange={( selected: ?Object, {action}: Object ) => {
-											if ( action === 'select-option' && selected ) {
-												this.modifySelection(selected.value, getInitialValues());
-												this.setState({activeKey: selected.value});
-											}
-										}}
-									/>
-								</div>
 							</div>
-							<Accordion activeKey={`prop_${this.state.activeKey}`}>
-								{this.selectionNodes()}
-							</Accordion>
-						</Card.Body>
-					</Accordion.Collapse>
-				</Card>
-			</Accordion>
-		);
-	};
+						</div>
+						<Accordion activeKey={`prop_${activeKey}`}>
+							{selectionNodes()}
+						</Accordion>
+					</Card.Body>
+				</Accordion.Collapse>
+			</Card>
+		</Accordion>
+	);
 }
 
 // Properties validation
 PropOverride.propTypes = {
-	onChange: () => {},
+	enabled: PropTypes.bool,
+	selection: PropTypes.object,
+	onChange: PropTypes.func,
 };
 
 // Default properties
 PropOverride.defaultProps = {
-	onChange: PropTypes.func,
+	enabled: true,
+	selection: {},
+	onChange: () => {},
 };
 
 export default PropOverride;
