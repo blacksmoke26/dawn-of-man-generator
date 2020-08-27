@@ -30,7 +30,7 @@ type ValueFrequencies = {
  */
 type Props = {
 	frequencies?: ValueFrequencies,
-	onChange ( template: string, value: ValueFrequencies ): void,
+	onChange ( template: string, values: ValueFrequencies ): void,
 };
 
 /** NoiseAmplitudes functional component */
@@ -53,6 +53,7 @@ function NoiseAmplitudes ( props: Props ) {
 		return `<noise_amplitudes values="${Object.values(frequencies).join(' ')}"/>`;
 	}, [frequencies]);
 	
+	/** Update frequency value */
 	const setFrequency = ( name: string, value: number ): void => {
 		setFrequencies(current => ({
 			...current,
@@ -66,6 +67,13 @@ function NoiseAmplitudes ( props: Props ) {
 				Modify the amplitudes of the different noise layers, the initial numbers
 				define the amplitudes of the low-frequencies (the height of large mountains), and the later
 				numbers define the amplitudes of the high_frequencies (the height of the small bumps).
+				<p className="mt-1">
+					For a complete guide: <a href="https://steamcommunity.com/sharedfiles/filedetails/?id=2087224377"
+						title="This guide explains how the <noise_amplitude> element works in Environment configuration files. It will help build your intuition for how amplitudes influence one another so you can more quickly achieve the results you're looking for."
+						target="_blank" rel="noopener noreferrer">
+						Understanding Amplitudes in Environment
+					</a>.
+				</p>
 			</div>
 			<div className="mb-2">
 				Frequency 1: <code className="pl-2 text-size-xs">{frequencies.freq1}</code>
