@@ -8,7 +8,7 @@
 
 import React from 'react';
 import * as PropTypes from 'prop-types';
-import { Card, Button, Form, Accordion, Row, Col } from 'react-bootstrap';
+import { Card, Button, Form, Accordion, Row, Col, ButtonGroup } from 'react-bootstrap';
 import Select from 'react-select';
 import { nanoid } from 'nanoid';
 import { Range } from 'rc-slider';
@@ -67,6 +67,48 @@ const getInitialValues = (): TreeAttr => {
 		min_angle, max_angle,
 		min_altitude, max_altitude,
 	};
+};
+
+/**
+ * @private
+ * @static
+ * Get randomized values
+ */
+const getRandomizeValues = ( attr: TreeAttr ): Object => {
+	const node: DetailAttr = {};
+	attr.density_enabled && (node.density = random.randomDensity());
+	
+	if ( attr.angle_enabled ) {
+		const [mi, mx] = random.randomAngle();
+		node.min_angle = mi;
+		node.max_angle = mx;
+	}
+	
+	const [mi, mx] = random.randomAltitude();
+	node.min_altitude = mi;
+	node.max_altitude = mx;
+	
+	return node;
+};
+
+/**
+ * @private
+ * @static
+ * Get default values
+ */
+const getDefaultValues = ( attr: TreeAttr ): Object => {
+	const node: DetailAttr = {};
+	attr.density_enabled && (node.density = Defaults.DENSITY_DEFAULT);
+	
+	if ( attr.angle_enabled ) {
+		node.min_angle = Defaults.ANGLE_MIN_DEFAULT;
+		node.max_angle = Defaults.ANGLE_MAX_DEFAULT;
+	}
+	
+	node.min_altitude = Defaults.ALTITUDE_MIN_DEFAULT;
+	node.max_altitude = Defaults.ALTITUDE_MAX_DEFAULT;
+	
+	return node;
 };
 
 /** TreesOverride functional component */
@@ -319,6 +361,18 @@ function TreesOverride ( props: Props ): Node {
 										}}/>
 								</Col>
 							</Form.Group>
+							<div className="mt-2">
+								<ButtonGroup>
+									<Button disabled={!isEnabled} variant="secondary" size="sm"
+										onClick={() => modifySelection(name, getRandomizeValues(attr))}>
+										Randomize
+									</Button>
+									<Button disabled={!isEnabled} variant="secondary" size="sm"
+										onClick={() => modifySelection(name, getDefaultValues(attr))}>
+										Restore
+									</Button>
+								</ButtonGroup>
+							</div>
 						</Card.Body>
 					</Accordion.Collapse>
 				</Card>
