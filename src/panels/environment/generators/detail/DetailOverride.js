@@ -382,7 +382,7 @@ function DetailOverride ( props: Props ): Node {
 		}
 		
 		return nodes;
-	});
+	}, [selection]);
 	
 	return (
 		<Accordion>
