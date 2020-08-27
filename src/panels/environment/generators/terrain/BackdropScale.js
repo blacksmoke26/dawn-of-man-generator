@@ -24,9 +24,9 @@ import * as random from '../../../../utils/random';
  */
 type Props = {
 	enabled: boolean,
-	angle1: number,
-	angle2: number,
-	angle3: number,
+	angle1?: number,
+	angle2?: number,
+	angle3?: number,
 	onChange ( template: string, values?: {[string]: any} ): void,
 };
 
