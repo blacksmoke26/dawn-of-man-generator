@@ -44,6 +44,7 @@ function GlobalTreeDensity ( props: Props ): Node {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [value, enabled]);
 	
+	/** Generate xml code */
 	const toTemplateText = (): string => {
 		return enabled
 			? `<global_tree_density value="${value}"/>`
