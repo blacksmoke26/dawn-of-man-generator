@@ -37,7 +37,6 @@ function LocationContainer (): Node {
 	const [locations, setLocations] = React.useState<Object>({});
 	const [init, setInit] = React.useState<boolean>(false);
 	const [activeKey, setActiveKey] = React.useState<string>('');
-	const [loading, setLoading] = React.useState<boolean>(false);
 	
 	React.useEffect(() => {
 		if ( !init ) {
@@ -71,19 +70,15 @@ function LocationContainer (): Node {
 			<div className="mb-3">
 				<ButtonGroup>
 					<Button variant="secondary" size="sm"
-						disabled={loading || total >= LOCATIONS_MAX_COUNT} onClick={() => {
+						disabled={total >= LOCATIONS_MAX_COUNT} onClick={() => {
 						if ( total <= LOCATIONS_MAX_COUNT  ) {
 							addNewLocation();
-							setLoading(true);
-							setTimeout(() => setLoading(false), 500);
 						}
 					}}>Add New</Button>
-					<Button variant="danger" size="sm" disabled={loading || total <= 1 } onClick={() => {
+					<Button variant="danger" size="sm" disabled={total <= 1 } onClick={() => {
 						const key = Object.keys(locations)[0];
 						setLocations({[key]: locations[key]});
 						setActiveKey(key);
-						setLoading(true);
-						setTimeout(() => setLoading(false), 100);
 					}}>Remove All</Button>
 				</ButtonGroup>
 			</div>
@@ -93,7 +88,8 @@ function LocationContainer (): Node {
 						title={
 							<>
 								<span className="text-size-sm pr-2">#{++i}</span>
-								<Button hidden={i === 0} variant="link" className="text-color-default text-decoration-none p-0" style={{
+								<Button hidden={i === 0} variant="link"
+									className="text-color-default text-decoration-none p-0" style={{
 									lineHeight: '10px',
 									position: 'relative',
 									top: '-2px',
@@ -110,8 +106,11 @@ function LocationContainer (): Node {
 							</>
 						}>
 						<TabContentWrapper>
-							<Locations onChange={( tpl, values) => {
-								setLocations({ ...locations, [v]: tpl});
+							<Locations onChange={template => {
+								setLocations(current => ({
+									...current,
+									[v]: template,
+								}));
 							}} />
 						</TabContentWrapper>
 					</Tab>
