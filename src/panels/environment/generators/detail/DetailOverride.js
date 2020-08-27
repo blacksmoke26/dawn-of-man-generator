@@ -136,13 +136,13 @@ function DetailOverride ( props: Props ): Node {
 	}, [enabled, selection]);
 	
 	/** Get react-select options */
-	const renderSelectOptions = (): Array<Object> => {
+	const renderSelectOptions = React.useCallback((): Array<Object> => {
 		const excludes: Array<string> = Object.keys(selection);
 		
 		return random.props
 			.filter(v => !excludes.includes(v))
 			.map(v => ({label: v, value: v}));
-	};
+	}, [selection]);
 	
 	/** Update given selection name data */
 	const modifySelection = ( name: string, attr: TreeAttr ): void => {
@@ -382,7 +382,7 @@ function DetailOverride ( props: Props ): Node {
 		}
 		
 		return nodes;
-	}, [selection]);
+	}, [selection, enabled]);
 	
 	return (
 		<Accordion>
