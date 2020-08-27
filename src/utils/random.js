@@ -6,7 +6,6 @@
  * @since 2019-11-10
  */
 
-import slugify from 'slugify';
 import faker from 'faker';
 import randomFloatMod from 'random-float';
 import randomInt from 'random-int';
@@ -14,12 +13,6 @@ import uniqueRandomArray from 'unique-random-array';
 
 // Utils
 import * as Defaults from './defaults';
-
-/** Builtin environments */
-export const environments: Array<string> = [
-	'eurasia', 'eurasia_conflict', 'eurasia_flatlands',
-	'eurasia_glacial', 'eurasia_north', 'eurasia_warm', 'flat',
-];
 
 /** Deposits types */
 export const deposits: Array<string> = [
@@ -80,11 +73,6 @@ export function randomDensity ( fraction: number = 2 ): number {
 	return Number(randomFloatMod(Defaults.DENSITY_MIN, Defaults.DENSITY_MAX)).toFixed(fraction);
 }
 
-/** Random Coordinates */
-export function randomCord ( fraction: number = 2 ): number {
-	return Number(randomFloatMod(0, 1)).toFixed(fraction);
-}
-
 /** Random Angle */
 export function randomAngle (): [number, number] {
 	return [
@@ -124,26 +112,6 @@ export function randomAltitude (): [number, number] {
 		randomInt(Defaults.ALTITUDE_MIN, 10),
 		randomInt(11, Defaults.ALTITUDE_MAX)
 	];
-}
-
-/** Random Name */
-export function randomName (): string {
-	return slugify(faker.address.city('{{name.cityPrefix}}').toLowerCase(),'_');
-}
-
-/** Random Seed */
-export function randomSeed (): string {
-	return String(randomInt(0, 11111111)).padStart(8, '0');
-}
-
-/** Random Environment */
-export function randomEnvironment (): string {
-	return faker.random.arrayElement(environments);
-}
-
-/** Random Lakes */
-export function randomLakes (): number {
-	return randomInt(0, 9);
 }
 
 /** Random River */
