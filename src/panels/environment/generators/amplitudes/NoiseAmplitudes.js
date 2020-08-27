@@ -79,7 +79,7 @@ function NoiseAmplitudes ( props: Props ) {
 				</p>
 			</div>
 			<div className="mb-2">
-				Frequency 1: <code className="pl-2 text-size-xs">{frequencies.freq1.toFixed(3)}</code>
+				Frequency 1: <code className="pl-2 text-size-xs">{frequencies.freq1}</code>
 				<Button className="button-reset-sm" variant="link"
 					onClick={() => setFrequency('freq1', random.randomFrequency())}>
 					Random
@@ -88,10 +88,10 @@ function NoiseAmplitudes ( props: Props ) {
 					onClick={() => setFrequency('freq1', 0)}>Min</Button>
 				<Button className="button-reset-sm" variant="link"
 					onClick={() => setFrequency('freq1', 1)}>Max</Button>
-				<UiSlider step={0.001} value={frequencies.freq1.toFixed(3)} onChange={v => setFrequency('freq1', v)}/>
+				<UiSlider step={0.001} value={frequencies.freq1} onChange={v => setFrequency('freq1', v)}/>
 			</div>
 			<div className="mb-2">
-				Frequency 2: <code className="pl-2 text-size-xs">{frequencies.freq2.toFixed(3)}</code>
+				Frequency 2: <code className="pl-2 text-size-xs">{frequencies.freq2}</code>
 				<Button className="button-reset-sm" variant="link"
 					onClick={() => setFrequency('freq2', random.randomFrequency())}>
 					Random
