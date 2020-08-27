@@ -62,7 +62,7 @@ export function randomName (): { name: string, slug: string } {
  * @static
  * Random Seed */
 export function randomSeed (): string {
-	return String(randomInt(0, 11111111)).padStart(8, '0');
+	return String(randomInt(0, 99999999)).padStart(8, '0');
 }
 
 /**
