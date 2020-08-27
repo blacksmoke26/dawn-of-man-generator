@@ -104,8 +104,8 @@ export function randomSeasonTemperature (): [number, number] {
 /** Random Humidity */
 export function randomHumidity (): [number, number] {
 	return [
-		Number(randomFloatMod(Defaults.HUMIDITY_MIN, Defaults.HUMIDITY_MAX)).toFixed(2),
-		Number(randomFloatMod(Defaults.HUMIDITY_MIN, Defaults.HUMIDITY_MAX)).toFixed(2)
+		Number(randomFloatMod(Defaults.HUMIDITY_MIN, 0.50)).toFixed(2),
+		Number(randomFloatMod(0.51, Defaults.HUMIDITY_MAX)).toFixed(2)
 	];
 }
 
