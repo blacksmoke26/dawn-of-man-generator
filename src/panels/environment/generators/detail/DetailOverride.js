@@ -175,7 +175,7 @@ function DetailOverride ( props: Props ): Node {
 					<Card.Header className="pt-0 pb-0 pl-2 pl-2">
 						<div className="clearfix">
 							<div className="float-left">
-								<Accordion.Toggle disabled={!enabled} as={Button}
+								<Accordion.Toggle disabled={!isEnabled} as={Button}
 									variant="link" eventKey={`detail_${name}`}
 									onClick={() => setActiveKey(name)}>
 									{name}
@@ -204,7 +204,7 @@ function DetailOverride ( props: Props ): Node {
 					</Card.Header>
 					<Accordion.Collapse eventKey={`detail_${name}`}>
 						<Card.Body className="pt-2 pb-2">
-							<Form.Group as={Row} className={cn('mb-2', {'text-muted': !isEnabled})}>
+							<Form.Group as={Row} className={cn('mb-2', {'text-muted': !isDensityEnabled})}>
 								<Form.Label className="text-size-sm" column={true} sm="2">
 									<Form.Check
 										disabled={!isEnabled}
@@ -337,7 +337,7 @@ function DetailOverride ( props: Props ): Node {
 										}}/>
 								</Col>
 							</Form.Group>
-							<Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled})}>
+							<Form.Group as={Row} className={cn('mb-2', {'text-muted': !isEnabled})}>
 								<Form.Label className="text-size-sm" column={true} sm="2">
 									<span style={{textDecoration: 'underline dotted'}}
 										title="The min and max altitudes at which this object is
@@ -354,12 +354,12 @@ function DetailOverride ( props: Props ): Node {
 												{' / '}
 											Max: <code className={cn({'text-muted': !isEnabled})}>{attr.max_altitude}</code>
 										</span>
-										<Button disabled={!enabled} className="button-reset-sm" variant="link"
+										<Button disabled={!isEnabled} className="button-reset-sm" variant="link"
 											onClick={() => {
 												const [min_altitude, max_altitude] = random.randomAltitude();
 												modifySelection(name, {min_altitude, max_altitude});
 											}}>Random</Button>
-										<Button disabled={!enabled} className="button-reset-sm" variant="link"
+										<Button disabled={!isEnabled} className="button-reset-sm" variant="link"
 											onClick={() => modifySelection(name, {
 												min_altitude: Defaults.ALTITUDE_MIN_DEFAULT,
 												max_altitude: Defaults.ALTITUDE_MAX_DEFAULT,
