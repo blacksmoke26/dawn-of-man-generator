@@ -24,19 +24,19 @@ import * as Defaults from './../../../../utils/defaults';
  * @type {Object}
  */
 type Props = {
-	enable: boolean,
+	enabled: boolean,
 	onChange ( template: string, value: number ): void,
 };
 
 /** GlobalTreeDensity functional component */
 function GlobalTreeDensity ( props: Props ): Node {
 	const [value, setValue] = React.useState<number>(random.randomDensity());
-	const [enabled, setEnabled] = React.useState<boolean>(props.enable);
+	const [enabled, setEnabled] = React.useState<boolean>(props.enabled);
 	
 	// Reflect attributes changes
 	React.useEffect(() => {
-		setEnabled(props.enable);
-	}, [props.enable]);
+		setEnabled(props.enabled);
+	}, [props.enabled]);
 	
 	// Reflect state changes
 	React.useEffect(() => {
@@ -45,9 +45,9 @@ function GlobalTreeDensity ( props: Props ): Node {
 	}, [value, enabled]);
 	
 	const toTemplateText = (): string => {
-		return !value || !enabled
-			? ''
-			: `<global_tree_density value="${value}"/>`;
+		return enabled
+			? `<global_tree_density value="${value}"/>`
+			: '';
 	}
 	
 	return (
@@ -91,15 +91,15 @@ function GlobalTreeDensity ( props: Props ): Node {
 }
 
 // Properties validation
-GlobalTreeDensity.defaultProps = {
-	enable: false,
-	onChange: () => {},
+GlobalTreeDensity.propTypes = {
+	enabled: PropTypes.bool,
+	onChange: PropTypes.func,
 };
 
 // Default properties
-GlobalTreeDensity.propTypes = {
-	enable: PropTypes.bool,
-	onChange: PropTypes.func,
+GlobalTreeDensity.defaultProps = {
+	enabled: false,
+	onChange: () => {},
 };
 
 export default GlobalTreeDensity;
