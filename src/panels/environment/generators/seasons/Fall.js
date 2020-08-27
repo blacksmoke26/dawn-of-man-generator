@@ -12,36 +12,17 @@ import { Row, Col, Button, Form, ButtonGroup } from 'react-bootstrap';
 import { Range }  from 'rc-slider';
 import cn from 'classname';
 
+// Types
+import type { Node } from 'react';
+import type { FallSeasonProps } from './../../../../utils/seasons';
+
 // Components
 import * as random from './../../../../utils/random';
 import * as Defaults from './../../../../utils/defaults';
+import { seasonsPropsDefault, randomizeFall, FallConfig } from './../../../../utils/seasons';
 
 // Components
 import UiSlider  from './../../../../components/UiSlider';
-
-export const defaultValues = {
-	id: 'Fall',
-	setup_id: 'Fall',
-	duration: 0.25,
-	precipitation_chance: 0.25,
-	windy_chance: 0.5,
-	very_windy_chance: 0.1,
-	min_temperature: {
-		value: 5,
-	},
-	max_temperature: {
-		value: 25,
-	},
-};
-
-type SeasonValue = {
-	duration: number,
-	precipitationChance: number,
-	windyChance: number,
-	veryWindyChance: number,
-	minTemperatureValue: number,
-	maxTemperatureValue: number,
-}
 
 /**
  * Fall `props` type
@@ -49,14 +30,14 @@ type SeasonValue = {
  */
 type Props = {
 	enabled?: boolean,
-	season?: SeasonValue,
-	onChange ( template: string, values?: {[string]: any} ): void,
+	season?: FallSeasonProps,
+	onChange ( template: string, values: FallSeasonProps ): void,
 };
 
 /** Fall functional component */
-function Fall ( props: Props ) {
+function Fall ( props: Props ): Node {
 	const [enabled, setEnabled] = React.useState<boolean>(props.enabled);
-	const [season, setSeason] = React.useState<SeasonValue>(props.season);
+	const [season, setSeason] = React.useState<FallSeasonProps>(props.season);
 	
 	// Reflect attributes changes
 	React.useEffect(() => {
@@ -84,37 +65,12 @@ function Fall ( props: Props ) {
 		): '';
 	}, [season, enabled]);
 	
-	/** Randomize season values */
-	const randomizeValues = (): void => {
-		const [minTemperatureValue, maxTemperatureValue] = random.randomSeasonTemperature();
-		setSeason({
-			duration: random.randomFloat(),
-			precipitationChance: random.randomFloat(),
-			windyChance: random.randomFloat(),
-			veryWindyChance: random.randomFloat(),
-			minTemperatureValue,
-			maxTemperatureValue,
-		});
-	}
-	
 	/** Update season */
 	const updateValue = ( name: string, value: any ): void => {
 		setSeason(current => ({
 			...current,
-			[name]: value
+			[name]: value,
 		}));
-	};
-	
-	/** Update season */
-	const setValuesDefault = (): void => {
-		setSeason({
-			duration: defaultValues.duration,
-			precipitationChance: defaultValues.precipitation_chance,
-			windyChance: defaultValues.windy_chance,
-			veryWindyChance: defaultValues.very_windy_chance,
-			minTemperatureValue: defaultValues.min_temperature.value,
-			maxTemperatureValue: defaultValues.max_temperature.value,
-		});
 	};
 	
 	return (
@@ -132,7 +88,7 @@ function Fall ( props: Props ) {
 					<Button disabled={!enabled} className="button-reset-sm" variant="link"
 						onClick={() => updateValue('duration', random.randomFloat())}>Random</Button>
 					<Button disabled={!enabled} className="button-reset-sm" variant="link"
-						onClick={() => updateValue('duration', defaultValues.duration)}>Default</Button>
+						onClick={() => updateValue('duration', FallConfig.duration)}>Default</Button>
 					<Button disabled={!enabled} className="button-reset-sm" variant="link"
 						onClick={() => updateValue('duration', 0)}>%</Button>
 					<Button disabled={!enabled} className="button-reset-sm" variant="link"
@@ -162,7 +118,7 @@ function Fall ( props: Props ) {
 					<Button disabled={!enabled} className="button-reset-sm" variant="link"
 						onClick={() => updateValue('precipitationChance', random.randomFloat())}>Random</Button>
 					<Button disabled={!enabled} className="button-reset-sm" variant="link"
-						onClick={() => updateValue('precipitationChance', defaultValues.precipitation_chance)}>Default</Button>
+						onClick={() => updateValue('precipitationChance', FallConfig.precipitation_chance)}>Default</Button>
 					<Button disabled={!enabled} className="button-reset-sm" variant="link"
 						onClick={() => updateValue('precipitationChance', 0)}>0%</Button>
 					<Button disabled={!enabled} className="button-reset-sm" variant="link"
@@ -192,7 +148,7 @@ function Fall ( props: Props ) {
 					<Button disabled={!enabled} className="button-reset-sm" variant="link"
 						onClick={() => updateValue('windyChance', random.randomFloat())}>Random</Button>
 					<Button disabled={!enabled} className="button-reset-sm" variant="link"
-						onClick={() => updateValue('windyChance', defaultValues.windy_chance)}>Default</Button>
+						onClick={() => updateValue('windyChance', FallConfig.windy_chance)}>Default</Button>
 					<Button disabled={!enabled} className="button-reset-sm" variant="link"
 						onClick={() => updateValue('windyChance', 0.0)}>0%</Button>
 					<Button disabled={!enabled} className="button-reset-sm" variant="link"
@@ -222,7 +178,7 @@ function Fall ( props: Props ) {
 					<Button disabled={!enabled} className="button-reset-sm" variant="link"
 						onClick={() => updateValue('veryWindyChance', random.randomFloat())}>Random</Button>
 					<Button disabled={!enabled} className="button-reset-sm" variant="link"
-						onClick={() => updateValue('veryWindyChance', defaultValues.very_windy_chance)}>Default</Button>
+						onClick={() => updateValue('veryWindyChance', FallConfig.very_windy_chance)}>Default</Button>
 					<Button disabled={!enabled} className="button-reset-sm" variant="link"
 						onClick={() => updateValue('veryWindyChance', 0)}>0%</Button>
 					<Button disabled={!enabled} className="button-reset-sm" variant="link"
@@ -261,8 +217,8 @@ function Fall ( props: Props ) {
 						}}>Random</Button>
 					<Button disabled={!enabled} className="button-reset-sm" variant="link"
 						onClick={() => {
-							updateValue('minTemperatureValue', defaultValues.min_temperature.value);
-							updateValue('maxTemperatureValue', defaultValues.max_temperature.value);
+							updateValue('minTemperatureValue', FallConfig.min_temperature.value);
+							updateValue('maxTemperatureValue', FallConfig.max_temperature.value);
 						}}>Default</Button>
 					<Range
 						min={Defaults.SEASON_TEMPERATURE_MIN}
@@ -278,9 +234,9 @@ function Fall ( props: Props ) {
 			<div className="mt-3">
 				<ButtonGroup>
 					<Button disabled={!enabled} variant="secondary" size="sm"
-						onClick={() => randomizeValues()}>Randomize All</Button>
+						onClick={() => setSeason(randomizeFall())}>Randomize</Button>
 					<Button disabled={!enabled} variant="secondary" size="sm"
-						onClick={() => setValuesDefault()}>
+						onClick={() => {setSeason(seasonsPropsDefault().fall)}}>
 						Set Defaults
 					</Button>
 				</ButtonGroup>
@@ -306,14 +262,7 @@ Fall.propTypes = {
 // Default properties
 Fall.defaultProps = {
 	enabled: true,
-	season: {
-		duration: defaultValues.duration,
-		precipitationChance: defaultValues.precipitation_chance,
-		windyChance: defaultValues.windy_chance,
-		veryWindyChance: defaultValues.very_windy_chance,
-		minTemperatureValue: defaultValues.min_temperature.value,
-		maxTemperatureValue: defaultValues.max_temperature.value,
-	},
+	season: seasonsPropsDefault().fall,
 	onChange: () => {},
 };
 

@@ -12,34 +12,17 @@ import { Row, Col, Button, Form, ButtonGroup } from 'react-bootstrap';
 import { Range }  from 'rc-slider';
 import cn from 'classname';
 
-// Components
-import * as random from './../../../../utils/random';
-import * as Defaults from './../../../../utils/defaults';
+// Types
+import type { Node } from 'react';
+import type { SummerSeasonProps } from './../../../../utils/seasons';
 
 // Components
 import UiSlider  from './../../../../components/UiSlider';
 
-export const defaultValues = {
-	id: 'Summer',
-	setup_id: 'Summer',
-	duration: 0.25,
-	precipitation_chance: 0.0,
-	windy_chance: 0.25,
-	min_temperature: {
-		value: 20,
-	},
-	max_temperature: {
-		value: 35,
-	},
-};
-
-type SeasonValue = {
-	duration: number,
-	precipitationChance: number,
-	windyChance: number,
-	minTemperatureValue: number,
-	maxTemperatureValue: number,
-}
+// Utils
+import * as random from './../../../../utils/random';
+import * as Defaults from './../../../../utils/defaults';
+import { seasonsPropsDefault, randomizeSummer, SummerConfig } from './../../../../utils/seasons';
 
 /**
  * Summer `props` type
@@ -47,14 +30,14 @@ type SeasonValue = {
  */
 type Props = {
 	enabled?: boolean,
-	season?: SeasonValue,
-	onChange ( template: string, values?: {[string]: any} ): void,
+	season?: SummerSeasonProps,
+	onChange ( template: string, values: SummerSeasonProps ): void,
 };
 
 /** Summer functional component */
-function Summer ( props: Props ) {
+function Summer ( props: Props ): Node {
 	const [enabled, setEnabled] = React.useState<boolean>(props.enabled);
-	const [season, setSeason] = React.useState<SeasonValue>(props.season);
+	const [season, setSeason] = React.useState<SummerSeasonProps>(props.season);
 	
 	// Reflect attributes changes
 	React.useEffect(() => {
@@ -81,34 +64,12 @@ function Summer ( props: Props ) {
 		): '';
 	}, [season, enabled]);
 	
-	/** Randomize season values */
-	const randomizeValues = (): void => {
-		const [minTemperatureValue, maxTemperatureValue] = random.randomSeasonTemperature();
-		setSeason({
-			duration: random.randomFloat(),
-			precipitationChance: random.randomFloat(),
-			windyChance: random.randomFloat(),
-			minTemperatureValue, maxTemperatureValue,
-		});
-	}
-	
 	/** Update season */
 	const updateValue = ( name: string, value: any ): void => {
 		setSeason(current => ({
 			...current,
-			[name]: value
+			[name]: value,
 		}));
-	};
-	
-	/** Update season */
-	const setValuesDefault = (): void => {
-		setSeason({
-			duration: defaultValues.duration,
-			precipitationChance: defaultValues.precipitation_chance,
-			windyChance: defaultValues.windy_chance,
-			minTemperatureValue: defaultValues.min_temperature.value,
-			maxTemperatureValue: defaultValues.max_temperature.value,
-		});
 	};
 	
 	return (
@@ -126,7 +87,7 @@ function Summer ( props: Props ) {
 					<Button disabled={!enabled} className="button-reset-sm" variant="link"
 						onClick={() => updateValue('duration', random.randomFloat())}>Random</Button>
 					<Button disabled={!enabled} className="button-reset-sm" variant="link"
-						onClick={() => updateValue('duration', defaultValues.duration)}>Default</Button>
+						onClick={() => updateValue('duration', SummerConfig.duration)}>Default</Button>
 					<Button disabled={!enabled} className="button-reset-sm" variant="link"
 						onClick={() => updateValue('duration', 0)}>%</Button>
 					<Button disabled={!enabled} className="button-reset-sm" variant="link"
@@ -156,7 +117,7 @@ function Summer ( props: Props ) {
 					<Button disabled={!enabled} className="button-reset-sm" variant="link"
 						onClick={() => updateValue('precipitationChance', random.randomFloat())}>Random</Button>
 					<Button disabled={!enabled} className="button-reset-sm" variant="link"
-						onClick={() => updateValue('precipitationChance', defaultValues.precipitation_chance)}>Default</Button>
+						onClick={() => updateValue('precipitationChance', SummerConfig.precipitation_chance)}>Default</Button>
 					<Button disabled={!enabled} className="button-reset-sm" variant="link"
 						onClick={() => updateValue('precipitationChance', 0)}>0%</Button>
 					<Button disabled={!enabled} className="button-reset-sm" variant="link"
@@ -186,7 +147,7 @@ function Summer ( props: Props ) {
 					<Button disabled={!enabled} className="button-reset-sm" variant="link"
 						onClick={() => updateValue('windyChance', random.randomFloat())}>Random</Button>
 					<Button disabled={!enabled} className="button-reset-sm" variant="link"
-						onClick={() => updateValue('windyChance', defaultValues.windy_chance)}>Default</Button>
+						onClick={() => updateValue('windyChance', SummerConfig.windy_chance)}>Default</Button>
 					<Button disabled={!enabled} className="button-reset-sm" variant="link"
 						onClick={() => updateValue('windyChance', 0.0)}>0%</Button>
 					<Button disabled={!enabled} className="button-reset-sm" variant="link"
@@ -225,8 +186,8 @@ function Summer ( props: Props ) {
 						}}>Random</Button>
 					<Button disabled={!enabled} className="button-reset-sm" variant="link"
 						onClick={() => {
-							updateValue('minTemperatureValue', defaultValues.min_temperature.value);
-							updateValue('maxTemperatureValue', defaultValues.max_temperature.value);
+							updateValue('minTemperatureValue', SummerConfig.min_temperature.value);
+							updateValue('maxTemperatureValue', SummerConfig.max_temperature.value);
 						}}>Default</Button>
 					<Range
 						min={Defaults.SEASON_TEMPERATURE_MIN}
@@ -242,9 +203,9 @@ function Summer ( props: Props ) {
 			<div className="mt-3">
 				<ButtonGroup>
 					<Button disabled={!enabled} variant="secondary" size="sm"
-						onClick={() => randomizeValues()}>Randomize All</Button>
+						onClick={() => setSeason(randomizeSummer())}>Randomize</Button>
 					<Button disabled={!enabled} variant="secondary" size="sm"
-						onClick={() => setValuesDefault()}>
+						onClick={() => setSeason(seasonsPropsDefault().summer)}>
 						Set Defaults
 					</Button>
 				</ButtonGroup>
@@ -269,13 +230,7 @@ Summer.propTypes = {
 // Default properties
 Summer.defaultProps = {
 	enabled: true,
-	season: {
-		duration: defaultValues.duration,
-		precipitationChance: defaultValues.precipitation_chance,
-		windyChance: defaultValues.windy_chance,
-		minTemperatureValue: defaultValues.min_temperature.value,
-		maxTemperatureValue: defaultValues.max_temperature.value,
-	},
+	season: seasonsPropsDefault().summer,
 	onChange: () => {},
 };
 

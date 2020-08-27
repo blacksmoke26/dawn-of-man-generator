@@ -12,38 +12,17 @@ import { Row, Col, Button, Form, ButtonGroup } from 'react-bootstrap';
 import { Range }  from 'rc-slider';
 import cn from 'classname';
 
-// Components
-import * as random from './../../../../utils/random';
-import * as Defaults from './../../../../utils/defaults';
+// Types
+import type { Node } from 'react';
+import type { SpringSeasonProps } from './../../../../utils/seasons';
 
 // Components
 import UiSlider  from './../../../../components/UiSlider';
 
-export const defaultValues = {
-	id: 'Spring',
-	setup_id: 'Spring',
-	duration: 0.25,
-	precipitation_chance: 0.25,
-	windy_chance: 0.5,
-	very_windy_chance: 0.1,
-	fish_boost: 0.5,
-	min_temperature: {
-		value: 5,
-	},
-	max_temperature: {
-		value: 25,
-	},
-};
-
-type SeasonValue = {
-	duration: number,
-	precipitationChance: number,
-	windyChance: number,
-	veryWindyChance: number,
-	fishBoost: number,
-	minTemperatureValue: number,
-	maxTemperatureValue: number,
-}
+// Utils
+import * as random from './../../../../utils/random';
+import * as Defaults from './../../../../utils/defaults';
+import { seasonsPropsDefault, randomizeSpring, SpringConfig } from './../../../../utils/seasons';
 
 /**
  * Spring `props` type
@@ -51,14 +30,14 @@ type SeasonValue = {
  */
 type Props = {
 	enabled?: boolean,
-	season?: SeasonValue,
-	onChange ( template: string, values?: {[string]: any} ): void,
+	season?: SpringSeasonProps,
+	onChange ( template: string, values: SpringSeasonProps ): void,
 };
 
 /** Spring functional component */
-function Spring ( props: Props ) {
+function Spring ( props: Props ): Node {
 	const [enabled, setEnabled] = React.useState<boolean>(props.enabled);
-	const [season, setSeason] = React.useState<SeasonValue>(props.season);
+	const [season, setSeason] = React.useState<SpringSeasonProps>(props.season);
 	
 	// Reflect attributes changes
 	React.useEffect(() => {
@@ -86,39 +65,12 @@ function Spring ( props: Props ) {
 		): '';
 	}, [season, enabled]);
 	
-	/** Randomize season values */
-	const randomizeValues = (): void => {
-		const [minTemperatureValue, maxTemperatureValue] = random.randomSeasonTemperature();
-		setSeason({
-			duration: random.randomFloat(),
-			precipitationChance: random.randomFloat(),
-			windyChance: random.randomFloat(),
-			veryWindyChance: random.randomFloat(),
-			fishBoost: random.randomFloat(),
-			minTemperatureValue,
-			maxTemperatureValue,
-		});
-	}
-	
 	/** Update season */
 	const updateValue = ( name: string, value: any ): void => {
 		setSeason(current => ({
 			...current,
-			[name]: value
+			[name]: value,
 		}));
-	};
-	
-	/** Update season */
-	const setValuesDefault = (): void => {
-		setSeason({
-			duration: defaultValues.duration,
-			precipitationChance: defaultValues.precipitation_chance,
-			windyChance: defaultValues.windy_chance,
-			veryWindyChance: defaultValues.very_windy_chance,
-			fishBoost: defaultValues.fish_boost,
-			minTemperatureValue: defaultValues.min_temperature.value,
-			maxTemperatureValue: defaultValues.max_temperature.value,
-		});
 	};
 	
 	return (
@@ -136,7 +88,7 @@ function Spring ( props: Props ) {
 					<Button disabled={!enabled} className="button-reset-sm" variant="link"
 						onClick={() => updateValue('duration', random.randomFloat())}>Random</Button>
 					<Button disabled={!enabled} className="button-reset-sm" variant="link"
-						onClick={() => updateValue('duration', defaultValues.duration)}>Default</Button>
+						onClick={() => updateValue('duration', SpringConfig.duration)}>Default</Button>
 					<Button disabled={!enabled} className="button-reset-sm" variant="link"
 						onClick={() => updateValue('duration', 0)}>%</Button>
 					<Button disabled={!enabled} className="button-reset-sm" variant="link"
@@ -166,7 +118,7 @@ function Spring ( props: Props ) {
 					<Button disabled={!enabled} className="button-reset-sm" variant="link"
 						onClick={() => updateValue('precipitationChance', random.randomFloat())}>Random</Button>
 					<Button disabled={!enabled} className="button-reset-sm" variant="link"
-						onClick={() => updateValue('precipitationChance', defaultValues.precipitation_chance)}>Default</Button>
+						onClick={() => updateValue('precipitationChance', SpringConfig.precipitation_chance)}>Default</Button>
 					<Button disabled={!enabled} className="button-reset-sm" variant="link"
 						onClick={() => updateValue('precipitationChance', 0)}>0%</Button>
 					<Button disabled={!enabled} className="button-reset-sm" variant="link"
@@ -196,7 +148,7 @@ function Spring ( props: Props ) {
 					<Button disabled={!enabled} className="button-reset-sm" variant="link"
 						onClick={() => updateValue('windyChance', random.randomFloat())}>Random</Button>
 					<Button disabled={!enabled} className="button-reset-sm" variant="link"
-						onClick={() => updateValue('windyChance', defaultValues.windy_chance)}>Default</Button>
+						onClick={() => updateValue('windyChance', SpringConfig.windy_chance)}>Default</Button>
 					<Button disabled={!enabled} className="button-reset-sm" variant="link"
 						onClick={() => updateValue('windyChance', 0.0)}>0%</Button>
 					<Button disabled={!enabled} className="button-reset-sm" variant="link"
@@ -226,7 +178,7 @@ function Spring ( props: Props ) {
 					<Button disabled={!enabled} className="button-reset-sm" variant="link"
 						onClick={() => updateValue('veryWindyChance', random.randomFloat())}>Random</Button>
 					<Button disabled={!enabled} className="button-reset-sm" variant="link"
-						onClick={() => updateValue('veryWindyChance', defaultValues.very_windy_chance)}>Default</Button>
+						onClick={() => updateValue('veryWindyChance', SpringConfig.very_windy_chance)}>Default</Button>
 					<Button disabled={!enabled} className="button-reset-sm" variant="link"
 						onClick={() => updateValue('veryWindyChance', 0)}>0%</Button>
 					<Button disabled={!enabled} className="button-reset-sm" variant="link"
@@ -256,7 +208,7 @@ function Spring ( props: Props ) {
 					<Button disabled={!enabled} className="button-reset-sm" variant="link"
 						onClick={() => updateValue('fishBoost', random.randomFloat())}>Random</Button>
 					<Button disabled={!enabled} className="button-reset-sm" variant="link"
-						onClick={() => updateValue('fishBoost', defaultValues.fish_boost)}>Default</Button>
+						onClick={() => updateValue('fishBoost', SpringConfig.fish_boost)}>Default</Button>
 					<Button disabled={!enabled} className="button-reset-sm" variant="link"
 						onClick={() => updateValue('fishBoost', 0)}>0%</Button>
 					<Button disabled={!enabled} className="button-reset-sm" variant="link"
@@ -295,8 +247,8 @@ function Spring ( props: Props ) {
 						}}>Random</Button>
 					<Button disabled={!enabled} className="button-reset-sm" variant="link"
 						onClick={() => {
-							updateValue('minTemperatureValue', defaultValues.min_temperature.value);
-							updateValue('maxTemperatureValue', defaultValues.max_temperature.value);
+							updateValue('minTemperatureValue', SpringConfig.min_temperature.value);
+							updateValue('maxTemperatureValue', SpringConfig.max_temperature.value);
 						}}>Default</Button>
 					<Range
 						min={Defaults.SEASON_TEMPERATURE_MIN}
@@ -312,9 +264,9 @@ function Spring ( props: Props ) {
 			<div className="mt-3">
 				<ButtonGroup>
 					<Button disabled={!enabled} variant="secondary" size="sm"
-						onClick={() => randomizeValues()}>Randomize All</Button>
+						onClick={() => setSeason(randomizeSpring())}>Randomize</Button>
 					<Button disabled={!enabled} variant="secondary" size="sm"
-						onClick={() => setValuesDefault()}>
+						onClick={() => setSeason(seasonsPropsDefault().spring)}>
 						Set Defaults
 					</Button>
 				</ButtonGroup>
@@ -341,15 +293,7 @@ Spring.propTypes = {
 // Default properties
 Spring.defaultProps = {
 	enabled: true,
-	season: {
-		duration: defaultValues.duration,
-		precipitationChance: defaultValues.precipitation_chance,
-		windyChance: defaultValues.windy_chance,
-		veryWindyChance: defaultValues.very_windy_chance,
-		fishBoost: defaultValues.fish_boost,
-		minTemperatureValue: defaultValues.min_temperature.value,
-		maxTemperatureValue: defaultValues.max_temperature.value,
-	},
+	season: seasonsPropsDefault().spring,
 	onChange: () => {},
 };
 
