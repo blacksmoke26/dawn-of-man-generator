@@ -19,7 +19,7 @@ import * as Defaults from './../../../../utils/defaults';
 // Components
 import UiSlider  from './../../../../components/UiSlider';
 
-const defaultValues = {
+export const defaultValues = {
 	id: 'Winter',
 	setup_id: 'Winter',
 	duration: 0.25,
