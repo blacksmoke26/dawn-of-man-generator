@@ -68,7 +68,9 @@ const getInitialValues = (): DetailAttr => {
  * @type {Object}
  */
 type Props = {
-	onChange ( template: string, values?: {[string]: any} ): void,
+	enabled?: boolean,
+	selection?: DetailSelection,
+	onChange ( template: string, values: DetailSelection ): void,
 };
 
 /**
