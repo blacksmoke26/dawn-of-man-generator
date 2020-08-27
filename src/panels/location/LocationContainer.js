@@ -12,7 +12,10 @@ import copyClipboard from 'clipboard-copy';
 import type { Node } from 'react';
 
 // Components
-import Locations from './generators/Locations';
+import Location from './generators/Location';
+
+// Utils
+import * as location from './../../utils/location';
 
 const randAlpha: Function = customAlphabet('abcdefghijklmnopqrstuvwxyz', 5);
 
@@ -106,12 +109,12 @@ function LocationContainer (): Node {
 							</>
 						}>
 						<TabContentWrapper>
-							<Locations onChange={template => {
+							<Location values={location.randomizeLocation()} onChange={template => {
 								setLocations(current => ({
 									...current,
 									[v]: template,
 								}));
-							}} />
+							}}/>
 						</TabContentWrapper>
 					</Tab>
 				))}
