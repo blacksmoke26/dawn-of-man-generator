@@ -306,7 +306,7 @@ function TreesOverride ( props: Props ): Node {
 												const [min_angle, max_angle] = random.randomAngle();
 												modifySelection(name, {min_angle, max_angle});
 											}}>Random</Button>
-										<Button disabled={!enabled || !attr.angle_enabled}
+										<Button disabled={!isAngleEnabled}
 											className="button-reset-sm" variant="link"
 											onClick={() => modifySelection(name, {
 												min_angle: Defaults.ANGLE_MIN_DEFAULT,
