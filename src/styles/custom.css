@@ -25,6 +25,24 @@
 	background-color: rgba(91, 101, 119, 0.38);
 }
 
+.rc-slider-rail {
+	background-color: #293140;
+}
+
+.rc-slider-track {
+	background-color: #7f90b4;
+}
+
+.rc-slider-handle {
+	border: 2px solid #4a5365;
+	background-color: #ffffff;
+}
+
+.rc-slider-handle:hover, .rc-slider-handle-click-focused {
+	border-color: #ffb785;
+	background-color: #7f90b4;
+}
+
 .syntax-highlighter code {
 	background-color: transparent;
 }
