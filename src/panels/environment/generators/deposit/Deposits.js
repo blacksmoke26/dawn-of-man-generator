@@ -80,7 +80,7 @@ function Deposits ( props: Props ) {
 						/>
 					</Col>
 				</Row>
-				<ul className="list-unstyled list-inline mb-0">
+				<ul className="list-unstyled list-inline mb-0 fixed-width">
 					{random.deposits.map(v => (
 						<li key={v} className="list-inline-item">
 							<Form.Check

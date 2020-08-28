@@ -79,7 +79,7 @@ function Trees ( props: Props ) {
 							/>
 						</Col>
 					</Row>
-					<ul className="list-unstyled list-inline mb-0">
+					<ul className="list-unstyled list-inline fixed-width mb-0">
 						{random.trees.map(v => (
 							<li key={v} className="list-inline-item mb-1">
 								<Form.Check
