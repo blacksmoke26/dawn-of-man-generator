@@ -24,6 +24,9 @@ import UiSlider from './../../../../components/UiSlider';
 import * as random from './../../../../utils/random';
 import * as Defaults from './../../../../utils/defaults';
 
+// Styles
+import * as reactSelect from './../../../../blocks/react-select';
+
 type DetailAttr = {
 	density_enabled?: boolean,
 	density?: number,
@@ -471,7 +474,8 @@ function DetailOverride ( props: Props ): Node {
 								<Select
 									isDisabled={!enabled}
 									menuPortalTarget={document.body}
-									styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
+									theme={reactSelect.theme}
+									styles={reactSelect.styles}
 									options={renderSelectOptions()}
 									placeholder="Choose detail to override"
 									onChange={( selected: ?Object, {action}: Object ) => {

@@ -19,6 +19,9 @@ import { Node } from 'react';
 // Components
 import UiSlider from './../../../../components/UiSlider';
 
+// Styles
+import * as reactSelect from './../../../../blocks/react-select';
+
 // Utils
 import * as random from './../../../../utils/random';
 import * as Defaults from './../../../../utils/defaults';
@@ -402,9 +405,10 @@ function PropOverride ( props: Props ): Node {
 							/>
 							<div className="mt-2 mt-2">
 								<Select
+									theme={reactSelect.theme}
+									styles={reactSelect.styles}
 									isDisabled={!enabled}
 									menuPortalTarget={document.body}
-									styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
 									options={renderSelectOptions()}
 									placeholder="Choose prop to override"
 									onChange={( selected: ?Object, {action}: Object ) => {

@@ -21,6 +21,9 @@ import { Node } from 'react';
 import * as random from './../../../../utils/random';
 import * as Defaults from './../../../../utils/defaults';
 
+// Styles
+import * as reactSelect from './../../../../blocks/react-select';
+
 type DepositAttr = {
 	_enabled: boolean,
 	min_angle?: number,
@@ -233,9 +236,10 @@ function DepositOverride ( props: Props ) {
 							/>
 							<div className="mt-2 mt-2">
 								<Select
+									theme={reactSelect.theme}
+									styles={reactSelect.styles}
 									isDisabled={!enabled}
 									menuPortalTarget={document.body}
-									styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
 									options={renderSelectOptions()}
 									placeholder="Choose deposit to override"
 									onChange={( selected: ?Object, {action}: Object ) => {
