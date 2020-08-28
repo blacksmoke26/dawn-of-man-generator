@@ -232,7 +232,7 @@ function TreesOverride ( props: Props ): Node {
 								<Button variant="link" disabled={!isEnabled}
 									onClick={() => removeFromSelection(name)}
 									style={{fontSize: '1.2rem', top: '1px'}}
-									className="p-0 text-decoration-none position-relative text-dark" size="sm">
+									className="p-0 text-decoration-none position-relative" size="sm">
 									&times;
 								</Button>
 							</div>
