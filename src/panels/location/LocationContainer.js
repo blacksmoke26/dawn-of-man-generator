@@ -4,7 +4,7 @@ import React from 'react';
 import { ButtonGroup, Button, Tabs, Tab, Card } from 'react-bootstrap';
 import { customAlphabet } from 'nanoid';
 import SyntaxHighlighter from 'react-syntax-highlighter';
-import { githubGist } from 'react-syntax-highlighter/dist/esm/styles/hljs';
+import { a11yDark } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import xmlFormatter from 'xml-formatter';
 import copyClipboard from 'clipboard-copy';
 
@@ -120,9 +120,11 @@ function LocationContainer (): Node {
 				))}
 			</Tabs>
 			<hr/>
-			<SyntaxHighlighter style={githubGist} language="xml">
-				{toTemplate()}
-			</SyntaxHighlighter>
+			<div className="syntax-highlighter">
+				<SyntaxHighlighter style={a11yDark} language="xml">
+					{toTemplate()}
+				</SyntaxHighlighter>
+			</div>
 			<div className="mt-2">
 				<Button size="sm" variant="secondary"
 					onClick={() => copyClipboard(toTemplate())}>
