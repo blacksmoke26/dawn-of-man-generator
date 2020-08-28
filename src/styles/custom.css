@@ -1,0 +1,26 @@
+/**
+ * @author Junaid Atari <mj.atari@gmail.com>
+ * @link http://junaidatari.com Author Website
+ * @since 2020-08-28
+ */
+
+.custom-switch .custom-control-input:checked~.custom-control-label::after {
+	background-color: #fff;
+}
+
+.rc-slider-disabled {
+	background-color: #5b6577 !important;
+}
+
+.rc-slider-disabled .rc-slider-handle, .rc-slider-disabled .rc-slider-dot {
+	border-color: #474e5b;
+	background-color: #5b6577;
+}
+
+.rc-slider-disabled .rc-slider-rail {
+	background-color: #474e5b;
+}
+
+.rc-slider-disabled .rc-slider-track {
+	background-color: rgba(91 101 119, 0.38);
+}
