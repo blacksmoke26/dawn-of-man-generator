@@ -24,3 +24,7 @@
 .rc-slider-disabled .rc-slider-track {
 	background-color: rgba(91 101 119, 0.38);
 }
+
+.syntax-highlighter code {
+	background-color: transparent;
+}
