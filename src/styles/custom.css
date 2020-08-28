@@ -54,3 +54,9 @@
 .nav-tabs a.nav-item.active button {
 	color: #82ccff !important;
 }
+
+.fixed-width .list-inline-item {
+	position: relative;
+	width: 90px;
+	margin-top: 5px;
+}
