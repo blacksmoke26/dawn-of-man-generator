@@ -9,7 +9,7 @@
 import React from 'react';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import { Card, Accordion, Button } from 'react-bootstrap';
-import { a11yDark } from 'react-syntax-highlighter/dist/esm/styles/hljs';
+import { anOldHope } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import xmlFormatter from 'xml-formatter';
 import copyClipboard from 'clipboard-copy';
 
@@ -151,7 +151,7 @@ function EnvironmentContainer (): Node {
 			</Accordion>
 			<hr/>
 			<div className="syntax-highlighter">
-				<SyntaxHighlighter style={a11yDark} language="xml">
+				<SyntaxHighlighter style={anOldHope} language="xml">
 					{toTemplateText()}
 				</SyntaxHighlighter>
 			</div>
