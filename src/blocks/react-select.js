@@ -31,4 +31,15 @@ export const theme = (theme) => ({
 export const styles = {
 	menuPortal: base => ({...base, zIndex: 9999}),
 	control: styles => ({ ...styles, backgroundColor: 'rgb(242 242 242 / 4%)' }),
+	option: (styles, { isDisabled, isSelected }) => ({
+		...styles,
+		color: isDisabled
+			? '#2e2e32'
+			: (
+				isSelected
+					? '#ffb74d'
+					: '#FFF'
+			),
+		singleValue: styles => ({ ...styles, color: '#ffb74d' }),
+	})
 };
