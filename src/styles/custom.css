@@ -22,9 +22,17 @@
 }
 
 .rc-slider-disabled .rc-slider-track {
-	background-color: rgba(91 101 119, 0.38);
+	background-color: rgba(91, 101, 119, 0.38);
 }
 
 .syntax-highlighter code {
 	background-color: transparent;
+}
+
+.nav-tabs a.nav-item.active {
+	background: rgba(42, 50, 66, 0.62) !important;
+}
+
+.nav-tabs a.nav-item.active button {
+	color: #82ccff !important;
 }
