@@ -85,7 +85,7 @@ function LocationContainer (): Node {
 					}}>Remove All</Button>
 				</ButtonGroup>
 			</div>
-			<Tabs activeKey={activeKey} id="locations-tab" onSelect={k => setActiveKey(k)}>
+			<Tabs activeKey={activeKey} id="locations-tab" className="nav-tabs-bottom" onSelect={k => setActiveKey(k)}>
 				{Object.keys(locations).map((v, i: number) => (
 					<Tab eventKey={v} key={v} as={'div'}
 						title={
