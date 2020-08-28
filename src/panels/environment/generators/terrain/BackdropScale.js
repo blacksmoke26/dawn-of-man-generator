@@ -82,7 +82,11 @@ function BackdropScale ( props: Props ) {
 								Random
 							</Button>
 							<Button disabled={!enabled} className="button-reset-sm" variant="link"
-								onClick={() => this.setState({...defaultValues})}>Reset</Button>
+								onClick={() => {
+									setAngle1(defaultValues.angle1);
+									setAngle2(defaultValues.angle2);
+									setAngle3(defaultValues.angle3);
+								}}>Reset</Button>
 							<div className="text-size-xxs text-muted mt-1">
 								Change the size of backdrops (the mountains you see beyond the map).
 							</div>
