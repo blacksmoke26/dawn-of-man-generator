@@ -154,7 +154,7 @@ function Location ( props: Props ): Node {
 							onClick={() => updateCoordinate(location.randomCoordinate())}>Random</Button>
 						<Button className="button-reset-sm" variant="link"
 							onClick={() => updateCoordinate(0)}>Reset</Button>
-						<UiSlider
+						<UiSlider step={0.01}
 							value={values.coordinates[0]}
 							onChange={v => updateCoordinate(Number(v))}/>
 					</div>
@@ -164,7 +164,7 @@ function Location ( props: Props ): Node {
 							onClick={() => updateCoordinate(null, location.randomCoordinate())}>Random</Button>
 						<Button className="button-reset-sm" variant="link"
 							onClick={() => updateCoordinate(null, 0)}>Reset</Button>
-						<UiSlider
+						<UiSlider step={0.01}
 							value={values.coordinates[1]}
 							onChange={v => updateCoordinate(null, Number(v))}/>
 					</div>
