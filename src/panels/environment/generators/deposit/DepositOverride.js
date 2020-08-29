@@ -99,7 +99,7 @@ function DepositOverride ( props: Props ) {
 				`<deposit_override_prototype>
 					<id value="${name}"/>
 					<min_angle value="${attr.min_angle}"/>
-					<min_angle value="${attr.max_angle}"/>
+					<max_angle value="${attr.max_angle}"/>
 					${altitudeTpl}
 				</deposit_override_prototype>`
 			);
