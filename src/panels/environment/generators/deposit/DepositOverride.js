@@ -28,18 +28,25 @@ type DepositAttr = {
 	_enabled: boolean,
 	min_angle?: number,
 	max_angle?: number,
+	altitude_enabled: boolean,
+	min_altitude?: number,
+	max_altitude?: number,
 };
 
 type DepositSelection = {
 	[string]: DepositAttr
 };
 
+/** Get randomized initial values */
 const getInitialValues = (): DepositAttr => {
 	let [min_angle, max_angle] = random.randomAngle();
+	const [min_altitude, max_altitude] = random.randomAltitude();
 	
 	return {
 		_enabled: true,
 		min_angle, max_angle,
+		altitude_enabled: false,
+		min_altitude, max_altitude,
 	}
 };
 
@@ -79,16 +86,21 @@ function DepositOverride ( props: Props ) {
 			return '';
 		}
 		
-		for ( let [name: string, attr: TreeAttr] of Object.entries(selection) ) {
+		for ( let [name: string, attr: DepositAttr] of Object.entries(selection) ) {
 			if ( !attr._enabled ) {
 				continue;
 			}
+			
+			const altitudeTpl: string = attr.altitude_enabled
+				? `<min_altitude value="${attr.min_altitude}" /><max_altitude value="${attr.max_altitude}"/>`
+				: '';
 			
 			templateOverride.push(
 				`<deposit_override_prototype>
 					<id value="${name}"/>
 					<min_angle value="${attr.min_angle}"/>
 					<min_angle value="${attr.max_angle}"/>
+					${altitudeTpl}
 				</deposit_override_prototype>`
 			);
 		}
@@ -132,6 +144,7 @@ function DepositOverride ( props: Props ) {
 		
 		for ( let [name: string, attr: DepositAttr] of Object.entries(selection) ) {
 			const isEnabled: boolean = attr._enabled && enabled;
+			const isAltitudeEnabled: boolean = isEnabled && attr.altitude_enabled;
 			
 			nodes.push(
 				<Card key={name}>
@@ -167,6 +180,60 @@ function DepositOverride ( props: Props ) {
 					</Card.Header>
 					<Accordion.Collapse eventKey={`deposit_${name}`}>
 						<Card.Body className="pt-2 pb-2">
+							<Form.Group as={Row} className={cn('mb-2', {'text-muted': !isAltitudeEnabled})}>
+								<Form.Label className="text-size-sm" column={true} sm="2">
+									<Form.Check
+										disabled={!isEnabled}
+										className="text-size-xs"
+										type="switch"
+										id={`deposit_override_altitude-switch-${nanoid(5)}`}
+										label={
+											<span style={{textDecoration: 'underline dotted'}}
+												title="The min and max altitudes at which this object is
+										placed, in meters. 0 means water level, negative values
+										might make sense for certain objects like reeds or rocks
+										that are placed underwater.">
+											Altitude:
+										</span>
+										}
+										checked={attr.altitude_enabled}
+										onChange={e => modifySelection(name, {altitude_enabled: e.target.checked})}
+									/>
+								</Form.Label>
+								<Col sm="10">
+									<div>
+										<span className="text-size-xs font-family-code">
+											Min: <code className={cn({'text-muted': !isAltitudeEnabled})}>
+												{attr.min_altitude}
+											</code>
+											{' / '}
+											Max: <code className={cn({'text-muted': !isAltitudeEnabled})}>
+												{attr.max_altitude}
+											</code>
+										</span>
+										<Button disabled={!isAltitudeEnabled}
+											className="button-reset-sm" variant="link"
+											onClick={() => {
+												const [min_altitude, max_altitude] = random.randomAltitude();
+												modifySelection(name, {min_altitude, max_altitude});
+											}}>Random</Button>
+										<Button disabled={!isAltitudeEnabled}
+											className="button-reset-sm" variant="link"
+											onClick={() => modifySelection(name, {
+												min_altitude: Defaults.ALTITUDE_MIN_DEFAULT,
+												max_altitude: Defaults.ALTITUDE_MAX_DEFAULT,
+											})}>Default</Button>
+									</div>
+									<Range
+										min={Defaults.ALTITUDE_MIN}
+										max={Defaults.ALTITUDE_MAX}
+										disabled={!isAltitudeEnabled}
+										value={[attr.min_altitude, attr.max_altitude]}
+										onChange={([min_altitude, max_altitude]) => {
+											modifySelection(name, {min_altitude, max_altitude});
+										}}/>
+								</Col>
+							</Form.Group>
 							<Form.Group as={Row} className={cn('mb-2', {'text-muted': !isEnabled})}>
 								<Form.Label className="text-size-sm" column={true} sm="2">
 									<span style={{textDecoration: 'underline dotted'}}
