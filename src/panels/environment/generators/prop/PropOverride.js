@@ -176,7 +176,7 @@ function PropOverride ( props: Props ): Node {
 	const renderSelectOptions = React.useCallback((): Array<Object> => {
 		const excludes: Array<string> = Object.keys(selection);
 		
-		return random.details
+		return random.props
 			.filter(v => !excludes.includes(v))
 			.map(v => ({label: v, value: v}));
 	}, [selection]);

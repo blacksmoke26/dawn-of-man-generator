@@ -194,7 +194,7 @@ function DetailOverride ( props: Props ): Node {
 	const renderSelectOptions = React.useCallback((): Array<Object> => {
 		const excludes: Array<string> = Object.keys(selection);
 		
-		return random.props
+		return random.details
 			.filter(v => !excludes.includes(v))
 			.map(v => ({label: v, value: v}));
 	}, [selection]);
