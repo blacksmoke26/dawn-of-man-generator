@@ -22,7 +22,9 @@ import { jsonToRedux } from './../data/environments/parser';
  */
 export function setEnvironment ( rawData: Object ): Promise<void> {
 	return async ( dispatch: Dispatch ) => {
-		const {environment}: Object = jsonToRedux(rawData);
+		const {environment}: Object = jsonToRedux(rawData, {
+			nullResolver: ( wrapperKey: string ) => ({[wrapperKey]: false}),
+		});
 		dispatch({type: SET_ENVIRONMENT, payload: environment});
 	};
 }
