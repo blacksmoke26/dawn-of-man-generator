@@ -8,7 +8,7 @@
 
 import React from 'react';
 import * as PropTypes from 'prop-types';
-import { Button, ButtonGroup, Form, Accordion } from 'react-bootstrap';
+import { Button, ButtonGroup, Form } from 'react-bootstrap';
 
 // Components
 import UiSlider from './../../../../components/UiSlider';
