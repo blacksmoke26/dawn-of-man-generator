@@ -25,7 +25,7 @@ export function jsonToRedux ( json: Object, options: JsonToReduxOptions = {} ): 
 	}
 	
 	const noiseAmplitudes: Array<number> = typeof parsed === 'number'
-		? new Array<number>(7).fill(parsed, 0, 7)
+		? new Array<number>(8).fill(parsed, 0, 8)
 		: parsed.split(' ').map(v => Number(v));
 	
 	return {noiseAmplitudes};
