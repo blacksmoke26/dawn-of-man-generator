@@ -90,7 +90,7 @@ function LocationContainer (): Node {
 					<Tab eventKey={v} key={v} as={'div'}
 						title={
 							<>
-								<span className="text-size-sm pr-2">#{++i}</span>
+								<span className="text-size-sm pr-2">#{i+1}</span>
 								<Button hidden={i === 0} variant="link"
 									className="text-color-default text-decoration-none p-0" style={{
 									lineHeight: '10px',
