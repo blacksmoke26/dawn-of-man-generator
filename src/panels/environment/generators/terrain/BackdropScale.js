@@ -8,6 +8,7 @@
 
 import React from 'react';
 import * as PropTypes from 'prop-types';
+import { useSelector } from 'react-redux';
 import { Card, Button, Form, Row, Col } from 'react-bootstrap';
 import { nanoid } from 'nanoid';
 import cn from 'classname';
@@ -44,13 +45,23 @@ function BackdropScale ( props: Props ) {
 	const [angle2, setAngle2] = React.useState<number>(props.angle2);
 	const [angle3, setAngle3] = React.useState<number>(props.angle3);
 	
+	const {extValue} = useSelector(( {environment} ) => ({
+		extValue: environment?.backdropScale ?? null,
+	}));
+	
 	// Reflect attributes changes
 	React.useEffect(() => {
-		setEnabled(props.enabled);
-		setAngle1(props.angle1);
-		setAngle2(props.angle2);
-		setAngle3(props.angle3);
-	}, [props.enabled, props.angle1, props.angle2, props.angle3]);
+		if ( typeof extValue === 'boolean' ) {
+			setEnabled(extValue);
+		}
+		
+		if ( Array.isArray(extValue) ) {
+			setEnabled(true);
+			setAngle1(extValue[0]);
+			setAngle2(extValue[1]);
+			setAngle3(extValue[2]);
+		}
+	}, [extValue]);
 	
 	// Reflect state changes
 	React.useEffect(() => {

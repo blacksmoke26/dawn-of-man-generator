@@ -8,10 +8,12 @@
 
 import React from 'react';
 import * as PropTypes from 'prop-types';
+import { useSelector } from 'react-redux';
 import { Card, Button, Form, Accordion, Row, Col, ButtonGroup } from 'react-bootstrap';
 import Select from 'react-select';
 import { nanoid } from 'nanoid';
 import { Range } from 'rc-slider';
+import cn from 'classname';
 
 // Types
 import { Node } from 'react';
@@ -25,7 +27,7 @@ import * as reactSelect from './../../../../blocks/react-select';
 // Utils
 import * as random from './../../../../utils/random';
 import * as Defaults from './../../../../utils/defaults';
-import cn from 'classname';
+import { isObject } from './../../../../data/environments/parser/utils/transform';
 
 type PropAttr = {
 	density_enabled?: boolean,
@@ -40,16 +42,6 @@ type PropAttr = {
 
 type PropSelection = {
 	[string]: PropAttr
-};
-
-/**
- * PropOverride `props` type
- * @type {Object}
- */
-type Props = {
-	enabled?: boolean,
-	selection?: PropSelection,
-	onChange ( template: string, values: PropSelection ): void,
 };
 
 /**
@@ -115,17 +107,71 @@ const getDefaultValues = ( attr: DetailAttr ): Object => {
 	return node;
 };
 
+/** Transform extended value into selection object */
+const extValueToSelection = ( data: Object = {} ): PropSelection => {
+	const selection: PropSelection = {};
+	
+	for ( let [name, attr] of Object.entries(data) ) {
+		const node: PropAttr = {
+			_enabled: true,
+		};
+		
+		if ( attr.hasOwnProperty('density') ) {
+			node.density_enabled = true;
+			node.density = attr.density
+		}
+		
+		if ( attr.hasOwnProperty('angle') ) {
+			const [mi, mx] = attr.angle;
+			node.angle_enabled = true;
+			node.min_angle = mi;
+			node.max_angle = mx;
+		}
+		
+		if ( attr.hasOwnProperty('altitude') ) {
+			const [mi, mx] = attr.altitude;
+			node.altitude_enabled = true;
+			node.min_altitude = mi;
+			node.max_altitude = mx;
+		}
+		
+		selection[name] = node;
+	}
+	
+	return selection;
+};
+
+/**
+ * PropOverride `props` type
+ * @type {Object}
+ */
+type Props = {
+	enabled?: boolean,
+	selection?: PropSelection,
+	onChange ( template: string, values: PropSelection ): void,
+};
+
 /** PropOverride functional component */
 function PropOverride ( props: Props ): Node {
 	const [enabled, setEnabled] = React.useState<boolean>(props.enabled);
 	const [selection, setSelection] = React.useState<DetailSelection>(props.selection);
 	const [activeKey, setActiveKey] = React.useState<string>('');
 	
+	const {extValue} = useSelector(( {environment} ) => ({
+		extValue: environment?.propOverridePrototypes ?? null,
+	}));
+	
 	// Reflect attributes changes
 	React.useEffect(() => {
-		setEnabled(props.enabled);
-		setSelection(props.selection);
-	}, [props.enabled, props.selection]);
+		if ( typeof extValue === 'boolean' ) {
+			setEnabled(extValue);
+		}
+		
+		if ( isObject(extValue) ) {
+			setEnabled(true);
+			setSelection(extValueToSelection(extValue));
+		}
+	}, [extValue]);
 	
 	// Reflect state changes
 	React.useEffect(() => {

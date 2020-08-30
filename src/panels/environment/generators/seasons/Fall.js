@@ -8,6 +8,7 @@
 
 import React from 'react';
 import * as PropTypes from 'prop-types';
+import { useSelector } from 'react-redux';
 import { Row, Col, Button, Form, ButtonGroup } from 'react-bootstrap';
 import { Range }  from 'rc-slider';
 import cn from 'classname';
@@ -20,9 +21,35 @@ import type { FallSeasonProps } from './../../../../utils/seasons';
 import * as random from './../../../../utils/random';
 import * as Defaults from './../../../../utils/defaults';
 import { seasonsPropsDefault, randomizeFall, FallConfig } from './../../../../utils/seasons';
+import { isObject } from './../../../../data/environments/parser/utils/transform';
 
 // Components
 import UiSlider  from './../../../../components/UiSlider';
+
+/** Transform extended value into selection object */
+const extValueToSeason = ( data: Object | boolean ): FallSeasonProps|boolean => {
+	if ( typeof data === 'boolean' ) {
+		return data;
+	}
+	
+	if ( !isObject(data)
+		|| !data.hasOwnProperty(FallConfig.id) ) {
+		return {};
+	}
+	
+	const node: Object = data[FallConfig.id];
+	
+	const [minTemperatureValue, maxTemperatureValue] = node.temperature;
+	
+	return {
+		duration: node.duration,
+		precipitationChance: node.precipitationChance,
+		windyChance: node.windyChance,
+		veryWindyChance: node.veryWindyChance,
+		minTemperatureValue,
+		maxTemperatureValue,
+	};
+};
 
 /**
  * Fall `props` type
@@ -38,6 +65,22 @@ type Props = {
 function Fall ( props: Props ): Node {
 	const [enabled, setEnabled] = React.useState<boolean>(props.enabled);
 	const [season, setSeason] = React.useState<FallSeasonProps>(props.season);
+	
+	const {extValue} = useSelector(( {environment} ) => ({
+		extValue: environment?.seasons ?? null,
+	}));
+	
+	// Reflect attributes changes
+	React.useEffect(() => {
+		if ( typeof extValue === 'boolean' ) {
+			setEnabled(extValue);
+		}
+		
+		if ( isObject(extValue) && Object.keys(extValue).length ) {
+			setEnabled(true);
+			setSeason(extValueToSeason(extValue));
+		}
+	}, [extValue]);
 	
 	// Reflect attributes changes
 	React.useEffect(() => {

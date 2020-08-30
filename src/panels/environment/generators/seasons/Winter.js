@@ -8,6 +8,7 @@
 
 import React from 'react';
 import * as PropTypes from 'prop-types';
+import { useSelector } from 'react-redux';
 import { Row, Col, Button, Form, ButtonGroup } from 'react-bootstrap';
 import { Range }  from 'rc-slider';
 import cn from 'classname';
@@ -23,6 +24,33 @@ import UiSlider  from './../../../../components/UiSlider';
 import * as random from './../../../../utils/random';
 import * as Defaults from './../../../../utils/defaults';
 import { seasonsPropsDefault, randomizeWinter, WinterConfig } from './../../../../utils/seasons';
+import { isObject } from './../../../../data/environments/parser/utils/transform';
+
+/** Transform extended value into selection object */
+const extValueToSeason = ( data: Object | boolean ): WinterSeasonProps|boolean => {
+	if ( typeof data === 'boolean' ) {
+		return data;
+	}
+	
+	if ( !isObject(data)
+		|| !data.hasOwnProperty(WinterConfig.id) ) {
+		return {};
+	}
+	
+	const node: Object = data[WinterConfig.id];
+	
+	const [minTemperatureValue, maxTemperatureValue] = node.temperature;
+	
+	return {
+		duration: node.duration,
+		precipitationChance: node.precipitationChance,
+		windyChance: node.windyChance,
+		veryWindyChance: node.veryWindyChance,
+		reducedFauna: node.reducedFauna,
+		minTemperatureValue,
+		maxTemperatureValue,
+	};
+};
 
 /**
  * Winter `props` type
@@ -38,6 +66,22 @@ type Props = {
 function Winter ( props: Props ): Node {
 	const [enabled, setEnabled] = React.useState<boolean>(props.enabled);
 	const [season, setSeason] = React.useState<WinterSeasonProps>(props.season);
+	
+	const {extValue} = useSelector(( {environment} ) => ({
+		extValue: environment?.seasons ?? null,
+	}));
+	
+	// Reflect attributes changes
+	React.useEffect(() => {
+		if ( typeof extValue === 'boolean' ) {
+			setEnabled(extValue);
+		}
+		
+		if ( isObject(extValue) && Object.keys(extValue).length ) {
+			setEnabled(true);
+			setSeason(extValueToSeason(extValue));
+		}
+	}, [extValue]);
 	
 	// Reflect attributes changes
 	React.useEffect(() => {

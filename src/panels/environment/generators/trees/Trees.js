@@ -8,6 +8,7 @@
 
 import React from 'react';
 import * as PropTypes from 'prop-types';
+import { useSelector } from 'react-redux';
 import { Card, Button, Form, Row, Col } from 'react-bootstrap';
 import { nanoid } from 'nanoid';
 import cn from 'classname';
@@ -29,10 +30,21 @@ function Trees ( props: Props ) {
 	const [trees, setTrees] = React.useState<string[]>(random.randomTrees());
 	const [enable, setEnable] = React.useState<boolean>(props.enable);
 	
+	const {extValue} = useSelector(( {environment} ) => ({
+		extValue: environment?.trees ?? null,
+	}));
+	
 	// Reflect attributes changes
 	React.useEffect(() => {
-		setEnable(props.enable);
-	}, [props.enable]);
+		if ( typeof extValue === 'boolean' ) {
+			setEnable(extValue);
+		}
+		
+		if ( Array.isArray(extValue) ) {
+			setEnable(true);
+			setTrees(extValue);
+		}
+	}, [extValue]);
 	
 	// Reflect state changes
 	React.useEffect(() => {

@@ -8,6 +8,7 @@
 
 import React from 'react';
 import * as PropTypes from 'prop-types';
+import { useSelector } from 'react-redux';
 import { Card, Button, Form, Accordion, ButtonGroup } from 'react-bootstrap';
 import { nanoid } from 'nanoid';
 import cn from 'classname';
@@ -24,6 +25,7 @@ import Winter from './Winter';
 
 // Utils
 import { seasonsPropsDefault, seasonsPropsRandomize } from './../../../../utils/seasons';
+import { isObject } from './../../../../data/environments/parser/utils/transform';
 
 /** Export values */
 type ExportValues = {
@@ -53,10 +55,20 @@ function SeasonsPanel ( props: Props ): Node {
 	
 	const {spring: springConfig, summer: summerConfig, fall: fallConfig, winter: winterConfig} = seasonProps;
 	
+	const {extValue} = useSelector(( {environment} ) => ({
+		extValue: environment?.seasons ?? null,
+	}));
+	
 	// Reflect attributes changes
 	React.useEffect(() => {
-		setEnabled(props.enabled);
-	}, [props.enabled]);
+		if ( typeof extValue === 'boolean' ) {
+			setEnabled(extValue);
+		}
+		
+		if ( isObject(extValue) && Object.keys(extValue).length ) {
+			setEnabled(true);
+		}
+	}, [extValue]);
 	
 	// Reflect state changes
 	React.useEffect(() => {

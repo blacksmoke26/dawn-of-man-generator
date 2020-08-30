@@ -8,6 +8,7 @@
 
 import React from 'react';
 import * as PropTypes from 'prop-types';
+import { useSelector } from 'react-redux';
 import { Card, Button, Form, Row, Col } from 'react-bootstrap';
 import { nanoid } from 'nanoid';
 import cn from 'classname';
@@ -33,10 +34,21 @@ function GlobalTreeDensity ( props: Props ): Node {
 	const [value, setValue] = React.useState<number>(random.randomDensity());
 	const [enabled, setEnabled] = React.useState<boolean>(props.enabled);
 	
+	const {extValue} = useSelector(( {environment} ) => ({
+		extValue: environment?.globalTreeDensity ?? null,
+	}));
+	
 	// Reflect attributes changes
 	React.useEffect(() => {
-		setEnabled(props.enabled);
-	}, [props.enabled]);
+		if ( typeof extValue === 'boolean' ) {
+			setEnabled(extValue);
+		}
+		
+		if ( typeof extValue === 'number' ) {
+			setEnabled(true);
+			setValue(extValue);
+		}
+	}, [extValue]);
 	
 	// Reflect state changes
 	React.useEffect(() => {

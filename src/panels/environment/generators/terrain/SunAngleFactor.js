@@ -8,6 +8,7 @@
 
 import React from 'react';
 import * as PropTypes from 'prop-types';
+import { useSelector } from 'react-redux';
 import { Card, Button, Form, Row, Col } from 'react-bootstrap';
 import { nanoid } from 'nanoid';
 import cn from 'classname';
@@ -36,11 +37,21 @@ function SunAngleFactor ( props: Props ) {
 	const [enabled, setEnabled] = React.useState<boolean>(props.enabled);
 	const [angle, setAngle] = React.useState<number>(props.angle);
 	
+	const {extValue} = useSelector(( {environment} ) => ({
+		extValue: environment?.sunAngleFactor ?? null,
+	}));
+	
 	// Reflect attributes changes
 	React.useEffect(() => {
-		setEnabled(props.enabled);
-		setAngle(props.angle);
-	}, [props.enabled, props.angle]);
+		if ( typeof extValue === 'boolean' ) {
+			setEnabled(extValue);
+		}
+		
+		if ( typeof extValue === 'number') {
+			setEnabled(true);
+			setAngle(extValue);
+		}
+	}, [extValue]);
 	
 	// Reflect state changes
 	React.useEffect(() => {

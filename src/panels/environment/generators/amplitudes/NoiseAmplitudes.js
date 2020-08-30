@@ -7,6 +7,7 @@
  */
 
 import React from 'react';
+import { useSelector } from 'react-redux';
 import * as PropTypes from 'prop-types';
 import { Button, ButtonGroup, Form } from 'react-bootstrap';
 
@@ -41,25 +42,40 @@ function NoiseAmplitudes ( props: Props ) {
 	const [frequencies, setFrequencies] = React.useState<ValueFrequencies>(props.frequencies);
 	const [enabled, setEnabled] = React.useState<ValueFrequencies>(props.enabled);
 	
+	const {extValue} = useSelector(( {environment} ) => ({
+		extValue: environment?.noiseAmplitudes ?? null,
+	}));
+	
 	// Reflect attributes changes
 	React.useEffect(() => {
-		setFrequencies({...props.frequencies});
-		setEnabled(enabled);
-	}, [props.frequencies, props.enabled]);
+		if ( typeof extValue === 'boolean' ) {
+			setEnabled(extValue);
+		}
+		if ( Array.isArray(extValue) && extValue.length === 8 ) {
+			for ( let i = 0; i <= 7; i++ ) {
+				setFrequency(`freq${i+1}`, extValue[i]);
+			}
+			setEnabled(true);
+		}
+	}, [extValue]);
 	
 	// Reflect state changes
 	React.useEffect(() => {
 		typeof props.onChange === 'function' && props.onChange(toTemplateText(), frequencies);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [frequencies]);
+	}, [enabled, frequencies]);
 	
 	/** Generate xml code */
 	const toTemplateText = React.useCallback((): string => {
+		if ( !enabled ) {
+			return '';
+		}
+		
 		const values: string = Object.values(frequencies)
 			.map(c => Number(c).toFixed(3))
 			.join(' ');
 		return `<noise_amplitudes values="${values}"/>`;
-	}, [frequencies]);
+	}, [frequencies, enabled]);
 	
 	/** Update frequency value */
 	const setFrequency = ( name: string, value: number ): void => {

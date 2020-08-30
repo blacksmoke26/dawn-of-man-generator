@@ -8,6 +8,7 @@
 
 import React from 'react';
 import * as PropTypes from 'prop-types';
+import { useSelector } from 'react-redux';
 import { Card, Button, Form, Accordion, Row, Col } from 'react-bootstrap';
 import Select from 'react-select';
 import { nanoid } from 'nanoid';
@@ -20,6 +21,7 @@ import { Node } from 'react';
 // Utils
 import * as random from './../../../../utils/random';
 import * as Defaults from './../../../../utils/defaults';
+import { isObject } from './../../../../data/environments/parser/utils/transform';
 
 // Styles
 import * as reactSelect from './../../../../blocks/react-select';
@@ -50,6 +52,35 @@ const getInitialValues = (): DepositAttr => {
 	}
 };
 
+/** Transform extended value into selection object */
+const extValueToSelection = ( data: Object = {} ): DepositSelection => {
+	const selection: DepositSelection = {};
+	
+	for ( let [name, attr] of Object.entries(data) ) {
+		const node: DepositAttr = {
+			_enabled: true,
+		};
+		
+		if ( attr.hasOwnProperty('angle') ) {
+			const [mi, mx] = attr.angle;
+			node.angle_enabled = true;
+			node.min_angle = mi;
+			node.max_angle = mx;
+		}
+		
+		if ( attr.hasOwnProperty('altitude') ) {
+			const [mi, mx] = attr.altitude;
+			node.altitude_enabled = true;
+			node.min_altitude = mi;
+			node.max_altitude = mx;
+		}
+		
+		selection[name] = node;
+	}
+	
+	return selection;
+};
+
 /**
  * DepositOverride `props` type
  * @type {Object}
@@ -66,11 +97,21 @@ function DepositOverride ( props: Props ) {
 	const [selection, setSelection] = React.useState<DepositSelection>(props.selection);
 	const [activeKey, setActiveKey] = React.useState<string>('');
 	
+	const {extValue} = useSelector(( {environment} ) => ({
+		extValue: environment?.depositOverridePrototypes ?? null,
+	}));
+	
 	// Reflect attributes changes
 	React.useEffect(() => {
-		setEnabled(props.enabled);
-		setSelection(props.selection);
-	}, [props.enabled, props.selection]);
+		if ( typeof extValue === 'boolean' ) {
+			setEnabled(extValue);
+		}
+		
+		if ( isObject(extValue) ) {
+			setEnabled(true);
+			setSelection(extValueToSelection(extValue));
+		}
+	}, [extValue]);
 	
 	// Reflect state changes
 	React.useEffect(() => {

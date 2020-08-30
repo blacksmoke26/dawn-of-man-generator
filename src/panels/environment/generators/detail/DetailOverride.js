@@ -8,6 +8,7 @@
 
 import React from 'react';
 import * as PropTypes from 'prop-types';
+import { useSelector } from 'react-redux';
 import { Card, Button, Form, Accordion, Row, Col, ButtonGroup } from 'react-bootstrap';
 import Select from 'react-select';
 import { nanoid } from 'nanoid';
@@ -23,6 +24,7 @@ import UiSlider from './../../../../components/UiSlider';
 // Utils
 import * as random from './../../../../utils/random';
 import * as Defaults from './../../../../utils/defaults';
+import { isObject } from './../../../../data/environments/parser/utils/transform';
 
 // Styles
 import * as reactSelect from './../../../../blocks/react-select';
@@ -64,6 +66,47 @@ const getInitialValues = (): DetailAttr => {
 		max_altitude: altitudeRand[1],
 		_enabled: true,
 	};
+};
+
+/** Transform extended value into selection object */
+const extValueToSelection = ( data: Object = {} ): DetailSelection => {
+	const selection: DetailSelection = {};
+	
+	for ( let [name, attr] of Object.entries(data) ) {
+		const node: DetailAttr = {
+			_enabled: true,
+		};
+		
+		if ( attr.hasOwnProperty('density') ) {
+			node.density_enabled = true;
+			node.density = attr.density
+		}
+		
+		if ( attr.hasOwnProperty('humidity') ) {
+			const [mi, mx] = attr.humidity;
+			node.humidity_enabled = true;
+			node.min_humidity = mi;
+			node.max_humidity = mx;
+		}
+		
+		if ( attr.hasOwnProperty('angle') ) {
+			const [mi, mx] = attr.angle;
+			node.angle_enabled = true;
+			node.min_angle = mi;
+			node.max_angle = mx;
+		}
+		
+		if ( attr.hasOwnProperty('altitude') ) {
+			const [mi, mx] = attr.altitude;
+			node.altitude_enabled = true;
+			node.min_altitude = mi;
+			node.max_altitude = mx;
+		}
+		
+		selection[name] = node;
+	}
+	
+	return selection;
 };
 
 /**
@@ -135,11 +178,21 @@ function DetailOverride ( props: Props ): Node {
 	const [selection, setSelection] = React.useState<DetailSelection>(props.selection);
 	const [activeKey, setActiveKey] = React.useState<string>('');
 	
+	const {extValue} = useSelector(( {environment} ) => ({
+		extValue: environment?.detailOverridePrototypes ?? null,
+	}));
+	
 	// Reflect attributes changes
 	React.useEffect(() => {
-		setEnabled(props.enabled);
-		setSelection(props.selection);
-	}, [props.enabled, props.selection]);
+		if ( typeof extValue === 'boolean' ) {
+			setEnabled(extValue);
+		}
+		
+		if ( isObject(extValue) ) {
+			setEnabled(true);
+			setSelection(extValueToSelection(extValue));
+		}
+	}, [extValue]);
 	
 	// Reflect state changes
 	React.useEffect(() => {

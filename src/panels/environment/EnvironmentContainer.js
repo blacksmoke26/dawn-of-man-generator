@@ -59,7 +59,7 @@ function EnvironmentContainer (): Node {
 	
 	return (
 		<>
-			<Accordion defaultActiveKey="environment_noise_amplitudes">
+			<Accordion>
 				<Card>
 					<Card.Header className="pt-1 pb-1 pl-2 pl-2 position-relative">
 						<Accordion.Toggle as={Button} variant="link" eventKey="environment_noise_amplitudes">

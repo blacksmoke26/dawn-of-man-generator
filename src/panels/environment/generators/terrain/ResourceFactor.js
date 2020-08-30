@@ -8,6 +8,7 @@
 
 import React from 'react';
 import * as PropTypes from 'prop-types';
+import { useSelector } from 'react-redux';
 import { Card, Button, Form, Row, Col } from 'react-bootstrap';
 import { nanoid } from 'nanoid';
 import cn from 'classname';
@@ -34,11 +35,21 @@ function ResourceFactor ( props: Props ) {
 	const [enabled, setEnabled] = React.useState<boolean>(props.enabled);
 	const [resource, setResource] = React.useState<number>(props.resource);
 	
+	const {extValue} = useSelector(( {environment} ) => ({
+		extValue: environment?.resourceFactor ?? null,
+	}));
+	
 	// Reflect attributes changes
 	React.useEffect(() => {
-		setEnabled(props.enabled);
-		setResource(props.resource);
-	}, [props.enabled, props.resource]);
+		if ( typeof extValue === 'boolean' ) {
+			setEnabled(extValue);
+		}
+		
+		if ( typeof extValue === 'number') {
+			setEnabled(true);
+			setResource(extValue);
+		}
+	}, [extValue]);
 	
 	// Reflect state changes
 	React.useEffect(() => {
@@ -86,7 +97,7 @@ function ResourceFactor ( props: Props ) {
 						/>
 					</Col>
 				</Row>
-				<UiSlider step={1}
+				<UiSlider step={0.01}
 					min={0}
 					max={100}
 					disabled={!enabled} value={Number(resource)}

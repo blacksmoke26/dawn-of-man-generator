@@ -8,6 +8,7 @@
 
 import React from 'react';
 import * as PropTypes from 'prop-types';
+import { useSelector } from 'react-redux';
 import { Card, Button, Form, Row, Col } from 'react-bootstrap';
 import { nanoid } from 'nanoid';
 import cn from 'classname';
@@ -28,6 +29,18 @@ type Props = {
 function TreesEverywhere ( props: Props ): Node {
 	const [value, setValue] = React.useState<boolean>(random.randomTreesEverywhere());
 	const [enable, setEnable] = React.useState<boolean>(props.enable);
+	
+	const {extValue} = useSelector(( {environment} ) => ({
+		extValue: environment?.treesEverywhere ?? null,
+	}));
+	
+	// Reflect attributes changes
+	React.useEffect(() => {
+		if ( typeof extValue === 'boolean' ) {
+			setEnable(!!extValue);
+			setValue(extValue);
+		}
+	}, [extValue]);
 	
 	// Reflect attributes changes
 	React.useEffect(() => {

@@ -8,6 +8,7 @@
 
 import React from 'react';
 import * as PropTypes from 'prop-types';
+import { useSelector } from 'react-redux';
 import { Card, Button, Form, Accordion, Row, Col, ButtonGroup } from 'react-bootstrap';
 import Select from 'react-select';
 import { nanoid } from 'nanoid';
@@ -20,12 +21,13 @@ import type { Node } from 'react';
 // Components
 import UiSlider from './../../../../components/UiSlider';
 
-// Styles
-import * as reactSelect from './../../../../blocks/react-select';
-
 // Utils
 import * as random from './../../../../utils/random';
 import * as Defaults from './../../../../utils/defaults';
+import { isObject } from './../../../../data/environments/parser/utils/transform';
+
+// Styles
+import * as reactSelect from './../../../../blocks/react-select';
 
 /** @type {Object} */
 type TreeAttr = {
@@ -42,16 +44,6 @@ type TreeAttr = {
 /** @type {Object} */
 type TreeSelection = {
 	[string]: TreeAttr
-};
-
-/**
- * TreesOverride `props` type
- * @type {Object}
- */
-type Props = {
-	enabled?: boolean,
-	selection?: TreeSelection,
-	onChange ( template: string, value: TreeSelection ): void,
 };
 
 /**
@@ -114,17 +106,71 @@ const getDefaultValues = ( attr: TreeAttr ): Object => {
 	return node;
 };
 
+/** Transform extended value into selection object */
+const extValueToSelection = ( data: Object = {} ): TreeSelection => {
+	const selection: TreeSelection = {};
+	
+	for ( let [name, attr] of Object.entries(data) ) {
+		const node: TreeAttr = {
+			_enabled: true,
+		};
+		
+		if ( attr.hasOwnProperty('density') ) {
+			node.density_enabled = true;
+			node.density = attr.density
+		}
+		
+		if ( attr.hasOwnProperty('angle') ) {
+			const [mi, mx] = attr.angle;
+			node.angle_enabled = true;
+			node.min_angle = mi;
+			node.max_angle = mx;
+		}
+		
+		if ( attr.hasOwnProperty('altitude') ) {
+			const [mi, mx] = attr.altitude;
+			node.altitude_enabled = true;
+			node.min_altitude = mi;
+			node.max_altitude = mx;
+		}
+		
+		selection[name] = node;
+	}
+	
+	return selection;
+};
+
+/**
+ * TreesOverride `props` type
+ * @type {Object}
+ */
+type Props = {
+	enabled?: boolean,
+	selection?: TreeSelection,
+	onChange ( template: string, value: TreeSelection ): void,
+};
+
 /** TreesOverride functional component */
 function TreesOverride ( props: Props ): Node {
 	const [enabled, setEnabled] = React.useState<boolean>(props.enabled);
 	const [selection, setSelection] = React.useState<TreeSelection>(props.selection);
 	const [activeKey, setActiveKey] = React.useState<string>('');
-
+	
+	const {extValue} = useSelector(( {environment} ) => ({
+		extValue: environment?.treeOverridePrototypes ?? null,
+	}));
+	
 	// Reflect attributes changes
 	React.useEffect(() => {
-		setEnabled(props.enabled);
-		setSelection(props.selection);
-	}, [props.enabled, props.selection]);
+		if ( typeof extValue === 'boolean' ) {
+			setEnabled(extValue);
+		}
+		
+		if ( isObject(extValue) ) {
+			setEnabled(true);
+			setSelection(extValueToSelection(extValue));
+		}
+	}, [extValue]);
 	
 	// Reflect state changes
 	React.useEffect(() => {

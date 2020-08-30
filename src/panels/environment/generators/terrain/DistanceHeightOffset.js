@@ -8,6 +8,7 @@
 
 import React from 'react';
 import * as PropTypes from 'prop-types';
+import { useSelector } from 'react-redux';
 import { Card, Button, Form, Row, Col } from 'react-bootstrap';
 import { nanoid } from 'nanoid';
 import cn from 'classname';
@@ -36,11 +37,21 @@ function DistanceHeightOffset ( props: Props ) {
 	const [enabled, setEnabled] = React.useState<boolean>(props.enabled);
 	const [distance, setDistance] = React.useState<number>(props.distance);
 	
+	const {extValue} = useSelector(( {environment} ) => ({
+		extValue: environment?.distanceHeightOffset ?? null,
+	}));
+	
 	// Reflect attributes changes
 	React.useEffect(() => {
-		setEnabled(props.enabled);
-		setDistance(props.distance);
-	}, [props.enabled, props.distance]);
+		if ( typeof extValue === 'boolean' ) {
+			setEnabled(extValue);
+		}
+		
+		if ( typeof extValue === 'number') {
+			setEnabled(true);
+			setDistance(extValue);
+		}
+	}, [extValue]);
 	
 	// Reflect state changes
 	React.useEffect(() => {
