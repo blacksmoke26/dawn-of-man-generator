@@ -97,12 +97,12 @@ function DepositOverride ( props: Props ) {
 	const [selection, setSelection] = React.useState<DepositSelection>(props.selection);
 	const [activeKey, setActiveKey] = React.useState<string>('');
 	
-	const {extValue} = useSelector(( {environment} ) => ({
-		extValue: environment?.depositOverridePrototypes ?? null,
-	}));
+	const {environment} = useSelector(( {environment} ) => ({environment}));
 	
 	// Reflect attributes changes
 	React.useEffect(() => {
+		const extValue = environment?.depositOverridePrototypes ?? null;
+		
 		if ( typeof extValue === 'boolean' ) {
 			setEnabled(extValue);
 		}
@@ -111,7 +111,7 @@ function DepositOverride ( props: Props ) {
 			setEnabled(true);
 			setSelection(extValueToSelection(extValue));
 		}
-	}, [extValue]);
+	}, [environment]);
 	
 	// Reflect state changes
 	React.useEffect(() => {

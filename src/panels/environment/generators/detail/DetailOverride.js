@@ -178,12 +178,12 @@ function DetailOverride ( props: Props ): Node {
 	const [selection, setSelection] = React.useState<DetailSelection>(props.selection);
 	const [activeKey, setActiveKey] = React.useState<string>('');
 	
-	const {extValue} = useSelector(( {environment} ) => ({
-		extValue: environment?.detailOverridePrototypes ?? null,
-	}));
+	const {environment} = useSelector(( {environment} ) => ({environment}));
 	
 	// Reflect attributes changes
 	React.useEffect(() => {
+		const extValue = environment?.detailOverridePrototypes ?? null;
+		
 		if ( typeof extValue === 'boolean' ) {
 			setEnabled(extValue);
 		}
@@ -192,7 +192,7 @@ function DetailOverride ( props: Props ): Node {
 			setEnabled(true);
 			setSelection(extValueToSelection(extValue));
 		}
-	}, [extValue]);
+	}, [environment]);
 	
 	// Reflect state changes
 	React.useEffect(() => {

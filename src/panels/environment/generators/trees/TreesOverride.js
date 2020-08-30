@@ -155,13 +155,13 @@ function TreesOverride ( props: Props ): Node {
 	const [enabled, setEnabled] = React.useState<boolean>(props.enabled);
 	const [selection, setSelection] = React.useState<TreeSelection>(props.selection);
 	const [activeKey, setActiveKey] = React.useState<string>('');
-	
-	const {extValue} = useSelector(( {environment} ) => ({
-		extValue: environment?.treeOverridePrototypes ?? null,
-	}));
+
+	const {environment} = useSelector(( {environment} ) => ({environment}));
 	
 	// Reflect attributes changes
 	React.useEffect(() => {
+		const extValue = environment?.treeOverridePrototypes ?? null;
+		
 		if ( typeof extValue === 'boolean' ) {
 			setEnabled(extValue);
 		}
@@ -170,7 +170,7 @@ function TreesOverride ( props: Props ): Node {
 			setEnabled(true);
 			setSelection(extValueToSelection(extValue));
 		}
-	}, [extValue]);
+	}, [environment]);
 	
 	// Reflect state changes
 	React.useEffect(() => {

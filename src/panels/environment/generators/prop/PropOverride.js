@@ -157,12 +157,12 @@ function PropOverride ( props: Props ): Node {
 	const [selection, setSelection] = React.useState<DetailSelection>(props.selection);
 	const [activeKey, setActiveKey] = React.useState<string>('');
 	
-	const {extValue} = useSelector(( {environment} ) => ({
-		extValue: environment?.propOverridePrototypes ?? null,
-	}));
+	const {environment} = useSelector(( {environment} ) => ({environment}));
 	
 	// Reflect attributes changes
 	React.useEffect(() => {
+		const extValue = environment?.propOverridePrototypes ?? null;
+		
 		if ( typeof extValue === 'boolean' ) {
 			setEnabled(extValue);
 		}
@@ -171,7 +171,7 @@ function PropOverride ( props: Props ): Node {
 			setEnabled(true);
 			setSelection(extValueToSelection(extValue));
 		}
-	}, [extValue]);
+	}, [environment]);
 	
 	// Reflect state changes
 	React.useEffect(() => {
