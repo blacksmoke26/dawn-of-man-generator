@@ -8,6 +8,13 @@
  * @since 2020-08-29
  */
 
+/** Environment info */
+export const info = {
+	label: 'Eurasia',
+	id: 'eurasia',
+	desc: 'Standard environment, used in the Continental Dawn freeplay scenario.',
+};
+
 /** Environment raw data */
 const environmentData: Object = {
 	'environment': {

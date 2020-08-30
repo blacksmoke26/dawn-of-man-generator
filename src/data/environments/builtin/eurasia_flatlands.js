@@ -8,6 +8,13 @@
  * @since 2020-08-29
  */
 
+/** Environment info */
+export const info = {
+	label: 'Eurasia Flatlands',
+	value: 'eurasia_flatlands',
+	desc: 'This scenario tailored to some of the challenges too',
+};
+
 /** Environment raw data */
 const environmentData: Object = {
 	'environment': {

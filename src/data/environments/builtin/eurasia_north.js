@@ -8,6 +8,13 @@
  * @since 2020-08-29
  */
 
+/** Environment info */
+export const info = {
+	label: 'Eurasia North',
+	value: 'eurasia_north',
+	desc: 'Longer winters, few resources, only perennial trees, used in the The Northlands freeplay scenario',
+};
+
 /** Environment raw data */
 const environmentData: Object = {
 	'environment': {

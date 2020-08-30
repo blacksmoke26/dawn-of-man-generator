@@ -2,11 +2,18 @@
 
 /**
  * Environment `flat`
- * No description here
+ * Flat land with specific resources
  * @link http://madrugaworks.com/dawnofman/files/BuiltinEnvironments.zip
  * @author Junaid Atari <mj.atari@gmail.com>
  * @since 2020-08-29
  */
+
+/** Environment info */
+export const info = {
+	label: 'Flat',
+	value: 'flat',
+	desc: 'Flat land with specific resources',
+};
 
 /** Environment raw data */
 const environmentData: Object = {

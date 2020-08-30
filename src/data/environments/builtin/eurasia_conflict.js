@@ -8,6 +8,13 @@
  * @since 2020-08-29
  */
 
+/** Environment info */
+export const info = {
+	label: 'Eurasia Conflict',
+	value: 'eurasia_conflict',
+	desc: 'Like eurasia but with less resources, used in the Ancient Warriors freeplay scenario.',
+};
+
 /** Environment raw data */
 const environmentData: Object = {
 	'environment': {

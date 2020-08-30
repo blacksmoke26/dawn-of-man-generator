@@ -8,6 +8,13 @@
  * @since 2020-08-29
  */
 
+/** Environment info */
+export const info = {
+	label: 'Eurasia Warm',
+	value: 'eurasia_warm',
+	desc: 'More resources, shorter winters. Used in Creative Mode.',
+};
+
 /** Environment raw data */
 const environmentData: Object = {
 	'environment': {
