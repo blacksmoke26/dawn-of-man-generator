@@ -6,4 +6,4 @@
  * @since 2020-08-29
  */
 
-export const ENVIRONMENT_NOISE_AMPLITUDES: string = 'ENVIRONMENT_NOISE_AMPLITUDES';
+export const SET_ENVIRONMENT: string = 'SET_ENVIRONMENT';
