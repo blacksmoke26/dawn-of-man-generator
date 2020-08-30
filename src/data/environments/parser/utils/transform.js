@@ -14,7 +14,9 @@ import op from 'object-path';
  * Check that given value is object
  */
 export function isObject ( obj: any ): boolean {
-	return typeof obj === 'object' && !Array.isArray(obj);
+	return typeof obj !== null
+		&& typeof obj === 'object'
+		&& obj instanceof Object;
 }
 
 /** transformObject() options argument type */
