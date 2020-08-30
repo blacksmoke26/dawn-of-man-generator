@@ -25,6 +25,10 @@ type TransformObjectOptions = {
 	requiredPropValidator?: ( value: any ) => boolean,
 	/** Optional properties list */
 	optionalProps: Array<string>|Array<{group: string, key: string}>,
+	/** Wrapper object key (e.g., 'overrideDetails') */
+	wrapperKey: string,
+	/** Null or none-exist value transformer (Defaults to {}) */
+	nullResolver?: ?( wrapperKey: string ) => any,
 }
 
 /**
@@ -32,21 +36,23 @@ type TransformObjectOptions = {
  * @static
  * Transform given node into object */
 export function transformObject ( node: any, options: TransformObjectOptions = {} ): Object {
-	if ( !isObject(node) ) {
-		return {};
-	}
-	
 	const opt: TransformObjectOptions = {
+		wrapperKey: '',
 		requiredProp: null,
 		requiredPropValidator: () => true,
 		optionalProps: [],
+		nullResolver: () => ({}),
 		...options,
 	};
+	
+	if ( !isObject(node) ) {
+		return opt.nullResolver(opt.wrapperKey);
+	}
 	
 	const id: string = op.get(node, `${opt.requiredProp}.value`, null);
 	
 	if ( id === null || !opt.requiredPropValidator(id) ) {
-		return {};
+		return opt.nullResolver(opt.wrapperKey);
 	}
 	
 	const container: Object = {};
@@ -86,7 +92,9 @@ type TransformOverrideObjectOptions = {
 	/** Wrapper object key (e.g., 'overrideDetails') */
 	wrapperKey: string,
 	/** transformObject() options */
-	transformOptions: TransformOptions,
+	transformOptions: TransformObjectOptions,
+	/** Null or none-exist value transformer (Defaults to {}) */
+	nullResolver?: ?( wrapperKey: string ) => any,
 }
 
 /**
@@ -94,23 +102,29 @@ type TransformOverrideObjectOptions = {
  * @static
  * Transform prototypes override nodes into object */
 export function transformOverrideObject ( json: any, options: TransformOverrideObjectOptions ): Object {
-	const parsed: ?Array<Object> = op.get(json, options.root, null);
+	const opt: TransformOverrideObjectOptions = {
+		nullResolver: () => ({}),
+		transformOptions: {},
+		...options,
+	};
+	
+	const parsed: ?Array<Object> = op.get(json, opt.root, null);
 	
 	if ( parsed === null ) {
-		return {};
+		return opt.nullResolver(opt.wrapperKey);
 	}
 	
 	if ( isObject(parsed) ) {
-		const node = transformObject(parsed, options.transformOptions);
+		const node = transformObject(parsed, opt.transformOptions);
 		
 		if ( !node.hasOwnProperty('id') ) {
-			return {};
+			return opt.nullResolver(opt.wrapperKey);
 		}
 		
 		const id: string = String(node.id)
 		delete node.id;
 		
-		return {[options.wrapperKey]: {
+		return {[opt.wrapperKey]: {
 			[id]: {...node}
 		}};
 	}
@@ -119,7 +133,7 @@ export function transformOverrideObject ( json: any, options: TransformOverrideO
 		const dataNodes: Object = {};
 		
 		for ( let p of parsed ) {
-			const node: Object = transformObject(p, options.transformOptions);
+			const node: Object = transformObject(p, opt.transformOptions);
 			
 			if ( !node.hasOwnProperty('id') ) {
 				continue;
@@ -131,7 +145,7 @@ export function transformOverrideObject ( json: any, options: TransformOverrideO
 			dataNodes[id] = {...node};
 		}
 		
-		return {[options.wrapperKey]: dataNodes};
+		return {[opt.wrapperKey]: dataNodes};
 	}
 	
 	return {};
@@ -143,6 +157,8 @@ type TransformNumericOptions = {
 	root: string,
 	/** Wrapper object key (e.g., 'overrideDetails') */
 	wrapperKey: string,
+	/** Null or none-exist value transformer (Defaults to {}) */
+	nullResolver?: ?( wrapperKey: string ) => any,
 }
 
 /**
@@ -150,11 +166,17 @@ type TransformNumericOptions = {
  * @static
  * Transform numeric node into object */
 export function transformNumeric ( json: any, options: TransformNumericOptions ): Object {
-	const parsed: ?Array<Object> = op.get(json, options.root, null);
-	
-	return parsed === null ? {} : {
-		[options.wrapperKey]: parsed,
+	const opt: TransformNumericOptions = {
+		wrapperKey: '',
+		nullResolver: () => ({}),
+		...options,
 	};
+	
+	const parsed: ?Array<Object> = op.get(json, opt.root, null);
+	
+	return parsed === null
+		? opt.nullResolver(opt.wrapperKey)
+		: {[opt.wrapperKey]: parsed};
 }
 
 /** transformBoolean() options argument type */
@@ -163,6 +185,8 @@ type TransformBooleanOptions = {
 	root: string,
 	/** Wrapper object key (e.g., 'overrideDetails') */
 	wrapperKey: string,
+	/** Null or none-exist value transformer (Defaults to {}) */
+	nullResolver?: ?( wrapperKey: string ) => any,
 }
 
 /**
@@ -170,11 +194,17 @@ type TransformBooleanOptions = {
  * @static
  * Transform boolean node into object */
 export function transformBoolean ( json: any, options: TransformBooleanOptions ): Object {
-	const parsed: ?Array<Object> = op.get(json, options.root, null);
-	
-	return parsed === null || typeof parsed !== 'boolean' ? {} : {
-		[options.wrapperKey]: parsed,
+	const opt: TransformNumericOptions = {
+		wrapperKey: '',
+		nullResolver: () => ({}),
+		...options,
 	};
+	
+	const parsed: ?Array<Object> = op.get(json, opt.root, null);
+	
+	return parsed === null || typeof parsed !== 'boolean'
+		? opt.nullResolver(opt.wrapperKey)
+		: {[opt.wrapperKey]: parsed};
 }
 
 /** transformSplitStringArray() options argument type */
@@ -193,6 +223,8 @@ type TransformSplitStringArrayOptions = {
 	minItems?: number,
 	/** Maximum limit of items [0 = no limit] */
 	maxItems?: number,
+	/** Null or none-exist value transformer (Defaults to {}) */
+	nullResolver?: ?( wrapperKey: string ) => any,
 }
 
 /**
@@ -201,18 +233,20 @@ type TransformSplitStringArrayOptions = {
  * Transform string based array node into object */
 export function transformSplitStringArray ( json: any, options: TransformSplitStringArrayOptions ): Object {
 	const opt: TransformSplitStringArrayOptions = {
+		nullOutput: null,
 		splitChar: ' ',
 		itemsValidator: () => true,
 		transformValue: ( value: string ) => value,
 		minItems: 0,
 		maxItems: 0,
+		nullResolver: () => ({}),
 		...options,
 	};
 	
 	const parsed: any = op.get(json, options.root, null);
 	
 	if ( parsed === null || !String(parsed || '') ) {
-		return {};
+		return opt.nullResolver(opt.wrapperKey);
 	}
 	
 	const list: Array<string> = String(parsed)
@@ -222,11 +256,11 @@ export function transformSplitStringArray ( json: any, options: TransformSplitSt
 		.filter(opt.itemsValidator);
 	
 	if ( opt.minItems > 0 && list.length < opt.minItems ) {
-		return {};
+		return opt.nullResolver(opt.wrapperKey);
 	}
 	
 	if ( opt.maxItems > 0 && list.length > opt.maxItems ) {
-		return {};
+		return opt.nullResolver(opt.wrapperKey);
 	}
 	
 	return !list.length ? {} : {
@@ -244,6 +278,8 @@ type TransformNumericArrayOptions = {
 	minItems?: number,
 	/** Maximum limit of items [0 = no limit] */
 	maxItems?: number,
+	/** Null or none-exist value transformer (Defaults to {}) */
+	nullResolver?: ?( wrapperKey: string ) => any,
 }
 
 /**
@@ -252,25 +288,26 @@ type TransformNumericArrayOptions = {
  * Transform string based numeric array node into object */
 export function transformNumericArray ( json: any, options: TransformNumericArrayOptions ): Object {
 	const opt: TransformNumericArrayOptions = {
+		nullResolver: () => ({}),
 		minItems: 0,
 		maxItems: 0,
 		...options,
 	};
 	
-	const parsed: any = op.get(json, options.root, null);
+	const parsed: any = op.get(json, opt.root, null);
 	
 	if ( parsed === null || !Array.isArray(parsed) ) {
-		return {};
+		return opt.nullResolver(opt.wrapperKey);
 	}
 	
 	const list: Array<number> = parsed.map(v => v.value);
 	
 	if ( opt.minItems > 0 && list.length < opt.minItems ) {
-		return {};
+		return opt.nullResolver(opt.wrapperKey);
 	}
 	
 	if ( opt.maxItems > 0 && list.length > opt.maxItems ) {
-		return {};
+		return opt.nullResolver(opt.wrapperKey);
 	}
 	
 	return !list.length ? {} : {

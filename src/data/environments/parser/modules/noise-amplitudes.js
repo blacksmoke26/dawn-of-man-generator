@@ -8,12 +8,20 @@
 
 import op from 'object-path';
 
+// Types
+import type { JsonToReduxOptions } from './../types/index.flow';
+
 /** Convert environment json into redux data */
-export function jsonToRedux ( json: Object ): Object {
+export function jsonToRedux ( json: Object, options: JsonToReduxOptions = {} ): Object {
+	const opt: TransformOverrideObjectOptions = {
+		nullResolver: () => ({}),
+		...options,
+	};
+	
 	const parsed: any = op.get(json, 'environment.noise_amplitudes.values', null);
 	
 	if ( parsed === null ) {
-		return {};
+		return opt.nullResolver('noiseAmplitudes');
 	}
 	
 	const noiseAmplitudes: Array<number> = typeof parsed === 'number'

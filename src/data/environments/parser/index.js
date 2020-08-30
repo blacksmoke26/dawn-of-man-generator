@@ -8,6 +8,9 @@
 
 import { recursive } from 'merge';
 
+// Types
+import type { JsonToReduxOptions } from './types/index.flow';
+
 // Utils
 import { jsonToRedux as j2r1 } from './modules/noise-amplitudes';
 import { jsonToRedux as j2r2 } from './modules/resource-factor';
@@ -29,14 +32,14 @@ import { jsonToRedux as j2rse } from './modules/seasons';
  * @public
  * @static
  * Convert environment json into redux data */
-export function jsonToRedux ( json: Object ): Object {
+export function jsonToRedux ( json: Object, options: JsonToReduxOptions = {} ): Object {
 	const environment: Object = recursive(true, {},
-		j2r1(json), j2r2(json), j2r3(json),
-		j2r4(json), j2r5(json), j2r6(json),
-		j2rdo1(json), j2rdo2(json),
-		j2rde1(json), j2rpr1(json),
-		j2rtr1(json), j2rtr2(json), j2rtr3(json), j2rtr4(json),
-		j2rse(json),
+		j2r1(json, options), j2r2(json, options), j2r3(json, options),
+		j2r4(json, options), j2r5(json, options), j2r6(json, options),
+		j2rdo1(json, options), j2rdo2(json, options),
+		j2rde1(json, options), j2rpr1(json, options),
+		j2rtr1(json, options), j2rtr2(json, options), j2rtr3(json, options), j2rtr4(json, options),
+		j2rse(json, options),
 	);
 	
 	return {environment};

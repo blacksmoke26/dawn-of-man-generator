@@ -4,12 +4,15 @@
  * @since 2020-08-29
  */
 
+// Types
+import type { JsonToReduxOptions } from './../../types/index.flow';
+
 // Utils
 import * as random from './../../../../../utils/random';
 import { transformOverrideObject } from './../../utils/transform';
 
 /** Convert environment json into redux data */
-export function jsonToRedux ( json: Object ): Object {
+export function jsonToRedux ( json: Object, options: JsonToReduxOptions = {} ): Object {
 	return transformOverrideObject(json, {
 		root: 'environment.detail_override_prototypes.detail_override_prototype',
 		wrapperKey: 'detailOverridePrototypes',
@@ -25,6 +28,7 @@ export function jsonToRedux ( json: Object ): Object {
 				{group: 'angle', key: 'min_angle'},
 				{group: 'angle', key: 'max_angle'},
 			],
-		}
+		},
+		...options,
 	});
 }

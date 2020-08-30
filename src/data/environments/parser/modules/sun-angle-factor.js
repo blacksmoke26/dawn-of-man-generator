@@ -6,12 +6,17 @@
  * @since 2020-08-29
  */
 
+// Types
+import type { JsonToReduxOptions } from './../types/index.flow';
+
+// Utils
 import { transformNumeric } from './../utils/transform';
 
 /** Convert environment json into redux data */
-export function jsonToRedux ( json: Object ): Object {
+export function jsonToRedux ( json: Object, options: JsonToReduxOptions = {} ): Object {
 	return transformNumeric(json, {
 		root: 'environment.sun_angle_factor.value',
 		wrapperKey: 'sunAngleFactor',
+		...options,
 	});
 }

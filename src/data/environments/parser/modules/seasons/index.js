@@ -7,6 +7,9 @@
 import op from 'object-path';
 import { recursive } from 'merge';
 
+// Types
+import type { JsonToReduxOptions } from './../../types/index.flow';
+
 // Utils
 import { jsonToRedux as j2rs1 } from './modules/spring';
 import { jsonToRedux as j2rs3 } from './modules/summer';
@@ -17,11 +20,16 @@ import { jsonToRedux as j2rs4 } from './modules/winter';
  * @public
  * @static
  * Convert environment json into redux data */
-export function jsonToRedux ( json: Object ): Object {
+export function jsonToRedux ( json: Object, options: JsonToReduxOptions = {} ): Object {
+	const opt: TransformOverrideObjectOptions = {
+		nullResolver: () => ({}),
+		...options,
+	};
+	
 	const parsed: Array<Object> = op.get(json, 'environment.seasons.season', []);
 
 	if ( parsed === null || !Array.isArray(parsed) ) {
-		return {};
+		return opt.nullResolver('seasons');
 	}
 	
 	const seasons: Object = recursive(true, {},
@@ -30,6 +38,6 @@ export function jsonToRedux ( json: Object ): Object {
 	);
 	
 	return Object.keys(seasons).length !== 4
-		? {}
+		? opt.nullResolver('seasons')
 		: {seasons};
 }
