@@ -11,7 +11,7 @@
 /** Environment info */
 export const info = {
 	label: 'Eurasia',
-	id: 'eurasia',
+	value: 'eurasia',
 	desc: 'Standard environment, used in the Continental Dawn freeplay scenario.',
 };
 
