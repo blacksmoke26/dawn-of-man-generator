@@ -14,9 +14,9 @@ import op from 'object-path';
  * Check that given value is object
  */
 export function isObject ( obj: any ): boolean {
-	return typeof obj !== null
-		&& typeof obj === 'object'
-		&& obj instanceof Object;
+	return typeof obj === 'object'
+		&& obj instanceof Object
+		&& !Array.isArray(obj);
 }
 
 /** transformObject() options argument type */
@@ -115,7 +115,6 @@ export function transformOverrideObject ( json: any, options: TransformOverrideO
 	if ( parsed === null ) {
 		return opt.nullResolver(opt.wrapperKey);
 	}
-	
 	if ( isObject(parsed) ) {
 		const node = transformObject(parsed, opt.transformOptions);
 		
