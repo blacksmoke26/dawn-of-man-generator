@@ -31,12 +31,12 @@ function Deposits ( props: Props ) {
 	const [enabled, setEnabled] = React.useState<boolean>(props.enabled);
 	const [deposits, setDeposits] = React.useState<string[]>(props.deposits);
 	
-	const {extValue} = useSelector(( {environment} ) => ({
-		extValue: environment?.deposits ?? null,
-	}));
+	const {environment} = useSelector(( {environment} ) => ({environment}));
 	
 	// Reflect attributes changes
 	React.useEffect(() => {
+		const extValue = environment?.deposits ?? null;
+		
 		if ( typeof extValue === 'boolean' ) {
 			setEnabled(extValue);
 		}
@@ -45,7 +45,7 @@ function Deposits ( props: Props ) {
 			setEnabled(true);
 			setDeposits(extValue);
 		}
-	}, [extValue]);
+	}, [environment]);
 	
 	// Reflect attributes changes
 	React.useEffect(() => {

@@ -55,12 +55,12 @@ function SeasonsPanel ( props: Props ): Node {
 	
 	const {spring: springConfig, summer: summerConfig, fall: fallConfig, winter: winterConfig} = seasonProps;
 	
-	const {extValue} = useSelector(( {environment} ) => ({
-		extValue: environment?.seasons ?? null,
-	}));
+	const {environment} = useSelector(( {environment} ) => ({environment}));
 	
 	// Reflect attributes changes
 	React.useEffect(() => {
+		const extValue = environment?.seasons ?? null;
+		
 		if ( typeof extValue === 'boolean' ) {
 			setEnabled(extValue);
 		}
@@ -68,7 +68,7 @@ function SeasonsPanel ( props: Props ): Node {
 		if ( isObject(extValue) && Object.keys(extValue).length ) {
 			setEnabled(true);
 		}
-	}, [extValue]);
+	}, [environment]);
 	
 	// Reflect state changes
 	React.useEffect(() => {

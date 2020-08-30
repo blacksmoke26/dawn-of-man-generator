@@ -34,12 +34,12 @@ function GlobalTreeDensity ( props: Props ): Node {
 	const [value, setValue] = React.useState<number>(random.randomDensity());
 	const [enabled, setEnabled] = React.useState<boolean>(props.enabled);
 	
-	const {extValue} = useSelector(( {environment} ) => ({
-		extValue: environment?.globalTreeDensity ?? null,
-	}));
+	const {environment} = useSelector(( {environment} ) => ({environment}));
 	
 	// Reflect attributes changes
 	React.useEffect(() => {
+		const extValue = environment?.globalTreeDensity ?? null;
+		
 		if ( typeof extValue === 'boolean' ) {
 			setEnabled(extValue);
 		}
@@ -48,7 +48,7 @@ function GlobalTreeDensity ( props: Props ): Node {
 			setEnabled(true);
 			setValue(extValue);
 		}
-	}, [extValue]);
+	}, [environment]);
 	
 	// Reflect state changes
 	React.useEffect(() => {

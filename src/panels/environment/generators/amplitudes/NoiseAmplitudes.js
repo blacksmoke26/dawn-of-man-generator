@@ -42,12 +42,12 @@ function NoiseAmplitudes ( props: Props ) {
 	const [frequencies, setFrequencies] = React.useState<ValueFrequencies>(props.frequencies);
 	const [enabled, setEnabled] = React.useState<ValueFrequencies>(props.enabled);
 	
-	const {extValue} = useSelector(( {environment} ) => ({
-		extValue: environment?.noiseAmplitudes ?? null,
-	}));
+	const {environment} = useSelector(( {environment} ) => ({environment}));
 	
 	// Reflect attributes changes
 	React.useEffect(() => {
+		const extValue = environment?.noiseAmplitudes ?? null;
+		
 		if ( typeof extValue === 'boolean' ) {
 			setEnabled(extValue);
 		}
@@ -57,7 +57,7 @@ function NoiseAmplitudes ( props: Props ) {
 			}
 			setEnabled(true);
 		}
-	}, [extValue]);
+	}, [environment]);
 	
 	// Reflect state changes
 	React.useEffect(() => {

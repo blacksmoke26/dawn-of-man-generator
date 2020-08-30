@@ -45,12 +45,12 @@ function BackdropScale ( props: Props ) {
 	const [angle2, setAngle2] = React.useState<number>(props.angle2);
 	const [angle3, setAngle3] = React.useState<number>(props.angle3);
 	
-	const {extValue} = useSelector(( {environment} ) => ({
-		extValue: environment?.backdropScale ?? null,
-	}));
+	const {environment} = useSelector(( {environment} ) => ({environment}));
 	
 	// Reflect attributes changes
 	React.useEffect(() => {
+		const extValue = environment?.backdropScale ?? null;
+		
 		if ( typeof extValue === 'boolean' ) {
 			setEnabled(extValue);
 		}
@@ -61,7 +61,7 @@ function BackdropScale ( props: Props ) {
 			setAngle2(extValue[1]);
 			setAngle3(extValue[2]);
 		}
-	}, [extValue]);
+	}, [environment]);
 	
 	// Reflect state changes
 	React.useEffect(() => {

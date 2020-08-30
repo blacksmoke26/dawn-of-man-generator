@@ -30,17 +30,17 @@ function TreesEverywhere ( props: Props ): Node {
 	const [value, setValue] = React.useState<boolean>(random.randomTreesEverywhere());
 	const [enable, setEnable] = React.useState<boolean>(props.enable);
 	
-	const {extValue} = useSelector(( {environment} ) => ({
-		extValue: environment?.treesEverywhere ?? null,
-	}));
+	const {environment} = useSelector(( {environment} ) => ({environment}));
 	
 	// Reflect attributes changes
 	React.useEffect(() => {
+		const extValue = environment?.treesEverywhere ?? null;
+		
 		if ( typeof extValue === 'boolean' ) {
 			setEnable(!!extValue);
 			setValue(extValue);
 		}
-	}, [extValue]);
+	}, [environment]);
 	
 	// Reflect attributes changes
 	React.useEffect(() => {

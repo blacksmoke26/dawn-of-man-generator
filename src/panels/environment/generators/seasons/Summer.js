@@ -65,12 +65,12 @@ function Summer ( props: Props ): Node {
 	const [enabled, setEnabled] = React.useState<boolean>(props.enabled);
 	const [season, setSeason] = React.useState<SummerSeasonProps>(props.season);
 	
-	const {extValue} = useSelector(( {environment} ) => ({
-		extValue: environment?.seasons ?? null,
-	}));
+	const {environment} = useSelector(( {environment} ) => ({environment}));
 	
 	// Reflect attributes changes
 	React.useEffect(() => {
+		const extValue = environment?.seasons ?? null;
+		
 		if ( typeof extValue === 'boolean' ) {
 			setEnabled(extValue);
 		}
@@ -79,7 +79,7 @@ function Summer ( props: Props ): Node {
 			setEnabled(true);
 			setSeason(extValueToSeason(extValue));
 		}
-	}, [extValue]);
+	}, [environment]);
 	
 	// Reflect attributes changes
 	React.useEffect(() => {
