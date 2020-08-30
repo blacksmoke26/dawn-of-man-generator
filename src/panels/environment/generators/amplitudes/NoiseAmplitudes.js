@@ -8,13 +8,15 @@
 
 import React from 'react';
 import * as PropTypes from 'prop-types';
-import { Button, ButtonGroup } from 'react-bootstrap';
+import { Button, ButtonGroup, Form, Accordion } from 'react-bootstrap';
 
 // Components
 import UiSlider from './../../../../components/UiSlider';
 
 // Utils
 import * as random from '../../../../utils/random';
+import { nanoid } from 'nanoid';
+import cn from 'classname';
 
 /**
  * Frequencies type
@@ -29,6 +31,7 @@ type ValueFrequencies = {
  * @type {Object}
  */
 type Props = {
+	enabled: boolean,
 	frequencies?: ValueFrequencies,
 	onChange ( template: string, values: ValueFrequencies ): void,
 };
@@ -36,11 +39,13 @@ type Props = {
 /** NoiseAmplitudes functional component */
 function NoiseAmplitudes ( props: Props ) {
 	const [frequencies, setFrequencies] = React.useState<ValueFrequencies>(props.frequencies);
+	const [enabled, setEnabled] = React.useState<ValueFrequencies>(props.enabled);
 	
 	// Reflect attributes changes
 	React.useEffect(() => {
 		setFrequencies({...props.frequencies});
-	}, [props.frequencies]);
+		setEnabled(enabled);
+	}, [props.frequencies, props.enabled]);
 	
 	// Reflect state changes
 	React.useEffect(() => {
@@ -77,120 +82,130 @@ function NoiseAmplitudes ( props: Props ) {
 						Understanding Amplitudes in Environment
 					</a>.
 				</p>
+				<div className="mt-2 mb-2">
+					<Form.Check
+						className="pull-right"
+						type="switch"
+						id={`seasons_override-switch-${nanoid(5)}`}
+						label="Override noise amplitudes parameters"
+						checked={enabled}
+						onChange={e => setEnabled(e.target.checked)}
+					/>
+				</div>
 			</div>
-			<div className="mb-2">
-				Frequency 1: <code className="pl-2 text-size-xs">{frequencies.freq1}</code>
-				<Button className="button-reset-sm" variant="link"
+			<div className={(cn('mb-2', {'text-muted': !enabled}))}>
+				Frequency 1: <code className={(cn('pl-2 text-size-xs', {'text-muted': !enabled}))}>{frequencies.freq1}</code>
+				<Button disabled={!enabled} className="button-reset-sm" variant="link"
 					onClick={() => setFrequency('freq1', random.randomFrequency())}>
 					Random
 				</Button>
-				<Button className="button-reset-sm" variant="link"
+				<Button disabled={!enabled} className="button-reset-sm" variant="link"
 					onClick={() => setFrequency('freq1', 0)}>Min</Button>
-				<Button className="button-reset-sm" variant="link"
+				<Button disabled={!enabled} className="button-reset-sm" variant="link"
 					onClick={() => setFrequency('freq1', 1)}>Max</Button>
-				<UiSlider step={0.001} value={frequencies.freq1} onChange={v => setFrequency('freq1', v)}/>
+				<UiSlider disabled={!enabled} step={0.001} value={frequencies.freq1} onChange={v => setFrequency('freq1', v)}/>
 			</div>
-			<div className="mb-2">
-				Frequency 2: <code className="pl-2 text-size-xs">{frequencies.freq2}</code>
-				<Button className="button-reset-sm" variant="link"
+			<div className={(cn('mb-2', {'text-muted': !enabled}))}>
+				Frequency 2: <code className={(cn('pl-2 text-size-xs', {'text-muted': !enabled}))}>{frequencies.freq2}</code>
+				<Button disabled={!enabled} className="button-reset-sm" variant="link"
 					onClick={() => setFrequency('freq2', random.randomFrequency())}>
 					Random
 				</Button>
-				<Button className="button-reset-sm" variant="link"
+				<Button disabled={!enabled} className="button-reset-sm" variant="link"
 					onClick={() => setFrequency('freq2', 0)}>Min</Button>
-				<Button className="button-reset-sm" variant="link"
+				<Button disabled={!enabled} className="button-reset-sm" variant="link"
 					onClick={() => setFrequency('freq2', 1)}>Max</Button>
-				<UiSlider step={0.001} value={frequencies.freq2} onChange={v => setFrequency('freq2', v)}/>
+				<UiSlider disabled={!enabled} step={0.001} value={frequencies.freq2} onChange={v => setFrequency('freq2', v)}/>
 			</div>
-			<div className="mb-2">
-				Frequency 3: <code className="pl-2 text-size-xs">{frequencies.freq3}</code>
-				<Button className="button-reset-sm" variant="link"
+			<div className={(cn('mb-2', {'text-muted': !enabled}))}>
+				Frequency 3: <code className={(cn('pl-2 text-size-xs', {'text-muted': !enabled}))}>{frequencies.freq3}</code>
+				<Button disabled={!enabled} className="button-reset-sm" variant="link"
 					onClick={() => setFrequency('freq3', random.randomFrequency())}>
 					Random
 				</Button>
-				<Button className="button-reset-sm" variant="link"
+				<Button disabled={!enabled} className="button-reset-sm" variant="link"
 					onClick={() => setFrequency('freq3', 0)}>Min</Button>
-				<Button className="button-reset-sm" variant="link"
+				<Button disabled={!enabled} className="button-reset-sm" variant="link"
 					onClick={() => setFrequency('freq3', 1)}>Max</Button>
-				<UiSlider step={0.001} value={frequencies.freq3}
+				<UiSlider disabled={!enabled} step={0.001} value={frequencies.freq3}
 					onChange={v => setFrequency('freq3', v)}/>
 			</div>
-			<div className="mb-2">
-				Frequency 4: <code className="pl-2 text-size-xs">{frequencies.freq4}</code>
-				<Button className="button-reset-sm" variant="link"
+			<div className={(cn('mb-2', {'text-muted': !enabled}))}>
+				Frequency 4: <code className={(cn('pl-2 text-size-xs', {'text-muted': !enabled}))}>{frequencies.freq4}</code>
+				<Button disabled={!enabled} className="button-reset-sm" variant="link"
 					onClick={() => setFrequency('freq4', random.randomFrequency())}>
 					Random
 				</Button>
-				<Button className="button-reset-sm" variant="link"
+				<Button disabled={!enabled} className="button-reset-sm" variant="link"
 					onClick={() => setFrequency('freq4', 0)}>Min</Button>
-				<Button className="button-reset-sm" variant="link"
+				<Button disabled={!enabled} className="button-reset-sm" variant="link"
 					onClick={() => setFrequency('freq4', 1)}>Max</Button>
-				<UiSlider step={0.001} value={frequencies.freq4}
+				<UiSlider disabled={!enabled} step={0.001} value={frequencies.freq4}
 					onChange={v => setFrequency('freq4', v)}/>
 			</div>
-			<div className="mb-2">
-				Frequency 5: <code className="pl-2 text-size-xs">{frequencies.freq5}</code>
-				<Button className="button-reset-sm" variant="link"
+			<div className={(cn('mb-2', {'text-muted': !enabled}))}>
+				Frequency 5: <code className={(cn('pl-2 text-size-xs', {'text-muted': !enabled}))}>{frequencies.freq5}</code>
+				<Button disabled={!enabled} className="button-reset-sm" variant="link"
 					onClick={() => setFrequency('freq5', random.randomFrequency())}>
 					Random
 				</Button>
-				<Button className="button-reset-sm" variant="link"
+				<Button disabled={!enabled} className="button-reset-sm" variant="link"
 					onClick={() => setFrequency('freq5', 0)}>Min</Button>
-				<Button className="button-reset-sm" variant="link"
+				<Button disabled={!enabled} className="button-reset-sm" variant="link"
 					onClick={() => setFrequency('freq5', 1)}>Max</Button>
-				<UiSlider step={0.001} value={frequencies.freq5}
+				<UiSlider disabled={!enabled} step={0.001} value={frequencies.freq5}
 					onChange={v => setFrequency('freq5', v)}/>
 			</div>
-			<div className="mb-2">
-				Frequency 6: <code className="pl-2 text-size-xs">{frequencies.freq6}</code>
-				<Button className="button-reset-sm" variant="link"
+			<div className={(cn('mb-2', {'text-muted': !enabled}))}>
+				Frequency 6: <code className={(cn('pl-2 text-size-xs', {'text-muted': !enabled}))}>{frequencies.freq6}</code>
+				<Button disabled={!enabled} className="button-reset-sm" variant="link"
 					onClick={() => setFrequency('freq6', random.randomFrequency())}>
 					Random
 				</Button>
-				<Button className="button-reset-sm" variant="link"
+				<Button disabled={!enabled} className="button-reset-sm" variant="link"
 					onClick={() => setFrequency('freq6', 0)}>Min</Button>
-				<Button className="button-reset-sm" variant="link"
+				<Button disabled={!enabled} className="button-reset-sm" variant="link"
 					onClick={() => setFrequency('freq6', 1)}>Max</Button>
-				<UiSlider step={0.001} value={frequencies.freq6}
+				<UiSlider disabled={!enabled} step={0.001} value={frequencies.freq6}
 					onChange={v => setFrequency('freq6', v)}/>
 			</div>
-			<div className="mb-2">
-				Frequency 7: <code className="pl-2 text-size-xs">{frequencies.freq7}</code>
-				<Button className="button-reset-sm" variant="link"
+			<div className={(cn('mb-2', {'text-muted': !enabled}))}>
+				Frequency 7: <code className={(cn('pl-2 text-size-xs', {'text-muted': !enabled}))}>{frequencies.freq7}</code>
+				<Button disabled={!enabled} className="button-reset-sm" variant="link"
 					onClick={() => setFrequency('freq7', random.randomFrequency())}>
 					Random
 				</Button>
-				<Button className="button-reset-sm" variant="link"
+				<Button disabled={!enabled} className="button-reset-sm" variant="link"
 					onClick={() => setFrequency('freq7', 0)}>Min</Button>
-				<Button className="button-reset-sm" variant="link"
+				<Button disabled={!enabled} className="button-reset-sm" variant="link"
 					onClick={() => setFrequency('freq7', 1)}>Max</Button>
-				<UiSlider step={0.001} value={frequencies.freq7}
+				<UiSlider disabled={!enabled} step={0.001} value={frequencies.freq7}
 					onChange={v => setFrequency('freq7', v)}/>
 			</div>
-			<div className="mb-2">
-				Frequency 8: <code className="pl-2 text-size-xs">{frequencies.freq8}</code>
-				<Button className="button-reset-sm" variant="link"
+			<div className={(cn('mb-2', {'text-muted': !enabled}))}>
+				Frequency 8: <code className={(cn('pl-2 text-size-xs', {'text-muted': !enabled}))}>{frequencies.freq8}</code>
+				<Button disabled={!enabled} className="button-reset-sm" variant="link"
 					onClick={() => setFrequency('freq8', random.randomFrequency())}>
 					Random
 				</Button>
-				<Button className="button-reset-sm" variant="link"
+				<Button disabled={!enabled} className="button-reset-sm" variant="link"
 					onClick={() => setFrequency('freq8', 0)}>Min</Button>
-				<Button className="button-reset-sm" variant="link"
+				<Button disabled={!enabled} className="button-reset-sm" variant="link"
 					onClick={() => setFrequency('freq8', 1)}>Max</Button>
-				<UiSlider step={0.001} value={frequencies.freq8}
+				<UiSlider disabled={!enabled} step={0.001} value={frequencies.freq8}
 					onChange={v => setFrequency('freq8', v)}/>
 			</div>
 			<div className="mt-2">
 				<ButtonGroup>
-					<Button variant="secondary" size="sm"
+					<Button disabled={!enabled} variant="secondary" size="sm"
 						onClick={() => {
 							setFrequencies({...random.randomFrequencies(null)})
 						}}>Randomize All</Button>
-					<Button variant="secondary" size="sm"
+					<Button disabled={!enabled} variant="secondary" size="sm"
 						onClick={() => {
 							setFrequencies({...random.randomFrequencies(0)})
 						}}>Min All</Button>
-					<Button variant="secondary" size="sm"
+					<Button disabled={!enabled} variant="secondary" size="sm"
 						onClick={() => {
 							setFrequencies({...random.randomFrequencies(1)})
 						}}>Max All</Button>
@@ -202,6 +217,7 @@ function NoiseAmplitudes ( props: Props ) {
 
 // Properties validation
 NoiseAmplitudes.propTypes = {
+	enabled: PropTypes.bool,
 	frequencies: PropTypes.shape({
 		freq1: PropTypes.number,
 		freq2: PropTypes.number,
@@ -217,6 +233,7 @@ NoiseAmplitudes.propTypes = {
 
 // Default properties
 NoiseAmplitudes.defaultProps = {
+	enabled: true,
 	frequencies: {...random.randomFrequencies(null, 3)},
 	onChange: () => {},
 };
