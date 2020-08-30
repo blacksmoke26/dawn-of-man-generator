@@ -16,26 +16,26 @@ https://dawn-of-man-mod-gen.netlify.com/
 3. Entity IDs: http://madrugaworks.com/dawnofman/reference_entities.php
 
 ### Used in App:
-1. React: [https://reactjs.org](https://reactjs.org/)
-2. Redux: [https://redux.js.org](https://redux.js.org)
-3. Redux Thunk:(https://github.com/reduxjs/redux-thunk)[https://github.com/reduxjs/redux-thunk]
-4. React Bootstrap: https://react-bootstrap.github.io/
-5. Flow: https://flow.org/
-6. RC Slider: [http://react-component.github.io/slider/](http://react-component.github.io/slider/)
-7. React-Select: [https://react-select.com/](https://react-select.com/)
-8. Fast XML Parser(https://naturalintelligence.github.io/fast-xml-parser/)[https://naturalintelligence.github.io/fast-xml-parser/]
-9. React Syntax Highlighter: [https://github.com/react-syntax-highlighter/react-syntax-highlighter](https://github.com/react-syntax-highlighter/react-syntax-highlighter)
-10. XML Formatter: [https://github.com/chrisbottin/xml-formatter#readme](https://github.com/chrisbottin/xml-formatter#readme)
-11. Slugify: [https://github.com/simov/slugify](https://github.com/simov/slugify)
-12. Nano ID: [https://www.npmjs.com/package/nanoid](https://www.npmjs.com/package/nanoid)
-13. Object Path: [https://github.com/mariocasciaro/object-path](https://github.com/mariocasciaro/object-path)
-14. Merge: [https://github.com/yeikos/js.merge](https://github.com/yeikos/js.merge)
-15. Clipboard Copy: [https://github.com/feross/clipboard-copy](https://github.com/feross/clipboard-copy)
-16. Classname: [https://github.com/casperin/classname](https://github.com/casperin/classname)
-15. Faker: [https://github.com/Marak/Faker.js#readme](https://github.com/Marak/Faker.js#readme)
-16. Random Float: [https://github.com/sindresorhus/random-float#readme](https://github.com/sindresorhus/random-float#readme)
-17. Random Int: [https://github.com/sindresorhus/random-int#readme](https://github.com/sindresorhus/random-int#readme)
-18. Unique Random Array: [https://github.com/sindresorhus/unique-random-array#readme](https://github.com/sindresorhus/unique-random-array#readme)
+1. [React](https://reactjs.org)
+2. [Redux](https://redux.js.org)
+3. [Redux Thunk](https://github.com/reduxjs/redux-thunk)
+4. [React Bootstrap](https://react-bootstrap.github.io/)
+5. [Flow](https://flow.org/)
+6. [RC Slider](http://react-component.github.io/slider/)
+7. [React-Select](https://react-select.com/)
+8. [Fast XML Parser](https://naturalintelligence.github.io/fast-xml-parser/)
+9. [React Syntax Highlighter](https://github.com/react-syntax-highlighter/react-syntax-highlighter)
+10. [XML Formatter](https://github.com/chrisbottin/xml-formatter#readme)
+11. [Slugify](https://github.com/simov/slugify)
+12. [Nano ID](https://www.npmjs.com/package/nanoid)
+13. [Object Path](https://github.com/mariocasciaro/object-path)
+14. [Merge](https://github.com/yeikos/js.merge)
+15. [Clipboard Copy](https://github.com/feross/clipboard-copy)
+16. [Classname](https://github.com/casperin/classname)
+15. [Faker](https://github.com/Marak/Faker.js#readme)
+16. [Random Float](https://github.com/sindresorhus/random-float#readme)
+17. [Random Int](https://github.com/sindresorhus/random-int#readme)
+18. [Unique Random Array](https://github.com/sindresorhus/unique-random-array#readme)
 
 ### Beyond simplicity?
 
