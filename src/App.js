@@ -8,6 +8,7 @@ import { Node } from 'react';
 
 // Components
 import EnvironmentContainer from './panels/environment/EnvironmentContainer';
+import EnvironmentPresets from './panels/environment/Presets';
 import LocationContainer from './panels/location/LocationContainer';
 import XmlToJsonConvertorContainer from './dev/panels/XmlToJsonConvertorContainer';
 
@@ -37,6 +38,7 @@ function App (): Node {
 					</Card.Header>
 					<Accordion.Collapse eventKey="accordion_0">
 						<Card.Body>
+							<EnvironmentPresets/>
 							<EnvironmentContainer/>
 						</Card.Body>
 					</Accordion.Collapse>
