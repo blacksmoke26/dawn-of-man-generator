@@ -50,8 +50,11 @@ const Presets = (): Node => {
 				placeholder="Choose preset..."
 				onChange={( selected: ?Object, {action}: Object ) => {
 					if ( action === 'select-option' && selected ) {
-						const envData = environments[selected.value]();
-						dispatch(setEnvironment(envData));
+						const envName: string = selected.value;
+						if ( environments.hasOwnProperty(envName) ) {
+							const envData = environments[envName]();
+							dispatch(setEnvironment(envData));
+						}
 					}
 				}}
 			/>
