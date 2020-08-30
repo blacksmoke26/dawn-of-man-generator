@@ -8,7 +8,7 @@
 
 // Redux actions
 import {
-	ENVIRONMENT_NOISE_AMPLITUDES,
+	SET_ENVIRONMENT,
 } from './action-types';
 
 /** `ReduxAppState` type */
@@ -29,6 +29,13 @@ const initialState: ReduxAppState = {
  * Root reducer / action states resolver */
 export default function rootReducer ( state: ReduxAppState = initialState, action: { type: string, payload: any } ): ReduxAppState {
 	const {type, payload} = action;
+	
+	if ( type === SET_ENVIRONMENT ) {
+		return {
+			...state,
+			environment: {...payload},
+		}
+	}
 	
 	return state;
 }
