@@ -14,17 +14,17 @@ import { nanoid } from 'nanoid';
 
 // Types
 import type { Node } from 'react';
-import type { LocationProps } from './../../../utils/location';
+import type { LocationProps } from './../../../../../utils/location';
 
 // Components
-import UiSlider from './../../../components/UiSlider';
+import UiSlider from './../../../../../components/UiSlider';
 
 // Utils
-import * as location from './../../../utils/location';
+import * as location from './../../../../../utils/location';
 
 export type Props = {
 	values?: LocationProps,
-	onChange ( template: string, values: LocationProps ): void,
+	onChange ( location: LocationProps ): void,
 };
 
 /** Location functional component */
@@ -33,25 +33,8 @@ function Location ( props: Props ): Node {
 	
 	// Reflect state changes
 	React.useEffect(() => {
-		typeof props.onChange === 'function' && props.onChange(toTemplateText(), values);
+		typeof props.onChange === 'function' && props.onChange(values);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [values]);
-	
-	/** Generate xml code */
-	const toTemplateText = React.useCallback((): string => {
-		const {name, seed, coordinates, river, environment, lakes} = values;
-		
-		const riverProp: string = ` river="${river ? 'true' : 'false'}"`;
-		const lakesProp: string = Number(lakes) ? ` lakes="${lakes}"` : '';
-		
-		return (
-			`<location id="${name}"
-				seed="${String(seed).padStart(8, '0')}"
-				environment="${environment}"
-				map_location="${coordinates[0]},${coordinates[1]}"
-				${riverProp} ${lakesProp}
-				/>`
-		);
 	}, [values]);
 	
 	/** Update given value by name */
@@ -65,11 +48,7 @@ function Location ( props: Props ): Node {
 	/** Update coordinate */
 	const updateCoordinate = ( north: number = null, south: number = null ): void => {
 		const [n, s] = values.coordinates;
-		
-		updateValue('coordinates', [
-			north ?? n,
-			south ?? s,
-		]);
+		updateValue('coordinates', [north ?? n, south ?? s]);
 	};
 	
 	return (
@@ -79,14 +58,26 @@ function Location ( props: Props ): Node {
 				<Col sm="10">
 					<InputGroup>
 						<Form.Control
-							value={values.name} size="sm" className="d-inline-block position-relative"
-							maxLength={40} style={{maxWidth:'280px'}} onChange={e => {
-							updateValue('name', slugify(e.target.value, '_'));
+							value={values.slug} size="sm" className="d-inline-block position-relative"
+							maxLength={22} style={{maxWidth:'280px'}} onChange={e => {
+							const slug: string = slugify(e.target.value, {
+								replacement: '_', lower: true, strict: true,
+							});
+							
+							const name: string = slug
+								.split('_')
+								.map(v => `${v.charAt(0).toUpperCase()}${v.slice(1)}`)
+								.join(' ');
+							
+							updateValue('slug', slug);
+							updateValue('name', name);
 						}} />
 						<InputGroup.Append>
 							<Button variant="secondary" className="mt-xs-1" size="sm"
 								onClick={() => {
-									updateValue('name', location.randomName().slug)
+									const {name, slug} = location.randomName();
+									updateValue('name', name);
+									updateValue('slug', slug);
 								}}>Randomize</Button>
 						</InputGroup.Append>
 					</InputGroup>
@@ -98,9 +89,9 @@ function Location ( props: Props ): Node {
 					<InputGroup>
 						<Form.Control
 							value={values.seed} size="sm" className="d-inline-block position-relative"
-							maxLength={8} style={{maxWidth:'140px'}} onChange={e => {
+							maxLength={9} style={{maxWidth:'140px'}} onChange={e => {
 							if ( e.target.value === '' || /^[0-9\b]+$/.test(e.target.value) ) {
-								updateValue('seed', Number(e.target.value));
+								updateValue('seed', e.target.value);
 							}
 						}} />
 						{' '}
@@ -215,7 +206,11 @@ function Location ( props: Props ): Node {
 			<div className="mt-2">
 				<ButtonGroup>
 					<Button variant="secondary" size="sm"
-						onClick={() => setValues(location.randomizeLocation())}>Randomize All</Button>
+						onClick={() => {
+							const randLocation = location.randomizeLocation();
+							randLocation._id = values._id;
+							setValues(randLocation);
+						}}>Randomize All</Button>
 				</ButtonGroup>
 			</div>
 		</>
