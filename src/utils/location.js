@@ -8,13 +8,16 @@
 
 import slugify from 'slugify';
 import faker from 'faker';
+import {nanoid} from 'nanoid';
 import randomFloat from 'random-float';
 import randomInt from 'random-int';
 import uniqueRandomArray from 'unique-random-array';
 
 // Location properties
 export type LocationProps = {
+	_id: string,
 	name: string,
+	slug: string,
 	seed: string,
 	coordinates: [number, number],
 	river: boolean,
@@ -94,15 +97,38 @@ export function randomRiver (): boolean {
  * @static
  * Randomize location values */
 export function randomizeLocation (): LocationProps {
-	const coordinates = randomCoordinates()
+	const coordinates = randomCoordinates();
+	const name = randomName();
 	
 	return {
-		name: randomName().slug,
+		_id: nanoid(7),
+		...name,
 		seed: randomSeed(),
 		coordinates,
 		river: randomRiver(),
 		environment: randomEnvironment(),
 		lakes: randomLakes(),
 	};
+}
+
+
+/**
+ * @public
+ * @static
+ * Convert location object into template */
+export function nodeToTemplate ( location: LocationProps ): string {
+	const {slug, seed, coordinates, river, environment, lakes} = location;
+	
+	const riverProp: string = ` river="${river ? 'true' : 'false'}"`;
+	const lakesProp: string = Number(lakes) ? ` lakes="${lakes}"` : '';
+	
+	return (
+		`<location id="${slug}"
+			seed="${String(seed).padStart(8, '0')}"
+			environment="${environment}"
+			map_location="${coordinates[0]},${coordinates[1]}"
+			${riverProp} ${lakesProp}
+		/>`
+	);
 }
 
