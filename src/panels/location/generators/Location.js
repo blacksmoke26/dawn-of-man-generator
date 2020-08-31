@@ -46,7 +46,7 @@ function Location ( props: Props ): Node {
 		
 		return (
 			`<location id="${name}"
-				seed="${seed}"
+				seed="${String(seed).padStart(8, '0')}"
 				environment="${environment}"
 				map_location="${coordinates[0]},${coordinates[1]}"
 				${riverProp} ${lakesProp}
@@ -99,10 +99,9 @@ function Location ( props: Props ): Node {
 						<Form.Control
 							value={values.seed} size="sm" className="d-inline-block position-relative"
 							maxLength={8} style={{maxWidth:'140px'}} onChange={e => {
-							updateValue('seed', e.target.value.padStart(8, '0'));
-						}} onKeyUp={e => {
-							e.target.value = String(e.target.value)
-								.replace(/\D+/, '');
+							if ( e.target.value === '' || /^[0-9\b]+$/.test(e.target.value) ) {
+								updateValue('seed', Number(e.target.value));
+							}
 						}} />
 						{' '}
 						<InputGroup.Append>
