@@ -32,5 +32,14 @@ export const RESOURCE_FACTOR_DEFAULT: number = 1;
 export const SEASON_TEMPERATURE_MIN = -50;
 export const SEASON_TEMPERATURE_MAX = 50;
 
-export const SEASON_WIND_MIN = 0;
-export const SEASON_WIND_MAX = 9;
+export const FORD_DISTANCE_FACTOR_MIN: number = 0;
+export const FORD_DISTANCE_FACTOR_MAX: number = 20;
+export const FORD_DISTANCE_FACTOR_DEFAULT: number = 1;
+
+export const DISTANCE_HEIGHT_OFFSET_MIN: number = 0;
+export const DISTANCE_HEIGHT_OFFSET_MAX: number = 20;
+export const DISTANCE_HEIGHT_OFFSET_DEFAULT: number = 0.22;
+
+export const SUN_ANGLE_FACTOR_MIN: number = 0;
+export const SUN_ANGLE_FACTOR_MAX: number = 20;
+export const SUN_ANGLE_FACTOR_DEFAULT: number = 1;
