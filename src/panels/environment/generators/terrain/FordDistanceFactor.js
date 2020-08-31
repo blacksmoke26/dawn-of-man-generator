@@ -62,7 +62,7 @@ function FordDistanceFactor ( props: Props ) {
 	/** Generate xml code */
 	const toTemplateText = React.useCallback((): string => {
 		return enabled
-			? `<distance_height_offset value="${distance}"/>`
+			? `<ford_distance_factor value="${distance}"/>`
 			: '';
 	}, [distance, enabled]);
 	
