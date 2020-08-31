@@ -47,7 +47,6 @@ function FordDistanceFactor ( props: Props ) {
 		
 		if ( typeof extValue === 'number') {
 			setEnabled(true);
-			console.log({fordDistanceFactor: extValue});
 			setDistance(extValue);
 		}
 	}, [environment]);
