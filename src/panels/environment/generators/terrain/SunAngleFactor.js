@@ -18,9 +18,7 @@ import UiSlider from './../../../../components/UiSlider';
 
 // Utils
 import * as random from '../../../../utils/random';
-
-const ANGLE_DEFAULT: number = 0;
-const ANGLE_MAX: number = 1;
+import * as Defaults from '../../../../utils/defaults';
 
 /**
  * SunAngleFactor `props` type
@@ -77,9 +75,11 @@ function SunAngleFactor ( props: Props ) {
 						<Button disabled={!enabled} className="button-reset-sm" variant="link"
 							onClick={() => setAngle(random.randomFloat())}>Random</Button>
 						<Button disabled={!enabled} className="button-reset-sm" variant="link"
-							onClick={() => setAngle(ANGLE_MAX)}>Max</Button>
+							onClick={() => setAngle(Defaults.SUN_ANGLE_FACTOR_MIN)}>Min</Button>
 						<Button disabled={!enabled} className="button-reset-sm" variant="link"
-							onClick={() => setAngle(ANGLE_DEFAULT)}>Reset</Button>
+							onClick={() => setAngle(Defaults.SUN_ANGLE_FACTOR_MAX)}>Max</Button>
+						<Button disabled={!enabled} className="button-reset-sm" variant="link"
+							onClick={() => setAngle(Defaults.SUN_ANGLE_FACTOR_DEFAULT)}>Reset</Button>
 						<div className="text-size-xxs text-muted mt-1">
 							How high is the sun in the sky, 1.0 is the default.
 						</div>
@@ -95,7 +95,10 @@ function SunAngleFactor ( props: Props ) {
 						/>
 					</Col>
 				</Row>
-				<UiSlider step={0.1} disabled={!enabled}
+				<UiSlider
+					min={Defaults.SUN_ANGLE_FACTOR_MIN}
+					max={Defaults.SUN_ANGLE_FACTOR_MAX}
+					step={0.1} disabled={!enabled}
 					value={Number(angle)} onChange={v => setAngle(v)}/>
 			</Card.Body>
 		</Card>

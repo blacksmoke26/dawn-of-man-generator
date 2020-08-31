@@ -18,9 +18,7 @@ import UiSlider from './../../../../components/UiSlider';
 
 // Utils
 import * as random from '../../../../utils/random';
-
-const DISTANCE_DEFAULT: number = 0;
-const DISTANCE_MAX: number = 1;
+import * as Defaults from '../../../../utils/defaults';
 
 /**
  * DistanceHeightOffset `props` type
@@ -80,9 +78,11 @@ function DistanceHeightOffset ( props: Props ) {
 								Random
 							</Button>
 							<Button disabled={!enabled} className="button-reset-sm" variant="link"
-								onClick={() => setDistance(DISTANCE_MAX)}>Max</Button>
+								onClick={() => setDistance(Defaults.DISTANCE_HEIGHT_OFFSET_MIN)}>Min</Button>
 							<Button disabled={!enabled} className="button-reset-sm" variant="link"
-								onClick={() => setDistance(DISTANCE_DEFAULT)}>Reset</Button>
+								onClick={() => setDistance(Defaults.DISTANCE_HEIGHT_OFFSET_MAX)}>Max</Button>
+							<Button disabled={!enabled} className="button-reset-sm" variant="link"
+								onClick={() => setDistance(Defaults.DISTANCE_HEIGHT_OFFSET_DEFAULT)}>Reset</Button>
 							<div className="text-size-xxs text-muted mt-1">
 								How much bigger are mountains at the edge of map.
 							</div>
@@ -98,7 +98,10 @@ function DistanceHeightOffset ( props: Props ) {
 							/>
 						</Col>
 					</Row>
-					<UiSlider step={0.01} disabled={!enabled}
+					<UiSlider
+						min={Defaults.DISTANCE_HEIGHT_OFFSET_MIN}
+						max={Defaults.DISTANCE_HEIGHT_OFFSET_MAX}
+						step={0.01} disabled={!enabled}
 						value={Number(distance)} onChange={v => setDistance(v)}/>
 				</Card.Body>
 			</Card>

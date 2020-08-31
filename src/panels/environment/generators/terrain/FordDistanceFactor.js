@@ -18,9 +18,7 @@ import UiSlider from './../../../../components/UiSlider';
 
 // Utils
 import * as random from '../../../../utils/random';
-
-const DISTANCE_DEFAULT: number = 0;
-const DISTANCE_MAX: number = 0;
+import * as Defaults from '../../../../utils/defaults';
 
 /**
  * FordDistanceFactor `props` type
@@ -49,6 +47,7 @@ function FordDistanceFactor ( props: Props ) {
 		
 		if ( typeof extValue === 'number') {
 			setEnabled(true);
+			console.log({fordDistanceFactor: extValue});
 			setDistance(extValue);
 		}
 	}, [environment]);
@@ -80,9 +79,11 @@ function FordDistanceFactor ( props: Props ) {
 								Random
 							</Button>
 							<Button disabled={!enabled} className="button-reset-sm" variant="link"
-								onClick={() => setDistance(DISTANCE_MAX)}>Max</Button>
+								onClick={() => setDistance(Defaults.FORD_DISTANCE_FACTOR_MIN)}>Max</Button>
 							<Button disabled={!enabled} className="button-reset-sm" variant="link"
-								onClick={() => setDistance(DISTANCE_DEFAULT)}>Reset</Button>
+								onClick={() => setDistance(Defaults.FORD_DISTANCE_FACTOR_MAX)}>Max</Button>
+							<Button disabled={!enabled} className="button-reset-sm" variant="link"
+								onClick={() => setDistance(Defaults.FORD_DISTANCE_FACTOR_DEFAULT)}>Reset</Button>
 							<div className="text-size-xxs text-muted mt-1">
 								The average distance between river fords, 1.0 is the default.
 							</div>
@@ -98,7 +99,10 @@ function FordDistanceFactor ( props: Props ) {
 							/>
 						</Col>
 					</Row>
-					<UiSlider step={0.01} disabled={!enabled} value={distance}
+					<UiSlider
+						min={Defaults.FORD_DISTANCE_FACTOR_MIN}
+						max={Defaults.FORD_DISTANCE_FACTOR_MAX}
+						step={0.01} disabled={!enabled} value={distance}
 						onChange={v => setDistance(v)}/>
 				</Card.Body>
 			</Card>
