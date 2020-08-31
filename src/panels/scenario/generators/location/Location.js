@@ -14,13 +14,13 @@ import { nanoid } from 'nanoid';
 
 // Types
 import type { Node } from 'react';
-import type { LocationProps } from './../../../../../utils/location';
+import type { LocationProps } from './../../../../utils/location';
 
 // Components
-import UiSlider from './../../../../../components/UiSlider';
+import UiSlider from './../../../../components/UiSlider';
 
 // Utils
-import * as location from './../../../../../utils/location';
+import * as location from './../../../../utils/location';
 
 export type Props = {
 	values?: LocationProps,
