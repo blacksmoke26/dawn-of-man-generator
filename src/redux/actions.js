@@ -18,13 +18,25 @@ import { jsonToRedux } from './../data/environments/parser';
  * @public
  * @static
  * @async
- * Set environment data
+ * Parse and set environment data
  */
 export function setEnvironment ( rawData: Object ): Promise<void> {
 	return async ( dispatch: Dispatch ) => {
 		const {environment}: Object = jsonToRedux(rawData, {
 			nullResolver: ( wrapperKey: string ) => ({[wrapperKey]: false}),
 		});
+		dispatch({type: SET_ENVIRONMENT, payload: environment});
+	};
+}
+
+/**
+ * @public
+ * @static
+ * @async
+ * Set parsed environment data
+ */
+export function setParsedEnvironment ( {environment = {}}: Object ): Promise<void> {
+	return async ( dispatch: Dispatch ) => {
 		dispatch({type: SET_ENVIRONMENT, payload: environment});
 	};
 }
