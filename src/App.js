@@ -9,7 +9,7 @@ import { Node } from 'react';
 // Components
 import EnvironmentContainer from './panels/environment/EnvironmentContainer';
 import EnvironmentPresets from './panels/environment/Presets';
-import LocationContainer from './panels/location/LocationContainer';
+import ScenarioContainer from './panels/scenario/ScenarioContainer';
 import XmlToJsonConvertorContainer from './dev/panels/XmlToJsonConvertorContainer';
 
 const ENV_PROD: boolean = process.env.NODE_ENV === 'production';
@@ -45,13 +45,13 @@ function App (): Node {
 				</Card>
 				<Card>
 					<Card.Header>
-						<Accordion.Toggle as={Button} variant="link" eventKey="accordion_1">
-							Locations
+						<Accordion.Toggle as={Button} variant="link" eventKey="scenario">
+							Scenario
 						</Accordion.Toggle>
 					</Card.Header>
-					<Accordion.Collapse eventKey="accordion_1">
+					<Accordion.Collapse eventKey="scenario">
 						<Card.Body>
-							<LocationContainer/>
+							<ScenarioContainer/>
 						</Card.Body>
 					</Accordion.Collapse>
 				</Card>
