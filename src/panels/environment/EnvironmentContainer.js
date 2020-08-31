@@ -8,10 +8,11 @@
 
 import React from 'react';
 import SyntaxHighlighter from 'react-syntax-highlighter';
-import { Card, Accordion, Button } from 'react-bootstrap';
+import { Card, Accordion, Button, ButtonGroup } from 'react-bootstrap';
 import { anOldHope } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import xmlFormatter from 'xml-formatter';
 import copyClipboard from 'clipboard-copy';
+import FileSaver from 'file-saver';
 
 // Types
 import type { Node } from 'react';
@@ -156,10 +157,19 @@ function EnvironmentContainer (): Node {
 				</SyntaxHighlighter>
 			</div>
 			<div className="mt-2">
-				<Button size="sm" variant="secondary"
-					onClick={() => copyClipboard(toTemplateText())}>
-					Copy to Clipboard
-				</Button>
+				<ButtonGroup size="sm">
+					<Button variant="secondary"
+						onClick={() => copyClipboard(toTemplateText())}>
+						Copy to Clipboard
+					</Button>
+					<Button variant="secondary"
+						onClick={() => {
+							var blob = new Blob([toTemplateText()], {type: 'text/xml;charset=utf-8'});
+							FileSaver.saveAs(blob, 'my-environment.xml');
+						}}>
+						Download File
+					</Button>
+				</ButtonGroup>
 			</div>
 		</>
 	);

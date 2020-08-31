@@ -7,6 +7,7 @@ import SyntaxHighlighter from 'react-syntax-highlighter';
 import { anOldHope } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import xmlFormatter from 'xml-formatter';
 import copyClipboard from 'clipboard-copy';
+import FileSaver from 'file-saver';
 
 // Types
 import type { Node } from 'react';
@@ -56,13 +57,22 @@ function LocationContainer (): Node {
 	};
 	
 	/** Generate xml code */
-	const toTemplate: () => string = (): string => {
-		const xml: string = `
-		<locations>
-			${Object.values(locations).join('')}
-		</locations>`;
+	const toTextTemplate = ( fileMarkup: boolean = false ): string => {
+		const locationsTemplate: string = (
+			`<locations>${Object.values(locations).join('')}</locations>`
+		);
 		
-		return xmlFormatter(xml, {indentation: '  '});
+		const template: string = fileMarkup
+			? (
+				`<?xml version="1.0" encoding="utf-8"?>
+				<scenario>
+					${locationsTemplate}
+				</scenario>
+				`
+			)
+			: `${locationsTemplate}`
+		
+		return xmlFormatter(template, {indentation: '  '});
 	};
 	
 	/** Total locations count */
@@ -122,14 +132,23 @@ function LocationContainer (): Node {
 			<hr/>
 			<div className="syntax-highlighter">
 				<SyntaxHighlighter style={anOldHope} language="xml">
-					{toTemplate()}
+					{toTextTemplate()}
 				</SyntaxHighlighter>
 			</div>
 			<div className="mt-2">
-				<Button size="sm" variant="secondary"
-					onClick={() => copyClipboard(toTemplate())}>
-					Copy to Clipboard
-				</Button>
+				<ButtonGroup size="sm">
+					<Button variant="secondary"
+						onClick={() => copyClipboard(toTextTemplate())}>
+						Copy to Clipboard
+					</Button>
+					<Button variant="secondary"
+						onClick={() => {
+							var blob = new Blob([toTextTemplate(true)], {type: 'text/xml;charset=utf-8'});
+							FileSaver.saveAs(blob, 'my-scenario.xml');
+						}}>
+						Download File
+					</Button>
+				</ButtonGroup>
 			</div>
 		</>
 	);
