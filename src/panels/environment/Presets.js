@@ -17,6 +17,9 @@ import { Dispatch } from 'redux';
 // Redux
 import { setEnvironment } from './../../redux/actions';
 
+// Components
+import XmlImporter from './XmlImporter';
+
 // Utils
 import { labels, environments } from './../../data/environments/builtin';
 
@@ -58,6 +61,7 @@ const Presets = (): Node => {
 					}
 				}}
 			/>
+			<XmlImporter/>
 		</div>
 	);
 };
