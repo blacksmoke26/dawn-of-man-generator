@@ -85,8 +85,8 @@ function ShowCompletionIcon ( props: Props ): Node {
 						custom
 						className="pull-right"
 						disabled={!enabled}
-						id={`hardcore_mode-${nanoid(5)}`}
-						label="Allow Hardcore Mode?"
+						id={`show_completion_icon-${nanoid(5)}`}
+						label="Show Completion Icon?"
 						checked={value}
 						onChange={e => setValue(e.target.checked)}
 					/>
