@@ -7,3 +7,4 @@
  */
 
 export const SET_ENVIRONMENT: string = 'SET_ENVIRONMENT';
+export const SET_SCENARIO: string = 'SET_SCENARIO';

@@ -7,13 +7,31 @@
  */
 
 // Redux actions
-import {
-	SET_ENVIRONMENT,
-} from './action-types';
+import {SET_ENVIRONMENT, SET_SCENARIO} from './action-types';
 
 /** `ReduxAppState` type */
 export type ReduxAppState = {
-	environment: Object,
+	environment: {
+		noiseAmplitudes: [number, number, number, number, number, number, number, number] | boolean,
+		resourceFactor: number | boolean,
+		distanceHeightOffset: number | boolean,
+		fordDistanceFactor: number | boolean,
+		sunAngleFactor: number | boolean,
+		backdropScale: [number, number, number] | boolean,
+		deposits: Array<string> | boolean,
+		depositOverridePrototypes: Object | boolean,
+		detailOverridePrototypes: Object | boolean,
+		propOverridePrototypes: Object | boolean,
+		globalTreeDensity: number|boolean,
+		treesEverywhere: boolean,
+		trees: Array<string> | boolean,
+		treeOverridePrototypes: Object | boolean,
+		seasons: Object | boolean,
+	},
+	scenario: {
+		size: number|boolean,
+		locations: Array<Object>|boolean,
+	},
 };
 
 /**
@@ -21,6 +39,7 @@ export type ReduxAppState = {
  * Redux store initial state */
 const initialState: ReduxAppState = {
 	environment: {},
+	scenario: {},
 }
 
 /**
@@ -34,6 +53,13 @@ export default function rootReducer ( state: ReduxAppState = initialState, actio
 		return {
 			...state,
 			environment: {...payload},
+		}
+	}
+	
+	if ( type === SET_SCENARIO ) {
+		return {
+			...state,
+			scenario: {...payload},
 		}
 	}
 	
