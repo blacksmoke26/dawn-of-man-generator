@@ -3,6 +3,11 @@
  * @link http://junaidatari.com Author Website
  * @since 2019-11-07
  */
+
+.cursor-default {
+	cursor: default !important;
+}
+
 .card-header-tabs {
 	margin-bottom: -1rem;
 }
