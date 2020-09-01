@@ -70,12 +70,14 @@ function ScenarioContainer (): Node {
 	const downloadFileClick = React.useCallback((): void => {
 		var blob = new Blob([toTemplateText()], {type: 'text/xml;charset=utf-8'});
 		FileSaver.saveAs(blob, `${SCENARIO_NAME}.xml`);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [locations]);
 	
 	/** Download language file button click handler */
 	const downloadLanguageFileClick = React.useCallback((): void => {
 		var blob = new Blob([toLanguageTemplateText()], {type: 'text/xml;charset=utf-8'});
 		FileSaver.saveAs(blob, `en_${SCENARIO_NAME}.xml`);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [langStrings]);
 	
 	return (
