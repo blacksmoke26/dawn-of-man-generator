@@ -19,6 +19,10 @@ import type { Node } from 'react';
 import type { LocationProps } from './../../utils/location';
 
 // Components
+import MapSize from './generators/general/MapSize';
+import HardcoreModeAllowed from './generators/general/HardcoreModeAllowed';
+import NomadModeAllowed from './generators/general/NomadModeAllowed';
+import ShowCompletionIcon from './generators/general/ShowCompletionIcon';
 import LocationContainer from './generators/location/LocationContainer';
 
 // Utils
@@ -28,19 +32,28 @@ const SCENARIO_NAME: string = 'scenario';
 
 /** ScenarioContainer functional component */
 function ScenarioContainer (): Node {
-	const [locations, setLocations] = React.useState<string>('');
+	const [templateTexts, setTemplateTexts] = React.useState<Object>({});
 	const [langStrings, setLangStrings] = React.useState<Object>({});
+	
+	/** Update templates raw texts */
+	const updateText = React.useCallback(( name: string, value: string ): void => {
+		setTemplateTexts(current => ({
+			...current,
+			[name]: value,
+		}));
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
 	
 	/** Generate xml code */
 	const toTemplateText = React.useCallback((): string => {
 		const xml: string = `
 		<?xml version="1.0" encoding="utf-8"?>
 		<scenario>
-			${locations}
+			${Object.values(templateTexts).join('')}
 		</scenario>`;
 		
 		return xmlFormatter(xml, {indentation: '  '});
-	}, [locations]);
+	}, [templateTexts]);
 	
 	/** Generate language string xml code */
 	const toLanguageTemplateText = React.useCallback((): string => {
@@ -71,7 +84,7 @@ function ScenarioContainer (): Node {
 		var blob = new Blob([toTemplateText()], {type: 'text/xml;charset=utf-8'});
 		FileSaver.saveAs(blob, `${SCENARIO_NAME}.xml`);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [locations]);
+	}, [templateTexts]);
 	
 	/** Download language file button click handler */
 	const downloadLanguageFileClick = React.useCallback((): void => {
@@ -82,7 +95,22 @@ function ScenarioContainer (): Node {
 	
 	return (
 		<>
-			<Accordion activeKey="locations">
+			<Accordion defaultActiveKey="general">
+				<Card>
+					<Card.Header className="pt-1 pb-1 pl-2 pl-2 position-relative">
+						<Accordion.Toggle as={Button} variant="link" eventKey="general">
+							General
+						</Accordion.Toggle>
+					</Card.Header>
+					<Accordion.Collapse eventKey="general">
+						<Card.Body>
+							<HardcoreModeAllowed onChange={v => updateText('hardcoreModeAllowed', v)} />
+							<NomadModeAllowed onChange={v => updateText('nomadModeAllowed', v)} />
+							<MapSize onChange={v => updateText('mapSize', v)} />
+							<ShowCompletionIcon onChange={v => updateText('showCompletionIcon', v)} />
+						</Card.Body>
+					</Accordion.Collapse>
+				</Card>
 				<Card>
 					<Card.Header className="pt-1 pb-1 pl-2 pl-2 position-relative">
 						<Accordion.Toggle as={Button} variant="link" eventKey="locations">
@@ -92,7 +120,7 @@ function ScenarioContainer (): Node {
 					<Accordion.Collapse eventKey="locations">
 						<Card.Body>
 							<LocationContainer onChange={( template: string, list: Array<LocationProps> ) => {
-								setLocations(template);
+								updateText('locations', template)
 								updateLangString('locations', nodesToLanguageStrings(list));
 							}}/>
 						</Card.Body>
