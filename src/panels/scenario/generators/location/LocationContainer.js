@@ -17,7 +17,7 @@ import Location from './Location';
 import * as location from './../../../../utils/location';
 
 /** Maximum limit of locations tabs */
-const LOCATIONS_MAX_COUNT: number = 19;
+const LOCATIONS_MAX_COUNT: number = 12;
 
 /** Tab contents wrapper */
 const TabContentWrapper = ( props: Object ): Node => {
