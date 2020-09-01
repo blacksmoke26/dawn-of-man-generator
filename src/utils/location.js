@@ -111,7 +111,6 @@ export function randomizeLocation (): LocationProps {
 	};
 }
 
-
 /**
  * @public
  * @static
@@ -130,5 +129,19 @@ export function nodeToTemplate ( location: LocationProps ): string {
 			${riverProp} ${lakesProp}
 		/>`
 	);
+}
+
+/**
+ * @public
+ * @static
+ * Convert location nodes into language strings */
+export function nodesToLanguageStrings ( nodes: Array<LocationProps> ): {[string]: string} {
+	const strings: Object = {};
+	
+	nodes.forEach(n => {
+		strings[n.slug] = n.name;
+	});
+	
+	return strings;
 }
 
