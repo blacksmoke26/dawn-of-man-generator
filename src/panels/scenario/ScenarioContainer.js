@@ -76,7 +76,7 @@ function ScenarioContainer (): Node {
 	/** Download language file button click handler */
 	const downloadLanguageFileClick = React.useCallback((): void => {
 		var blob = new Blob([toLanguageTemplateText()], {type: 'text/xml;charset=utf-8'});
-		FileSaver.saveAs(blob, `en_${SCENARIO_NAME}.xml`);
+		FileSaver.saveAs(blob, `en_${SCENARIO_NAME}.lng.xml`);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [langStrings]);
 	
