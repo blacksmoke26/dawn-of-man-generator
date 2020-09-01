@@ -2,7 +2,9 @@
 
 import React from 'react';
 import * as PropTypes from 'prop-types';
-import { ButtonGroup, Button, Tabs, Tab, Card } from 'react-bootstrap';
+import { ButtonGroup, Button, Tabs, Tab, Card, Form } from 'react-bootstrap';
+import { nanoid } from 'nanoid';
+import cn from 'classname';
 
 // Types
 import type { Node } from 'react';
@@ -15,7 +17,7 @@ import Location from './Location';
 import * as location from './../../../../utils/location';
 
 /** Maximum limit of locations tabs */
-const LOCATIONS_MAX_COUNT: number = 12;
+const LOCATIONS_MAX_COUNT: number = 19;
 
 /** Tab contents wrapper */
 const TabContentWrapper = ( props: Object ): Node => {
@@ -49,28 +51,47 @@ function LocationContainer ( props: Props ): Node {
 	React.useEffect(() => {
 		if ( !init ) {
 			setInit(true);
-			addLocation();
+			newLocation();
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [init]);
 	
 	/** Add new location */
-	const addLocation = (): void => {
+	const newLocation = React.useCallback((): void => {
 		const randLocation: LocationProps = location.randomizeLocation();
 		setLocations(( current: Array<LocationProps> ) => ([
 			...current,
 			randLocation,
 		]));
 		setActiveKey(randLocation._id);
-	};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
 	
 	/** Remove location */
-	const removeLocation = ( id: string ): void => {
-		const lastIndex: string = locations.findIndex(v => v._id === id);
-		const lastId: string = locations[lastIndex-1]._id;
-		const newLocations = locations.filter(v => v._id !== id);
-		setLocations(newLocations);
-		setActiveKey(lastId);
-	};
+	const removeLocation = React.useCallback(( tabId: string ): void => {
+		if ( locations.length === 1 ) {
+			return;
+		}
+		
+		let tabIdIndex: number = 0;
+		
+		const tabs: Array<LocationProps> = locations.filter(( tab: LocationProps, index: number ) => {
+			tab._id === tabId && (tabIdIndex = index);
+			return tab._id !== tabId;
+		});
+		
+		let curValue: string = activeKey;
+		
+		if ( curValue === tabId ) {
+			curValue = tabIdIndex === 0
+				? locations[tabIdIndex + 1]._id
+				: locations[tabIdIndex - 1]._id;
+		}
+		
+		setLocations(tabs);
+		setActiveKey(curValue);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [locations, activeKey]);
 	
 	// Reflect state changes
 	React.useEffect(() => {
@@ -90,27 +111,39 @@ function LocationContainer ( props: Props ): Node {
 
 	return (
 		<>
+			<div className="mt-2 mb-2">
+				<Form.Check
+					className="pull-right"
+					type="switch"
+					id={`seasons_override-switch-${nanoid(5)}`}
+					label="Enable locations"
+					checked={enabled}
+					onChange={e => setEnabled(e.target.checked)}
+				/>
+			</div>
 			<div className="mb-3">
 				<ButtonGroup>
 					<Button variant="secondary" size="sm"
-						disabled={total >= LOCATIONS_MAX_COUNT} onClick={() => {
+						disabled={!enabled || total >= LOCATIONS_MAX_COUNT} onClick={() => {
 						if ( total <= LOCATIONS_MAX_COUNT  ) {
-							addLocation();
+							newLocation();
 						}
 					}}>New Location</Button>
-					<Button variant="danger" size="sm" disabled={total <= 1} onClick={() => {
-						setLocations([]); addLocation();
+					<Button variant="danger" size="sm" disabled={!enabled || total <= 1} onClick={() => {
+						setLocations([]); newLocation();
 					}}>Remove All</Button>
 				</ButtonGroup>
 			</div>
-			<Tabs activeKey={activeKey} id="locations-tab" className="nav-tabs-bottom" onSelect={k => setActiveKey(k)}>
+			<Tabs activeKey={activeKey} id="locations-tab"
+				className="nav-tabs-bottom" onSelect={k => setActiveKey(k)}>
 				{locations.map((location, i: number) => (
-					<Tab eventKey={location._id} key={location._id} as={'div'}
+					<Tab disabled={!enabled} eventKey={location._id} key={location._id} as={'div'}
 						title={
 							<>
-								<span className="text-size-sm pr-2">{location.name}</span>
-								<Button hidden={i === 0} variant="link"
-									className="text-color-default text-decoration-none p-0" style={{
+								<span className={cn('text-size-sm pr-2', {'text-muted': !enabled})}>{location.name}</span>
+								<Button disabled={!enabled} hidden={i === 0} variant="link"
+									className="text-color-default text-decoration-none p-0"
+									style={{
 									lineHeight: '10px',
 									position: 'relative',
 									top: '-2px',
@@ -122,7 +155,7 @@ function LocationContainer ( props: Props ): Node {
 							</>
 						}>
 						<TabContentWrapper>
-							<Location values={location} onChange={updated => {
+							<Location enabled={enabled} values={location} onChange={updated => {
 								setLocations(current => {
 									const list: Array<LocationProps> = [...current];
 									const index: number = list.findIndex(loc => loc._id === updated._id);
