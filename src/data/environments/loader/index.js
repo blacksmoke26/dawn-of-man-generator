@@ -24,13 +24,21 @@ function allEqual ( arr: Array<any> ): boolean {
  * @static
  * Check the XML is valid or not
  */
-export function validateXml ( xml: string ): boolean {
-	try {
-		const valid = xmlParser.validate(xml);
-		return typeof valid === 'boolean';
-	} catch ( e ) {
-		return false;
+export function validateXml ( xml: string ): { valid: boolean, error: string } {
+	const response = {
+		error: '', valid: false,
 	}
+	
+	const valid = xmlParser.validate(xml, {allowBooleanAttributes: true});
+	
+	if ( typeof valid === 'boolean' && valid ) {
+		response.valid = true;
+		return response;
+	}
+	
+	const { code, msg, line } = valid.err;
+	response.error = `${code}: ${msg} at ${line}`;
+	return response;
 }
 
 /**
