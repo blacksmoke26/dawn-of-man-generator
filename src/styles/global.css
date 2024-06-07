@@ -1,8 +1,20 @@
 /**
  * @author Junaid Atari <mj.atari@gmail.com>
- * @link http://junaidatari.com Author Website
- * @since 2019-11-07
+ * @see https://github.com/blacksmoke26/dawn-of-man-generator
+ * @since 2020-08-29
  */
+
+:root {
+	color-scheme: dark;
+}
+
+::-webkit-scrollbar { width: 8px; height: 8px;}
+::-webkit-scrollbar-button {  background-color: #666; }
+::-webkit-scrollbar-track {  background-color: #323232;}
+::-webkit-scrollbar-track-piece { background-color: #646464;}
+::-webkit-scrollbar-thumb { height: 50px; background-color: #373f4c; border-radius: 3px;}
+::-webkit-scrollbar-corner { background-color: #323232;}
+::-webkit-resizer { background-color: #666;}
 
 .cursor-default {
 	cursor: default !important;

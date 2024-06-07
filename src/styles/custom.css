@@ -1,7 +1,7 @@
 /**
  * @author Junaid Atari <mj.atari@gmail.com>
- * @link http://junaidatari.com Author Website
- * @since 2020-08-28
+ * @see https://github.com/blacksmoke26/dawn-of-man-generator
+ * @since 2020-08-29
  */
 
 .custom-switch .custom-control-input:checked~.custom-control-label::after {
@@ -59,4 +59,43 @@
 	position: relative;
 	width: 90px;
 	margin-top: 5px;
+}
+
+.modal-header .close {
+	color: inherit;
+}
+
+.modal-header .close {
+	padding: 1.25rem;
+	margin: -1.25rem -1.25rem -1.25rem auto;
+}
+
+.form-check.form-switch > input[type="checkbox"] {
+	margin-top: 0;
+}
+
+.form-check.form-switch > label {
+	margin-left: -0.8rem;
+}
+
+.form-check.form-switch > label.align {
+	position: relative;
+	top: -0.2rem;
+}
+
+.checkbox-align .form-check.form-switch > label {
+	position: relative;
+	top: -0.18rem;
+}
+
+.rc-slider-disabled {
+	background-color: transparent !important;
+}
+
+#locations-tab > .nav-item > button {
+	background-color: transparent !important;
+}
+
+.btn-group-sm>.btn, .btn-sm {
+	border-radius: 0 !important;
 }
