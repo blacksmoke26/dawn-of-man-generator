@@ -139,7 +139,7 @@ export const transformNumeric = (json: Json, options: TransformNumericOptions): 
     nullResolver: () => ({}),
   }, options);
 
-  const parsed = op.get<Record<string, object[]> | null>(json, opt.root, null);
+  const parsed = op.get<Record<string, Json[]> | null>(json, opt.root, null);
 
   return parsed === null
     ? opt.nullResolver(opt.wrapperKey)
@@ -156,7 +156,7 @@ export const transformBoolean = (json: Json, options: TransformBooleanOptions): 
     nullResolver: () => ({}),
   }, options);
 
-  const parsed = op.get<boolean | object[] | null>(json, opt.root, null);
+  const parsed = op.get<boolean | Json[] | null>(json, opt.root, null);
 
   return parsed === null || typeof parsed !== 'boolean'
     ? opt.nullResolver(opt.wrapperKey)
