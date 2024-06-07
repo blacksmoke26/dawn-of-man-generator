@@ -70,6 +70,7 @@ const ScenarioContainer = () => {
 		</scenario>`;
 
     return xmlFormatter(xml, {indentation: '  '});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [templateTexts]);
 
   /** Generate language string xml code */

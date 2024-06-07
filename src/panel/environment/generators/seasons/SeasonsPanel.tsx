@@ -25,7 +25,7 @@ import {seasonsPropsDefault, seasonsPropsRandomize} from '~/utils/seasons';
 
 // redux
 import {useAppSelector, useAppDispatch} from '~redux/hooks';
-import {updateEnvironment, updateEnvironmentRaw} from '~redux/reducers';
+import {updateEnvironmentRaw} from '~redux/reducers';
 
 // types
 import type {SeasonsProp} from '~/utils/seasons.types';
@@ -59,7 +59,7 @@ const SeasonsPanel = (props: Props) => {
   const [summer, setSummer] = React.useState<string>('');
   const [fall, setFall] = React.useState<string>('');
   const [winter, setWinter] = React.useState<string>('');
-  const [seasonProps, setSeasonProps] = React.useState<SeasonsProp>(seasonsPropsDefault());
+  const [seasonProps] = React.useState<SeasonsProp>(seasonsPropsDefault());
 
   const {spring: springConfig, summer: summerConfig, fall: fallConfig, winter: winterConfig} = seasonProps;
 

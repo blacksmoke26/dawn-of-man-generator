@@ -6,7 +6,6 @@
 
 import React from 'react';
 import * as PropTypes from 'prop-types';
-import { useSelector } from 'react-redux';
 import { Card, Button, Form, Row, Col } from 'react-bootstrap';
 import { nanoid } from 'nanoid';
 import cn from 'classname';
@@ -32,7 +31,7 @@ export interface Props {
 };
 
 /** SunAngleFactor functional component */
-function SunAngleFactor ( props: Props ) {
+const SunAngleFactor = ( props: Props ) => {
 	props = merge({
 		enabled: false,
 		angle: random.randomFloat(),
@@ -43,34 +42,34 @@ function SunAngleFactor ( props: Props ) {
 	const [angle, setAngle] = React.useState<number>(props.angle as number);
 
 	const environment = useAppSelector(({environment}) => (environment));
-	
+
 	// Reflect attributes changes
 	React.useEffect(() => {
 		const extValue = environment?.sunAngleFactor ?? null;
-		
+
 		if ( typeof extValue === 'boolean' ) {
 			setEnabled(extValue);
 		}
-		
+
 		if ( typeof extValue === 'number') {
 			setEnabled(true);
 			setAngle(extValue);
 		}
 	}, [environment]);
-	
+
 	// Reflect state changes
 	React.useEffect(() => {
 		typeof props.onChange === 'function' && props.onChange(toTemplateText(), angle);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [angle, enabled]);
-	
+
 	/** Generate xml code */
 	const toTemplateText = React.useCallback((): string => {
 		return enabled
 			? `<sun_angle_factor value="${angle}"/>`
 			: '';
 	}, [angle, enabled]);
-	
+
 	return (
 		<Card className={cn('mb-2', {'text-muted': !enabled})}>
 			<Card.Body>
@@ -110,7 +109,7 @@ function SunAngleFactor ( props: Props ) {
 			</Card.Body>
 		</Card>
 	);
-}
+};
 
 // Default properties
 SunAngleFactor.propTypes = {

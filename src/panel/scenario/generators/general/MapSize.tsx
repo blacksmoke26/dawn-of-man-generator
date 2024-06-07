@@ -9,7 +9,6 @@ import * as PropTypes from 'prop-types';
 import cn from 'classname';
 import merge from 'deepmerge';
 import {nanoid} from 'nanoid';
-import {useSelector} from 'react-redux';
 import {Card, Button, Form, Row, Col} from 'react-bootstrap';
 
 // Components
