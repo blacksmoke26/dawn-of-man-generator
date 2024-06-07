@@ -21,8 +21,11 @@ export const jsonToRedux = ( json: Json, options: JsonToReduxOptions = {} ): Jso
 			requiredProp: 'id',
 			requiredPropValidator: (id) => deposits.includes(id),
 			optionalProps: [
+				'density',
 				{group: 'altitude', key: 'min_altitude'},
 				{group: 'altitude', key: 'max_altitude'},
+				{group: 'humidity', key: 'min_humidity'},
+				{group: 'humidity', key: 'max_humidity'},
 				{group: 'angle', key: 'min_angle'},
 				{group: 'angle', key: 'max_angle'},
 			],
