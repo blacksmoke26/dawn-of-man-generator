@@ -117,7 +117,7 @@ export const nodeToTemplate = (location: LocationProps): string => {
 
   const riverProp: string = ` river="${river ? 'true' : 'false'}"`;
   const lakesProp: string = Number(lakes) ? ` lakes="${lakes}"` : '';
-  const positionStr = positionEnabled ? `map_position="${position?.[0] as number},${position?.[1] as number}"` : '';
+  const positionStr = positionEnabled ? `position="${position?.[0] as number},${position?.[1] as number}"` : '';
 
   return (
     `<location id="${slug}"
