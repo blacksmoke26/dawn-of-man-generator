@@ -14,6 +14,9 @@ export const ALTITUDE_MAX: number = 100;
 export const ALTITUDE_MIN_DEFAULT: number = 5;
 export const ALTITUDE_MAX_DEFAULT: number = 10;
 
+export const POSITION_MIN: number = 1;
+export const POSITION_MAX: number = 2048;
+
 export const ANGLE_MIN: number = -10;
 export const ANGLE_MAX: number = 60;
 export const ANGLE_MIN_DEFAULT: number = 40;

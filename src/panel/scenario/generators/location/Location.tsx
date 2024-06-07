@@ -22,6 +22,7 @@ import Slider from '~/components/ui/Slider';
 // utils
 import * as location from '~/utils/location';
 import {labels} from '~/data/environments/builtin';
+import {POSITION_MAX, POSITION_MIN} from '~/utils/defaults';
 
 export interface Props {
   enabled?: boolean,
@@ -213,7 +214,7 @@ const Location = (props: Props) => {
                     onClick={() => updatePosition(location.randomPosition()[0], null)}>Random</Button>
             <Button disabled={!isPositionEnabled} className="button-reset-sm" variant="link"
                     onClick={() => updatePosition(0)}>Reset</Button>
-            <Slider disabled={!isPositionEnabled} step={0} min={1} max={1024}
+            <Slider disabled={!isPositionEnabled} step={0} min={POSITION_MIN} max={POSITION_MAX}
                     value={values.position?.[0] ?? 0}
                     onChange={v => updatePosition(Number(v))}/>
           </div>
@@ -224,7 +225,7 @@ const Location = (props: Props) => {
             <Button disabled={!isPositionEnabled} className="button-reset-sm" variant="link"
                     onClick={() => updatePosition(null, 0)}>Reset</Button>
             <Slider disabled={!isPositionEnabled} step={0}
-                    value={values.position?.[1] ?? 0} min={1} max={1024}
+                    value={values.position?.[1] ?? 0} min={POSITION_MIN} max={POSITION_MAX}
                     onChange={v => updatePosition(null, Number(v))}/>
           </div>
           <div className="mt-2">

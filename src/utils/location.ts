@@ -11,6 +11,9 @@ import {faker} from '@faker-js/faker';
 import randomFloat from 'random-float';
 import uniqueRandomArray from 'unique-random-array';
 
+// utils
+import {POSITION_MIN, POSITION_MAX} from '~/utils/defaults';
+
 // Location properties
 export interface LocationProps {
   _id: string;
@@ -83,10 +86,9 @@ export const randomLakes = (): number => randomInt(0, 5);
 export const randomRiver = (): boolean => uniqueRandomArray([true, false])();
 
 export const randomPosition = (): [number, number] => [
-  randomInt(0, 1024),
-  randomInt(0, 1024)
+  randomInt(POSITION_MIN, POSITION_MAX),
+  randomInt(POSITION_MIN, POSITION_MAX)
 ];
-
 
 /**
  * @public
