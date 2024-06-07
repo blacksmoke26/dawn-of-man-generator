@@ -1,7 +1,20 @@
 [![GitHub release](https://img.shields.io/github/v/release/blacksmoke26/dawn-of-man-generator)](https://github.com/blacksmoke26/dawn-of-man-generator/releases/latest) [![GitHub issues](https://img.shields.io/github/issues/blacksmoke26/dawn-of-man-generator?style=plastic)](https://github.com/blacksmoke26/dawn-of-man-generator/issues) [![Netlify Status](https://api.netlify.com/api/v1/badges/d15bd739-2ab5-4f27-bd99-9cf624936425/deploy-status)](https://app.netlify.com/sites/dawn-of-man-mod-gen/deploys)
 
-## Dawn of Man - Environment/Location Generator
-I love this game, Yeah! So that's why I created this utility in the first place. A really cool web app made on the top of [ReactJS](https://reactjs.org/docs/hooks-intro.html) to generate environment and location data. It offers you great features like Presets loader, Import from XML Text, File Download and Random data generator with awesome Dark UI.
+## Dawn of Man - Environment/Location Generator v2
+I love this game, Yeah! So that's why I created this utility in the first place. A really cool web app made on the top of TypeScript / [ReactJS](https://reactjs.org/docs/hooks-intro.html) to generate environment and location data. It offers you great features like Presets loader, Import from XML Text, File Download and Random data generator with awesome Dark UI.
+
+### A long drive to V2
+This is the second major release after a half-decade, this time I have completely rewritten in TypeScript (Node v22.x). Yeah it was a hassle but where we are.
+
+I will implement events editor in future versions. Collaboration warmly accepted. ;) 
+
+### Version History
+| Name                                                                      | Status  | EOL | Year |
+|---------------------------------------------------------------------------|---------|-----|:-----|
+| [1.x](https://66633ec1a9b2a80007380984--dawn-of-man-mod-gen.netlify.app/) | Stable  | Yes | 2019 |
+| [2.x](https://dawn-of-man-mod-gen.netlify.app/)                           | Current | No  | 2024 |
+| [2.x](https://6663426caa320104ce31d438--dawn-of-man-mod-gen.netlify.app/) | Nightly | No  | 2024 |
+
 
 *(more features are coming)*
 
@@ -49,8 +62,8 @@ https://dawn-of-man-mod-gen.netlify.com/
 ### Beyond simplicity?
 
 1. Clone this Repository.
-2. `npm i -D` to install required dependencies.
-3. `npm run start` to start the server.
+2. `yarn` to install required dependencies.
+3. `yarn start` to start the server.
 4. Extend as you please...
 5. Profit.
 
