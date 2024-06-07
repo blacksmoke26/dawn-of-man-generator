@@ -26,6 +26,8 @@ export const jsonToRedux = ( seasons: Json[] ): Json => {
 	const duration = op.get<number>(node, 'duration', SummerConfig.duration);
 	const precipitationChance = op.get<number>(node, 'precipitation_chance', SummerConfig.precipitation_chance);
 	const windyChance = op.get<number>(node, 'windy_chance', SummerConfig.windy_chance);
+	const minWind = op.get<number>(node, 'min_wind', SummerConfig.min_wind);
+	const maxWind = op.get<number>(node, 'max_wind', SummerConfig.max_wind);
 	const minTemperature = op.get<number>(node, 'min_temperature.value', SummerConfig.min_temperature.value);
 	const maxTemperature = op.get<number>(node, 'max_temperature.value', SummerConfig.max_temperature.value);
 
@@ -33,6 +35,8 @@ export const jsonToRedux = ( seasons: Json[] ): Json => {
 		duration,
 		precipitationChance,
 		windyChance,
+		minWind,
+		maxWind,
 		temperature: [minTemperature, maxTemperature],
 	}};
 };
