@@ -87,6 +87,7 @@ const ScenarioContainer = () => {
 			<?xml version="1.0" encoding="utf-8"?>
 			<strings>${data.join('')}</strings>
 		`, {indentation: '  ', collapseContent: true});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [langStrings, templateTexts]);
 
   /** Update language strings data */
