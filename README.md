@@ -69,4 +69,4 @@ https://dawn-of-man-mod-gen.netlify.com/
 
 ## License
 
-MIT © [Junaid Atari](mailto:mj.atari@gmail.com) 2019-2020
+MIT © [Junaid Atari](mailto:mj.atari@gmail.com) 2019-2024
