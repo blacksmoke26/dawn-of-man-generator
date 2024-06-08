@@ -43,8 +43,12 @@ const Location = (props: Props) => {
   const [values, setValues] = React.useState<LocationProps>(props.values as LocationProps);
   const [enabled, setEnabled] = React.useState<boolean>(props.enabled as boolean);
   const [positionEnabled, setPositionEnabled] = React.useState<boolean>(false);
+  const [lakeEnabled, setLakeEnabled] = React.useState<boolean>(true);
+  const [riverEnabled, setRiverEnabled] = React.useState<boolean>(true);
 
   const isPositionEnabled = enabled && positionEnabled;
+  const isLakeEnabled = enabled && lakeEnabled;
+  const isRiverEnabled = enabled && riverEnabled;
 
   // Reflect props changes
   React.useEffect(() => {
@@ -53,9 +57,14 @@ const Location = (props: Props) => {
 
   // Reflect state changes
   React.useEffect(() => {
-    typeof props.onChange === 'function' && props.onChange({...values, positionEnabled: isPositionEnabled});
+    typeof props.onChange === 'function' && props.onChange({
+      ...values,
+      positionEnabled: isPositionEnabled,
+      lakesEnabled: isLakeEnabled,
+      riverEnabled: isRiverEnabled,
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [values, isPositionEnabled]);
+  }, [values, isPositionEnabled, isLakeEnabled, isRiverEnabled]);
 
   /** Update given value by name */
   const updateValue = (name: string, value: any): void => {
@@ -109,7 +118,8 @@ const Location = (props: Props) => {
         </Col>
       </Form.Group>
       <Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled})}>
-        <Form.Label className="text-size-sm" column={true} sm="2">Seed</Form.Label>
+        <Form.Label className="text-size-sm" style={{textDecoration: 'underline dotted'}}
+                    title="Used to create a map" column={true} sm="2">Seed</Form.Label>
         <Col sm="10">
           <InputGroup>
             <Form.Control
@@ -131,7 +141,10 @@ const Location = (props: Props) => {
         </Col>
       </Form.Group>
       <Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled})}>
-        <Form.Label className="text-size-sm" column={true} sm="2">Environment</Form.Label>
+        <Form.Label className="text-size-sm" column={true} sm="2"
+                    style={{textDecoration: 'underline dotted'}}
+                    title="Reference to environment, custom environmnts must be placed in subfolder rootOtScenarioFile/Environments"
+        >Environment</Form.Label>
         <Col sm="10">
           <InputGroup>
             <Form.Control
@@ -164,7 +177,11 @@ const Location = (props: Props) => {
         </Col>
       </Form.Group>
       <Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled})}>
-        <Form.Label className="text-size-sm" column={true} sm="2">Coordinates</Form.Label>
+        <Form.Label className="text-size-sm" column={true} sm="2"
+                    style={{textDecoration: 'underline dotted'}}
+                    title="Only affects the marker position on the minimap! this is not the starting position of the settlement see position for that">
+          Coordinates
+        </Form.Label>
         <Col sm="10">
           <div className="mb-2 text-size-xs">
             North: <code className={cn('text-size-xs', {'text-muted': !enabled})}>{values.coordinates[0]}</code>
@@ -205,11 +222,14 @@ const Location = (props: Props) => {
             style={{top: 4}}
             checked={positionEnabled}
             onChange={e => setPositionEnabled(e.target.checked)}
-          />Position
+          /><span
+          style={{textDecoration: 'underline dotted'}}
+          title="Sets the starting position of the settlement, possible range is (0, <size>*512-1)">Position</span>
         </Form.Label>
         <Col sm="10" className={cn('mb-2 text-size-xs', {'text-muted': !isPositionEnabled})}>
           <div className="mb-2 text-size-xs">
-            North: <code className={cn('text-size-xs', {'text-muted': !isPositionEnabled})}>{values.position?.[0] as number}</code>
+            North: <code
+            className={cn('text-size-xs', {'text-muted': !isPositionEnabled})}>{values.position?.[0] as number}</code>
             <Button disabled={!isPositionEnabled} className="button-reset-sm" variant="link"
                     onClick={() => updatePosition(location.randomPosition()[0], null)}>Random</Button>
             <Button disabled={!isPositionEnabled} className="button-reset-sm" variant="link"
@@ -219,7 +239,8 @@ const Location = (props: Props) => {
                     onChange={v => updatePosition(Number(v))}/>
           </div>
           <div>
-            South: <code className={cn('text-size-xs', {'text-muted': !isPositionEnabled})}>{values.position?.[1] as number}</code>
+            South: <code
+            className={cn('text-size-xs', {'text-muted': !isPositionEnabled})}>{values.position?.[1] as number}</code>
             <Button disabled={!isPositionEnabled} className="button-reset-sm" variant="link"
                     onClick={() => updatePosition(null, location.randomPosition()[1])}>Random</Button>
             <Button disabled={!isPositionEnabled} className="button-reset-sm" variant="link"
@@ -236,11 +257,25 @@ const Location = (props: Props) => {
           </div>
         </Col>
       </Form.Group>
-      <Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled}, 'checkbox-align')}>
-        <Form.Label className="text-size-sm" column={true} sm="2">River</Form.Label>
+      <Form.Group as={Row} className={cn('mb-2', {'text-muted': !isRiverEnabled}, 'checkbox-align')}>
+        <Form.Label className="text-size-sm" column={true} sm="2">
+          <Form.Check
+            type="switch"
+            disabled={!enabled}
+            id={`river-switch-${nanoid(5)}`}
+            label=""
+            style={{top: 4}}
+            className="d-inline p-relative"
+            checked={riverEnabled}
+            onChange={e => setRiverEnabled(e.target.checked)}
+          /><span
+          style={{textDecoration: 'underline dotted'}}
+          title="Determines if rivers are created">River</span>
+        </Form.Label>
+
         <Col sm="10">
           <Form.Check
-            disabled={!enabled}
+            disabled={!riverEnabled}
             style={{top: 9}}
             className="position-relative"
             type="switch"
@@ -251,12 +286,25 @@ const Location = (props: Props) => {
           />
         </Col>
       </Form.Group>
-      <Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled})}>
-        <Form.Label className="text-size-sm" column={true} sm="2">Lakes</Form.Label>
+      <Form.Group as={Row} className={cn('mb-2', {'text-muted': !isLakeEnabled}, 'checkbox-align')}>
+        <Form.Label className="text-size-sm" column={true} sm="2">
+          <Form.Check
+            type="switch"
+            disabled={!enabled}
+            id={`lakes-switch-${nanoid(5)}`}
+            label=""
+            style={{top: 4}}
+            className="d-inline p-relative"
+            checked={lakeEnabled}
+            onChange={e => setLakeEnabled(e.target.checked)}
+          /><span
+          style={{textDecoration: 'underline dotted'}}
+          title="Number of lakes, no influence on size, lakes might intersect">Lakes</span>
+        </Form.Label>
         <Col sm="10">
           <InputGroup>
             <Form.Control
-              disabled={!enabled}
+              disabled={!lakeEnabled}
               value={values.lakes} size="sm" className="d-inline-block position-relative"
               maxLength={1} style={{maxWidth: '60px'}} onChange={e => {
               updateValue('lakes', Number(e.target.value));
@@ -264,11 +312,11 @@ const Location = (props: Props) => {
               // @ts-ignore
               e.target.value = Number(String(e.target.value).replace(/\D+/, '')) || 0;
             }}/>
-            <Button disabled={!enabled} variant="secondary" size="sm"
+            <Button disabled={!lakeEnabled} variant="secondary" size="sm"
                     onClick={() => {
                       updateValue('lakes', location.randomLakes());
                     }}>Randomize</Button>
-            <Button disabled={!enabled} variant="secondary" size="sm"
+            <Button disabled={!lakeEnabled} variant="secondary" size="sm"
                     onClick={() => updateValue('lakes', 0)}>None</Button>
           </InputGroup>
         </Col>
@@ -280,6 +328,9 @@ const Location = (props: Props) => {
                   onClick={() => {
                     const randLocation = location.randomizeLocation();
                     randLocation._id = values._id;
+                    !isLakeEnabled && (randLocation.lakes = values.lakes);
+                    !isRiverEnabled && (randLocation.river = values.river);
+                    !isPositionEnabled && (randLocation.position = values.position);
                     setValues(randLocation);
                   }}>Randomize All</Button>
         </ButtonGroup>
