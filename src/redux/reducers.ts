@@ -12,7 +12,7 @@ import type {PayloadAction} from '@reduxjs/toolkit';
 import type {AppState, Environment, Scenario} from './reducers.types';
 
 // utils
-import { jsonToRedux } from '~/data/environments/parser';
+import {jsonToRedux} from '~/data/environments/parser';
 
 /**
  * @private
@@ -20,28 +20,32 @@ import { jsonToRedux } from '~/data/environments/parser';
 const initialState: AppState = {
   environment: {},
   scenario: {},
+  initiated: false,
 };
 
 const appSlice = createSlice({
   name: 'app',
   initialState,
   reducers: {
-    updateEnvironment: (state, action: PayloadAction<Environment>) => {
+    updateInit(state, action: PayloadAction<boolean>) {
+      state.initiated = action.payload;
+    },
+    updateEnvironment(state, action: PayloadAction<Environment>) {
       const {environment} = jsonToRedux({environment: action.payload}, {
-        nullResolver: ( wrapperKey: string ) => ({[wrapperKey]: false}),
+        nullResolver: (wrapperKey: string) => ({[wrapperKey]: false}),
       });
 
       state.environment = merge(state.environment as Environment, environment);
     },
-    updateEnvironmentRaw: (state, action: PayloadAction<Environment>) => {
+    updateEnvironmentRaw(state, action: PayloadAction<Environment>) {
       state.environment = merge(state.environment as Environment, action.payload as Environment);
     },
-    updateScenario: (state, action: PayloadAction<Scenario>) => {
+    updateScenario(state, action: PayloadAction<Scenario>) {
       state.scenario = merge(state.scenario as Scenario, action.payload as Scenario);
     }
   }
 });
 
-export const {updateEnvironment, updateEnvironmentRaw, updateScenario} = appSlice.actions;
+export const {updateEnvironment, updateEnvironmentRaw, updateScenario, updateInit} = appSlice.actions;
 
 export const reducer = appSlice.reducer;

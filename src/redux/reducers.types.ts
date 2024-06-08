@@ -39,4 +39,5 @@ export interface Scenario {
 export interface AppState {
   environment?: Environment;
   scenario?: Scenario;
+  initiated: boolean;
 }
