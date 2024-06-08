@@ -26,7 +26,7 @@ interface Props {
 const HardcoreModeAllowed = (props: Props) => {
   props = merge({
     value: true,
-    enabled: true,
+    enabled: false,
     onChange: () => {
     },
   }, props);
