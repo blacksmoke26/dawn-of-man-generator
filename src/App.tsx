@@ -18,20 +18,18 @@ import ScenarioContainer from '~/panel/scenario/ScenarioContainer';
 const KEY_ENVIRONMENT: string = 'environment';
 const KEY_SCENARIO: string = 'scenario';
 
-function App() {
-  return (
-    <Container className="mt-4 mb-4">
-      <Header/>
-      <Accordion header="Environment" eventKey={KEY_ENVIRONMENT} defaultActiveKey={KEY_ENVIRONMENT}>
-        <EnvironmentPresets/>
-        <EnvironmentContainer/>
-      </Accordion>
-      <Accordion header="Scenario" eventKey={KEY_SCENARIO}>
-        <ScenarioContainer/>
-      </Accordion>
-      <Footer/>
-    </Container>
-  );
-}
+const App = () => (
+  <Container className="mt-4 mb-4">
+    <Header/>
+    <Accordion header="Environment" eventKey={KEY_ENVIRONMENT} defaultActiveKey={KEY_ENVIRONMENT}>
+      <EnvironmentPresets/>
+      <EnvironmentContainer/>
+    </Accordion>
+    <Accordion header="Scenario" eventKey={KEY_SCENARIO}>
+      <ScenarioContainer/>
+    </Accordion>
+    <Footer/>
+  </Container>
+);
 
 export default App;
