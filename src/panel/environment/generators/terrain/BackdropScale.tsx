@@ -9,7 +9,7 @@ import cn from 'classname';
 import {nanoid} from 'nanoid';
 import merge from 'deepmerge';
 import * as PropTypes from 'prop-types';
-import {Card, Button, Form, Row, Col} from 'react-bootstrap';
+import {Button, Col, Form, Row} from 'react-bootstrap';
 
 // components
 import Slider from '~/components/ui/Slider';

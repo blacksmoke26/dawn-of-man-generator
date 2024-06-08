@@ -6,7 +6,7 @@
 
 import React from 'react';
 import * as PropTypes from 'prop-types';
-import {Card, Button, Form, Row, Col} from 'react-bootstrap';
+import {Button, Col, Form, Row} from 'react-bootstrap';
 import {nanoid} from 'nanoid';
 import cn from 'classname';
 import merge from 'deepmerge';

@@ -7,8 +7,8 @@
 import React from 'react';
 import * as PropTypes from 'prop-types';
 import cn from 'classname';
-import { nanoid } from 'nanoid';
-import { Card, Button, Form, Row, Col } from 'react-bootstrap';
+import {nanoid} from 'nanoid';
+import {Button, Col, Form, Row} from 'react-bootstrap';
 
 // components
 import Slider from '~/components/ui/Slider';

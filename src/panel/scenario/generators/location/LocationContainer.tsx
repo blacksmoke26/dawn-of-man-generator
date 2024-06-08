@@ -9,17 +9,16 @@ import * as PropTypes from 'prop-types';
 import cn from 'classname';
 import merge from 'deepmerge';
 import {nanoid} from 'nanoid';
-import {ButtonGroup, Button, Tabs, Tab, Card, Form} from 'react-bootstrap';
+import {Button, ButtonGroup, Form, Tab, Tabs} from 'react-bootstrap';
 
 // types
 import type {Json} from '~/types/json.types';
 import type {LocationProps} from '~/utils/location';
+// utils
+import * as location from '~/utils/location';
 
 // components
 import Location from './Location';
-
-// utils
-import * as location from '~/utils/location';
 
 // redux
 import {useAppSelector} from '~redux/hooks';
