@@ -15,8 +15,9 @@ import {
   DENSITY_MIN, DENSITY_MAX,
   ANGLE_MIN, ANGLE_MAX,
   ALTITUDE_MIN, ALTITUDE_MAX,
-  HUMIDITY_MIN, HUMIDITY_MAX, SEASON_WIND_MIN, SEASON_WIND_MAX,
+  HUMIDITY_MIN, HUMIDITY_MAX, SEASON_WIND_MIN, SEASON_WIND_MAX, PERIOD_MAX, PERIOD_MIN, DEFAULT_DISASTER,
 } from './defaults';
+import {DisasterType} from '~/types/scenario.types';
 
 
 /** Deposits types */
@@ -34,6 +35,11 @@ export const props: string[] = [
 export const details: string[] = [
   'DetailGrass', 'DetailReeds', 'DetailFlowers',
   'GroundPlant', 'DetailStick',
+];
+
+/** Disaster types */
+export const disasters: string[] = [
+  'Storm', 'Blizzard',
 ];
 
 /** Trees types */
@@ -153,4 +159,14 @@ export const randomTrees = <T = string>(counts: number = 5): T[] => {
   }
 
   return list;
+};
+
+/** Random period */
+export const randomPeriod = (): string => {
+  return Number(randomFloatMod(PERIOD_MIN, PERIOD_MAX)).toFixed(1);
+};
+
+/** Random disaster */
+export const randomDisaster = (): DisasterType => {
+  return uniqueRandomArray(DEFAULT_DISASTER)() as DisasterType;
 };

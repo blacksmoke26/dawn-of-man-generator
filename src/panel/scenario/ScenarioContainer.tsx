@@ -40,6 +40,7 @@ import {nodesToLanguageStrings} from '~/utils/location';
 
 // types
 import type {Json} from '~/types/json.types';
+import DisasterContainer from '~/panel/scenario/generators/disaster/DisasterContainer';
 
 const SCENARIO_NAME: string = 'scenario';
 
@@ -58,6 +59,7 @@ const ScenarioContainer = () => {
     loadingScreens: '',
     startingConditions: '',
     visible: '',
+    disasters: '',
     locations: '',
   });
 
@@ -111,7 +113,7 @@ const ScenarioContainer = () => {
 
   /** Download file button click handler */
   const downloadFileClick = React.useCallback((): void => {
-    var blob = new Blob([toTemplateText()], {type: 'text/xml;charset=utf-8'});
+    const blob = new Blob([toTemplateText()], {type: 'text/xml;charset=utf-8'});
     FileSaver.saveAs(blob, `${SCENARIO_NAME}.xml`);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [templateTexts]);
@@ -149,6 +151,9 @@ const ScenarioContainer = () => {
         <StartingCondition onChange={v => updateText('startingConditions', v)}/>
         <hr className="mt-1"/>
         <Visible onChange={v => updateText('visible', v)}/>
+      </Accordion>
+      <Accordion header={<><IconBlock width="17" height="17"/> Disasters</>} eventKey="disasters">
+        <DisasterContainer onChange={(template: string) => updateText('disasters', template)}/>
       </Accordion>
       <Accordion header={<><IconBlock width="17" height="17"/> Locations</>} eventKey="locations" noBodyPad={true}>
         <LocationContainer onChange={(template: string, list) => {

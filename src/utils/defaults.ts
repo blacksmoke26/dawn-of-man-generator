@@ -48,9 +48,17 @@ export const SUN_ANGLE_FACTOR_MIN: number = 0;
 export const SUN_ANGLE_FACTOR_MAX: number = 20;
 export const SUN_ANGLE_FACTOR_DEFAULT: number = 1;
 
+export const PERIOD_MIN: number = 1;
+export const PERIOD_MAX: number = 5;
+
 export const DEFAULT_SEASONS: string[] = [
   'Spring',
   'Summer',
   'Fall',
   'Winter',
+];
+
+export const DEFAULT_DISASTER: string[] = [
+  'Storm',
+  'Blizzard',
 ];
