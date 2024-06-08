@@ -9,15 +9,18 @@ import merge from 'deepmerge';
 
 import {
   BlocksIcon,
-  Flower2Icon, HammerIcon,
+  Flower2Icon,
+  HammerIcon,
   LeafIcon,
-  LucideProps, MountainIcon,
+  LucideProps,
+  MountainIcon,
   PlusIcon,
   RotateCcwIcon,
   ShuffleIcon,
   SnowflakeIcon,
   SproutIcon,
   SunIcon,
+  ThermometerSnowflakeIcon,
   TreesIcon,
   XIcon
 } from 'lucide-react';
@@ -79,4 +82,8 @@ export const IconMountain = (props: LucideProps) => (
 
 export const IconHammer = (props: LucideProps) => (
   <HammerIcon {...merge(iconDefaultProps, props)}/>
+);
+
+export const IconStorm = (props: LucideProps) => (
+  <ThermometerSnowflakeIcon {...merge(iconDefaultProps, props)}/>
 );

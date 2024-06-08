@@ -3,9 +3,11 @@
  * @see https://github.com/blacksmoke26/dawn-of-man-generator
  * @since 2020-08-29
  */
+import {Omit} from 'utility-types';
 import {Json} from '~/types/json.types';
 import {SeasonsProp} from '~/utils/seasons.types';
-import {StartingCondition} from '~/types/scenario.types';
+import {Disaster, Disasters, DisasterType, StartingCondition} from '~/types/scenario.types';
+
 
 export interface Environment {
   noiseAmplitudes?: [number, number, number, number, number, number, number, number] | boolean;
@@ -34,7 +36,10 @@ export interface Scenario {
   showCompletionIcon?: boolean;
   size?: number;
   requiredScenario?: string;
+  disasters?: Disasters;
+  requiredMilestones?: number;
   startingCondition?: StartingCondition;
+  customSettlementNameAllowed?: boolean;
   loadingScreen?: string;
   locations?: Json[];
 }

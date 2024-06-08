@@ -14,7 +14,7 @@ import {Col, Form, Row} from 'react-bootstrap';
 // redux
 import {useAppSelector} from '~redux/hooks';
 
-/** HardcoreModeAllowed `props` type */
+/** CustomSettlementNameAllowed `props` type */
 interface Props {
   enabled?: boolean,
   value?: boolean,
@@ -22,8 +22,8 @@ interface Props {
   onChange(template: string, value: boolean): void,
 }
 
-/** HardcoreModeAllowed functional component */
-const HardcoreModeAllowed = (props: Props) => {
+/** CustomSettlementNameAllowed functional component */
+const CustomSettlementNameAllowed = (props: Props) => {
   props = merge({
     value: true,
     enabled: false,
@@ -38,7 +38,7 @@ const HardcoreModeAllowed = (props: Props) => {
 
   // Reflect attributes changes
   React.useEffect(() => {
-    const extValue = scenario?.hardcoreModeAllowed ?? null;
+    const extValue = scenario?.customSettlementNameAllowed ?? null;
 
     if (typeof extValue === 'boolean') {
       setEnabled(extValue);
@@ -60,25 +60,25 @@ const HardcoreModeAllowed = (props: Props) => {
   const toTemplateText = (): string => {
     return !enabled
       ? ''
-      : `<hardcore_mode_allowed value="${value ? 'true' : 'false'}"/>`;
+      : `<custom_settlement_name_allowed value="${value ? 'true' : 'false'}"/>`;
   };
 
   return (
     <div className={cn('mb-2', {'text-muted': !enabled}, 'checkbox-align')}>
       <Row className="mb-1">
         <Col xs="10">
-          Hardcore Mode <code className={cn('text-size-xs', {'text-muted': !enabled})}>
+          Custom Settlement Name <code className={cn('text-size-xs', {'text-muted': !enabled})}>
           {value ? '<True>' : '<False>'}
         </code>
           <div className="text-size-xxs text-muted mt-1">
-            Player whether this scenario can be played in hardcore mode or not.
+            Determines if naming the settlement is an option on game start - unknown default name, where to set the name
           </div>
         </Col>
         <Col xs="2" className="text-right">
           <Form.Check
             className="pull-right"
             type="switch"
-            id={`hardcore_mode_allowed-switch-${nanoid(5)}`}
+            id={`custom_settlement_name_allowed-switch-${nanoid(5)}`}
             label=""
             checked={enabled}
             onChange={e => setEnabled(e.target.checked)}
@@ -89,8 +89,8 @@ const HardcoreModeAllowed = (props: Props) => {
         type="switch"
         className="pull-right"
         disabled={!enabled}
-        id={`hardcore_mode_allowed-${nanoid(5)}`}
-        label="Allow Hardcore Mode?"
+        id={`custom_settlement_name_allowed-${nanoid(5)}`}
+        label="Allow Custom Settlement Name?"
         checked={value}
         onChange={e => setValue(e.target.checked)}
       />
@@ -99,10 +99,10 @@ const HardcoreModeAllowed = (props: Props) => {
 };
 
 // Properties validation
-HardcoreModeAllowed.propTypes = {
+CustomSettlementNameAllowed.propTypes = {
   value: PropTypes.bool,
   enabled: PropTypes.bool,
   onChange: PropTypes.func,
 };
 
-export default HardcoreModeAllowed;
+export default CustomSettlementNameAllowed;
