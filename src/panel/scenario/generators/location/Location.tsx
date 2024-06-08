@@ -95,7 +95,7 @@ const Location = (props: Props) => {
             <Form.Control
               disabled={!enabled}
               value={values.slug} size="sm" className="d-inline-block position-relative"
-              maxLength={22} style={{maxWidth: '280px'}} onChange={e => {
+              maxLength={22} style={{maxWidth: 280}} onChange={e => {
               const slug: string = slugify(e.target.value, {
                 replacement: '_', lower: true, strict: true,
               });
@@ -125,7 +125,7 @@ const Location = (props: Props) => {
             <Form.Control
               disabled={!enabled}
               value={values.seed} size="sm" className="d-inline-block position-relative"
-              maxLength={9} style={{maxWidth: '140px'}} onChange={e => {
+              maxLength={9} style={{maxWidth: 140}} onChange={e => {
               if (e.target.value === '' || /^[0-9\b]+$/.test(e.target.value)) {
                 updateValue('seed', e.target.value);
               }
@@ -151,7 +151,7 @@ const Location = (props: Props) => {
               disabled={!enabled}
               value={values.environment} size="sm"
               className="d-inline-block position-relative"
-              maxLength={40} style={{maxWidth: '300px'}} onChange={e => {
+              maxLength={40} style={{maxWidth: 300}} onChange={e => {
               updateValue('environment', slugify(e.target.value, '_'));
             }}/>
             <Button disabled={!enabled} variant="secondary" size="sm"
@@ -306,7 +306,7 @@ const Location = (props: Props) => {
             <Form.Control
               disabled={!lakeEnabled}
               value={values.lakes} size="sm" className="d-inline-block position-relative"
-              maxLength={1} style={{maxWidth: '60px'}} onChange={e => {
+              maxLength={1} style={{maxWidth: 60}} onChange={e => {
               updateValue('lakes', Number(e.target.value));
             }} onKeyUp={e => {
               // @ts-ignore
