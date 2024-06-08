@@ -9,33 +9,32 @@ import * as PropTypes from 'prop-types';
 import cn from 'classname';
 import merge from 'deepmerge';
 import {nanoid} from 'nanoid';
-import {ButtonGroup, Button, Tabs, Tab, Card, Form} from 'react-bootstrap';
+import {Button, ButtonGroup, Form, Tab, Tabs} from 'react-bootstrap';
 
 // types
 import type {Json} from '~/types/json.types';
 import type {LocationProps} from '~/utils/location';
 
-// components
-import Location from './Location';
-
 // utils
 import * as location from '~/utils/location';
+
+// components
+import Location from './Location';
 
 // redux
 import {useAppSelector} from '~redux/hooks';
 
+// icons
+import {IconClear, IconNew} from '~/components/icons/app';
+
 /** Maximum limit of location tabs */
-const LOCATIONS_MAX_COUNT: number = 12;
+const LOCATIONS_MAX_COUNT: number = 15;
 
 /** Tab contents wrapper */
 const TabContentWrapper = (props: Json) => {
   return (
-    <div style={{marginTop: '1rem'}}>
-      <Card className="rounded-0">
-        <Card.Body>
-          {props.children}
-        </Card.Body>
-      </Card>
+    <div style={{marginTop: '1rem'}} className="pl-3 pr-3">
+      {props.children}
     </div>
   );
 };
@@ -123,34 +122,36 @@ const LocationContainer = (props: Props) => {
 
   return (
     <>
-      <div className="mt-2 mb-2 checkbox-align">
-        <Form.Check
-          className="pull-right"
-          type="switch"
-          id={`seasons_override-switch-${nanoid(5)}`}
-          label="Enable locations"
-          checked={enabled}
-          onChange={e => setEnabled(e.target.checked)}
-        />
-      </div>
-      <div className="mb-3">
-        <ButtonGroup>
-          <Button variant="secondary" size="sm"
-                  disabled={!enabled || total >= LOCATIONS_MAX_COUNT} onClick={() => {
-            if (total <= LOCATIONS_MAX_COUNT) {
+      <div className="pl-3">
+        <div className="mt-2 mb-2 checkbox-align">
+          <Form.Check
+            className="pull-right"
+            type="switch"
+            id={`locations_override-switch-${nanoid(5)}`}
+            label="Enable locations"
+            checked={enabled}
+            onChange={e => setEnabled(e.target.checked)}
+          />
+        </div>
+        <div className="mb-3">
+          <ButtonGroup>
+            <Button variant="secondary" size="sm"
+                    disabled={!enabled || total >= LOCATIONS_MAX_COUNT} onClick={() => {
+              if (total <= LOCATIONS_MAX_COUNT) {
+                newLocation();
+              }
+            }}><IconNew/> New Location</Button>
+            <Button variant="danger" size="sm" disabled={!enabled || total <= 1} onClick={() => {
+              setLocations([]);
               newLocation();
-            }
-          }}>New Location</Button>
-          <Button variant="danger" size="sm" disabled={!enabled || total <= 1} onClick={() => {
-            setLocations([]);
-            newLocation();
-          }}>Remove All</Button>
-        </ButtonGroup>
+            }}><IconClear/> Remove All</Button>
+          </ButtonGroup>
+        </div>
       </div>
       <Tabs activeKey={activeKey} id="locations-tab"
             className="nav-tabs-bottom" onSelect={k => setActiveKey(k as string)}>
         {locations.map((location, i: number) => (
-          <Tab disabled={!enabled} eventKey={location._id} key={location._id} as="div"
+          <Tab disabled={!enabled} eventKey={location._id} key={location._id} as="div" className="mb-3"
                title={
                  <>
                    <span className={cn('text-size-sm pr-2', {'text-muted': !enabled})}>{location.name}</span>

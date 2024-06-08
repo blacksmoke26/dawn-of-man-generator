@@ -26,6 +26,9 @@ import {isObject} from '~/helpers/object';
 // redux
 import {useAppSelector} from '~redux/hooks';
 
+// icons
+import {IconMountain} from '~/components/icons/app';
+
 export interface DepositAttr {
   _enabled?: boolean;
 
@@ -238,7 +241,7 @@ const DepositOverride = (props: Props) => {
       const eventKey = `deposit_${name}`;
 
       nodes.push(
-        <Accordion key={eventKey} defaultActiveKey={eventKey} eventKey={eventKey} headerAfter={
+        <Accordion key={eventKey} noCard={true} defaultActiveKey={eventKey} eventKey={eventKey} headerAfter={
           <div className="float-right">
             <Form.Check
               disabled={!enabled}
@@ -265,7 +268,7 @@ const DepositOverride = (props: Props) => {
         } header={
           <div className="clearfix">
             <div className="float-left">
-              {name}
+              <IconMountain width="17" height="17"/> {name}
             </div>
           </div>
         } accordion={{'aria-disabled': !isAltitudeEnabled, flush: true}}>
@@ -468,8 +471,8 @@ const DepositOverride = (props: Props) => {
   }, [enabled, selection]);
 
   return (
-    <Accordion header="Override Deposit Prototypes" eventKey="deposit_override_panel">
-      <div className="mb-3 checkbox-align">
+    <Accordion header="Override Deposit Prototypes" noCard={true} eventKey="deposit_override_panel">
+      <div className="mb-3 mt-2 checkbox-align">
         <Form.Check
           className="pull-right"
           type="switch"

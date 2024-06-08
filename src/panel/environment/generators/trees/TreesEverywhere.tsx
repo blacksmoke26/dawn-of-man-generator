@@ -8,8 +8,8 @@ import React from 'react';
 import * as PropTypes from 'prop-types';
 import cn from 'classname';
 import merge from 'deepmerge';
-import { nanoid } from 'nanoid';
-import { Card, Button, Form, Row, Col } from 'react-bootstrap';
+import {nanoid} from 'nanoid';
+import {Button, Col, Form, Row} from 'react-bootstrap';
 
 // utils
 import * as random from '~/utils/random';
@@ -62,42 +62,38 @@ const TreesEverywhere = ( props: Props ) => {
 	};
 
 	return (
-		<>
-			<Card className={cn('mb-2', {'text-muted': !enabled})}>
-				<Card.Body className="checkbox-align checkbox-align">
-					<Row className="mb-1">
-						<Col xs="10">
-							Trees Everywhere <code className="ml-1 text-size-xs">{value ? '<true>' : '<false>'}</code>
-							<Button disabled={!enabled} className="button-reset-sm" variant="link"
-								onClick={() => setValue(random.randomTreesEverywhere())}>
-								Random
-							</Button>
-							<Button disabled={!enabled} className="button-reset-sm" variant="link"
-								onClick={() => setValue(false)}>None</Button>
-						</Col>
-						<Col xs="2" className="text-right">
-							<Form.Check
-								className="pull-right"
-								type="switch"
-								id={`trees_everywhere-switch-${nanoid(5)}`}
-								label=""
-								checked={enabled}
-								onChange={e => setEnabled(e.target.checked)}
-							/>
-						</Col>
-					</Row>
+		<div className={cn('mb-2 checkbox-align', {'text-muted': !enabled})}>
+			<Row className="mb-1">
+				<Col xs="10">
+					Trees Everywhere <code className="ml-1 text-size-xs">{value ? '<true>' : '<false>'}</code>
+					<Button disabled={!enabled} className="button-reset-sm" variant="link"
+									onClick={() => setValue(random.randomTreesEverywhere())}>
+						Random
+					</Button>
+					<Button disabled={!enabled} className="button-reset-sm" variant="link"
+									onClick={() => setValue(false)}>None</Button>
+				</Col>
+				<Col xs="2" className="text-right">
 					<Form.Check
-						type="switch"
 						className="pull-right"
-						disabled={!enabled}
-						id={`trees_everywhere-${nanoid(5)}`}
-						label="Show everywhere?"
-						checked={value}
-						onChange={e => setValue(e.target.checked)}
+						type="switch"
+						id={`trees_everywhere-switch-${nanoid(5)}`}
+						label=""
+						checked={enabled}
+						onChange={e => setEnabled(e.target.checked)}
 					/>
-				</Card.Body>
-			</Card>
-		</>
+				</Col>
+			</Row>
+			<Form.Check
+				type="switch"
+				className="pull-right"
+				disabled={!enabled}
+				id={`trees_everywhere-${nanoid(5)}`}
+				label="Show everywhere?"
+				checked={value}
+				onChange={e => setValue(e.target.checked)}
+			/>
+		</div>
 	);
 };
 

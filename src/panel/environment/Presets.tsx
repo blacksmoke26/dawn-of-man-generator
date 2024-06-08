@@ -30,6 +30,7 @@ const Presets = () => {
   return (
     <div className="mb-2">
       <Select
+        isSearchable={false}
         formatOptionLabel={(option: Option | any) => {
           return (
             <div>

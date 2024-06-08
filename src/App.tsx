@@ -34,11 +34,11 @@ const App = () => {
   return (
     <Container className="mt-4 mb-4">
       <Header/>
-      <Accordion header="Environment" eventKey={KEY_ENVIRONMENT} defaultActiveKey={KEY_ENVIRONMENT}>
+      <Accordion header="Environment" eventKey={KEY_ENVIRONMENT} defaultActiveKey={KEY_ENVIRONMENT} noBodyPad={true}>
         <EnvironmentPresets/>
         <EnvironmentContainer/>
       </Accordion>
-      <Accordion header="Scenario" eventKey={KEY_SCENARIO}>
+      <Accordion header="Scenario" eventKey={KEY_SCENARIO} noBodyPad={true}>
         <ScenarioContainer/>
       </Accordion>
       <Footer/>

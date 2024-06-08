@@ -27,6 +27,9 @@ import {seasonsPropsDefault, seasonsPropsRandomize} from '~/utils/seasons';
 import {useAppSelector, useAppDispatch} from '~redux/hooks';
 import {updateEnvironmentRaw} from '~redux/reducers';
 
+// icons
+import {IconFall, IconRestore, IconShuffle, IconSpring, IconSummer, IconWinter} from '~/components/icons/app';
+
 // types
 import type {SeasonsProp} from '~/utils/seasons.types';
 import type {Json} from '~/types/json.types';
@@ -96,7 +99,7 @@ const SeasonsPanel = (props: Props) => {
 
   return (
     <div className="checkbox-align">
-      <div className="mb-3">
+      <div className="mb-2">
         <Form.Check
           className="pull-right"
           type="switch"
@@ -106,29 +109,32 @@ const SeasonsPanel = (props: Props) => {
           onChange={e => setEnabled(e.target.checked)}
         />
       </div>
-      <Accordion header="Spring" eventKey="seasons_spring">
+      <Accordion header={<><IconSpring width="17" height="17"/> Spring</>} eventKey="seasons_spring" noCard={true}>
         <Spring season={springConfig} onChange={v => setSpring(v)} enabled={enabled}/>
       </Accordion>
-      <Accordion header="Summer" eventKey="seasons_summer">
+      <hr/>
+      <Accordion header={<><IconSummer width="17" height="17"/> Summer</>} eventKey="seasons_summer" noCard={true}>
         <Summer season={summerConfig} onChange={v => setSummer(v)} enabled={enabled}/>
       </Accordion>
-      <Accordion header="Fall" eventKey="seasons_fall">
+      <hr/>
+      <Accordion header={<><IconFall width="17" height="17"/> Fall</>} eventKey="seasons_fall" noCard={true}>
         <Fall season={fallConfig} onChange={v => setFall(v)} enabled={enabled}/>
       </Accordion>
-      <Accordion header="Winter" eventKey="seasons_winter">
+      <hr/>
+      <Accordion header={<><IconWinter width="17" height="17"/> Winter</>} eventKey="seasons_winter" noCard={true}>
         <Winter season={winterConfig} onChange={v => setWinter(v)} enabled={enabled}/>
       </Accordion>
-
-      <div className="mt-2">
+      <hr/>
+      <div>
         <ButtonGroup>
           <Button disabled={!enabled} variant="secondary" size="sm"
                   onClick={() => {
                     dispatch(updateEnvironmentRaw({seasons: seasonsPropsRandomize()}));
-                  }}>Randomize All</Button>
+                  }}><IconShuffle/> Randomize All</Button>
           <Button disabled={!enabled} variant="secondary" size="sm"
                   onClick={() => {
                     dispatch(updateEnvironmentRaw({seasons: seasonsPropsDefault()}));
-                  }}>Set Defaults</Button>
+                  }}><IconRestore/> Restore</Button>
         </ButtonGroup>
       </div>
     </div>

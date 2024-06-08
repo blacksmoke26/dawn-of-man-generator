@@ -1,7 +1,9 @@
+// @flow
+
 /**
  * @author Junaid Atari <mj.atari@gmail.com>
- * @see https://github.com/blacksmoke26/dawn-of-man-generator
- * @since 2020-08-29
+ * @link http://junaidatari.com Author Website
+ * @since 2019-11-07
  */
 
 import React from 'react';
@@ -14,94 +16,94 @@ import {Col, Form, Row} from 'react-bootstrap';
 // redux
 import {useAppSelector} from '~redux/hooks';
 
-/** ShowCompletionIcon `props` type */
+/** LoadingScreen `props` type */
 interface Props {
 	enabled?: boolean,
-	value?: boolean,
+	value?: string,
 
-	onChange(template: string, value: boolean): void,
+	onChange?(template: string, value: string): void,
 }
 
-/** ShowCompletionIcon functional component */
-const ShowCompletionIcon = ( props: Props ) => {
+/** LoadingScreen functional component */
+const LoadingScreen = ( props: Props ) => {
 	props = merge({
-		value: true,
+		value: 'map_the_northlands',
 		enabled: false,
 		onChange: () => {},
 	}, props);
 
-	const [value, setValue] = React.useState<boolean>(props.value as boolean);
+	const [value, setValue] = React.useState<string>(props.value as string);
 	const [enabled, setEnabled] = React.useState<boolean>(props.enabled as boolean);
 
 	const scenario = useAppSelector(({scenario}) => (scenario));
-
+	
 	// Reflect attributes changes
 	React.useEffect(() => {
-		const extValue = scenario?.showCompletionIcon ?? null;
-
-		if ( typeof extValue === 'boolean' ) {
-			setEnabled(extValue);
-			setValue(extValue);
+		const extValue = scenario?.loadingScreen ?? null;
+		
+		if ( !extValue ) {
+			setEnabled(false);
+		} else {
+			setValue(extValue as string);
 		}
 	}, [scenario]);
-
+	
 	// Reflect attributes changes
 	React.useEffect(() => {
 		setEnabled(props.enabled as boolean);
 	}, [props.enabled]);
-
+	
 	// Reflect state changes
 	React.useEffect(() => {
 		typeof props.onChange === 'function' && props.onChange(toTemplateText(), value);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [value, enabled]);
-
+	
 	const toTemplateText = (): string => {
 		return !enabled
 			? ''
-			: `<show_completion_icon value="${value ? 'true' : 'false'}"/>`;
+			: `<loading_screens values="${value}"/>`;
 	};
-
+	
 	return (
 		<div className={cn('mb-2', {'text-muted': !enabled}, 'checkbox-align')}>
 			<Row className="mb-1">
 				<Col xs="10">
-					Show Completion Icon <code className={cn('text-size-xs', {'text-muted': !enabled})}>
-					{value ? '<True>' : '<False>'}
-				</code>
+					Required Scenario
 					<div className="text-size-xxs text-muted mt-1">
-						Defines whether a small icon will appear next to the scenario indicating it's completion status.
+						Probably referees to a .lng file with loading screen hints
 					</div>
 				</Col>
 				<Col xs="2" className="text-right">
 					<Form.Check
 						className="pull-right"
 						type="switch"
-						id={`show_completion_icon-switch-${nanoid(5)}`}
+						id={`loading_screens-switch-${nanoid(5)}`}
 						label=""
 						checked={enabled}
 						onChange={e => setEnabled(e.target.checked)}
 					/>
 				</Col>
 			</Row>
-			<Form.Check
-				type="switch"
-				className="pull-right"
+			<Form.Control
+				type="text"
 				disabled={!enabled}
-				id={`show_completion_icon-${nanoid(5)}`}
-				label="Show Completion Icon?"
-				checked={value}
-				onChange={e => setValue(e.target.checked)}
+				className="pull-right"
+				aria-disabled={!enabled}
+				id={`loading_screens-${nanoid(5)}`}
+				aria-placeholder={props.value}
+				value={value}
+				onChange={e => setValue(e.target.value.replace(/['"]+/ig, ``))}
 			/>
 		</div>
 	);
 };
 
 // Properties validation
-ShowCompletionIcon.propTypes = {
+LoadingScreen.propTypes = {
 	value: PropTypes.bool,
 	enabled: PropTypes.bool,
 	onChange: PropTypes.func,
 };
 
-export default ShowCompletionIcon;
+export default LoadingScreen;

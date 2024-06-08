@@ -47,3 +47,10 @@ export const DISTANCE_HEIGHT_OFFSET_DEFAULT: number = 0.22;
 export const SUN_ANGLE_FACTOR_MIN: number = 0;
 export const SUN_ANGLE_FACTOR_MAX: number = 20;
 export const SUN_ANGLE_FACTOR_DEFAULT: number = 1;
+
+export const DEFAULT_SEASONS: string[] = [
+  'Spring',
+  'Summer',
+  'Fall',
+  'Winter',
+];

@@ -8,8 +8,8 @@ import React from 'react';
 import * as PropTypes from 'prop-types';
 import cn from 'classname';
 import merge from 'deepmerge';
-import { nanoid } from 'nanoid';
-import { Card, Button, Form, Row, Col } from 'react-bootstrap';
+import {nanoid} from 'nanoid';
+import {Button, Col, Form, Row} from 'react-bootstrap';
 
 // Utils
 import * as random from '~/utils/random';
@@ -64,60 +64,56 @@ const Trees = ( props: Props ) => {
 	}
 
 	return (
-		<>
-			<Card className={cn('mb-2', {'text-muted': !enabled})}>
-				<Card.Body>
-					<Row className="mb-1">
-						<Col xs="10">
-							Present Trees {' '}
-							<code className="pl-2 text-size-xs">
-								{!trees.length ? '<None>' : trees.join(' ').trim()}
-						</code>
-							<Button disabled={!enabled} className="button-reset-sm" variant="link"
-								onClick={() => setTrees(random.randomTrees())}>
-								Random
-							</Button>
-							<Button disabled={!enabled} className="button-reset-sm" variant="link"
-								onClick={() => setTrees([...random.trees])}>All</Button>
-							<Button disabled={!enabled} className="button-reset-sm" variant="link"
-								onClick={() => setTrees([])}>None</Button>
-							<div className="text-size-xxs text-muted mt-1">
-								What trees are present in the level.
-							</div>
-						</Col>
-						<Col xs="2" className="text-right">
-							<Form.Check
-								className="pull-right"
-								type="switch"
-								id={`trees-present-switch-${nanoid(5)}`}
-								label=""
-								checked={enabled}
-								onChange={e => setEnabled(e.target.checked)}
-							/>
-						</Col>
-					</Row>
-					<ul className="list-unstyled list-inline fixed-width mb-0 checkbox-align">
-						{random.trees.map(v => (
-							<li key={v} className="list-inline-item mb-1">
-								<Form.Check
-									disabled={!enabled}
-									type="switch"
-									data-value={v}
-									checked={trees.findIndex(val => v === val) !== -1}
-									id={`trees_${v}`}
-									label={v}
-									onChange={(e) => {
-										const list = trees.filter(val => val !== e.target.getAttribute('data-value'));
-										e.target.checked && list.push(v);
-										setTrees([...list]);
-									}}
-								/>
-							</li>
-						))}
-					</ul>
-				</Card.Body>
-			</Card>
-		</>
+		<div className={cn('mb-2', {'text-muted': !enabled})}>
+			<Row className="mb-1">
+				<Col xs="10">
+					Present Trees {' '}
+					<code className="pl-2 text-size-xs">
+						{!trees.length ? '<None>' : trees.join(' ').trim()}
+					</code>
+					<Button disabled={!enabled} className="button-reset-sm" variant="link"
+									onClick={() => setTrees(random.randomTrees())}>
+						Random
+					</Button>
+					<Button disabled={!enabled} className="button-reset-sm" variant="link"
+									onClick={() => setTrees([...random.trees])}>All</Button>
+					<Button disabled={!enabled} className="button-reset-sm" variant="link"
+									onClick={() => setTrees([])}>None</Button>
+					<div className="text-size-xxs text-muted mt-1">
+						What trees are present in the level.
+					</div>
+				</Col>
+				<Col xs="2" className="text-right">
+					<Form.Check
+						className="pull-right"
+						type="switch"
+						id={`trees-present-switch-${nanoid(5)}`}
+						label=""
+						checked={enabled}
+						onChange={e => setEnabled(e.target.checked)}
+					/>
+				</Col>
+			</Row>
+			<ul className="list-unstyled list-inline fixed-width mb-0 checkbox-align">
+				{random.trees.map(v => (
+					<li key={v} className="list-inline-item mb-1">
+						<Form.Check
+							disabled={!enabled}
+							type="switch"
+							data-value={v}
+							checked={trees.findIndex(val => v === val) !== -1}
+							id={`trees_${v}`}
+							label={v}
+							onChange={(e) => {
+								const list = trees.filter(val => val !== e.target.getAttribute('data-value'));
+								e.target.checked && list.push(v);
+								setTrees([...list]);
+							}}
+						/>
+					</li>
+				))}
+			</ul>
+		</div>
 	);
 };
 

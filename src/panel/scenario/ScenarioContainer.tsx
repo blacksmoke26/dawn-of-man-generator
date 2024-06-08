@@ -14,6 +14,9 @@ import {Button, ButtonGroup} from 'react-bootstrap';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import {anOldHope} from 'react-syntax-highlighter/dist/esm/styles/hljs';
 
+// icons
+import {IconBlock} from '~/components/icons/app';
+
 // elemental components
 import Accordion from '~/components/ui/Accordion';
 
@@ -33,6 +36,8 @@ import {nodesToLanguageStrings} from '~/utils/location';
 
 // types
 import type {Json} from '~/types/json.types';
+import StartingCondition from './generators/general/StartingCondition';
+import LoadingScreen from './generators/general/LoadingScreen';
 
 const SCENARIO_NAME: string = 'scenario';
 
@@ -46,6 +51,8 @@ const ScenarioContainer = () => {
     mapSize: '',
     showCompletionIcon: '',
     requiredScenario: '',
+    loadingScreens: '',
+    startingConditions: '',
     visible: '',
     locations: '',
   });
@@ -114,29 +121,39 @@ const ScenarioContainer = () => {
 
   return (
     <>
-      <Accordion header="General" eventKey="general">
+      <Accordion header={<><IconBlock width="17" height="17"/> General</>} eventKey="general">
         <HardcoreModeAllowed onChange={v => updateText('hardcoreModeAllowed', v)}/>
+        <hr className="mt-1"/>
         <NomadModeAllowed onChange={v => updateText('nomadModeAllowed', v)}/>
+        <hr className="mt-1"/>
         <Category onChange={v => updateText('category', v)}/>
+        <hr className="mt-1"/>
         <GroupID onChange={v => updateText('groupId', v)}/>
+        <hr className="mt-1"/>
         <MapSize onChange={v => updateText('mapSize', v)}/>
+        <hr className="mt-1"/>
         <ShowCompletionIcon onChange={v => updateText('showCompletionIcon', v)}/>
+        <hr className="mt-1"/>
         <RequiredScenario onChange={v => updateText('requiredScenario', v)}/>
+        <hr className="mt-1"/>
+        <LoadingScreen onChange={v => updateText('loadingScreens', v)}/>
+        <hr className="mt-1"/>
+        <StartingCondition onChange={v => updateText('startingConditions', v)}/>
+        <hr className="mt-1"/>
         <Visible onChange={v => updateText('visible', v)}/>
       </Accordion>
-      <Accordion header="Locations" eventKey="locations">
+      <Accordion header={<><IconBlock width="17" height="17"/> Locations</>} eventKey="locations" noBodyPad={true}>
         <LocationContainer onChange={(template: string, list) => {
           updateText('locations', template);
           updateLangString('locations', template.trim() ? nodesToLanguageStrings(list) as any : '');
         }}/>
       </Accordion>
-      <hr/>
-      <div className="syntax-highlighter">
+      <div className="syntax-highlighter pl-2 pr-2">
         <SyntaxHighlighter style={anOldHope} language="xml">
           {toTemplateText()}
         </SyntaxHighlighter>
       </div>
-      <div className="mt-2">
+      <div className="mt-2 ml-2">
         <ButtonGroup size="sm">
           <Button variant="secondary"
                   onClick={() => copyClipboard(toTemplateText())}>
@@ -148,13 +165,13 @@ const ScenarioContainer = () => {
           </Button>
         </ButtonGroup>
       </div>
-      <hr/>
-      <div className="syntax-highlighter">
+      <hr className="mt-2 mb-2"/>
+      <div className="syntax-highlighter pl-2 pr-2">
         <SyntaxHighlighter style={anOldHope} language="xml">
           {toLanguageTemplateText()}
         </SyntaxHighlighter>
       </div>
-      <div className="mt-2">
+      <div className="mt-2 ml-2 mb-2">
         <ButtonGroup size="sm">
           <Button variant="secondary"
                   onClick={() => copyClipboard(toLanguageTemplateText())}>

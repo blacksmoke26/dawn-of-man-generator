@@ -14,7 +14,7 @@ import XmlTextLoader from './loaders/XmlTextLoader';
 const XmlImporter = () => {
 	return (
 		<>
-			<div className="mt-2 text-right">
+			<div className="mt-2 text-right mr-2">
 				<span className="text-muted mr-2 d-inline-block">Import environment xml by:</span>
 				<ButtonGroup size="sm">
 					<XmlTextLoader/>

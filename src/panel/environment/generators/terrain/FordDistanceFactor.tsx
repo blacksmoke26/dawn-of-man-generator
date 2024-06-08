@@ -9,7 +9,7 @@ import * as PropTypes from 'prop-types';
 import cn from 'classname';
 import {nanoid} from 'nanoid';
 import merge from 'deepmerge';
-import {Card, Button, Form, Row, Col} from 'react-bootstrap';
+import {Button, Col, Form, Row} from 'react-bootstrap';
 
 // Components
 import Slider from '~/components/ui/Slider';
@@ -27,6 +27,7 @@ import {useAppSelector} from '~redux/hooks';
 export interface Props {
   enabled?: boolean;
   distance?: number;
+
   onChange?(template: string, value: number): void;
 }
 
@@ -72,47 +73,43 @@ function FordDistanceFactor(props: Props) {
   }, [distance, enabled]);
 
   return (
-    <>
-      <Card className={cn('mb-2', {'text-muted': !enabled})}>
-        <Card.Body>
-          <Row className="mb-1">
-            <Col xs="10">
-              Ford Distance Factor <code className={cn('pl-2 text-size-xs', {'text-muted': !enabled})}>
-              {distance}
-            </code>
-              <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                      onClick={() => setDistance(random.randomFloat())}>
-                Random
-              </Button>
-              <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                      onClick={() => setDistance(Defaults.FORD_DISTANCE_FACTOR_MIN)}>Max</Button>
-              <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                      onClick={() => setDistance(Defaults.FORD_DISTANCE_FACTOR_MAX)}>Max</Button>
-              <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                      onClick={() => setDistance(Defaults.FORD_DISTANCE_FACTOR_DEFAULT)}>Reset</Button>
-              <div className="text-size-xxs text-muted mt-1">
-                The average distance between river fords, 1.0 is the default.
-              </div>
-            </Col>
-            <Col xs="2" className="text-right">
-              <Form.Check
-                className="pull-right"
-                type="switch"
-                id={`river-switch-${nanoid(5)}`}
-                label=""
-                checked={enabled}
-                onChange={e => setEnabled(e.target.checked)}
-              />
-            </Col>
-          </Row>
-          <Slider
-            min={Defaults.FORD_DISTANCE_FACTOR_MIN}
-            max={Defaults.FORD_DISTANCE_FACTOR_MAX}
-            step={0.01} disabled={!enabled} value={distance}
-            onChange={v => setDistance(v as number)}/>
-        </Card.Body>
-      </Card>
-    </>
+    <div className={cn('mb-2', {'text-muted': !enabled})}>
+      <Row className="mb-1">
+        <Col xs="10">
+          Ford Distance Factor <code className={cn('pl-2 text-size-xs', {'text-muted': !enabled})}>
+          {distance}
+        </code>
+          <Button disabled={!enabled} className="button-reset-sm" variant="link"
+                  onClick={() => setDistance(random.randomFloat())}>
+            Random
+          </Button>
+          <Button disabled={!enabled} className="button-reset-sm" variant="link"
+                  onClick={() => setDistance(Defaults.FORD_DISTANCE_FACTOR_MIN)}>Max</Button>
+          <Button disabled={!enabled} className="button-reset-sm" variant="link"
+                  onClick={() => setDistance(Defaults.FORD_DISTANCE_FACTOR_MAX)}>Max</Button>
+          <Button disabled={!enabled} className="button-reset-sm" variant="link"
+                  onClick={() => setDistance(Defaults.FORD_DISTANCE_FACTOR_DEFAULT)}>Reset</Button>
+          <div className="text-size-xxs text-muted mt-1">
+            The average distance between river fords, 1.0 is the default.
+          </div>
+        </Col>
+        <Col xs="2" className="text-right">
+          <Form.Check
+            className="pull-right"
+            type="switch"
+            id={`river-switch-${nanoid(5)}`}
+            label=""
+            checked={enabled}
+            onChange={e => setEnabled(e.target.checked)}
+          />
+        </Col>
+      </Row>
+      <Slider
+        min={Defaults.FORD_DISTANCE_FACTOR_MIN}
+        max={Defaults.FORD_DISTANCE_FACTOR_MAX}
+        step={0.01} disabled={!enabled} value={distance}
+        onChange={v => setDistance(v as number)}/>
+    </div>
   );
 }
 

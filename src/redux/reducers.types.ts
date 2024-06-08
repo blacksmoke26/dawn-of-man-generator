@@ -5,6 +5,7 @@
  */
 import {Json} from '~/types/json.types';
 import {SeasonsProp} from '~/utils/seasons.types';
+import {StartingCondition} from '~/types/scenario.types';
 
 export interface Environment {
   noiseAmplitudes?: [number, number, number, number, number, number, number, number] | boolean;
@@ -33,6 +34,8 @@ export interface Scenario {
   showCompletionIcon?: boolean;
   size?: number;
   requiredScenario?: string;
+  startingCondition?: StartingCondition;
+  loadingScreen?: string;
   locations?: Json[];
 }
 

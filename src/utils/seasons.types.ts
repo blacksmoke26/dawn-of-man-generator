@@ -4,6 +4,12 @@
  * @since 2020-08-29
  */
 
+export type Season =
+	| 'Spring'
+	| 'Summer'
+	| 'Fall'
+	| 'Winter';
+
 export interface SpringSeasonProps {
 	duration?: number,
 	precipitationChance?: number,
