@@ -26,6 +26,9 @@ import {isObject} from '~/helpers/object';
 // redux
 import {useAppSelector} from '~redux/hooks';
 
+// icons
+import {IconTree} from '~/components/icons/app';
+
 export interface TreeAttr {
 	_enabled?: boolean;
 
@@ -265,7 +268,7 @@ const TreesOverride = (props: Props) => {
 				} header={
 					<div className="clearfix">
 						<div className="float-left">
-							{name}
+							<IconTree width="17" height="17"/> {name}
 						</div>
 					</div>
 				} accordion={{'aria-disabled': !isAltitudeEnabled, flush: true}}>

@@ -26,6 +26,9 @@ import {isObject} from '~/helpers/object';
 // redux
 import {useAppSelector} from '~redux/hooks';
 
+// icons
+import {IconMountain} from '~/components/icons/app';
+
 export interface DepositAttr {
   _enabled?: boolean;
 
@@ -265,7 +268,7 @@ const DepositOverride = (props: Props) => {
         } header={
           <div className="clearfix">
             <div className="float-left">
-              {name}
+              <IconMountain width="17" height="17"/> {name}
             </div>
           </div>
         } accordion={{'aria-disabled': !isAltitudeEnabled, flush: true}}>

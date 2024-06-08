@@ -14,6 +14,7 @@ import {Button, ButtonGroup, Form, Tab, Tabs} from 'react-bootstrap';
 // types
 import type {Json} from '~/types/json.types';
 import type {LocationProps} from '~/utils/location';
+
 // utils
 import * as location from '~/utils/location';
 
@@ -22,6 +23,9 @@ import Location from './Location';
 
 // redux
 import {useAppSelector} from '~redux/hooks';
+
+// icons
+import {IconClear, IconNew} from '~/components/icons/app';
 
 /** Maximum limit of location tabs */
 const LOCATIONS_MAX_COUNT: number = 15;
@@ -136,11 +140,11 @@ const LocationContainer = (props: Props) => {
               if (total <= LOCATIONS_MAX_COUNT) {
                 newLocation();
               }
-            }}>New Location</Button>
+            }}><IconNew/> New Location</Button>
             <Button variant="danger" size="sm" disabled={!enabled || total <= 1} onClick={() => {
               setLocations([]);
               newLocation();
-            }}>Remove All</Button>
+            }}><IconClear/> Remove All</Button>
           </ButtonGroup>
         </div>
       </div>

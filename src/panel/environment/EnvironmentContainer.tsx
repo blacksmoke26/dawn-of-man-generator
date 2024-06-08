@@ -15,6 +15,9 @@ import {anOldHope} from 'react-syntax-highlighter/dist/esm/styles/hljs';
 // elemental components
 import Accordion from '~/components/ui/Accordion';
 
+// icons
+import {IconBlock} from '~/components/icons/app';
+
 // Components
 import NoiseAmplitudes from './generators/amplitudes/NoiseAmplitudes';
 
@@ -60,11 +63,11 @@ function EnvironmentContainer() {
 
   return (
     <>
-      <Accordion header="Noise Amplitudes" eventKey="environment_noise_amplitudes">
+      <Accordion header={<><IconBlock width="17" height="17"/> Noise Amplitudes</>} eventKey="environment_noise_amplitudes">
         <NoiseAmplitudes onChange={v => setNoiseAmplitudes(v)}/>
       </Accordion>
 
-      <Accordion header="Terrain Features" eventKey="environment_terrain">
+      <Accordion header={<><IconBlock width="17" height="17"/> Terrain Features</>} eventKey="environment_terrain">
         <ResourceFactor onChange={v => setResourceFactor(v)}/>
         <hr className="mt-1"/>
         <DistanceHeightOffset onChange={v => setDistanceHeightOffset(v)}/>
@@ -76,23 +79,23 @@ function EnvironmentContainer() {
         <BackdropScale onChange={v => setBackdropScale(v)}/>
       </Accordion>
 
-      <Accordion header="Deposit (terrain)" eventKey="deposit_terrain">
+      <Accordion header={<><IconBlock width="17" height="17"/> Deposit (terrain)</>} eventKey="deposit_terrain">
         <DepositPanel onChange={v => setDeposits(v)}/>
       </Accordion>
 
-      <Accordion header="Detail (terrain)" eventKey="deposit_terrain">
+      <Accordion header={<><IconBlock width="17" height="17"/> Detail (terrain)</>} eventKey="deposit_terrain">
         <DetailPanel onChange={v => setDetail(v)}/>
       </Accordion>
 
-      <Accordion header="Prop (terrain)" eventKey="deposit_terrain">
+      <Accordion header={<><IconBlock width="17" height="17"/> Prop (terrain)</>} eventKey="deposit_terrain">
         <PropPanel onChange={v => setProp(v)}/>
       </Accordion>
 
-      <Accordion header="Tree (terrain)" eventKey="deposit_terrain">
+      <Accordion header={<><IconBlock width="17" height="17"/> Tree (terrain)</>} eventKey="deposit_terrain">
         <TreesPanel onChange={v => setTrees(v)}/>
       </Accordion>
 
-      <Accordion header="Season (atmosphere)" eventKey="deposit_terrain">
+      <Accordion header={<><IconBlock width="17" height="17"/> Season (atmosphere)</>} eventKey="deposit_terrain">
         <SeasonsPanel onChange={v => setSeasons(v)}/>
       </Accordion>
 

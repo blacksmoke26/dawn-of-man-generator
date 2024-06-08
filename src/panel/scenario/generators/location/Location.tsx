@@ -10,19 +10,22 @@ import cn from 'classname';
 import slugify from 'slugify';
 import merge from 'deepmerge';
 import {nanoid} from 'nanoid';
-import {Form, Row, Col, Button, ButtonGroup, InputGroup} from 'react-bootstrap';
+import {Button, ButtonGroup, Col, Form, InputGroup, Row} from 'react-bootstrap';
 
 // types
 import type {Json} from '~/types/json.types';
 import type {LocationProps} from '~/utils/location';
 
-// components
-import Slider from '~/components/ui/Slider';
-
 // utils
 import * as location from '~/utils/location';
+
+// components
+import Slider from '~/components/ui/Slider';
 import {labels} from '~/data/environments/builtin';
 import {POSITION_MAX, POSITION_MIN} from '~/utils/defaults';
+
+// icons
+import {IconRestore, IconShuffle} from '~/components/icons/app';
 
 export interface Props {
   enabled?: boolean,
@@ -113,7 +116,7 @@ const Location = (props: Props) => {
                       const {name, slug} = location.randomName();
                       updateValue('name', name);
                       updateValue('slug', slug);
-                    }}>Randomize</Button>
+                    }} title="Randomize"><IconShuffle/></Button>
           </InputGroup>
         </Col>
       </Form.Group>
@@ -132,10 +135,10 @@ const Location = (props: Props) => {
             }}/>
             {' '}
             <Button disabled={!enabled} variant="secondary" size="sm"
-                    onClick={() => updateValue('seed', location.randomSeed())}>Randomize</Button>
+                    onClick={() => updateValue('seed', location.randomSeed())} title="Randomize"><IconShuffle/></Button>
             <Button disabled={!enabled} variant="secondary" size="sm"
-                    onClick={() => updateValue('seed', '11111111')}>1x8</Button>
-            <Button disabled={!enabled} variant="secondary" size="sm"
+                    onClick={() => updateValue('seed', '11111111')} title="Set all as 1">1x8</Button>
+            <Button disabled={!enabled} variant="secondary" size="sm" title="Set all as 0"
                     onClick={() => updateValue('seed', '00000000')}>0x8</Button>
           </InputGroup>
         </Col>
@@ -154,10 +157,10 @@ const Location = (props: Props) => {
               maxLength={40} style={{maxWidth: 300}} onChange={e => {
               updateValue('environment', slugify(e.target.value, '_'));
             }}/>
-            <Button disabled={!enabled} variant="secondary" size="sm"
+            <Button disabled={!enabled} variant="secondary" size="sm" title="Randomize"
                     onClick={() => {
                       updateValue('environment', location.randomEnvironment());
-                    }}>Randomize</Button>
+                    }}><IconShuffle/></Button>
           </InputGroup>
           <ul className="list-unstyled list-inline mb-0 mt-1">
             {labels.map((v: Json) => (
@@ -206,7 +209,7 @@ const Location = (props: Props) => {
           <div className="mt-2">
             <ButtonGroup aria-label="Basic example">
               <Button disabled={!enabled} variant="secondary" size="sm"
-                      onClick={() => updateValue('coordinates', location.randomCoordinates())}>Randomize</Button>
+                      onClick={() => updateValue('coordinates', location.randomCoordinates())}><IconShuffle/> Randomize</Button>
             </ButtonGroup>
           </div>
         </Col>
@@ -252,7 +255,7 @@ const Location = (props: Props) => {
           <div className="mt-2">
             <ButtonGroup aria-label="Basic example">
               <Button disabled={!isPositionEnabled} variant="secondary" size="sm"
-                      onClick={() => updateValue('position', location.randomPosition())}>Randomize</Button>
+                      onClick={() => updateValue('position', location.randomPosition())}><IconShuffle/> Randomize</Button>
             </ButtonGroup>
           </div>
         </Col>
@@ -312,12 +315,12 @@ const Location = (props: Props) => {
               // @ts-ignore
               e.target.value = Number(String(e.target.value).replace(/\D+/, '')) || 0;
             }}/>
-            <Button disabled={!lakeEnabled} variant="secondary" size="sm"
+            <Button disabled={!lakeEnabled} variant="secondary" size="sm" title="Randomize"
                     onClick={() => {
                       updateValue('lakes', location.randomLakes());
-                    }}>Randomize</Button>
-            <Button disabled={!lakeEnabled} variant="secondary" size="sm"
-                    onClick={() => updateValue('lakes', 0)}>None</Button>
+                    }}><IconShuffle/></Button>
+            <Button disabled={!lakeEnabled} variant="secondary" size="sm" title="Clear / None"
+                    onClick={() => updateValue('lakes', 0)}><IconRestore/></Button>
           </InputGroup>
         </Col>
       </Form.Group>
@@ -332,7 +335,7 @@ const Location = (props: Props) => {
                     !isRiverEnabled && (randLocation.river = values.river);
                     !isPositionEnabled && (randLocation.position = values.position);
                     setValues(randLocation);
-                  }}>Randomize All</Button>
+                  }}><IconShuffle/> Randomize All</Button>
         </ButtonGroup>
       </div>
     </>

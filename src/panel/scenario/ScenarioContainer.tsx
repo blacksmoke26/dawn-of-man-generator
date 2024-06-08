@@ -14,6 +14,9 @@ import {Button, ButtonGroup} from 'react-bootstrap';
 import SyntaxHighlighter from 'react-syntax-highlighter';
 import {anOldHope} from 'react-syntax-highlighter/dist/esm/styles/hljs';
 
+// icons
+import {IconBlock} from '~/components/icons/app';
+
 // elemental components
 import Accordion from '~/components/ui/Accordion';
 
@@ -118,7 +121,7 @@ const ScenarioContainer = () => {
 
   return (
     <>
-      <Accordion header="General" eventKey="general">
+      <Accordion header={<><IconBlock width="17" height="17"/> General</>} eventKey="general">
         <HardcoreModeAllowed onChange={v => updateText('hardcoreModeAllowed', v)}/>
         <hr className="mt-1"/>
         <NomadModeAllowed onChange={v => updateText('nomadModeAllowed', v)}/>
@@ -139,7 +142,7 @@ const ScenarioContainer = () => {
         <hr className="mt-1"/>
         <Visible onChange={v => updateText('visible', v)}/>
       </Accordion>
-      <Accordion header="Locations" eventKey="locations" noBodyPad={true}>
+      <Accordion header={<><IconBlock width="17" height="17"/> Locations</>} eventKey="locations" noBodyPad={true}>
         <LocationContainer onChange={(template: string, list) => {
           updateText('locations', template);
           updateLangString('locations', template.trim() ? nodesToLanguageStrings(list) as any : '');

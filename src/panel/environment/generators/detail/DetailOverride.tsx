@@ -23,6 +23,9 @@ import * as random from '~/utils/random';
 import * as Defaults from '~/utils/defaults';
 import {isObject} from '~/helpers/object';
 
+// icons
+import {IconPlant} from '~/components/icons/app';
+
 // redux
 import {useAppSelector} from '~redux/hooks';
 
@@ -265,7 +268,7 @@ const DetailOverride = (props: Props) => {
         } header={
           <div className="clearfix">
             <div className="float-left">
-              {name}
+              <IconPlant width="17" height="17"/> {name}
             </div>
           </div>
         } accordion={{'aria-disabled': !isAltitudeEnabled, flush: true}}>
