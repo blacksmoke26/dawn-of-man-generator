@@ -97,7 +97,7 @@ function EnvironmentContainer() {
       </Accordion>
 
       <hr/>
-      <div className="syntax-highlighter">
+      <div className="syntax-highlighter pl-2 pr-2">
         <SyntaxHighlighter style={anOldHope} language="xml">
           {toTemplateText()}
         </SyntaxHighlighter>

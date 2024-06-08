@@ -145,7 +145,7 @@ const ScenarioContainer = () => {
           updateLangString('locations', template.trim() ? nodesToLanguageStrings(list) as any : '');
         }}/>
       </Accordion>
-      <div className="syntax-highlighter">
+      <div className="syntax-highlighter pl-2 pr-2">
         <SyntaxHighlighter style={anOldHope} language="xml">
           {toTemplateText()}
         </SyntaxHighlighter>
@@ -163,7 +163,7 @@ const ScenarioContainer = () => {
         </ButtonGroup>
       </div>
       <hr className="mt-2 mb-2"/>
-      <div className="syntax-highlighter">
+      <div className="syntax-highlighter pl-2 pr-2">
         <SyntaxHighlighter style={anOldHope} language="xml">
           {toLanguageTemplateText()}
         </SyntaxHighlighter>
