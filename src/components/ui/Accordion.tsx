@@ -31,7 +31,11 @@ export interface AccordionProps {
 
 export type {EventHandler};
 
-const Div = (props: React.HTMLAttributes<HTMLDivElement>) => <div {...props}>{props.children}</div>;
+const Div = (props: React.HTMLAttributes<HTMLDivElement>) => {
+  const _props: any = {...props, bsPrefix: ''};
+  'bsPrefix' in _props && delete _props.bsPrefix;
+  return <div {..._props}>{_props.children}</div>;
+};
 
 const Accordion = (props: AccordionProps) => {
   props = {
