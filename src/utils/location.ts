@@ -20,12 +20,14 @@ export interface LocationProps {
   name: string;
   slug: string;
   seed: string;
-  coordinates: [number, number];
-  position?: [number, number];
-  positionEnabled?: boolean;
-  river: boolean;
   environment: string;
-  lakes: number;
+  coordinates: [number, number];
+  positionEnabled?: boolean;
+  position?: [number, number];
+  riverEnabled?: boolean;
+  river?: boolean;
+  lakesEnabled?: boolean;
+  lakes?: number;
 }
 
 /** Builtin environments */
@@ -115,18 +117,18 @@ export const randomizeLocation = (): LocationProps => {
  * @static
  * Convert a location object into template */
 export const nodeToTemplate = (location: LocationProps): string => {
-  const {slug, seed, coordinates, river, environment, lakes, position, positionEnabled} = location;
+  const {slug, seed, coordinates, river, environment, lakes, position} = location;
 
-  const riverProp: string = ` river="${river ? 'true' : 'false'}"`;
-  const lakesProp: string = Number(lakes) ? ` lakes="${lakes}"` : '';
-  const positionStr = positionEnabled ? `position="${position?.[0] as number},${position?.[1] as number}"` : '';
+  const riverProp: string = location.riverEnabled ? ` river="${river ? 'true' : 'false'}"` : '';
+  const lakesProp: string = location.lakesEnabled ? (Number(lakes) ? ` lakes="${lakes}"` : '') : '';
+  const positionProp: string = location.positionEnabled ? `position="${position?.[0] as number},${position?.[1] as number}"` : '';
 
   return (
     `<location id="${slug}"
 			seed="${String(seed).padStart(8, '0')}"
 			environment="${environment}"
 			map_location="${coordinates[0]},${coordinates[1]}"
-			${positionStr}
+			${positionProp}
 			${riverProp} ${lakesProp}
 		/>`
   );

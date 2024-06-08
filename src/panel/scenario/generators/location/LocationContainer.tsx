@@ -21,6 +21,9 @@ import Location from './Location';
 // utils
 import * as location from '~/utils/location';
 
+// redux
+import {useAppSelector} from '~redux/hooks';
+
 /** Maximum limit of location tabs */
 const LOCATIONS_MAX_COUNT: number = 12;
 
@@ -52,18 +55,18 @@ const LocationContainer = (props: Props) => {
     },
   }, props);
 
+  const initiated = useAppSelector(({initiated}) => initiated);
+
   const [enabled, setEnabled] = React.useState<boolean>(props.enabled as boolean);
   const [locations, setLocations] = React.useState<LocationProps[]>([]);
-  const [init, setInit] = React.useState<boolean>(false);
   const [activeKey, setActiveKey] = React.useState<string>('');
 
   React.useEffect(() => {
-    if (!init) {
-      setInit(true);
+    if (initiated) {
       newLocation();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [init]);
+  }, [initiated]);
 
   /** Add new location */
   const newLocation = React.useCallback((): void => {

@@ -15,10 +15,22 @@ import EnvironmentPresets from '~/panel/environment/Presets';
 import EnvironmentContainer from '~/panel/environment/EnvironmentContainer';
 import ScenarioContainer from '~/panel/scenario/ScenarioContainer';
 
+// redux
+import {useAppDispatch} from '~redux/hooks';
+import {updateInit} from '~redux/reducers';
+
+
 const KEY_ENVIRONMENT: string = 'environment';
 const KEY_SCENARIO: string = 'scenario';
 
-function App() {
+const App = () => {
+  const dispatch = useAppDispatch();
+
+  React.useEffect(() => {
+    dispatch(updateInit(true));
+    // eslint-disable-next-line
+  }, []);
+
   return (
     <Container className="mt-4 mb-4">
       <Header/>
@@ -32,6 +44,6 @@ function App() {
       <Footer/>
     </Container>
   );
-}
+};
 
 export default App;
