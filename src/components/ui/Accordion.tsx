@@ -10,6 +10,7 @@ import type {AccordionProps as AccordionProp, AccordionItemProps, AccordionBodyP
 
 // elemental components
 import AccordionHeader, {AccordionHeaderProps, EventHandler} from '~/components/ui/AccordionHeader';
+import cn from 'classname';
 
 export interface AccordionProps {
   eventKey: string;
@@ -18,6 +19,10 @@ export interface AccordionProps {
   header: any;
   headerAfter?: any;
   children?: any;
+  noCard?: boolean;
+  darkHeader?: boolean;
+  noEndPadding?: boolean;
+  noBodyPad?: boolean;
   accordion?: Partial<AccordionProp>;
   toggle?: Partial<AccordionHeaderProps>;
   item?: Partial<AccordionItemProps>;
@@ -26,8 +31,18 @@ export interface AccordionProps {
 
 export type {EventHandler};
 
+const Div = (props: React.HTMLAttributes<HTMLDivElement>) => <div {...props}>{props.children}</div>;
+
 const Accordion = (props: AccordionProps) => {
+  props = {
+    noCard: false,
+    ...props,
+  }
   const [activeKey, setActiveKey] = React.useState<string>(props.activeKey as string);
+
+  const CartComponent = !props?.noCard ? Card : Div;
+  const CardHeaderComponent = !props?.noCard ? Card.Header : Div;
+  const CardBodyComponent = !props?.noCard ? Card.Body : Div;
 
   React.useEffect(() => {
     props.activeKey && setActiveKey(props.activeKey as string);
@@ -35,23 +50,23 @@ const Accordion = (props: AccordionProps) => {
 
   return (
     <AccordionBootstrap defaultActiveKey={props?.defaultActiveKey} activeKey={activeKey} {...props.accordion}>
-      <Card>
+      <CartComponent className={cn({'no-padding': !!props?.darkHeader})}>
         <AccordionBootstrap.Item eventKey={props.eventKey} {...props.item}>
-          <Card.Header>
+          <CardHeaderComponent bsPrefix={cn('card-header', {'card-header-dark': !!props?.darkHeader})}>
             <div className="clearfix">
               <AccordionHeader eventKey={props.eventKey} {...props.toggle}>
                 {props.header}
               </AccordionHeader>
               {props.headerAfter}
             </div>
-          </Card.Header>
+          </CardHeaderComponent>
           <AccordionBootstrap.Body {...props.body}>
-            <Card.Body className="pt-0">
+            <CardBodyComponent className={cn('pt-0', {'p-0': !!props?.noBodyPad})}>
               {props?.children}
-            </Card.Body>
+            </CardBodyComponent>
           </AccordionBootstrap.Body>
         </AccordionBootstrap.Item>
-      </Card>
+      </CartComponent>
     </AccordionBootstrap>
   );
 };

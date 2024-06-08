@@ -67,58 +67,56 @@ const Deposits = (props: Props) => {
   }, [deposits, enabled]);
 
   return (
-    <Card className={cn('mb-2', {'text-muted': !enabled})}>
-      <Card.Body>
-        <Row className="mb-1">
-          <Col xs="10">
-            Deposits <code className={cn('pl-2 text-size-xs', {'text-muted': !enabled})}>
-            {!deposits.length ? '<None>' : deposits.join(', ')}
-          </code>
-            <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                    onClick={() => setDeposits(random.randomDeposits())}>
-              Random
-            </Button>
-            <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                    onClick={() => setDeposits([...random.deposits])}>All</Button>
-            <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                    onClick={() => setDeposits([])}>None</Button>
-            <div className="text-size-xxs text-muted mt-1">
-              What types of deposit are present in the level.
-            </div>
-          </Col>
-          <Col xs="2" className="text-right">
+    <div className={cn('mb-2', {'text-muted': !enabled})}>
+      <Row className="mb-1">
+        <Col xs="10">
+          Deposits <code className={cn('pl-2 text-size-xs', {'text-muted': !enabled})}>
+          {!deposits.length ? '<None>' : deposits.join(', ')}
+        </code>
+          <Button disabled={!enabled} className="button-reset-sm" variant="link"
+                  onClick={() => setDeposits(random.randomDeposits())}>
+            Random
+          </Button>
+          <Button disabled={!enabled} className="button-reset-sm" variant="link"
+                  onClick={() => setDeposits([...random.deposits])}>All</Button>
+          <Button disabled={!enabled} className="button-reset-sm" variant="link"
+                  onClick={() => setDeposits([])}>None</Button>
+          <div className="text-size-xxs text-muted mt-1">
+            What types of deposit are present in the level.
+          </div>
+        </Col>
+        <Col xs="2" className="text-right">
+          <Form.Check
+            className="pull-right"
+            type="switch"
+            id={`deposit-switch-${nanoid(5)}`}
+            label=""
+            checked={enabled}
+            onChange={e => setEnabled(e.target.checked)}
+          />
+        </Col>
+      </Row>
+      <ul className="list-unstyled list-inline mb-0 fixed-width">
+        {random.deposits.map(v => (
+          <li key={v} className="list-inline-item checkbox-align">
             <Form.Check
-              className="pull-right"
               type="switch"
-              id={`deposit-switch-${nanoid(5)}`}
-              label=""
-              checked={enabled}
-              onChange={e => setEnabled(e.target.checked)}
+              disabled={!enabled}
+              data-value={v}
+              checked={deposits.findIndex(val => v === val) !== -1}
+              id={`deposit_${v}`}
+              label={v}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                const list = deposits.filter(val => val !== e.target.getAttribute('data-value'));
+                console.log({list});
+                e.target.checked && list.push(v);
+                setDeposits([...list]);
+              }}
             />
-          </Col>
-        </Row>
-        <ul className="list-unstyled list-inline mb-0 fixed-width">
-          {random.deposits.map(v => (
-            <li key={v} className="list-inline-item checkbox-align">
-              <Form.Check
-                type="switch"
-                disabled={!enabled}
-                data-value={v}
-                checked={deposits.findIndex(val => v === val) !== -1}
-                id={`deposit_${v}`}
-                label={v}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  const list = deposits.filter(val => val !== e.target.getAttribute('data-value'));
-                  console.log({list});
-                  e.target.checked && list.push(v);
-                  setDeposits([...list]);
-                }}
-              />
-            </li>
-          ))}
-        </ul>
-      </Card.Body>
-    </Card>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 };
 

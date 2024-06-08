@@ -114,7 +114,7 @@ const Spring = (props: Props) => {
 
   return (
     <>
-      <Form.Group as={Row} className="mb-2">
+      <Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled})}>
         <Form.Label className="text-size-sm" column={true} sm="2">
 					<span style={{textDecoration: 'underline dotted'}}
                 title="How long this season is, in terms of a fraction of a
@@ -145,7 +145,7 @@ const Spring = (props: Props) => {
             onChange={v => updateValue('duration', v)}/>
         </Col>
       </Form.Group>
-      <Form.Group as={Row} className="mb-2">
+      <Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled})}>
         <Form.Label className="text-size-sm" column={true} sm="2">
 					<span style={{textDecoration: 'underline dotted'}}
                 title="How likely it is to rain/snow in this season.">
@@ -175,7 +175,7 @@ const Spring = (props: Props) => {
             onChange={v => updateValue('precipitationChance', v)}/>
         </Col>
       </Form.Group>
-      <Form.Group as={Row} className="mb-2">
+      <Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled})}>
         <Form.Label className="text-size-sm" column={true} sm="2">
 					<span style={{textDecoration: 'underline dotted'}}
                 title="How likely it is for it to be windy in this season.">
@@ -205,7 +205,7 @@ const Spring = (props: Props) => {
             onChange={v => updateValue('windyChance', v)}/>
         </Col>
       </Form.Group>
-      <Form.Group as={Row} className="mb-2">
+      <Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled})}>
         <Form.Label className="text-size-sm" column={true} sm="2">
 					<span style={{textDecoration: 'underline dotted'}}
                 title="How likely it is for it to be very windy in this season.">
@@ -235,7 +235,7 @@ const Spring = (props: Props) => {
             onChange={n => updateValue('veryWindyChance', n)}/>
         </Col>
       </Form.Group>
-      <Form.Group as={Row} className="mb-2">
+      <Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled})}>
         <Form.Label className="text-size-sm" column={true} sm="2">
 					<span style={{textDecoration: 'underline dotted'}}
                 title="Fish in banks will replenish by this amount at the beginning of this season.">
@@ -265,7 +265,7 @@ const Spring = (props: Props) => {
             onChange={n => updateValue('fishBoost', n)}/>
         </Col>
       </Form.Group>
-      <Form.Group as={Row} className="mb-2">
+      <Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled})}>
         <Form.Label className="text-size-sm" column={true} sm="2">
 					<span style={{textDecoration: 'underline dotted'}}
                 title="Temperature will randomly oscillate between these 2 values (in Celsius)">

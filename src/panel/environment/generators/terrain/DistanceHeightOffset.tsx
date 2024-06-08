@@ -73,47 +73,43 @@ const DistanceHeightOffset = (props: Props) => {
   }, [distance, enabled]);
 
   return (
-    <>
-      <Card className={cn('mb-2', {'text-muted': !enabled})}>
-        <Card.Body>
-          <Row className="mb-1">
-            <Col xs="10">
-              Distance Height Offset <code className={cn('pl-2 text-size-xs', {'text-muted': !enabled})}>
-              {distance}
-            </code>
-              <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                      onClick={() => setDistance(random.randomFloat())}>
-                Random
-              </Button>
-              <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                      onClick={() => setDistance(Defaults.DISTANCE_HEIGHT_OFFSET_MIN)}>Min</Button>
-              <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                      onClick={() => setDistance(Defaults.DISTANCE_HEIGHT_OFFSET_MAX)}>Max</Button>
-              <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                      onClick={() => setDistance(Defaults.DISTANCE_HEIGHT_OFFSET_DEFAULT)}>Reset</Button>
-              <div className="text-size-xxs text-muted mt-1">
-                How much bigger are mountains at the edge of map.
-              </div>
-            </Col>
-            <Col xs="2" className="text-right">
-              <Form.Check
-                className="pull-right"
-                type="switch"
-                id={`river-switch-${nanoid(5)}`}
-                label=""
-                checked={enabled}
-                onChange={e => setEnabled(e.target.checked)}
-              />
-            </Col>
-          </Row>
-          <Slider
-            min={Defaults.DISTANCE_HEIGHT_OFFSET_MIN}
-            max={Defaults.DISTANCE_HEIGHT_OFFSET_MAX}
-            step={0.01} disabled={!enabled}
-            value={Number(distance)} onChange={v => setDistance(v as number)}/>
-        </Card.Body>
-      </Card>
-    </>
+    <div className={cn('mb-2', {'text-muted': !enabled})}>
+      <Row className="mb-1">
+        <Col xs="10">
+          Distance Height Offset <code className={cn('pl-2 text-size-xs', {'text-muted': !enabled})}>
+          {distance}
+        </code>
+          <Button disabled={!enabled} className="button-reset-sm" variant="link"
+                  onClick={() => setDistance(random.randomFloat())}>
+            Random
+          </Button>
+          <Button disabled={!enabled} className="button-reset-sm" variant="link"
+                  onClick={() => setDistance(Defaults.DISTANCE_HEIGHT_OFFSET_MIN)}>Min</Button>
+          <Button disabled={!enabled} className="button-reset-sm" variant="link"
+                  onClick={() => setDistance(Defaults.DISTANCE_HEIGHT_OFFSET_MAX)}>Max</Button>
+          <Button disabled={!enabled} className="button-reset-sm" variant="link"
+                  onClick={() => setDistance(Defaults.DISTANCE_HEIGHT_OFFSET_DEFAULT)}>Reset</Button>
+          <div className="text-size-xxs text-muted mt-1">
+            How much bigger are mountains at the edge of map.
+          </div>
+        </Col>
+        <Col xs="2" className="text-right">
+          <Form.Check
+            className="pull-right"
+            type="switch"
+            id={`river-switch-${nanoid(5)}`}
+            label=""
+            checked={enabled}
+            onChange={e => setEnabled(e.target.checked)}
+          />
+        </Col>
+      </Row>
+      <Slider
+        min={Defaults.DISTANCE_HEIGHT_OFFSET_MIN}
+        max={Defaults.DISTANCE_HEIGHT_OFFSET_MAX}
+        step={0.01} disabled={!enabled}
+        value={Number(distance)} onChange={v => setDistance(v as number)}/>
+    </div>
   );
 };
 

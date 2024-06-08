@@ -114,38 +114,38 @@ const Fall = (props: Props) => {
 
   return (
     <>
-      <Form.Group as={Row} className="mb-2">
-        <Form.Label className="text-size-sm" column={true} sm="2">
+      <Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled})}>
+          <Form.Label className="text-size-sm" column={true} sm="2">
 					<span style={{textDecoration: 'underline dotted'}}
                 title="How long this season is, in terms of a fraction of a
 						year, all season durations have to add up to 1.">
 						Duration
 					</span>
-        </Form.Label>
-        <Col sm="10">
-          <code className={cn('text-size-xs', {'text-muted': !enabled})}>{season.duration}</code>
-          <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                  onClick={() => updateValue('duration', random.randomFloat())}>Random</Button>
-          <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                  onClick={() => updateValue('duration', FallConfig.duration)}>Default</Button>
-          <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                  onClick={() => updateValue('duration', 0)}>%</Button>
-          <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                  onClick={() => updateValue('duration', 0.25)}>25%</Button>
-          <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                  onClick={() => updateValue('duration', 0.50)}>50%</Button>
-          <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                  onClick={() => updateValue('duration', 0.75)}>75%</Button>
-          <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                  onClick={() => updateValue('duration', 1)}>100%</Button>
-          <Slider
-            disabled={!enabled}
-            min={0} max={1} step={0.01}
-            value={season.duration}
-            onChange={v => updateValue('duration', v)}/>
-        </Col>
+          </Form.Label>
+          <Col sm="10">
+            <code className={cn('text-size-xs', {'text-muted': !enabled})}>{season.duration}</code>
+            <Button disabled={!enabled} className="button-reset-sm" variant="link"
+                    onClick={() => updateValue('duration', random.randomFloat())}>Random</Button>
+            <Button disabled={!enabled} className="button-reset-sm" variant="link"
+                    onClick={() => updateValue('duration', FallConfig.duration)}>Default</Button>
+            <Button disabled={!enabled} className="button-reset-sm" variant="link"
+                    onClick={() => updateValue('duration', 0)}>%</Button>
+            <Button disabled={!enabled} className="button-reset-sm" variant="link"
+                    onClick={() => updateValue('duration', 0.25)}>25%</Button>
+            <Button disabled={!enabled} className="button-reset-sm" variant="link"
+                    onClick={() => updateValue('duration', 0.50)}>50%</Button>
+            <Button disabled={!enabled} className="button-reset-sm" variant="link"
+                    onClick={() => updateValue('duration', 0.75)}>75%</Button>
+            <Button disabled={!enabled} className="button-reset-sm" variant="link"
+                    onClick={() => updateValue('duration', 1)}>100%</Button>
+            <Slider
+              disabled={!enabled}
+              min={0} max={1} step={0.01}
+              value={season.duration}
+              onChange={v => updateValue('duration', v)}/>
+          </Col>
       </Form.Group>
-      <Form.Group as={Row} className="mb-2">
+      <Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled})}>
         <Form.Label className="text-size-sm" column={true} sm="2">
 					<span style={{textDecoration: 'underline dotted'}}
                 title="How likely it is to rain/snow in this season.">
@@ -175,7 +175,7 @@ const Fall = (props: Props) => {
             onChange={v => updateValue('precipitationChance', v)}/>
         </Col>
       </Form.Group>
-      <Form.Group as={Row} className="mb-2">
+      <Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled})}>
         <Form.Label className="text-size-sm" column={true} sm="2">
 					<span style={{textDecoration: 'underline dotted'}}
                 title="How likely it is for it to be windy in this season.">
@@ -205,7 +205,7 @@ const Fall = (props: Props) => {
             onChange={v => updateValue('windyChance', v)}/>
         </Col>
       </Form.Group>
-      <Form.Group as={Row} className="mb-2">
+      <Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled})}>
         <Form.Label className="text-size-sm" column={true} sm="2">
 					<span style={{textDecoration: 'underline dotted'}}
                 title="How likely it is for it to be very windy in this season.">
@@ -235,7 +235,7 @@ const Fall = (props: Props) => {
             onChange={n => updateValue('veryWindyChance', n)}/>
         </Col>
       </Form.Group>
-      <Form.Group as={Row} className="mb-2">
+      <Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled})}>
         <Form.Label className="text-size-sm" column={true} sm="2">
 					<span style={{textDecoration: 'underline dotted'}}
                 title="Temperature will randomly oscillate between these 2 values (in Celsius)">

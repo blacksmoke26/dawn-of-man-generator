@@ -9,7 +9,7 @@ import * as PropTypes from 'prop-types';
 import cn from 'classname';
 import merge from 'deepmerge';
 import {nanoid} from 'nanoid';
-import {Card, Form, Row, Col} from 'react-bootstrap';
+import {Col, Form, Row} from 'react-bootstrap';
 
 // redux
 import {useAppSelector} from '~redux/hooks';
@@ -63,39 +63,37 @@ const ShowCompletionIcon = ( props: Props ) => {
 	};
 
 	return (
-		<Card className={cn('mb-2', {'text-muted': !enabled}, 'checkbox-align')}>
-			<Card.Body>
-				<Row className="mb-1">
-					<Col xs="10">
-						Show Completion Icon <code className={cn('text-size-xs', {'text-muted': !enabled})}>
-						{value ? '<True>' : '<False>'}
-					</code>
-						<div className="text-size-xxs text-muted mt-1">
-							Defines whether a small icon will appear next to the scenario indicating it's completion status.
-						</div>
-					</Col>
-					<Col xs="2" className="text-right">
-						<Form.Check
-							className="pull-right"
-							type="switch"
-							id={`show_completion_icon-switch-${nanoid(5)}`}
-							label=""
-							checked={enabled}
-							onChange={e => setEnabled(e.target.checked)}
-						/>
-					</Col>
-				</Row>
-				<Form.Check
-					type="switch"
-					className="pull-right"
-					disabled={!enabled}
-					id={`show_completion_icon-${nanoid(5)}`}
-					label="Show Completion Icon?"
-					checked={value}
-					onChange={e => setValue(e.target.checked)}
-				/>
-			</Card.Body>
-		</Card>
+		<div className={cn('mb-2', {'text-muted': !enabled}, 'checkbox-align')}>
+			<Row className="mb-1">
+				<Col xs="10">
+					Show Completion Icon <code className={cn('text-size-xs', {'text-muted': !enabled})}>
+					{value ? '<True>' : '<False>'}
+				</code>
+					<div className="text-size-xxs text-muted mt-1">
+						Defines whether a small icon will appear next to the scenario indicating it's completion status.
+					</div>
+				</Col>
+				<Col xs="2" className="text-right">
+					<Form.Check
+						className="pull-right"
+						type="switch"
+						id={`show_completion_icon-switch-${nanoid(5)}`}
+						label=""
+						checked={enabled}
+						onChange={e => setEnabled(e.target.checked)}
+					/>
+				</Col>
+			</Row>
+			<Form.Check
+				type="switch"
+				className="pull-right"
+				disabled={!enabled}
+				id={`show_completion_icon-${nanoid(5)}`}
+				label="Show Completion Icon?"
+				checked={value}
+				onChange={e => setValue(e.target.checked)}
+			/>
+		</div>
 	);
 };
 

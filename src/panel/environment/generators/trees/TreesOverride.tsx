@@ -238,7 +238,7 @@ const TreesOverride = (props: Props) => {
 			const eventKey = `tree_${name}`;
 
 			nodes.push(
-				<Accordion key={eventKey} defaultActiveKey={eventKey} eventKey={eventKey} headerAfter={
+				<Accordion noCard={true} key={eventKey} defaultActiveKey={eventKey} eventKey={eventKey} headerAfter={
 					<div className="float-right">
 						<Form.Check
 							disabled={!enabled}
@@ -468,8 +468,8 @@ const TreesOverride = (props: Props) => {
 	}, [enabled, selection]);
 
 	return (
-		<Accordion header="Override Tree Prototypes" eventKey="tree_override_panel">
-			<div className="mb-3 checkbox-align">
+		<Accordion noCard={true} header="Override Tree Prototypes" eventKey="tree_override_panel">
+			<div className="mt-2 checkbox-align">
 				<Form.Check
 					className="pull-right"
 					type="switch"

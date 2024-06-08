@@ -49,6 +49,7 @@ const DepositPanel = ( props: Props ) => {
 	return (
 		<>
 			<Deposits onChange={v => setDeposits(v)}/>
+			<hr className="mt-1"/>
 			<DepositOverride onChange={v => setDepositOverride(v)}/>
 		</>
 	);

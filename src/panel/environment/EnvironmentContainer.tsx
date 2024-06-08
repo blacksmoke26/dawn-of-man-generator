@@ -66,9 +66,13 @@ function EnvironmentContainer() {
 
       <Accordion header="Terrain Features" eventKey="environment_terrain">
         <ResourceFactor onChange={v => setResourceFactor(v)}/>
+        <hr className="mt-1"/>
         <DistanceHeightOffset onChange={v => setDistanceHeightOffset(v)}/>
+        <hr className="mt-1"/>
         <FordDistanceFactor onChange={v => setFordDistanceFactor(v)}/>
+        <hr className="mt-1"/>
         <SunAngleFactor onChange={v => setSunAngleFactor(v)}/>
+        <hr className="mt-1"/>
         <BackdropScale onChange={v => setBackdropScale(v)}/>
       </Accordion>
 
@@ -98,17 +102,17 @@ function EnvironmentContainer() {
           {toTemplateText()}
         </SyntaxHighlighter>
       </div>
-      <div className="mt-2">
+      <div className="mt-2 ml-2 mb-2">
         <ButtonGroup size="sm">
           <Button variant="secondary"
                   onClick={() => copyClipboard(toTemplateText())}>
             Copy to Clipboard
           </Button>
           <Button variant="secondary"
-            onClick={() => {
-              const blob = new Blob([toTemplateText()], {type: 'text/xml;charset=utf-8'});
-              FileSaver.saveAs(blob, 'my-environment.xml');
-            }}>
+                  onClick={() => {
+                    const blob = new Blob([toTemplateText()], {type: 'text/xml;charset=utf-8'});
+                    FileSaver.saveAs(blob, 'my-environment.xml');
+                  }}>
             Download File
           </Button>
         </ButtonGroup>

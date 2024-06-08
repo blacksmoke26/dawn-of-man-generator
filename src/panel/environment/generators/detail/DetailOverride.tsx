@@ -238,7 +238,7 @@ const DetailOverride = (props: Props) => {
       const eventKey = `detail_${name}`;
 
       nodes.push(
-        <Accordion key={eventKey} defaultActiveKey={eventKey} eventKey={eventKey} headerAfter={
+        <Accordion noCard={true} key={eventKey} defaultActiveKey={eventKey} eventKey={eventKey} headerAfter={
           <div className="float-right">
             <Form.Check
               disabled={!enabled}
@@ -468,8 +468,8 @@ const DetailOverride = (props: Props) => {
   }, [enabled, selection]);
 
   return (
-    <Accordion header="Override Detail Prototypes" eventKey="detail_override_panel">
-      <div className="mb-3 checkbox-align">
+    <Accordion noCard={true} header="Override Detail Prototypes" eventKey="detail_override_panel">
+      <div className="mt-2 checkbox-align">
         <Form.Check
           className="pull-right"
           type="switch"

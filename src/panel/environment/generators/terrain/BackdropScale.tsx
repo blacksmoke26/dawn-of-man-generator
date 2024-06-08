@@ -88,59 +88,55 @@ const BackdropScale = (props: Props) => {
   }, [enabled, angle1, angle2, angle3]);
 
   return (
-    <>
-      <Card className="mb-2">
-        <Card.Body>
-          <Row className="mb-1">
-            <Col xs="10" className={cn({'text-muted': !enabled})}>
-              Backdrop Scale <code className={cn('pl-2 text-size-xs', {'text-muted': !enabled})}>
-              {angle1}, {angle2}, {angle3}
-            </code>
-              <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                      onClick={() => {
-                        const rand = random.randomBackdropScale();
-                        setAngle1(rand[0]);
-                        setAngle2(rand[1]);
-                        setAngle3(rand[2]);
-                      }}>
-                Random
-              </Button>
-              <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                      onClick={() => {
-                        setAngle1(defaultValues.angle1);
-                        setAngle2(defaultValues.angle2);
-                        setAngle3(defaultValues.angle3);
-                      }}>Reset</Button>
-              <div className="text-size-xxs text-muted mt-1">
-                Change the size of backdrops (the mountains you see beyond the map).
-              </div>
-            </Col>
-            <Col xs="2" className="text-right">
-              <Form.Check
-                className="pull-right"
-                type="switch"
-                id={`backdrop_scale-switch-${nanoid(5)}`}
-                label=""
-                checked={enabled}
-                onChange={e => setEnabled(e.target.checked)}
-              />
-            </Col>
-          </Row>
-          <div className="mb-2">
-            <Slider disabled={!enabled} step={0.01} value={Number(angle1)}
-                    onChange={v => setAngle1(v as number)}/>
+    <div className={cn('mb-2', {'text-muted': !enabled})}>
+      <Row className="mb-1">
+        <Col xs="10" className={cn({'text-muted': !enabled})}>
+          Backdrop Scale <code className={cn('pl-2 text-size-xs', {'text-muted': !enabled})}>
+          {angle1}, {angle2}, {angle3}
+        </code>
+          <Button disabled={!enabled} className="button-reset-sm" variant="link"
+                  onClick={() => {
+                    const rand = random.randomBackdropScale();
+                    setAngle1(rand[0]);
+                    setAngle2(rand[1]);
+                    setAngle3(rand[2]);
+                  }}>
+            Random
+          </Button>
+          <Button disabled={!enabled} className="button-reset-sm" variant="link"
+                  onClick={() => {
+                    setAngle1(defaultValues.angle1);
+                    setAngle2(defaultValues.angle2);
+                    setAngle3(defaultValues.angle3);
+                  }}>Reset</Button>
+          <div className="text-size-xxs text-muted mt-1">
+            Change the size of backdrops (the mountains you see beyond the map).
           </div>
-          <div className="mb-2">
-            <Slider disabled={!enabled} step={0.01} value={Number(angle2)}
-                    onChange={v => setAngle2(v as number)}/>
-          </div>
-          <div className="mb-2">
-            <Slider disabled={!enabled} step={0.01} value={Number(angle3)}
-                    onChange={v => setAngle3(v as number)}/>
-          </div>
-        </Card.Body>
-      </Card>
-    </>
+        </Col>
+        <Col xs="2" className="text-right">
+          <Form.Check
+            className="pull-right"
+            type="switch"
+            id={`backdrop_scale-switch-${nanoid(5)}`}
+            label=""
+            checked={enabled}
+            onChange={e => setEnabled(e.target.checked)}
+          />
+        </Col>
+      </Row>
+      <div className="mb-2">
+        <Slider disabled={!enabled} step={0.01} value={Number(angle1)}
+                onChange={v => setAngle1(v as number)}/>
+      </div>
+      <div className="mb-2">
+        <Slider disabled={!enabled} step={0.01} value={Number(angle2)}
+                onChange={v => setAngle2(v as number)}/>
+      </div>
+      <div className="mb-2">
+        <Slider disabled={!enabled} step={0.01} value={Number(angle3)}
+                onChange={v => setAngle3(v as number)}/>
+      </div>
+    </div>
   );
 };
 

@@ -99,3 +99,19 @@
 .btn-group-sm>.btn, .btn-sm {
 	border-radius: 0 !important;
 }
+
+.syntax-highlighter > pre {
+	border-radius: 0 !important;
+}
+
+.card-header-dark {
+	background: #262d3c !important;
+	margin-bottom: 1rem !important;
+	padding-bottom: 11px !important;
+	padding-top: 11px !important;
+}
+
+.card.no-padding {
+	box-shadow: none;
+
+}

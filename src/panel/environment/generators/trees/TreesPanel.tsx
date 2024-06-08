@@ -57,8 +57,11 @@ const TreesPanel = (props: Props) => {
   return (
     <>
       <GlobalTreeDensity onChange={v => setGlobalTreeDensity(v)}/>
+      <hr/>
       <TreesEverywhere onChange={v => setTreesEverywhere(v)}/>
+      <hr/>
       <Trees onChange={v => setTrees(v)}/>
+      <hr/>
       <TreesOverride onChange={v => setTreesOverride(v)}/>
     </>
   );

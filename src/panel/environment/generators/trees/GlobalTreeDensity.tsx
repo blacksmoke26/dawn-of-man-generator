@@ -67,46 +67,42 @@ const GlobalTreeDensity = ( props: Props ) => {
 	}
 
 	return (
-		<>
-			<Card className={cn('mb-2', {'text-muted': !enabled})}>
-				<Card.Body>
-					<Form.Group as={Row} className="mb-2 checkbox-align">
-						<Form.Label column={true} sm="3">
-							<Form.Check
-								type="switch"
-								id={`global_tree_density-switch-${nanoid(5)}`}
-								label={
-									<span style={{textDecoration: 'underline dotted'}}
-									 title="The global tree density in the environment.">
+		<div className={cn('mb-2', {'text-muted': !enabled})}>
+			<Form.Group as={Row} className="mb-2 checkbox-align">
+				<Form.Label column={true} sm="3">
+					<Form.Check
+						type="switch"
+						id={`global_tree_density-switch-${nanoid(5)}`}
+						label={
+							<span style={{textDecoration: 'underline dotted'}}
+										title="The global tree density in the environment.">
 										Global Tree Density:
 									</span>
-								}
-								onChange={e => setEnabled(Boolean(e.target.checked))}
-							/>
-						</Form.Label>
-						<Col sm="9">
+						}
+						onChange={e => setEnabled(Boolean(e.target.checked))}
+					/>
+				</Form.Label>
+				<Col sm="9">
 								<span className="text-size-xs font-family-code">
 									Value: <code>{value}</code>
 								</span>
-							<Button disabled={!enabled} className="button-reset-sm" variant="link"
-								onClick={() => setValue(random.randomDensity())}>
-								Random
-							</Button>
-							<Button disabled={!enabled} className="button-reset-sm" variant="link"
-								onClick={() => setValue(Defaults.DENSITY_DEFAULT)}>
-								Default
-							</Button>
-							<Button disabled={!enabled} className="button-reset-sm" variant="link"
-								onClick={() => setValue(Defaults.DENSITY_MIN)}>
-								None
-							</Button>
-							<Slider step={0.01} disabled={!enabled} min={Defaults.DENSITY_MIN} max={Defaults.DENSITY_MAX}
-								value={Number(value)} onChange={v => setValue(v as number)}/>
-						</Col>
-					</Form.Group>
-				</Card.Body>
-			</Card>
-		</>
+					<Button disabled={!enabled} className="button-reset-sm" variant="link"
+									onClick={() => setValue(random.randomDensity())}>
+						Random
+					</Button>
+					<Button disabled={!enabled} className="button-reset-sm" variant="link"
+									onClick={() => setValue(Defaults.DENSITY_DEFAULT)}>
+						Default
+					</Button>
+					<Button disabled={!enabled} className="button-reset-sm" variant="link"
+									onClick={() => setValue(Defaults.DENSITY_MIN)}>
+						None
+					</Button>
+					<Slider step={0.01} disabled={!enabled} min={Defaults.DENSITY_MIN} max={Defaults.DENSITY_MAX}
+									value={Number(value)} onChange={v => setValue(v as number)}/>
+				</Col>
+			</Form.Group>
+		</div>
 	);
 };
 

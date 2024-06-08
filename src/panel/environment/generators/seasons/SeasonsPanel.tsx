@@ -96,7 +96,7 @@ const SeasonsPanel = (props: Props) => {
 
   return (
     <div className="checkbox-align">
-      <div className="mb-3">
+      <div className="mb-2">
         <Form.Check
           className="pull-right"
           type="switch"
@@ -106,20 +106,23 @@ const SeasonsPanel = (props: Props) => {
           onChange={e => setEnabled(e.target.checked)}
         />
       </div>
-      <Accordion header="Spring" eventKey="seasons_spring">
+      <Accordion header="Spring" eventKey="seasons_spring" noCard={true}>
         <Spring season={springConfig} onChange={v => setSpring(v)} enabled={enabled}/>
       </Accordion>
-      <Accordion header="Summer" eventKey="seasons_summer">
+      <hr/>
+      <Accordion header="Summer" eventKey="seasons_summer" noCard={true}>
         <Summer season={summerConfig} onChange={v => setSummer(v)} enabled={enabled}/>
       </Accordion>
-      <Accordion header="Fall" eventKey="seasons_fall">
+      <hr/>
+      <Accordion header="Fall" eventKey="seasons_fall" noCard={true}>
         <Fall season={fallConfig} onChange={v => setFall(v)} enabled={enabled}/>
       </Accordion>
-      <Accordion header="Winter" eventKey="seasons_winter">
+      <hr/>
+      <Accordion header="Winter" eventKey="seasons_winter" noCard={true}>
         <Winter season={winterConfig} onChange={v => setWinter(v)} enabled={enabled}/>
       </Accordion>
-
-      <div className="mt-2">
+      <hr/>
+      <div>
         <ButtonGroup>
           <Button disabled={!enabled} variant="secondary" size="sm"
                   onClick={() => {

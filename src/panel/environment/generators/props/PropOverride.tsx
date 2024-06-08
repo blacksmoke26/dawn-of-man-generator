@@ -238,7 +238,7 @@ const PropOverride = (props: Props) => {
       const eventKey = `prop_${name}`;
 
       nodes.push(
-        <Accordion key={eventKey} defaultActiveKey={eventKey} eventKey={eventKey} headerAfter={
+        <Accordion noCard={true} key={eventKey} defaultActiveKey={eventKey} eventKey={eventKey} headerAfter={
           <div className="float-right">
             <Form.Check
               disabled={!enabled}
@@ -468,8 +468,8 @@ const PropOverride = (props: Props) => {
   }, [enabled, selection]);
 
   return (
-    <Accordion header="Override Prop Prototypes" eventKey="prop_override_panel">
-      <div className="mb-3 checkbox-align">
+    <Accordion noCard={true} header="Override Prop Prototypes" eventKey="prop_override_panel">
+      <div className="mt-2 checkbox-align">
         <Form.Check
           className="pull-right"
           type="switch"

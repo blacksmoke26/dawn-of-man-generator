@@ -238,7 +238,7 @@ const DepositOverride = (props: Props) => {
       const eventKey = `deposit_${name}`;
 
       nodes.push(
-        <Accordion key={eventKey} defaultActiveKey={eventKey} eventKey={eventKey} headerAfter={
+        <Accordion key={eventKey} noCard={true} defaultActiveKey={eventKey} eventKey={eventKey} headerAfter={
           <div className="float-right">
             <Form.Check
               disabled={!enabled}
@@ -468,8 +468,8 @@ const DepositOverride = (props: Props) => {
   }, [enabled, selection]);
 
   return (
-    <Accordion header="Override Deposit Prototypes" eventKey="deposit_override_panel">
-      <div className="mb-3 checkbox-align">
+    <Accordion header="Override Deposit Prototypes" noCard={true} eventKey="deposit_override_panel">
+      <div className="mb-3 mt-2 checkbox-align">
         <Form.Check
           className="pull-right"
           type="switch"

@@ -73,45 +73,43 @@ const ResourceFactor = (props: Props) => {
   }, [resource, enabled]);
 
   return (
-    <Card className={cn('mb-2', {'text-muted': !enabled})}>
-      <Card.Body>
-        <Row className="mb-1">
-          <Col xs="10">
-            Resource Factor <code className={cn('pl-2 text-size-xs', {'text-muted': !enabled})}>
-            {resource}
-          </code>
-            <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                    onClick={() => setResource(random.randomResource())}>
-              Random
-            </Button>
-            <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                    onClick={() => setResource(Defaults.RESOURCE_FACTOR_DEFAULT)}>Default</Button>
-            <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                    onClick={() => setResource(Defaults.RESOURCE_FACTOR_MAX)}>Max</Button>
-            <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                    onClick={() => setResource(Defaults.RESOURCE_FACTOR_MIN)}>None</Button>
-            <div className="text-size-xxs text-muted mt-1">
-              The amount of resources in the map. 1 is the default.
-            </div>
-          </Col>
-          <Col xs="2" className="text-right">
-            <Form.Check
-              className="pull-right"
-              type="switch"
-              id={`river-switch-${nanoid(5)}`}
-              label=""
-              checked={enabled}
-              onChange={e => setEnabled(e.target.checked)}
-            />
-          </Col>
-        </Row>
-        <Slider step={0.01}
-                min={0}
-                max={100}
-                disabled={!enabled} value={Number(resource)}
-                onChange={v => setResource(v as number)}/>
-      </Card.Body>
-    </Card>
+    <div className={cn('mb-2', {'text-muted': !enabled})}>
+      <Row className="mb-1">
+        <Col xs="10">
+          Resource Factor <code className={cn('pl-2 text-size-xs', {'text-muted': !enabled})}>
+          {resource}
+        </code>
+          <Button disabled={!enabled} className="button-reset-sm" variant="link"
+                  onClick={() => setResource(random.randomResource())}>
+            Random
+          </Button>
+          <Button disabled={!enabled} className="button-reset-sm" variant="link"
+                  onClick={() => setResource(Defaults.RESOURCE_FACTOR_DEFAULT)}>Default</Button>
+          <Button disabled={!enabled} className="button-reset-sm" variant="link"
+                  onClick={() => setResource(Defaults.RESOURCE_FACTOR_MAX)}>Max</Button>
+          <Button disabled={!enabled} className="button-reset-sm" variant="link"
+                  onClick={() => setResource(Defaults.RESOURCE_FACTOR_MIN)}>None</Button>
+          <div className="text-size-xxs text-muted mt-1">
+            The amount of resources in the map. 1 is the default.
+          </div>
+        </Col>
+        <Col xs="2" className="text-right">
+          <Form.Check
+            className="pull-right"
+            type="switch"
+            id={`river-switch-${nanoid(5)}`}
+            label=""
+            checked={enabled}
+            onChange={e => setEnabled(e.target.checked)}
+          />
+        </Col>
+      </Row>
+      <Slider step={0.01}
+              min={0}
+              max={100}
+              disabled={!enabled} value={Number(resource)}
+              onChange={v => setResource(v as number)}/>
+    </div>
   );
 };
 
