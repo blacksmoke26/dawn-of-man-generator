@@ -29,6 +29,7 @@ import Visible from './generators/general/Visible';
 import GroupID from '~/panel/scenario/generators/general/GroupID';
 import ShowCompletionIcon from './generators/general/ShowCompletionIcon';
 import RequiredScenario from './generators/general/RequiredScenario';
+import CustomSettlementNameAllowed from './generators/general/CustomSettlementNameAllowed';
 import LocationContainer from './generators/location/LocationContainer';
 
 // utils
@@ -51,6 +52,7 @@ const ScenarioContainer = () => {
     mapSize: '',
     showCompletionIcon: '',
     requiredScenario: '',
+    customSettlementNameAllowed: '',
     loadingScreens: '',
     startingConditions: '',
     visible: '',
@@ -135,6 +137,8 @@ const ScenarioContainer = () => {
         <ShowCompletionIcon onChange={v => updateText('showCompletionIcon', v)}/>
         <hr className="mt-1"/>
         <RequiredScenario onChange={v => updateText('requiredScenario', v)}/>
+        <hr className="mt-1"/>
+        <CustomSettlementNameAllowed onChange={v => updateText('customSettlementNameAllowed', v)}/>
         <hr className="mt-1"/>
         <LoadingScreen onChange={v => updateText('loadingScreens', v)}/>
         <hr className="mt-1"/>

@@ -35,6 +35,7 @@ export interface Scenario {
   size?: number;
   requiredScenario?: string;
   startingCondition?: StartingCondition;
+  customSettlementNameAllowed?: boolean;
   loadingScreen?: string;
   locations?: Json[];
 }
