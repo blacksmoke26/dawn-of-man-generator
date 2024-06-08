@@ -30,6 +30,9 @@ import GroupID from '~/panel/scenario/generators/general/GroupID';
 import ShowCompletionIcon from './generators/general/ShowCompletionIcon';
 import RequiredScenario from './generators/general/RequiredScenario';
 import CustomSettlementNameAllowed from './generators/general/CustomSettlementNameAllowed';
+import StartingCondition from './generators/general/StartingCondition';
+import LoadingScreen from './generators/general/LoadingScreen';
+import RequiredMilestone from '~/panel/scenario/generators/general/RequiredMilestone';
 import LocationContainer from './generators/location/LocationContainer';
 
 // utils
@@ -37,8 +40,6 @@ import {nodesToLanguageStrings} from '~/utils/location';
 
 // types
 import type {Json} from '~/types/json.types';
-import StartingCondition from './generators/general/StartingCondition';
-import LoadingScreen from './generators/general/LoadingScreen';
 
 const SCENARIO_NAME: string = 'scenario';
 
@@ -52,6 +53,7 @@ const ScenarioContainer = () => {
     mapSize: '',
     showCompletionIcon: '',
     requiredScenario: '',
+    requiredMilestone: '',
     customSettlementNameAllowed: '',
     loadingScreens: '',
     startingConditions: '',
@@ -137,6 +139,8 @@ const ScenarioContainer = () => {
         <ShowCompletionIcon onChange={v => updateText('showCompletionIcon', v)}/>
         <hr className="mt-1"/>
         <RequiredScenario onChange={v => updateText('requiredScenario', v)}/>
+        <hr className="mt-1"/>
+        <RequiredMilestone onChange={v => updateText('requiredMilestone', v)}/>
         <hr className="mt-1"/>
         <CustomSettlementNameAllowed onChange={v => updateText('customSettlementNameAllowed', v)}/>
         <hr className="mt-1"/>
