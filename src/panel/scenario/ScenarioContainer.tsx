@@ -33,6 +33,8 @@ import {nodesToLanguageStrings} from '~/utils/location';
 
 // types
 import type {Json} from '~/types/json.types';
+import StartingCondition from './generators/general/StartingCondition';
+import LoadingScreen from './generators/general/LoadingScreen';
 
 const SCENARIO_NAME: string = 'scenario';
 
@@ -46,6 +48,8 @@ const ScenarioContainer = () => {
     mapSize: '',
     showCompletionIcon: '',
     requiredScenario: '',
+    loadingScreens: '',
+    startingConditions: '',
     visible: '',
     locations: '',
   });
@@ -122,6 +126,8 @@ const ScenarioContainer = () => {
         <MapSize onChange={v => updateText('mapSize', v)}/>
         <ShowCompletionIcon onChange={v => updateText('showCompletionIcon', v)}/>
         <RequiredScenario onChange={v => updateText('requiredScenario', v)}/>
+        <LoadingScreen onChange={v => updateText('loadingScreens', v)}/>
+        <StartingCondition onChange={v => updateText('startingConditions', v)}/>
         <Visible onChange={v => updateText('visible', v)}/>
       </Accordion>
       <Accordion header="Locations" eventKey="locations">
