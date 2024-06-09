@@ -75,7 +75,7 @@ export type TimeElapsed =
   | 'GoalsCompletedTime'
   | 'PrimalVisionTime';
 
-type ValueEqualsType =
+export type ValueEqualsType =
   | 'Population'
   | 'DomesticAnimalCount'
   | 'CompletedMilestones'
@@ -94,7 +94,7 @@ type ValueEqualsType =
   | 'CurrentGameMode'
   | 'CurrentStartMode';
 
-type ValueReachedType =
+export type ValueReachedType =
   | 'Population'
   | 'DomesticAnimalCount'
   | 'CompletedMilestones'
@@ -112,7 +112,7 @@ export type InteractionType =
   | 'None'
   | 'CustomizePanels';
 
-interface ConditionAnd {
+export interface ConditionAnd {
   subConditions: SubConditions;
 }
 
@@ -175,10 +175,11 @@ export interface ConditionNewGame {
   startMode: StartMode;
 }
 
-interface ConditionNot {
+export interface ConditionNot {
   subConditions: SubConditions;
 }
-interface ConditionOr {
+
+export interface ConditionOr {
   subConditions: SubConditions;
 }
 
@@ -192,7 +193,7 @@ export interface ConditionTechUnlocked {
   tech: TechEntityType;
   /** Space seperated values of `TechEntityType` <br>
    * e.g., 'armor' or 'armor baking ...' */
-  techs: string;
+  techs: TechEntityType[];
 }
 
 export interface ConditionTimeElapsed {
