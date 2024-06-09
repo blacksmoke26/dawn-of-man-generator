@@ -25,6 +25,10 @@ import {
   XIcon
 } from 'lucide-react';
 
+export const COLOR_DISABLED: string = 'rgba(255, 255, 255, .5';
+
+export const COLOR_REDDISH: string = '#ff8a65';
+
 export const iconDefaultProps: Partial<LucideProps> = {
   className: 'd-inline position-relative',
   height: 14,
