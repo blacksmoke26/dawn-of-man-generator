@@ -8,7 +8,7 @@ import randomInt from 'random-int';
 import randomFloatMod from 'random-float';
 import uniqueRandomArray from 'unique-random-array';
 
-// Utils
+// utils
 import {
   SEASON_TEMPERATURE_MAX, SEASON_TEMPERATURE_MIN,
   RESOURCE_FACTOR_MIN, RESOURCE_FACTOR_MAX,
@@ -17,8 +17,10 @@ import {
   ALTITUDE_MIN, ALTITUDE_MAX,
   HUMIDITY_MIN, HUMIDITY_MAX, SEASON_WIND_MIN, SEASON_WIND_MAX, PERIOD_MAX, PERIOD_MIN, DEFAULT_DISASTER,
 } from './defaults';
-import {DisasterType} from '~/types/scenario.types';
+import {ENTITY_COUNT_MAX, ENTITY_COUNT_MIN, PERFORMERS_MAX, PERFORMERS_MIN} from '~/utils/condition';
 
+// types
+import {DisasterType} from '~/types/scenario.types';
 
 /** Deposits types */
 export const deposits: string[] = [
@@ -169,4 +171,14 @@ export const randomPeriod = (): string => {
 /** Random disaster */
 export const randomDisaster = (): DisasterType => {
   return uniqueRandomArray(DEFAULT_DISASTER)() as DisasterType;
+};
+
+/** Random performers (condition) */
+export const randomPerformers = (): number => {
+  return randomInt(PERFORMERS_MIN, PERFORMERS_MAX);
+};
+
+/** Random entity count (condition) */
+export const randomEntityCount = (): number => {
+  return randomInt(ENTITY_COUNT_MIN, ENTITY_COUNT_MAX);
 };
