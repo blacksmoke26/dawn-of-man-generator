@@ -8,7 +8,7 @@ import React from 'react';
 import merge from 'deepmerge';
 
 import {
-  BlocksIcon,
+  BlocksIcon, BrainCircuitIcon,
   Flower2Icon,
   HammerIcon,
   LeafIcon,
@@ -86,4 +86,8 @@ export const IconHammer = (props: LucideProps) => (
 
 export const IconStorm = (props: LucideProps) => (
   <ThermometerSnowflakeIcon {...merge(iconDefaultProps, props)}/>
+);
+
+export const IconCondition = (props: LucideProps) => (
+  <BrainCircuitIcon {...merge(iconDefaultProps, props)}/>
 );
