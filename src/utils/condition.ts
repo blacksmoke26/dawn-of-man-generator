@@ -15,6 +15,10 @@ export const PERFORMERS_MIN: number = 0;
 
 export const PERFORMERS_MAX: number = 250;
 
+export const WORKERS_MIN: number = 1;
+
+export const WORKERS_MAX: number = 250;
+
 export const defaultsParams: DeepPartial<ConditionDefaultParams> = {
   anyTasksActive: {
     minPerformers: PERFORMERS_MIN,

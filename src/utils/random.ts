@@ -17,7 +17,14 @@ import {
   ALTITUDE_MIN, ALTITUDE_MAX,
   HUMIDITY_MIN, HUMIDITY_MAX, SEASON_WIND_MIN, SEASON_WIND_MAX, PERIOD_MAX, PERIOD_MIN, DEFAULT_DISASTER,
 } from './defaults';
-import {ENTITY_COUNT_MAX, ENTITY_COUNT_MIN, PERFORMERS_MAX, PERFORMERS_MIN} from '~/utils/condition';
+import {
+  ENTITY_COUNT_MAX,
+  ENTITY_COUNT_MIN,
+  PERFORMERS_MAX,
+  PERFORMERS_MIN,
+  WORKERS_MAX,
+  WORKERS_MIN
+} from '~/utils/condition';
 
 // types
 import {DisasterType} from '~/types/scenario.types';
@@ -176,6 +183,11 @@ export const randomDisaster = (): DisasterType => {
 /** Random performers (condition) */
 export const randomPerformers = (): number => {
   return randomInt(PERFORMERS_MIN, PERFORMERS_MAX);
+};
+
+/** Random workers (condition) */
+export const randomWorkers = (): number => {
+  return randomInt(WORKERS_MIN, WORKERS_MAX);
 };
 
 /** Random entity count (condition) */
