@@ -114,7 +114,7 @@ const AnyTasksActive = (props: DeepPartial<Props>) => {
             aria-disabled={!attributes.enabled}
             id={`condition-${nanoid(5)}`}
             placeholder="e.g., protein_hoarding"
-            value={attributes.taskType}
+            value={attributes?.taskType || ''}
             onChange={e => setAttribute('taskType', e.target.value.replace(/['"]+/ig, ``))}
           />
         </Col>
