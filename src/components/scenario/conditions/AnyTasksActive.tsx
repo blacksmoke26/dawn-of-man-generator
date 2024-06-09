@@ -86,8 +86,7 @@ const AnyTasksActive = (props: DeepPartial<Props>) => {
   return (
     <div className={cn('mb-2', {'text-muted': !attributes.enabled}, 'checkbox-align')}>
       <Row className="mb-1">
-        <Col xs="10"><IconCondition width="17" height="17" color="#ff8a65"/> <strong>Condition</strong>: Any Tasks
-          Active</Col>
+        <Col xs="10"><IconCondition width="17" height="17" color="#ff8a65"/> <strong>Condition</strong>: AnyTasksActive</Col>
         <Col xs="2" className="text-right">
           <Form.Check
             className="pull-right"
