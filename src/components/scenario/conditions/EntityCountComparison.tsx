@@ -148,7 +148,6 @@ const EntityCountComparison = (props: DeepPartial<Props>) => {
         </Col>
         <Col xs="5">
           <Select
-            defaultMenuIsOpen={true}
             isDisabled={!attributes.enabled}
             menuPortalTarget={document.body}
             options={ENTITIES_OPTIONS}
