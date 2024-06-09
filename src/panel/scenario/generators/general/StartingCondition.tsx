@@ -1,9 +1,7 @@
-// @flow
-
 /**
  * @author Junaid Atari <mj.atari@gmail.com>
- * @link http://junaidatari.com Author Website
- * @since 2019-11-07
+ * @see https://github.com/blacksmoke26/dawn-of-man-generator
+ * @since 2020-08-29
  */
 
 import React from 'react';
@@ -130,7 +128,6 @@ const StartingCondition = (props: Props) => {
                   isSearchable={false}
                   placeholder="Choose season"
                   value={{label: attributes.seasonId, value: attributes.seasonId}}
-            /*defaultInputValue={attributes.seasonId}*/
                   options={renderSelectOptions()}
                   onChange={(option: Option | any, {action}): void => {
                     if (action === 'select-option' && option) {
