@@ -18,6 +18,8 @@ import {
   HUMIDITY_MIN, HUMIDITY_MAX, SEASON_WIND_MIN, SEASON_WIND_MAX, PERIOD_MAX, PERIOD_MIN, DEFAULT_DISASTER,
 } from './defaults';
 import {
+  DISTANCE_MAX,
+  DISTANCE_MIN,
   ENTITY_COUNT_MAX,
   ENTITY_COUNT_MIN,
   PERFORMERS_MAX,
@@ -193,4 +195,9 @@ export const randomWorkers = (): number => {
 /** Random entity count (condition) */
 export const randomEntityCount = (): number => {
   return randomInt(ENTITY_COUNT_MIN, ENTITY_COUNT_MAX);
+};
+
+/** Random distance (condition) */
+export const randomDistance = (): number => {
+  return randomInt(DISTANCE_MIN, DISTANCE_MAX);
 };

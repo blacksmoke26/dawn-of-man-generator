@@ -146,7 +146,7 @@ export interface ConditionEntityCountReached {
 }
 
 export interface ConditionEntityNearMarker {
-  entityType: TechEntityType;
+  entityType: EntityType;
   /**
    * Decimal Number
    * @default 20

@@ -21,6 +21,10 @@ export const WORKERS_MIN: number = 1;
 
 export const WORKERS_MAX: number = 250;
 
+export const DISTANCE_MIN: number = 1;
+
+export const DISTANCE_MAX: number = 360;
+
 export const LOGICAL_CONDITION: string[] = [
   'And',
   'Not',
