@@ -14,7 +14,7 @@ import {nanoid} from 'nanoid';
 import {Button, Col, Form, Row} from 'react-bootstrap';
 
 // icons
-import {IconCondition} from '~/components/icons/app';
+import {COLOR_DISABLED, COLOR_REDDISH, IconCondition} from '~/components/icons/app';
 
 // elemental components
 import Slider from '~/components/ui/Slider';
@@ -86,7 +86,11 @@ const AnyTasksActive = (props: DeepPartial<Props>) => {
   return (
     <div className={cn('mb-2', {'text-muted': !attributes.enabled}, 'checkbox-align')}>
       <Row className="mb-1">
-        <Col xs="10"><IconCondition width="17" height="17" color="#ff8a65"/> <strong>Condition</strong>: AnyTasksActive</Col>
+        <Col xs="10">
+          <IconCondition width="17" height="17"
+                         color={!attributes.enabled ? COLOR_DISABLED : COLOR_REDDISH}/>
+          {' '} <strong>Condition</strong>: AnyTasksActive
+        </Col>
         <Col xs="2" className="text-right">
           <Form.Check
             className="pull-right"
@@ -98,11 +102,11 @@ const AnyTasksActive = (props: DeepPartial<Props>) => {
           />
         </Col>
       </Row>
-      <Row className="mb-1 mt-3">
+      <Row className="mb-1 mt-2">
         <Col xs="2">
-            <span className="position-relative" style={{top: 7}}>
+            <div className="position-relative pl-3" style={{top: 7}}>
               Task Type
-            </span>
+            </div>
         </Col>
         <Col xs="6">
           <Form.Control
@@ -120,9 +124,9 @@ const AnyTasksActive = (props: DeepPartial<Props>) => {
       </Row>
       <Row className="mb-1 mt-3">
         <Col xs="2">
-            <span className="position-relative" style={{top: 7}}>
+            <div className="position-relative pl-3" style={{top: 7}}>
               Min Performers
-            </span>
+            </div>
         </Col>
         <Col xs="6">
           <span className="text-size-xs font-family-code">

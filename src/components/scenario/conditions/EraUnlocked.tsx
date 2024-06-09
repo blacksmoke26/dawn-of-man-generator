@@ -22,7 +22,7 @@ import {defaultsParams, ERAS} from '~/utils/condition';
 // types
 import type {$Keys, DeepPartial} from 'utility-types';
 import type {ConditionEraUnlocked as ConditionAttributes, EraType,} from '~/types/condition.types';
-import {IconCondition} from '~/components/icons/app';
+import {COLOR_DISABLED, COLOR_REDDISH, IconCondition} from '~/components/icons/app';
 import {nanoid} from 'nanoid';
 import {capitalCase} from 'change-case';
 
@@ -81,8 +81,11 @@ const EraUnlocked = (props: DeepPartial<Props>) => {
   return (
     <div className={cn('mb-2', {'text-muted': !attributes.enabled}, 'checkbox-align')}>
       <Row className="mb-1">
-        <Col xs="10"><IconCondition width="17" height="17" color="#ff8a65"/> <strong>Condition</strong>:
-          EraUnlocked</Col>
+        <Col xs="10">
+          <IconCondition width="17" height="17"
+                         color={!attributes.enabled ? COLOR_DISABLED : COLOR_REDDISH}/>
+          {' '} <strong>Condition</strong>: EraUnlocked
+        </Col>
         <Col xs="2" className="text-right">
           <Form.Check
             className="pull-right"
@@ -94,11 +97,9 @@ const EraUnlocked = (props: DeepPartial<Props>) => {
           />
         </Col>
       </Row>
-      <Row className="mb-1 mt-3">
+      <Row className="mb-1 mt-2">
         <Col xs="2">
-            <span className="position-relative" style={{top: 7}}>
-              Era
-            </span>
+            <div className="position-relative pl-3" style={{top: 7}}>Era</div>
         </Col>
         <Col xs="5">
           <Select

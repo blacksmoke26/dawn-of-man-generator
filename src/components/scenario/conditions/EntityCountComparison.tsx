@@ -15,7 +15,7 @@ import {capitalCase} from 'change-case';
 import {Button, Col, Form, Row} from 'react-bootstrap';
 
 // icons
-import {IconCondition} from '~/components/icons/app';
+import {COLOR_DISABLED, COLOR_REDDISH, IconCondition} from '~/components/icons/app';
 
 // elemental components
 import Slider from '~/components/ui/Slider';
@@ -25,17 +25,14 @@ import Select, {Option} from '~/components/ui/Select';
 import * as random from '~/utils/random';
 import {ENTITIES, ENTITIES_OPTIONS} from '~/utils/entities';
 import {toEntityCount} from '~/utils/units';
-import {
-  COMPARISONS, COUNTERS, defaultsParams,
-  ENTITY_COUNT_MAX, ENTITY_COUNT_MIN
-} from '~/utils/condition';
+import {COMPARISONS, COUNTERS, defaultsParams, ENTITY_COUNT_MAX, ENTITY_COUNT_MIN} from '~/utils/condition';
 
 // types
 import type {$Keys, DeepPartial} from 'utility-types';
 import {
-  CounterType,
   ComparisonType,
   ConditionEntityCountComparison as ConditionAttributes,
+  CounterType,
 } from '~/types/condition.types';
 import type {EntityType} from '~/types/entity.types';
 
@@ -106,8 +103,11 @@ const EntityCountComparison = (props: DeepPartial<Props>) => {
   return (
     <div className={cn('mb-2', {'text-muted': !attributes.enabled}, 'checkbox-align')}>
       <Row className="mb-1">
-        <Col xs="10"><IconCondition width="17" height="17" color="#ff8a65"/> <strong>Condition</strong>:
-          EntityCountComparison</Col>
+        <Col xs="10">
+          <IconCondition width="17" height="17"
+                         color={!attributes.enabled ? COLOR_DISABLED : COLOR_REDDISH}/>
+          {' '} <strong>Condition</strong>: EntityCountComparison
+        </Col>
         <Col xs="2" className="text-right">
           <Form.Check
             className="pull-right"
@@ -119,11 +119,11 @@ const EntityCountComparison = (props: DeepPartial<Props>) => {
           />
         </Col>
       </Row>
-      <Row className="mb-1 mt-3">
+      <Row className="mb-1 mt-2">
         <Col xs="2">
-            <span className="position-relative" style={{top: 7}}>
+            <div className="position-relative pl-3" style={{top: 7}}>
               Counter
-            </span>
+            </div>
         </Col>
         <Col xs="4">
           <Select
@@ -142,9 +142,9 @@ const EntityCountComparison = (props: DeepPartial<Props>) => {
       </Row>
       <Row className="mb-1 mt-3">
         <Col xs="2">
-            <span className="position-relative" style={{top: 7}}>
+            <div className="position-relative pl-3" style={{top: 7}}>
               Entity Type
-            </span>
+            </div>
         </Col>
         <Col xs="5">
           <Select
@@ -162,9 +162,9 @@ const EntityCountComparison = (props: DeepPartial<Props>) => {
       </Row>
       <Row className="mb-1 mt-3">
         <Col xs="2">
-            <span className="position-relative" style={{top: 7}}>
+            <div className="position-relative pl-3" style={{top: 7}}>
               Comparison
-            </span>
+            </div>
         </Col>
         <Col xs="4">
           <Select
@@ -183,9 +183,9 @@ const EntityCountComparison = (props: DeepPartial<Props>) => {
       </Row>
       <Row className="mb-1 mt-3">
         <Col xs="2">
-            <span className="position-relative" style={{top: 7}}>
+            <div className="position-relative pl-3" style={{top: 7}}>
               Value
-            </span>
+            </div>
         </Col>
         <Col xs="6">
           <span className="text-size-xs font-family-code">

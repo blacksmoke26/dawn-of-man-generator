@@ -27,7 +27,7 @@ import {defaultsParams, DISTANCE_MAX, DISTANCE_MIN} from '~/utils/condition';
 import type {$Keys, DeepPartial} from 'utility-types';
 import type {EntityType} from '~/types/entity.types';
 import type {ConditionEntityNearMarker as ConditionAttributes,} from '~/types/condition.types';
-import {IconCondition} from '~/components/icons/app';
+import {COLOR_DISABLED, COLOR_REDDISH, IconCondition} from '~/components/icons/app';
 import {nanoid} from 'nanoid';
 
 interface Attributes extends ConditionAttributes {
@@ -89,8 +89,11 @@ const EntityNearMarker = (props: DeepPartial<Props>) => {
   return (
     <div className={cn('mb-2', {'text-muted': !attributes.enabled}, 'checkbox-align')}>
       <Row className="mb-1">
-        <Col xs="10"><IconCondition width="17" height="17" color="#ff8a65"/> <strong>Condition</strong>:
-          EntityNearMarker</Col>
+        <Col xs="10">
+          <IconCondition width="17" height="17"
+                         color={!attributes.enabled ? COLOR_DISABLED : COLOR_REDDISH}/>
+          {' '} <strong>Condition</strong>: EntityNearMarker
+        </Col>
         <Col xs="2" className="text-right">
           <Form.Check
             className="pull-right"
@@ -102,11 +105,11 @@ const EntityNearMarker = (props: DeepPartial<Props>) => {
           />
         </Col>
       </Row>
-      <Row className="mb-1 mt-3">
+      <Row className="mb-1 mt-2">
         <Col xs="2">
-            <span className="position-relative" style={{top: 7}}>
+            <div className="position-relative pl-3" style={{top: 7}}>
               Entity Type
-            </span>
+            </div>
         </Col>
         <Col xs="5">
           <Select
@@ -124,9 +127,9 @@ const EntityNearMarker = (props: DeepPartial<Props>) => {
       </Row>
       <Row className="mb-1 mt-3">
         <Col xs="2">
-            <span className="position-relative" style={{top: 7}}>
+            <div className="position-relative pl-3" style={{top: 7}}>
               Distance
-            </span>
+            </div>
         </Col>
         <Col xs="6">
           <span className="text-size-xs font-family-code">
