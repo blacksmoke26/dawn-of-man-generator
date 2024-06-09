@@ -15,7 +15,7 @@ export const theme = (theme: any) => ({
     neutral10: '#2a3141',
     neutral20: '#293040',
     neutral30: '#293040',
-    neutral40: 'rgba(255,255,255,.1)',
+    neutral40: 'rgba(255,255,255,.6)',
     neutral50: 'rgba(255,255,255,.2)',
     neutral60: 'rgba(255,255,255,.7)',
     neutral70: 'rgba(255,255,255,.7)',
