@@ -214,8 +214,8 @@ const ConditionLogical = (props: Props) => {
           delete componentProps?.internalName;
 
           return (
-            <>
-              <div className="ml-3 pl-3" style={{borderLeft: '2px solid #616978'}} key={_id}>
+            <React.Fragment key={_id}>
+              <div className="ml-3 pl-3" style={{borderLeft: '2px solid #616978'}}>
                 <ConditionComponent
                   {...componentProps}
                   disabledCheckbox={!enabled}
@@ -225,7 +225,7 @@ const ConditionLogical = (props: Props) => {
                   }}/>
               </div>
               {index < totalCount-1 && <hr className="mt-2 mb-2"/>}
-            </>
+            </React.Fragment>
           );
         })}
       </div>
