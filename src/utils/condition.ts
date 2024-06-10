@@ -144,36 +144,59 @@ export const INTERACTIONS: string[] = [
 
 export const defaultsParams: DeepPartial<ConditionDefaultParams> = {
   anyTasksActive: {
+    taskType: undefined,
     minPerformers: PERFORMERS_MIN,
   },
   anyWorkAreasActive: {
+    workAreaId: undefined,
     maxWorkers: 1
   },
   entityCountComparison: {
-    counter: 'All',
+    counter: undefined,
+    entityType: undefined,
     value: ENTITY_COUNT_DEFAULT,
+    comparison: undefined,
   },
   entityCountReached: {
+    counter: undefined,
+    entityType: undefined,
     value: ENTITY_COUNT_DEFAULT,
   },
   entityNearMarker: {
+    entityType: undefined,
     distance: 20,
   },
-  eraUnlocked: {},
+  eraUnlocked: {
+    era: undefined,
+  },
   initGame: {},
-  isAlive: {},
-  isGameInteractionPending: {},
-  newGame: {},
+  isAlive: {
+    name: undefined,
+  },
+  isGameInteractionPending: {
+    value: undefined,
+  },
+  newGame: {
+    startMode: undefined,
+  },
   scenarioCompleted: {
+    id: undefined,
     gameMode: 'Normal',
   },
-  techUnlocked: {},
+  techUnlocked: {
+    tech: undefined,
+    techs: [],
+  },
   timeElapsed: {
     timer: 'RealTime',
     value: 0,
   },
-  valueEquals: {},
+  valueEquals: {
+    id: undefined,
+    value: '',
+  },
   valueReached: {
+    id: undefined,
     value: ENTITY_COUNT_DEFAULT,
   },
 };
