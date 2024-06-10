@@ -8,7 +8,8 @@ import React from 'react';
 import merge from 'deepmerge';
 
 import {
-  BlocksIcon, BrainCircuitIcon,
+  AmpersandIcon, BlendIcon,
+  BlocksIcon, BrainCircuitIcon, EqualNotIcon,
   Flower2Icon,
   HammerIcon,
   LeafIcon,
@@ -94,4 +95,16 @@ export const IconStorm = (props: LucideProps) => (
 
 export const IconCondition = (props: LucideProps) => (
   <BrainCircuitIcon {...merge(iconDefaultProps, props)}/>
+);
+
+export const IconConditionAnd = (props: LucideProps) => (
+  <AmpersandIcon {...merge(iconDefaultProps, props)}/>
+);
+
+export const IconConditionOr = (props: LucideProps) => (
+  <BlendIcon {...merge(iconDefaultProps, props)}/>
+);
+
+export const IconConditionNot = (props: LucideProps) => (
+  <EqualNotIcon {...merge(iconDefaultProps, props)}/>
 );
