@@ -43,6 +43,23 @@ export type GeneralCondition =
   | 'ValueEquals'
   | 'ValueReached';
 
+export type GeneralConditionKey =
+  | 'anyTasksActive'
+  | 'anyWorkAreasActive'
+  | 'entityCountComparison'
+  | 'entityCountReached'
+  | 'entityNearMarker'
+  | 'eraUnlocked'
+  | 'initGame'
+  | 'isAlive'
+  | 'isGameInteractionPending'
+  | 'newGame'
+  | 'scenarioCompleted'
+  | 'techUnlocked'
+  | 'timeElapsed'
+  | 'valueEquals'
+  | 'valueReached';
+
 export type CounterType =
   | 'All'
   | 'PlayerEntities'
@@ -218,21 +235,21 @@ export interface ConditionValueReached {
 }
 
 export type ConditionType =
-  | ConditionAnyTasksActive
-  | ConditionAnyWorkAreasActive
-  | ConditionEntityCountComparison
-  | ConditionEntityCountReached
-  | ConditionEntityNearMarker
-  | ConditionEraUnlocked
-  | ConditionInitGame
-  | ConditionIsAlive
-  | ConditionIsGameInteractionPending
-  | ConditionNewGame
-  | ConditionScenarioCompleted
-  | ConditionTechUnlocked
-  | ConditionTimeElapsed
-  | ConditionValueEquals
-  | ConditionValueReached;
+  | Condition<ConditionAnyTasksActive>
+  | Condition<ConditionAnyWorkAreasActive>
+  | Condition<ConditionEntityCountComparison>
+  | Condition<ConditionEntityCountReached>
+  | Condition<ConditionEntityNearMarker>
+  | Condition<ConditionEraUnlocked>
+  | Condition<ConditionInitGame>
+  | Condition<ConditionIsAlive>
+  | Condition<ConditionIsGameInteractionPending>
+  | Condition<ConditionNewGame>
+  | Condition<ConditionScenarioCompleted>
+  | Condition<ConditionTechUnlocked>
+  | Condition<ConditionTimeElapsed>
+  | Condition<ConditionValueEquals>
+  | Condition<ConditionValueReached>;
 
 export type ConditionParams<Condition> = {
   [Property in keyof Condition]: Condition[Property];
@@ -241,6 +258,7 @@ export type ConditionParams<Condition> = {
 export type SubConditions = ConditionType[];
 
 export type Condition<O> = {
+  internalName: GeneralCondition;
   type: LogicalCondition | GeneralCondition;
 } & ConditionParams<O>;
 
