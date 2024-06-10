@@ -30,7 +30,6 @@ import {useAppSelector} from '~redux/hooks';
 
 // types
 import type {Json} from '~/types/json.types';
-import type {DisasterType} from '~/types/scenario.types';
 
 export interface Attributes {
   enabled?: boolean;
