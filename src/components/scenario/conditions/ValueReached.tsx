@@ -21,7 +21,9 @@ import {COLOR_DISABLED, COLOR_REDDISH, IconCondition} from '~/components/icons/a
 import Select, {Option} from '~/components/ui/Select';
 
 // utils
-import {defaultsParams, ENTITY_COUNT_DEFAULT, VALUE_EQUALS, VALUE_REACHED} from '~/utils/condition';
+import {toString} from '~/helpers/string';
+import {toInteger} from '~/helpers/number';
+import {defaultsParams, VALUE_REACHED} from '~/utils/condition';
 
 // types
 import type {$Keys, DeepPartial} from 'utility-types';
@@ -29,6 +31,7 @@ import type {ConditionValueReached as ConditionAttributes, ValueReachedType} fro
 
 interface Attributes extends ConditionAttributes {
   enabled: boolean;
+  disabledCheckbox?: boolean;
 }
 
 interface Props extends Attributes {
@@ -40,15 +43,16 @@ const CONDITION_NAME: string = 'ValueReached';
 const ValueReached = (props: DeepPartial<Props>) => {
   const newProps = merge.all<Props>([{
     enabled: false,
-    value: ENTITY_COUNT_DEFAULT,
+    disabledCheckbox: false,
     onChange: () => {
     },
   }, defaultsParams.valueReached as Props, props]);
 
   const [attributes, setAttributes] = React.useState<Attributes>({
     enabled: newProps.enabled as boolean,
-    id: newProps.id as ValueReachedType,
-    value: newProps.value as number,
+    disabledCheckbox: newProps.disabledCheckbox as boolean,
+    id: toString<ValueReachedType>(newProps.id),
+    value: toInteger(newProps?.value),
   });
 
   const setAttribute = <T = any>(name: $Keys<Attributes>, value: T) => {
@@ -77,20 +81,23 @@ const ValueReached = (props: DeepPartial<Props>) => {
 
   // Reflect prop changes
   React.useEffect(() => {
-    'enabled' in props && setAttribute('enabled', props.enabled);
+    setAttribute('enabled', props.enabled);
+    setAttribute('disabledCheckbox', props.disabledCheckbox);
 
-    if (attributes.enabled) {
+    if (props.enabled) {
       props?.id && setAttribute('id', props.id?.toString());
       props?.value && setAttribute('value', props.value?.toString()?.trim());
     }
-  }, [props, attributes.enabled]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props]);
+
+  const isDisabled = attributes.disabledCheckbox || !attributes.enabled;
 
   return (
-    <div className={cn('mb-2', {'text-muted': !attributes.enabled}, 'checkbox-align')}>
+    <div className={cn('mb-2', {'text-muted': isDisabled}, 'checkbox-align')}>
       <Row className="mb-1">
         <Col xs="10">
-          <IconCondition width="17" height="17"
-                         color={!attributes.enabled ? COLOR_DISABLED : COLOR_REDDISH}/>
+          <IconCondition width="17" height="17" color={isDisabled ? COLOR_DISABLED : COLOR_REDDISH}/>
           {' '} <strong>Condition</strong>: ValueReached
         </Col>
         <Col xs="2" className="text-right">
@@ -98,6 +105,7 @@ const ValueReached = (props: DeepPartial<Props>) => {
             className="pull-right"
             type="switch"
             id={`condition-switch-${nanoid(5)}`}
+            disabled={attributes.disabledCheckbox}
             label=""
             checked={attributes.enabled}
             onChange={e => setAttribute('enabled', e.target.checked)}
@@ -110,7 +118,7 @@ const ValueReached = (props: DeepPartial<Props>) => {
         </Col>
         <Col xs="5">
           <Select
-            isDisabled={!attributes.enabled}
+            isDisabled={isDisabled}
             isSearchable={false}
             defaultValue={attributes?.id ? {label: attributes.id, value: attributes.id} : null}
             menuPortalTarget={document.body}
@@ -135,12 +143,12 @@ const ValueReached = (props: DeepPartial<Props>) => {
             maxLength={4}
             min={1}
             max={9990}
-            disabled={!attributes.enabled}
+            disabled={isDisabled}
             className="pull-right"
-            aria-disabled={!attributes.enabled}
+            aria-disabled={isDisabled}
             id={`condition-${nanoid(5)}`}
             placeholder="e.g., 50"
-            value={attributes?.value || ''}
+            value={toInteger(attributes?.value)}
             onChange={e => setAttribute('value', Number(String(e.target.value).replace(/\D+/, '')) || 0)}
             onKeyUp={e => {
               // @ts-ignore
@@ -156,6 +164,7 @@ const ValueReached = (props: DeepPartial<Props>) => {
 // Properties validation
 ValueReached.propTypes = {
   enabled: PropTypes.bool,
+  disabledCheckbox: PropTypes.bool,
   id: PropTypes.oneOf(VALUE_REACHED),
   value: PropTypes.number,
   onChange: PropTypes.func,

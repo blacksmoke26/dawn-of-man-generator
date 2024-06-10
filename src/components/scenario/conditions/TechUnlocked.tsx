@@ -14,16 +14,15 @@ import {nanoid} from 'nanoid';
 import {capitalCase} from 'change-case';
 import {Col, Form, Row} from 'react-bootstrap';
 
+// icons
+import {COLOR_DISABLED, COLOR_REDDISH, IconCondition} from '~/components/icons/app';
+
 // elemental components
 import Select, {Option} from '~/components/ui/Select';
 
 // utils
+import {toString} from '~/helpers/string';
 import {techEntities} from '~/utils/entities';
-
-// icons
-import {COLOR_DISABLED, COLOR_REDDISH, IconCondition} from '~/components/icons/app';
-
-// utils
 import {defaultsParams} from '~/utils/condition';
 
 // types
@@ -33,6 +32,7 @@ import type {ConditionTechUnlocked as ConditionAttributes,} from '~/types/condit
 
 interface Attributes extends ConditionAttributes {
   enabled: boolean;
+  disabledCheckbox?: boolean;
 }
 
 interface Props extends Attributes {
@@ -44,14 +44,16 @@ const CONDITION_NAME: string = 'TechUnlocked';
 const TechUnlocked = (props: Partial<Props>) => {
   const newProps = merge.all<Props>([{
     enabled: false,
+    disabledCheckbox: false,
     onChange: () => {
     },
   }, defaultsParams.techUnlocked as Props, props]);
 
   const [attributes, setAttributes] = React.useState<Attributes>({
     enabled: newProps.enabled as boolean,
-    tech: newProps.tech as TechEntityType,
-    techs: newProps.techs as TechEntityType[],
+    disabledCheckbox: newProps.disabledCheckbox as boolean,
+    tech: toString<TechEntityType>(newProps.tech),
+    techs: (newProps?.techs || []) as TechEntityType[],
   });
 
   const setAttribute = <T = any>(name: $Keys<Attributes>, value: T) => {
@@ -86,20 +88,23 @@ const TechUnlocked = (props: Partial<Props>) => {
 
   // Reflect prop changes
   React.useEffect(() => {
-    'enabled' in props && setAttribute('enabled', props.enabled);
+    setAttribute('enabled', props.enabled);
+    setAttribute('disabledCheckbox', props.disabledCheckbox);
 
-    if (attributes.enabled) {
+    if (props.enabled) {
       props?.tech?.length && setAttribute('tech', props.tech);
       props?.techs?.length && setAttribute('techs', props.techs);
     }
-  }, [props, attributes.enabled]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props]);
+
+  const isDisabled = attributes.disabledCheckbox || !attributes.enabled;
 
   return (
-    <div className={cn('mb-2', {'text-muted': !attributes.enabled}, 'checkbox-align')}>
+    <div className={cn('mb-2', {'text-muted': isDisabled}, 'checkbox-align')}>
       <Row className="mb-1">
         <Col xs="10">
-          <IconCondition width="17" height="17"
-                         color={!attributes.enabled ? COLOR_DISABLED : COLOR_REDDISH}/>
+          <IconCondition width="17" height="17" color={isDisabled ? COLOR_DISABLED : COLOR_REDDISH}/>
           {' '} <strong>Condition</strong>: TechUnlocked
         </Col>
         <Col xs="2" className="text-right">
@@ -107,6 +112,7 @@ const TechUnlocked = (props: Partial<Props>) => {
             className="pull-right"
             type="switch"
             id={`condition-switch-${nanoid(5)}`}
+            disabled={attributes.disabledCheckbox}
             label=""
             checked={attributes.enabled}
             onChange={e => setAttribute('enabled', e.target.checked)}
@@ -119,7 +125,7 @@ const TechUnlocked = (props: Partial<Props>) => {
         </Col>
         <Col xs="6">
           <Select
-            isDisabled={!attributes.enabled}
+            isDisabled={isDisabled}
             isClearable={true}
             defaultValue={attributes?.tech ? {label: attributes.tech, value: attributes.tech} : null}
             menuPortalTarget={document.body}
@@ -138,7 +144,7 @@ const TechUnlocked = (props: Partial<Props>) => {
         <Col xs="8">
           <Select
             isClearable={true}
-            isDisabled={!attributes.enabled}
+            isDisabled={isDisabled}
             isMulti={true}
             menuPortalTarget={document.body}
             defaultValue={newProps?.techs?.map(value => ({label: capitalCase(value), value}) || [])}
@@ -159,6 +165,7 @@ const TechUnlocked = (props: Partial<Props>) => {
 // Properties validation
 TechUnlocked.propTypes = {
   enabled: PropTypes.bool,
+  disabledCheckbox: PropTypes.bool,
   tech: PropTypes.oneOf(techEntities),
   techs: PropTypes.arrayOf(PropTypes.oneOf(techEntities)),
   onChange: PropTypes.func,

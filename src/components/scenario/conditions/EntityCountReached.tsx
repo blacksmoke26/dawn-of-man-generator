@@ -32,15 +32,17 @@ import {
 
 // types
 import type {$Keys, DeepPartial} from 'utility-types';
-import {
+import type {EntityType} from '~/types/entity.types';
+import type {
   CounterType,
-  ComparisonType,
   ConditionEntityCountReached as ConditionAttributes,
 } from '~/types/condition.types';
-import type {EntityType} from '~/types/entity.types';
+import {toString} from '~/helpers/string';
+import {toInteger} from '~/helpers/number';
 
 interface Attributes extends ConditionAttributes {
   enabled: boolean;
+  disabledCheckbox?: boolean;
 }
 
 interface Props extends Attributes {
@@ -52,16 +54,16 @@ const CONDITION_NAME: string = 'EntityCountReached';
 const EntityCountReached = (props: DeepPartial<Props>) => {
   const newProps = merge.all<Props>([{
     enabled: false,
-    counter: 'All',
-    value: 1,
+    disabledCheckbox: false,
     onChange: () => {
     },
   }, defaultsParams.entityCountReached as Props, props]);
 
   const [attributes, setAttributes] = React.useState<Attributes>({
     enabled: newProps.enabled as boolean,
-    counter: newProps.counter as CounterType,
-    entityType: newProps.entityType as EntityType,
+    disabledCheckbox: newProps.disabledCheckbox as boolean,
+    counter: toString<CounterType>(newProps.counter),
+    entityType: toString<EntityType>(newProps.entityType),
     value: newProps.value as number,
   });
 
@@ -90,21 +92,25 @@ const EntityCountReached = (props: DeepPartial<Props>) => {
 
   // Reflect prop changes
   React.useEffect(() => {
-    'enabled' in props && setAttribute('enabled', props.enabled);
+    setAttribute('enabled', props.enabled);
+    setAttribute('disabledCheckbox', props.disabledCheckbox);
 
-    if (attributes.enabled) {
+    if (props.enabled) {
       props?.counter && setAttribute('counter', props.counter);
       props?.entityType && setAttribute('entityType', props.entityType);
       props?.value && setAttribute('value', toEntityCount(props.value));
     }
-  }, [props, attributes.enabled]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props]);
+
+  const isDisabled = props.disabledCheckbox || !attributes.enabled;
 
   return (
-    <div className={cn('mb-2', {'text-muted': !attributes.enabled}, 'checkbox-align')}>
+    <div className={cn('mb-2', {'text-muted': isDisabled}, 'checkbox-align')}>
       <Row className="mb-1">
         <Col xs="10">
           <IconCondition width="17" height="17"
-                         color={!attributes.enabled ? COLOR_DISABLED : COLOR_REDDISH}/>
+                         color={isDisabled ? COLOR_DISABLED : COLOR_REDDISH}/>
           {' '} <strong>Condition</strong>: EntityCountReached
         </Col>
         <Col xs="2" className="text-right">
@@ -112,6 +118,7 @@ const EntityCountReached = (props: DeepPartial<Props>) => {
             className="pull-right"
             type="switch"
             id={`condition-switch-${nanoid(5)}`}
+            disabled={attributes.disabledCheckbox}
             label=""
             checked={attributes.enabled}
             onChange={e => setAttribute('enabled', e.target.checked)}
@@ -126,9 +133,12 @@ const EntityCountReached = (props: DeepPartial<Props>) => {
         </Col>
         <Col xs="4">
           <Select
-            isDisabled={!attributes.enabled}
+            isDisabled={isDisabled}
             menuPortalTarget={document.body}
-            defaultValue={{label: capitalCase(newProps.counter as string), value: newProps.counter}}
+            defaultValue={newProps?.counter ? {
+              label: capitalCase(newProps.counter as string),
+              value: newProps.counter
+            } : null}
             options={COUNTERS.map(value => ({label: capitalCase(value), value}))}
             placeholder="Choose counter..."
             onChange={(option: Option | any, {action}): void => {
@@ -147,9 +157,13 @@ const EntityCountReached = (props: DeepPartial<Props>) => {
         </Col>
         <Col xs="5">
           <Select
-            isDisabled={!attributes.enabled}
+            isDisabled={isDisabled}
             menuPortalTarget={document.body}
             options={ENTITIES_OPTIONS}
+            defaultValue={newProps?.entityType ? {
+              label: capitalCase(newProps.entityType as string),
+              value: newProps.entityType
+            } : null}
             placeholder="Choose..."
             onChange={(option: Option | any, {action}): void => {
               if (action === 'select-option' && option) {
@@ -167,9 +181,9 @@ const EntityCountReached = (props: DeepPartial<Props>) => {
         </Col>
         <Col xs="6">
           <span className="text-size-xs font-family-code">
-										Value: <code className={cn({'text-muted': !attributes.enabled})}>{attributes.value}</code>
+										Value: <code className={cn({'text-muted': isDisabled})}>{attributes.value}</code>
 									</span>
-          <Button disabled={!attributes.enabled}
+          <Button disabled={isDisabled}
                   className="button-reset-sm" variant="link"
                   onClick={() => setAttribute('value', random.randomEntityCount())}>
             Random
@@ -177,8 +191,8 @@ const EntityCountReached = (props: DeepPartial<Props>) => {
           <Slider
             min={ENTITY_COUNT_MIN}
             max={ENTITY_COUNT_MAX}
-            step={1} disabled={!attributes.enabled}
-            value={Number(attributes.value)}
+            step={1} disabled={isDisabled}
+            value={toInteger(attributes.value)}
             onChange={value => setAttribute('value', Number(value))}/>
         </Col>
       </Row>
@@ -189,6 +203,7 @@ const EntityCountReached = (props: DeepPartial<Props>) => {
 // Properties validation
 EntityCountReached.propTypes = {
   enabled: PropTypes.bool,
+  disabledCheckbox: PropTypes.bool,
   counter: PropTypes.oneOf(COUNTERS),
   entityType: PropTypes.oneOf(ENTITIES),
   value: PropTypes.number,

@@ -21,6 +21,7 @@ import {COLOR_DISABLED, COLOR_REDDISH, IconCondition} from '~/components/icons/a
 import Select, {Option} from '~/components/ui/Select';
 
 // utils
+import {toString} from '~/helpers/string';
 import {defaultsParams, VALUE_EQUALS} from '~/utils/condition';
 
 // types
@@ -29,6 +30,7 @@ import type {ConditionValueEquals as ConditionAttributes, ValueEqualsType} from 
 
 interface Attributes extends ConditionAttributes {
   enabled: boolean;
+  disabledCheckbox?: boolean;
 }
 
 interface Props extends Attributes {
@@ -40,15 +42,15 @@ const CONDITION_NAME: string = 'ValueEquals';
 const ValueEquals = (props: DeepPartial<Props>) => {
   const newProps = merge.all<Props>([{
     enabled: false,
-    value: '',
+    disabledCheckbox: false,
     onChange: () => {
     },
   }, defaultsParams.valueEquals as Props, props]);
 
   const [attributes, setAttributes] = React.useState<Attributes>({
     enabled: newProps.enabled as boolean,
-    id: newProps.id as ValueEqualsType,
-    value: newProps.value as string,
+    id: toString<ValueEqualsType>(newProps?.id),
+    value: toString(newProps.value),
   });
 
   const setAttribute = <T = any>(name: $Keys<Attributes>, value: T) => {
@@ -77,20 +79,23 @@ const ValueEquals = (props: DeepPartial<Props>) => {
 
   // Reflect prop changes
   React.useEffect(() => {
-    'enabled' in props && setAttribute('enabled', props.enabled);
+    setAttribute('enabled', props.enabled);
+    setAttribute('disabledCheckbox', props.disabledCheckbox);
 
-    if (attributes.enabled) {
+    if (props.enabled) {
       props?.id && setAttribute('id', props.id?.toString());
       props?.value && setAttribute('value', props.value?.toString()?.trim());
     }
-  }, [props, attributes.enabled]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props]);
+
+  const isDisabled = attributes.disabledCheckbox || !attributes.enabled;
 
   return (
-    <div className={cn('mb-2', {'text-muted': !attributes.enabled}, 'checkbox-align')}>
+    <div className={cn('mb-2', {'text-muted': isDisabled}, 'checkbox-align')}>
       <Row className="mb-1">
         <Col xs="10">
-          <IconCondition width="17" height="17"
-                         color={!attributes.enabled ? COLOR_DISABLED : COLOR_REDDISH}/>
+          <IconCondition width="17" height="17" color={isDisabled ? COLOR_DISABLED : COLOR_REDDISH}/>
           {' '} <strong>Condition</strong>: ValueEquals
         </Col>
         <Col xs="2" className="text-right">
@@ -98,6 +103,7 @@ const ValueEquals = (props: DeepPartial<Props>) => {
             className="pull-right"
             type="switch"
             id={`condition-switch-${nanoid(5)}`}
+            disabled={attributes.disabledCheckbox}
             label=""
             checked={attributes.enabled}
             onChange={e => setAttribute('enabled', e.target.checked)}
@@ -110,9 +116,12 @@ const ValueEquals = (props: DeepPartial<Props>) => {
         </Col>
         <Col xs="5">
           <Select
-            isDisabled={!attributes.enabled}
+            isDisabled={isDisabled}
             isSearchable={false}
-            defaultValue={attributes?.id ? {label: attributes.id, value: attributes.id} : null}
+            defaultValue={attributes?.id
+              ? {label: toString(attributes?.id), value: toString(attributes?.id)}
+              : null
+            }
             menuPortalTarget={document.body}
             options={VALUE_EQUALS.map(value => ({label: capitalCase(value), value}))}
             placeholder="Choose..."
@@ -132,12 +141,12 @@ const ValueEquals = (props: DeepPartial<Props>) => {
           <Form.Control
             type="text"
             size="sm"
-            disabled={!attributes.enabled}
+            disabled={isDisabled}
             className="pull-right"
-            aria-disabled={!attributes.enabled}
+            aria-disabled={isDisabled}
             id={`condition-${nanoid(5)}`}
             placeholder="e.g., SomeValue"
-            value={attributes?.value || ''}
+            value={toString(attributes?.value)}
             onChange={e => setAttribute('value', e.target.value.replace(/['"]+/ig, ``))}
           />
         </Col>
@@ -149,6 +158,7 @@ const ValueEquals = (props: DeepPartial<Props>) => {
 // Properties validation
 ValueEquals.propTypes = {
   enabled: PropTypes.bool,
+  disabledCheckbox: PropTypes.bool,
   id: PropTypes.oneOf(VALUE_EQUALS),
   value: PropTypes.string,
   onChange: PropTypes.func,

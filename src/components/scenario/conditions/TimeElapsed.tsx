@@ -23,18 +23,21 @@ import Select, {Option} from '~/components/ui/Select';
 
 // utils
 import * as random from '~/utils/random';
+import {toString} from '~/helpers/string';
+import {toInteger} from '~/helpers/number';
 import {PERIOD_MIN, PERIOD_MAX} from '~/utils/defaults';
 import {defaultsParams, TIME_ELAPSED} from '~/utils/condition';
 
 // types
 import type {$Keys, DeepPartial} from 'utility-types';
 import type {
+  TimeElapsed as TimeElapsedList,
   ConditionTimeElapsed as ConditionAttributes,
-  TimeElapsed as TimeElapsedList
 } from '~/types/condition.types';
 
 interface Attributes extends ConditionAttributes {
   enabled: boolean;
+  disabledCheckbox?: boolean;
 }
 
 interface Props extends Attributes {
@@ -46,16 +49,16 @@ const CONDITION_NAME: string = 'TimeElapsed';
 const TimeElapsed = (props: DeepPartial<Props>) => {
   const newProps = merge.all<Props>([{
     enabled: false,
-    timer: 'RealTime',
-    value: 0,
+    disabledCheckbox: false,
     onChange: () => {
     },
   }, defaultsParams.timeElapsed as Props, props]);
 
   const [attributes, setAttributes] = React.useState<Attributes>({
     enabled: newProps.enabled as boolean,
-    timer: newProps.timer as TimeElapsedList,
-    value: newProps.value as number,
+    disabledCheckbox: newProps.disabledCheckbox as boolean,
+    timer: toString<TimeElapsedList>(newProps?.timer),
+    value: toInteger(newProps?.value),
   });
 
   const setAttribute = <T = any>(name: $Keys<Attributes>, value: T) => {
@@ -65,7 +68,7 @@ const TimeElapsed = (props: DeepPartial<Props>) => {
   };
 
   const toTemplateText = (): string => {
-    return !attributes.enabled || !attributes?.timer.trim() || !attributes?.value
+    return !attributes.enabled || !attributes?.timer.trim() || attributes?.value < 0
       ? ''
       : (
         `<condition type="${CONDITION_NAME}"`
@@ -82,20 +85,23 @@ const TimeElapsed = (props: DeepPartial<Props>) => {
 
   // Reflect prop changes
   React.useEffect(() => {
-    'enabled' in props && setAttribute('enabled', props.enabled);
+    setAttribute('enabled', props.enabled);
+    setAttribute('disabledCheckbox', props.disabledCheckbox);
 
-    if (attributes.enabled) {
+    if (props.enabled) {
       props?.timer && setAttribute('timer', props.timer);
       props?.value && setAttribute('value', props.value);
     }
-  }, [props, attributes.enabled]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props]);
+
+  const isDisabled = attributes.disabledCheckbox || !attributes.enabled;
 
   return (
-    <div className={cn('mb-2', {'text-muted': !attributes.enabled}, 'checkbox-align')}>
+    <div className={cn('mb-2', {'text-muted': isDisabled}, 'checkbox-align')}>
       <Row className="mb-1">
         <Col xs="10">
-          <IconCondition width="17" height="17"
-                         color={!attributes.enabled ? COLOR_DISABLED : COLOR_REDDISH}/>
+          <IconCondition width="17" height="17" color={isDisabled ? COLOR_DISABLED : COLOR_REDDISH}/>
           {' '} <strong>Condition</strong>: TimeElapsed
         </Col>
         <Col xs="2" className="text-right">
@@ -103,6 +109,7 @@ const TimeElapsed = (props: DeepPartial<Props>) => {
             className="pull-right"
             type="switch"
             id={`condition-switch-${nanoid(5)}`}
+            disabled={attributes.disabledCheckbox}
             label=""
             checked={attributes.enabled}
             onChange={e => setAttribute('enabled', e.target.checked)}
@@ -117,10 +124,10 @@ const TimeElapsed = (props: DeepPartial<Props>) => {
         </Col>
         <Col xs="5">
           <Select
-            isDisabled={!attributes.enabled}
+            isDisabled={isDisabled}
             menuPortalTarget={document.body}
             options={TIME_ELAPSED.map(value => ({label: capitalCase(value), value}))}
-            defaultValue={attributes?.value ? {label: attributes.value, value: attributes.value} : null}
+            defaultValue={attributes?.timer ? {label: attributes.timer, value: attributes.timer} : null}
             placeholder="Choose..."
             onChange={(option: Option | any, {action}): void => {
               if (action === 'select-option' && option) {
@@ -138,18 +145,18 @@ const TimeElapsed = (props: DeepPartial<Props>) => {
         </Col>
         <Col xs="6">
           <span className="text-size-xs font-family-code">
-										Value: <code className={cn({'text-muted': !attributes.enabled})}>{attributes.value}y</code>
+										Value: <code className={cn({'text-muted': isDisabled})}>{attributes.value}y</code>
 									</span>
-          <Button disabled={!attributes.enabled}
+          <Button disabled={isDisabled}
                   className="button-reset-sm" variant="link"
-                  onClick={() => setAttribute('value', +Number(random.randomPeriod()).toFixed(0))}>
+                  onClick={() => setAttribute('value', +random.randomPeriod())}>
             Random
           </Button>
           <Slider
             min={PERIOD_MIN}
             max={PERIOD_MAX}
-            step={1} disabled={!attributes.enabled}
-            value={Number(attributes.value)}
+            step={0.1} disabled={isDisabled}
+            value={toInteger(attributes.value)}
             onChange={value => setAttribute('value', Number(value))}/>
         </Col>
       </Row>
@@ -160,6 +167,7 @@ const TimeElapsed = (props: DeepPartial<Props>) => {
 // Properties validation
 TimeElapsed.propTypes = {
   enabled: PropTypes.bool,
+  disabledCheckbox: PropTypes.bool,
   time: PropTypes.oneOf(TIME_ELAPSED),
   value: PropTypes.number,
   onChange: PropTypes.func,

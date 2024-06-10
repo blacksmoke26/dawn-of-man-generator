@@ -15,24 +15,25 @@ import {capitalCase} from 'change-case';
 import {Col, Form, Row} from 'react-bootstrap';
 
 // icons
+import {COLOR_DISABLED, COLOR_REDDISH, IconCondition} from '~/components/icons/app';
+
 // elemental components
 import Select, {Option} from '~/components/ui/Select';
 
 // utils
-import {defaultsParams, GAME_MODES, INTERACTIONS, START_MODES} from '~/utils/condition';
+import {toString} from '~/helpers/string';
+import {defaultsParams, GAME_MODES, START_MODES} from '~/utils/condition';
 
 // types
 import type {$Keys, DeepPartial} from 'utility-types';
 import type {
-  ConditionNewGame as ConditionAttributes,
-  GameMode,
-  InteractionType,
   StartMode,
+  ConditionNewGame as ConditionAttributes,
 } from '~/types/condition.types';
-import {COLOR_DISABLED, COLOR_REDDISH, IconCondition} from '~/components/icons/app';
 
 interface Attributes extends ConditionAttributes {
   enabled: boolean;
+  disabledCheckbox?: boolean;
 }
 
 interface Props extends Attributes {
@@ -44,13 +45,15 @@ const CONDITION_NAME: string = 'NewGame';
 const NewGame = (props: DeepPartial<Props>) => {
   const newProps = merge.all<Props>([{
     enabled: false,
+    disabledCheckbox: false,
     onChange: () => {
     },
   }, defaultsParams.newGame as Props, props]);
 
   const [attributes, setAttributes] = React.useState<Attributes>({
     enabled: newProps.enabled as boolean,
-    startMode: newProps.startMode as StartMode,
+    disabledCheckbox: newProps.disabledCheckbox as boolean,
+    startMode: toString<StartMode>(newProps.startMode),
   });
 
   const setAttribute = <T = any>(name: $Keys<Attributes>, value: T) => {
@@ -75,19 +78,22 @@ const NewGame = (props: DeepPartial<Props>) => {
 
   // Reflect prop changes
   React.useEffect(() => {
-    'enabled' in props && setAttribute('enabled', props.enabled);
+    setAttribute('enabled', props.enabled);
+    setAttribute('disabledCheckbox', props.disabledCheckbox);
 
     if (attributes.enabled) {
       props?.startMode && setAttribute('startMode', props.startMode);
     }
-  }, [props, attributes.enabled]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props]);
+
+  const isDisabled = attributes.disabledCheckbox || !attributes.enabled;
 
   return (
-    <div className={cn('mb-2', {'text-muted': !attributes.enabled}, 'checkbox-align')}>
+    <div className={cn('mb-2', {'text-muted': isDisabled}, 'checkbox-align')}>
       <Row className="mb-1">
         <Col xs="10">
-          <IconCondition width="17" height="17"
-                         color={!attributes.enabled ? COLOR_DISABLED : COLOR_REDDISH}/>
+          <IconCondition width="17" height="17" color={isDisabled ? COLOR_DISABLED : COLOR_REDDISH}/>
           {' '} <strong>Condition</strong>: NewGame
         </Col>
         <Col xs="2" className="text-right">
@@ -95,6 +101,7 @@ const NewGame = (props: DeepPartial<Props>) => {
             className="pull-right"
             type="switch"
             id={`condition-switch-${nanoid(5)}`}
+            disabled={attributes.disabledCheckbox}
             label=""
             checked={attributes.enabled}
             onChange={e => setAttribute('enabled', e.target.checked)}
@@ -108,8 +115,12 @@ const NewGame = (props: DeepPartial<Props>) => {
         <Col xs="5">
           <Select
             isSearchable={false}
-            isDisabled={!attributes.enabled}
+            isDisabled={isDisabled}
             menuPortalTarget={document.body}
+            defaultValue={newProps?.startMode ? {
+              label: capitalCase(newProps.startMode as string),
+              value: newProps.startMode
+            } : null}
             options={GAME_MODES.map(value => ({label: capitalCase(value), value}))}
             placeholder="Choose..."
             onChange={(option: Option | any, {action}): void => {
@@ -127,6 +138,7 @@ const NewGame = (props: DeepPartial<Props>) => {
 // Properties validation
 NewGame.propTypes = {
   enabled: PropTypes.bool,
+  disabledCheckbox: PropTypes.bool,
   startMode: PropTypes.oneOf(START_MODES),
   onChange: PropTypes.func,
 };

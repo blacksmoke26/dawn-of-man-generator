@@ -10,24 +10,27 @@ import React from 'react';
 import * as PropTypes from 'prop-types';
 import cn from 'classname';
 import merge from 'deepmerge';
+import {nanoid} from 'nanoid';
 import {Col, Form, Row} from 'react-bootstrap';
 
 // icons
+import {COLOR_DISABLED, COLOR_REDDISH, IconCondition} from '~/components/icons/app';
+
 // elemental components
 import Select, {Option} from '~/components/ui/Select';
 
 // utils
+import {capitalCase} from 'change-case';
+import {toString} from '~/helpers/string';
 import {defaultsParams, ERAS} from '~/utils/condition';
 
 // types
 import type {$Keys, DeepPartial} from 'utility-types';
-import type {ConditionEraUnlocked as ConditionAttributes, EraType,} from '~/types/condition.types';
-import {COLOR_DISABLED, COLOR_REDDISH, IconCondition} from '~/components/icons/app';
-import {nanoid} from 'nanoid';
-import {capitalCase} from 'change-case';
+import type {ConditionEraUnlocked as ConditionAttributes, EraType} from '~/types/condition.types';
 
 interface Attributes extends ConditionAttributes {
   enabled: boolean;
+  disabledCheckbox?: boolean;
 }
 
 interface Props extends Attributes {
@@ -39,13 +42,15 @@ const CONDITION_NAME: string = 'EraUnlocked';
 const EraUnlocked = (props: DeepPartial<Props>) => {
   const newProps = merge.all<Props>([{
     enabled: false,
+    disabledCheckbox: false,
     onChange: () => {
     },
   }, defaultsParams.eraUnlocked as Props, props]);
 
   const [attributes, setAttributes] = React.useState<Attributes>({
     enabled: newProps.enabled as boolean,
-    era: newProps.era as EraType,
+    disabledCheckbox: newProps.disabledCheckbox as boolean,
+    era: toString<EraType>(newProps.era),
   });
 
   const setAttribute = <T = any>(name: $Keys<Attributes>, value: T) => {
@@ -55,7 +60,7 @@ const EraUnlocked = (props: DeepPartial<Props>) => {
   };
 
   const toTemplateText = (): string => {
-    return !attributes.enabled || !String(attributes?.era ?? '').trim()
+    return isDisabled || !String(attributes?.era ?? '').trim()
       ? ''
       : (
         `<condition type="${CONDITION_NAME}"`
@@ -71,19 +76,23 @@ const EraUnlocked = (props: DeepPartial<Props>) => {
 
   // Reflect prop changes
   React.useEffect(() => {
-    'enabled' in props && setAttribute('enabled', props.enabled);
+    setAttribute('enabled', props.enabled);
+    setAttribute('disabledCheckbox', props.disabledCheckbox);
 
-    if (attributes.enabled) {
+    if (props.enabled) {
       props?.era && setAttribute('era', props.era);
     }
-  }, [props, attributes.enabled]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props]);
+
+  const isDisabled = attributes.disabledCheckbox || !attributes.enabled;
 
   return (
-    <div className={cn('mb-2', {'text-muted': !attributes.enabled}, 'checkbox-align')}>
+    <div className={cn('mb-2', {'text-muted': isDisabled}, 'checkbox-align')}>
       <Row className="mb-1">
         <Col xs="10">
           <IconCondition width="17" height="17"
-                         color={!attributes.enabled ? COLOR_DISABLED : COLOR_REDDISH}/>
+                         color={isDisabled ? COLOR_DISABLED : COLOR_REDDISH}/>
           {' '} <strong>Condition</strong>: EraUnlocked
         </Col>
         <Col xs="2" className="text-right">
@@ -91,6 +100,7 @@ const EraUnlocked = (props: DeepPartial<Props>) => {
             className="pull-right"
             type="switch"
             id={`condition-switch-${nanoid(5)}`}
+            disabled={attributes.disabledCheckbox}
             label=""
             checked={attributes.enabled}
             onChange={e => setAttribute('enabled', e.target.checked)}
@@ -99,12 +109,16 @@ const EraUnlocked = (props: DeepPartial<Props>) => {
       </Row>
       <Row className="mb-1 mt-2">
         <Col xs="2">
-            <div className="position-relative pl-3" style={{top: 7}}>Era</div>
+          <div className="position-relative pl-3" style={{top: 7}}>Era</div>
         </Col>
         <Col xs="5">
           <Select
-            isDisabled={!attributes.enabled}
+            isDisabled={isDisabled}
             menuPortalTarget={document.body}
+            defaultValue={newProps?.era ? {
+              label: capitalCase(newProps.era as string),
+              value: newProps.era
+            } : null}
             options={ERAS.map(value => ({label: capitalCase(value), value}))}
             placeholder="Choose..."
             onChange={(option: Option | any, {action}): void => {
@@ -122,6 +136,7 @@ const EraUnlocked = (props: DeepPartial<Props>) => {
 // Properties validation
 EraUnlocked.propTypes = {
   enabled: PropTypes.bool,
+  disabledCheckbox: PropTypes.bool,
   era: PropTypes.oneOf(ERAS),
   onChange: PropTypes.func,
 };

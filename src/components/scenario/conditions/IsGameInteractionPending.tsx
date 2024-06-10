@@ -15,19 +15,22 @@ import {capitalCase} from 'change-case';
 import {Col, Form, Row} from 'react-bootstrap';
 
 // icons
+import {COLOR_DISABLED, COLOR_REDDISH, IconCondition} from '~/components/icons/app';
+
 // elemental components
 import Select, {Option} from '~/components/ui/Select';
 
 // utils
+import {toString} from '~/helpers/string';
 import {defaultsParams, INTERACTIONS} from '~/utils/condition';
 
 // types
 import type {$Keys, DeepPartial} from 'utility-types';
 import type {ConditionIsGameInteractionPending as ConditionAttributes, InteractionType,} from '~/types/condition.types';
-import {COLOR_DISABLED, COLOR_REDDISH, IconCondition} from '~/components/icons/app';
 
 interface Attributes extends ConditionAttributes {
   enabled: boolean;
+  disabledCheckbox?: boolean;
 }
 
 interface Props extends Attributes {
@@ -39,13 +42,15 @@ const CONDITION_NAME: string = 'IsGameInteractionPending';
 const IsGameInteractionPending = (props: DeepPartial<Props>) => {
   const newProps = merge.all<Props>([{
     enabled: false,
+    disabledCheckbox: false,
     onChange: () => {
     },
   }, defaultsParams.isGameInteractionPending as Props, props]);
 
   const [attributes, setAttributes] = React.useState<Attributes>({
     enabled: newProps.enabled as boolean,
-    value: newProps.value as InteractionType,
+    disabledCheckbox: newProps.disabledCheckbox as boolean,
+    value: toString<InteractionType>(newProps.value),
   });
 
   const setAttribute = <T = any>(name: $Keys<Attributes>, value: T) => {
@@ -70,19 +75,23 @@ const IsGameInteractionPending = (props: DeepPartial<Props>) => {
 
   // Reflect prop changes
   React.useEffect(() => {
-    'enabled' in props && setAttribute('enabled', props.enabled);
+    setAttribute('enabled', props.enabled);
+    setAttribute('disabledCheckbox', props.disabledCheckbox);
 
-    if (attributes.enabled) {
+    if (props.enabled) {
       props?.value && setAttribute('value', props.value);
     }
-  }, [props, attributes.enabled]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props]);
+
+  const isDisabled = attributes.disabledCheckbox || !attributes.enabled;
 
   return (
-    <div className={cn('mb-2', {'text-muted': !attributes.enabled}, 'checkbox-align')}>
+    <div className={cn('mb-2', {'text-muted': isDisabled}, 'checkbox-align')}>
       <Row className="mb-1">
         <Col xs="10">
           <IconCondition width="17" height="17"
-                         color={!attributes.enabled ? COLOR_DISABLED : COLOR_REDDISH}/>
+                         color={isDisabled ? COLOR_DISABLED : COLOR_REDDISH}/>
           {' '} <strong>Condition</strong>: IsGameInteractionPending
         </Col>
         <Col xs="2" className="text-right">
@@ -90,6 +99,7 @@ const IsGameInteractionPending = (props: DeepPartial<Props>) => {
             className="pull-right"
             type="switch"
             id={`condition-switch-${nanoid(5)}`}
+            disabled={attributes.disabledCheckbox}
             label=""
             checked={attributes.enabled}
             onChange={e => setAttribute('enabled', e.target.checked)}
@@ -103,8 +113,12 @@ const IsGameInteractionPending = (props: DeepPartial<Props>) => {
         <Col xs="5">
           <Select
             isSearchable={false}
-            isDisabled={!attributes.enabled}
+            isDisabled={isDisabled}
             menuPortalTarget={document.body}
+            defaultValue={newProps?.value
+              ? {label: capitalCase(newProps.value), value: newProps.value}
+              : null
+            }
             options={INTERACTIONS.map(value => ({label: capitalCase(value), value}))}
             placeholder="Choose..."
             onChange={(option: Option | any, {action}): void => {
@@ -122,6 +136,7 @@ const IsGameInteractionPending = (props: DeepPartial<Props>) => {
 // Properties validation
 IsGameInteractionPending.propTypes = {
   enabled: PropTypes.bool,
+  disabledCheckbox: PropTypes.bool,
   value: PropTypes.oneOf(INTERACTIONS),
   onChange: PropTypes.func,
 };
