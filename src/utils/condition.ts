@@ -144,47 +144,47 @@ export const INTERACTIONS: string[] = [
 
 export const defaultsParams: DeepPartial<ConditionDefaultParams> = {
   anyTasksActive: {
-    taskType: undefined,
+    taskType: '',
     minPerformers: PERFORMERS_MIN,
   },
   anyWorkAreasActive: {
-    workAreaId: undefined,
+    workAreaId: '',
     maxWorkers: 1
   },
   entityCountComparison: {
-    counter: undefined,
-    entityType: undefined,
+    counter: 'All',
+    entityType: 'primitive_human',
     value: ENTITY_COUNT_DEFAULT,
-    comparison: undefined,
+    comparison: 'Equals',
   },
   entityCountReached: {
-    counter: undefined,
-    entityType: undefined,
+    counter: 'All',
+    entityType: 'primitive_human',
     value: ENTITY_COUNT_DEFAULT,
   },
   entityNearMarker: {
-    entityType: undefined,
+    entityType: 'primitive_human',
     distance: 20,
   },
   eraUnlocked: {
-    era: undefined,
+    era: 'IronAge',
   },
   initGame: {},
   isAlive: {
-    name: undefined,
+    name: '',
   },
   isGameInteractionPending: {
-    value: undefined,
+    value: 'None',
   },
   newGame: {
-    startMode: undefined,
+    startMode: 'Settled',
   },
   scenarioCompleted: {
-    id: undefined,
+    id: '',
     gameMode: 'Normal',
   },
   techUnlocked: {
-    tech: undefined,
+    tech: 'archery',
     techs: [],
   },
   timeElapsed: {
@@ -192,11 +192,11 @@ export const defaultsParams: DeepPartial<ConditionDefaultParams> = {
     value: 0,
   },
   valueEquals: {
-    id: undefined,
+    id: 'Population',
     value: '',
   },
   valueReached: {
-    id: undefined,
+    id: 'Population',
     value: ENTITY_COUNT_DEFAULT,
   },
 };
