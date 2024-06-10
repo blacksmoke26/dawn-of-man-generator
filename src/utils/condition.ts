@@ -167,7 +167,7 @@ export const defaultsParams: DeepPartial<ConditionDefaultParams> = {
     distance: 20,
   },
   eraUnlocked: {
-    era: 'IronAge',
+    era: 'Paleolithic',
   },
   initGame: {},
   isAlive: {
@@ -177,7 +177,7 @@ export const defaultsParams: DeepPartial<ConditionDefaultParams> = {
     value: 'None',
   },
   newGame: {
-    startMode: 'Settled',
+    startMode: 'Nomad',
   },
   scenarioCompleted: {
     id: '',
