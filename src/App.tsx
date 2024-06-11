@@ -18,14 +18,13 @@ import ScenarioContainer from '~/panel/scenario/ScenarioContainer';
 // redux
 import {useAppDispatch} from '~redux/hooks';
 import {updateInit} from '~redux/reducers';
-
+import Milestone from '~/panel/scenario/generators/milestones/Milestone';
 
 const KEY_ENVIRONMENT: string = 'environment';
 const KEY_SCENARIO: string = 'scenario';
 
 const App = () => {
   const dispatch = useAppDispatch();
-
   React.useEffect(() => {
     dispatch(updateInit(true));
     // eslint-disable-next-line
@@ -40,6 +39,20 @@ const App = () => {
       </Accordion>
       <Accordion header="Scenario" eventKey={KEY_SCENARIO} noBodyPad={true}>
         <ScenarioContainer/>
+      </Accordion>
+      <Accordion header="Milestones" eventKey="test">
+        <Milestone onChange={(template: string) => {
+          //console.log('Milestone template:', template);
+        }}/>
+        {/*<ConditionLogical enabled={!disabled}
+          removeIcon={true}
+          operator="And"
+          onRemoveClick={(): void => {
+            console.log('----> Removed clicked');
+          }}
+          onChange={(template: string) => {
+            console.log(template);
+          }}/>*/}
       </Accordion>
       <Footer/>
     </Container>
