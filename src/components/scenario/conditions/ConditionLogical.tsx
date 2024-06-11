@@ -116,7 +116,7 @@ const createConditionComponent = (condition: ConditionType): React.FC<any> => {
     throw new Error(`Unknown condition component: ${condition.internalName}`);
   }
 
-  return componentsMap[condition.internalName];
+  return componentsMap[condition.internalName as GeneralCondition];
 };
 
 /** ConditionLogical functional component */
@@ -279,7 +279,7 @@ const ConditionLogical = (props: Props) => {
                       if (action === 'select-option' && option) {
                         const defaultConfigKey = camelCase(option?.value) as GeneralConditionKey;
                         const newCondition = merge<ConditionType>({
-                            internalName: option.value as GeneralCondition,
+                            internalName: option.value as string,
                             enabled: true,
                             expanded: true,
                             template: '',
