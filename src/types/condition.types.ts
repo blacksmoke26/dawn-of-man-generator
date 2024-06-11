@@ -258,7 +258,7 @@ export type ConditionParams<Condition> = {
 export type SubConditions = ConditionType[];
 
 export type Condition<O> = {
-  internalName: GeneralCondition;
+  internalName: string;
   type: LogicalCondition | GeneralCondition;
 } & ConditionParams<O>;
 
