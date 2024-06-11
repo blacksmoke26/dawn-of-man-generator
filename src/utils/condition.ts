@@ -4,6 +4,9 @@
  * @since 2020-08-29
  */
 
+import {capitalCase} from 'change-case';
+
+// types
 import {DeepPartial} from 'utility-types';
 import {ConditionDefaultParams,} from '~/types/condition.types';
 
@@ -140,6 +143,14 @@ export const VALUE_REACHED: string[] = [
 export const INTERACTIONS: string[] = [
   'None',
   'CustomizePanels',
+];
+
+/** List of all conditions */
+export const CONDITIONS_ALL = ([] as string[]).concat(LOGICAL_CONDITION, GENERAL_CONDITIONS);
+
+export const CONDITIONS_OPTIONS = [
+  {label: 'Logical', options: LOGICAL_CONDITION.map(value => ({label: capitalCase(value), value}))},
+  {label: 'General', options: GENERAL_CONDITIONS.map(value => ({label: capitalCase(value), value}))},
 ];
 
 export const defaultsParams: DeepPartial<ConditionDefaultParams> = {
