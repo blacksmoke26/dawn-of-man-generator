@@ -13,8 +13,8 @@ import merge from 'deepmerge';
 import {nanoid} from 'nanoid';
 import {Col, Form, Row} from 'react-bootstrap';
 
-// icons
-import {COLOR_DISABLED, COLOR_REDDISH, IconCondition} from '~/components/icons/app';
+// elemental components
+import ConditionHeader from './../elements/ConditionHeader';
 
 // utils
 import {toString} from '~/helpers/string';
@@ -27,9 +27,14 @@ import type {ConditionIsAlive as ConditionAttributes} from '~/types/condition.ty
 interface Attributes extends ConditionAttributes {
   enabled: boolean;
   disabledCheckbox?: boolean;
+  expanded?: boolean;
 }
 
 interface Props extends Attributes {
+  removeIcon?: boolean;
+
+  onRemoveClick?(): void,
+
   onChange?(template: string, values: Attributes): void,
 }
 
@@ -37,14 +42,20 @@ const CONDITION_NAME: string = 'IsAlive';
 
 const IsAlive = (props: DeepPartial<Props>) => {
   const newProps = merge.all<Props>([{
-    enabled: false,
+    enabled: true,
     disabledCheckbox: false,
+    removeIcon: false,
+    expanded: true,
     onChange: () => {
+    },
+    onRemoveClick: () => {
     },
   }, defaultsParams.isAlive as Props, props]);
 
   const [attributes, setAttributes] = React.useState<Attributes>({
     enabled: newProps.enabled as boolean,
+    disabledCheckbox: newProps.disabledCheckbox as boolean,
+    expanded: newProps.expanded as boolean,
     name: toString(newProps.name),
   });
 
@@ -72,6 +83,7 @@ const IsAlive = (props: DeepPartial<Props>) => {
   React.useEffect(() => {
     setAttribute('enabled', props.enabled);
     setAttribute('disabledCheckbox', props.disabledCheckbox);
+    setAttribute('expanded', props.expanded);
 
     if (props.enabled) {
       props?.name && setAttribute('name', props.name);
@@ -83,41 +95,36 @@ const IsAlive = (props: DeepPartial<Props>) => {
 
   return (
     <div className={cn('mb-2', {'text-muted': isDisabled}, 'checkbox-align')}>
-      <Row className="mb-1">
-        <Col xs="10">
-          <IconCondition width="17" height="17"
-                         color={isDisabled ? COLOR_DISABLED : COLOR_REDDISH}/>
-          {' '} <strong>Condition</strong>: IsAlive</Col>
-        <Col xs="2" className="text-right">
-          <Form.Check
-            className="pull-right"
-            type="switch"
-            id={`condition-switch-${nanoid(5)}`}
-            disabled={attributes.disabledCheckbox}
-            label=""
-            checked={attributes.enabled}
-            onChange={e => setAttribute('enabled', e.target.checked)}
-          />
-        </Col>
-      </Row>
-      <Row className="mb-1 mt-2">
-        <Col xs="2">
-            <div className="position-relative pl-3" style={{top: 7}}>Name</div>
-        </Col>
-        <Col xs="6">
-          <Form.Control
-            type="text"
-            size="sm"
-            disabled={isDisabled}
-            className="pull-right"
-            aria-disabled={isDisabled}
-            id={`condition-${nanoid(5)}`}
-            placeholder="e.g., deer"
-            value={attributes?.name || ''}
-            onChange={e => setAttribute('name', e.target.value.replace(/['"]+/ig, ``))}
-          />
-        </Col>
-      </Row>
+      <ConditionHeader caption={CONDITION_NAME}
+                       enabled={attributes.enabled}
+                       onEnabled={(isEnabled: boolean) => setAttribute('enabled', isEnabled)}
+                       disabledCheckbox={attributes.disabledCheckbox}
+                       removeIcon={newProps.removeIcon}
+                       onRemoveClick={newProps.onRemoveClick}
+                       onExpandedClick={(state: boolean) => setAttribute('expanded', state)}
+                       expanded={attributes.expanded}/>
+      {attributes?.expanded && (
+        <>
+          <Row className="mb-1 mt-2">
+            <Col xs="2">
+              <div className="position-relative pl-3" style={{top: 7}}>Name</div>
+            </Col>
+            <Col xs="6">
+              <Form.Control
+                type="text"
+                size="sm"
+                disabled={isDisabled}
+                className="pull-right"
+                aria-disabled={isDisabled}
+                id={`condition-${nanoid(5)}`}
+                placeholder="e.g., deer"
+                value={attributes?.name || ''}
+                onChange={e => setAttribute('name', e.target.value.replace(/['"]+/ig, ``))}
+              />
+            </Col>
+          </Row>
+        </>
+      )}
     </div>
   );
 };

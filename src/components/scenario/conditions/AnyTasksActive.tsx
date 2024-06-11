@@ -13,11 +13,9 @@ import merge from 'deepmerge';
 import {nanoid} from 'nanoid';
 import {Button, Col, Form, Row} from 'react-bootstrap';
 
-// icons
-import {COLOR_DISABLED, COLOR_REDDISH, IconCondition} from '~/components/icons/app';
-
 // elemental components
 import Slider from '~/components/ui/Slider';
+import ConditionHeader from './../elements/ConditionHeader';
 
 // utils
 import * as random from '~/utils/random';
@@ -27,14 +25,19 @@ import {defaultsParams, PERFORMERS_MAX, PERFORMERS_MIN} from '~/utils/condition'
 
 // types
 import type {$Keys, DeepPartial} from 'utility-types';
-import {ConditionAnyTasksActive as ConditionAttributes} from '~/types/condition.types';
+import type {ConditionAnyTasksActive as ConditionAttributes} from '~/types/condition.types';
 
 interface Attributes extends ConditionAttributes {
   enabled?: boolean;
   disabledCheckbox?: boolean;
+  expanded?: boolean;
 }
 
 interface Props extends Attributes {
+  removeIcon?: boolean;
+
+  onRemoveClick?(): void,
+
   onChange?(template: string, values: Attributes): void,
 }
 
@@ -42,15 +45,20 @@ const CONDITION_NAME: string = 'AnyTasksActive';
 
 const AnyTasksActive = (props: DeepPartial<Props>) => {
   const newProps = merge.all<Props>([{
-    disabledCheckbox: true,
-    enabled: false,
+    enabled: true,
+    disabledCheckbox: false,
+    removeIcon: false,
+    expanded: true,
     onChange: () => {
+    },
+    onRemoveClick: () => {
     },
   }, defaultsParams.anyTasksActive as Props, props]);
 
   const [attributes, setAttributes] = React.useState<Attributes>({
     enabled: newProps.enabled as boolean,
     disabledCheckbox: newProps.disabledCheckbox as boolean,
+    expanded: newProps.expanded as boolean,
     taskType: toString(newProps.taskType),
     minPerformers: toPerformers(newProps.minPerformers as number),
   });
@@ -81,62 +89,56 @@ const AnyTasksActive = (props: DeepPartial<Props>) => {
   React.useEffect(() => {
     setAttribute('enabled', props.enabled);
     setAttribute('disabledCheckbox', props.disabledCheckbox);
+    setAttribute('expanded', props.expanded);
 
     if (props.enabled) {
       props?.taskType && setAttribute('taskType', toString(props.taskType));
       props?.minPerformers && setAttribute('minPerformers', toPerformers(props.minPerformers));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props]);
 
   const isDisabled = props.disabledCheckbox || !attributes.enabled;
 
   return (
     <div className={cn('mb-2', {'text-muted': isDisabled}, 'checkbox-align')}>
-      <Row className="mb-1">
-        <Col xs="10">
-          <IconCondition width="17" height="17"
-                         color={isDisabled ? COLOR_DISABLED : COLOR_REDDISH}/>
-          {' '} <strong>Condition</strong>: AnyTasksActive
-        </Col>
-        <Col xs="2" className="text-right">
-          <Form.Check
-            className="pull-right"
-            type="switch"
-            disabled={attributes.disabledCheckbox}
-            id={`condition-switch-${nanoid(5)}`}
-            label=""
-            checked={attributes.enabled}
-            onChange={e => setAttribute('enabled', e.target.checked)}
-          />
-        </Col>
-      </Row>
-      <Row className="mb-1 mt-2">
-        <Col xs="2">
-          <div className="position-relative pl-3" style={{top: 7}}>
-            Task Type
-          </div>
-        </Col>
-        <Col xs="6">
-          <Form.Control
-            type="text"
-            size="sm"
-            disabled={isDisabled}
-            className="pull-right"
-            aria-disabled={!isDisabled}
-            id={`condition-${nanoid(5)}`}
-            placeholder="e.g., protein_hoarding"
-            value={attributes?.taskType || ''}
-            onChange={e => setAttribute('taskType', e.target.value.replace(/['"]+/ig, ``))}
-          />
-        </Col>
-      </Row>
-      <Row className="mb-1 mt-2">
-        <Col xs="2">
-          <div className="position-relative pl-3" style={{top: 7}}>
-            Min Performers
-          </div>
-        </Col>
-        <Col xs="6">
+      <ConditionHeader caption={CONDITION_NAME}
+                       enabled={attributes.enabled}
+                       onEnabled={(isEnabled: boolean) => setAttribute('enabled', isEnabled)}
+                       disabledCheckbox={attributes.disabledCheckbox}
+                       removeIcon={newProps.removeIcon}
+                       onRemoveClick={newProps.onRemoveClick}
+                       onExpandedClick={(state: boolean) => setAttribute('expanded', state)}
+                       expanded={attributes.expanded}/>
+      {attributes?.expanded && (
+        <>
+          <Row className="mb-1 mt-2">
+            <Col xs="2">
+              <div className="position-relative pl-3" style={{top: 7}}>
+                Task Type
+              </div>
+            </Col>
+            <Col xs="6">
+              <Form.Control
+                type="text"
+                size="sm"
+                disabled={isDisabled}
+                className="pull-right"
+                aria-disabled={!isDisabled}
+                id={`condition-${nanoid(5)}`}
+                placeholder="e.g., protein_hoarding"
+                value={attributes?.taskType || ''}
+                onChange={e => setAttribute('taskType', e.target.value.replace(/['"]+/ig, ``))}
+              />
+            </Col>
+          </Row>
+          <Row className="mb-1 mt-2">
+            <Col xs="2">
+              <div className="position-relative pl-3" style={{top: 7}}>
+                Min Performers
+              </div>
+            </Col>
+            <Col xs="6">
           <span className="text-size-xs font-family-code">
             Value:
             {' '}
@@ -144,20 +146,22 @@ const AnyTasksActive = (props: DeepPartial<Props>) => {
               {attributes.minPerformers}
             </code>
           </span>
-          <Button disabled={isDisabled}
-                  style={{top: -1}}
-                  className="button-reset-sm" variant="link"
-                  onClick={() => setAttribute('minPerformers', random.randomPerformers())}>
-            Random
-          </Button>
-          <Slider
-            min={PERFORMERS_MIN}
-            max={PERFORMERS_MAX}
-            step={1} disabled={isDisabled}
-            value={Number(attributes.minPerformers)}
-            onChange={value => setAttribute('minPerformers', Number(value))}/>
-        </Col>
-      </Row>
+              <Button disabled={isDisabled}
+                      style={{top: -1}}
+                      className="button-reset-sm" variant="link"
+                      onClick={() => setAttribute('minPerformers', random.randomPerformers())}>
+                Random
+              </Button>
+              <Slider
+                min={PERFORMERS_MIN}
+                max={PERFORMERS_MAX}
+                step={1} disabled={isDisabled}
+                value={Number(attributes.minPerformers)}
+                onChange={value => setAttribute('minPerformers', Number(value))}/>
+            </Col>
+          </Row>
+        </>
+      )}
     </div>
   );
 };
@@ -166,6 +170,9 @@ const AnyTasksActive = (props: DeepPartial<Props>) => {
 AnyTasksActive.propTypes = {
   enabled: PropTypes.bool,
   disabledCheckbox: PropTypes.bool,
+  removeIcon: PropTypes.bool,
+  onRemoveClick: PropTypes.func,
+  expanded: PropTypes.bool,
   taskType: PropTypes.string,
   minPerformers: PropTypes.number,
   onChange: PropTypes.func,

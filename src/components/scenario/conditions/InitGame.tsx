@@ -10,12 +10,9 @@ import React from 'react';
 import * as PropTypes from 'prop-types';
 import cn from 'classname';
 import merge from 'deepmerge';
-import {nanoid} from 'nanoid';
-import {Col, Form, Row} from 'react-bootstrap';
 
-// icons
-import {COLOR_DISABLED, COLOR_REDDISH, IconCondition} from '~/components/icons/app';
 // elemental components
+import ConditionHeader from './../elements/ConditionHeader';
 
 // utils
 import {defaultsParams} from '~/utils/condition';
@@ -27,25 +24,35 @@ import type {ConditionInitGame as ConditionAttributes,} from '~/types/condition.
 interface Attributes extends ConditionAttributes {
   enabled: boolean;
   disabledCheckbox?: boolean;
+  expanded?: boolean;
 }
 
 interface Props extends Attributes {
-  onChange?(template: string): void,
+  removeIcon?: boolean;
+
+  onRemoveClick?(): void,
+
+  onChange?(template: string, values: Attributes): void,
 }
 
 const CONDITION_NAME: string = 'InitGame';
 
 const InitGame = (props: DeepPartial<Props>) => {
   const newProps = merge.all<Props>([{
-    enabled: false,
+    enabled: true,
     disabledCheckbox: false,
+    removeIcon: false,
+    expanded: true,
     onChange: () => {
+    },
+    onRemoveClick: () => {
     },
   }, defaultsParams.initGame as Props, props]);
 
   const [attributes, setAttributes] = React.useState<Attributes>({
     enabled: newProps.enabled as boolean,
     disabledCheckbox: newProps.disabledCheckbox as boolean,
+    expanded: newProps.expanded as boolean,
   });
 
   const setAttribute = <T = any>(name: $Keys<Attributes>, value: T) => {
@@ -63,7 +70,7 @@ const InitGame = (props: DeepPartial<Props>) => {
 
   // Reflect state changes
   React.useEffect(() => {
-    typeof newProps.onChange === 'function' && newProps.onChange(toTemplateText());
+    typeof newProps.onChange === 'function' && newProps.onChange(toTemplateText(), attributes);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [attributes]);
 
@@ -71,6 +78,7 @@ const InitGame = (props: DeepPartial<Props>) => {
   React.useEffect(() => {
     setAttribute('enabled', props.enabled);
     setAttribute('disabledCheckbox', props.disabledCheckbox);
+    setAttribute('expanded', props.expanded);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props]);
 
@@ -78,25 +86,17 @@ const InitGame = (props: DeepPartial<Props>) => {
 
   return (
     <div className={cn('mb-2', {'text-muted': isDisabled}, 'checkbox-align')}>
-      <Row className="mb-1">
-        <Col xs="10">
-          <IconCondition width="17" height="17"
-                         color={!attributes.enabled ? COLOR_DISABLED : COLOR_REDDISH}/>
-          {' '} <strong>Condition</strong>:
-          InitGame</Col>
-        <Col xs="2" className="text-right">
-          <Form.Check
-            className="pull-right"
-            type="switch"
-            id={`condition-switch-${nanoid(5)}`}
-            disabled={attributes.disabledCheckbox}
-            label=""
-            checked={attributes.enabled}
-            onChange={e => setAttribute<boolean>('enabled', e.target.checked)}
-          />
-        </Col>
-      </Row>
-      <div className="pl-3 text-muted mb-3"><i>No parameters</i></div>
+      <ConditionHeader caption={CONDITION_NAME}
+                       enabled={attributes.enabled}
+                       onEnabled={(isEnabled: boolean) => setAttribute('enabled', isEnabled)}
+                       disabledCheckbox={attributes.disabledCheckbox}
+                       removeIcon={newProps.removeIcon}
+                       onRemoveClick={newProps.onRemoveClick}
+                       onExpandedClick={(state: boolean) => setAttribute('expanded', state)}
+                       expanded={attributes.expanded}/>
+      {attributes?.expanded && (
+        <div className="pl-3 text-muted mb-3"><i>No parameters</i></div>
+      )}
     </div>
   );
 };
@@ -105,6 +105,9 @@ const InitGame = (props: DeepPartial<Props>) => {
 InitGame.propTypes = {
   enabled: PropTypes.bool,
   disabledCheckbox: PropTypes.bool,
+  removeIcon: PropTypes.bool,
+  onRemoveClick: PropTypes.func,
+  expanded: PropTypes.bool,
   onChange: PropTypes.func,
 };
 
