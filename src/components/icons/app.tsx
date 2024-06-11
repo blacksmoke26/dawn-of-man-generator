@@ -8,8 +8,11 @@ import React from 'react';
 import merge from 'deepmerge';
 
 import {
-  AmpersandIcon, BlendIcon,
-  BlocksIcon, BrainCircuitIcon, EqualNotIcon,
+  AmpersandIcon,
+  BlendIcon,
+  BlocksIcon,
+  BrainCircuitIcon,
+  EqualNotIcon,
   Flower2Icon,
   HammerIcon,
   LeafIcon,
@@ -20,10 +23,13 @@ import {
   ShuffleIcon,
   SnowflakeIcon,
   SproutIcon,
+  SquareChevronDownIcon,
+  SquareChevronUpIcon,
+  SquareXIcon,
   SunIcon,
   ThermometerSnowflakeIcon,
   TreesIcon,
-  XIcon
+  XIcon,
 } from 'lucide-react';
 
 export const COLOR_DISABLED: string = 'rgba(255, 255, 255, .5';
@@ -47,6 +53,10 @@ export const IconRestore = (props: LucideProps) => (
 
 export const IconClear = (props: LucideProps) => (
   <XIcon {...merge(iconDefaultProps, props)}/>
+);
+
+export const IconSquareMinus = (props: LucideProps) => (
+  <SquareXIcon {...merge(iconDefaultProps, props)}/>
 );
 
 export const IconBlock = (props: LucideProps) => (
@@ -107,4 +117,12 @@ export const IconConditionOr = (props: LucideProps) => (
 
 export const IconConditionNot = (props: LucideProps) => (
   <EqualNotIcon {...merge(iconDefaultProps, props)}/>
+);
+
+export const IconChevronUp = (props: LucideProps) => (
+  <SquareChevronUpIcon {...merge(iconDefaultProps, props)}/>
+);
+
+export const IconChevronDown = (props: LucideProps) => (
+  <SquareChevronDownIcon {...merge(iconDefaultProps, props)}/>
 );
