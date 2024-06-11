@@ -96,11 +96,11 @@ export const ConditionHeader = (props: Props) => {
 
   return (
     <Row className={cn('mb-1', {'text-muted': isDisabled}, 'checkbox-align')}>
-      <Col xs="10">
+      <Col xs="6">
         <IconCondition width="17" height="17" color={isDisabled ? COLOR_DISABLED : COLOR_REDDISH}/>
         {' '} <strong>Condition</strong>: {props.caption}
       </Col>
-      <Col xs="2" className="text-right">
+      <Col xs="6" className="text-right">
         <div className="d-inline-block">
           <Button variant="link" className="p-0" style={{top: '-0.2rem'}}
                   disabled={attributes.disabledCheckbox}
@@ -116,11 +116,11 @@ export const ConditionHeader = (props: Props) => {
         </div>
         <div className="d-inline-block">
           <Form.Check
-            className="pull-right"
             type="switch"
             disabled={attributes.disabledCheckbox}
             id={`condition-switch-${nanoid(5)}`}
             label=""
+            className="ml-1 pl-3"
             checked={attributes.enabled}
             onChange={e => {
               'function' === typeof props?.onEnabled && props?.onEnabled(e.target.checked);
@@ -130,10 +130,14 @@ export const ConditionHeader = (props: Props) => {
         </div>
         {newProps?.removeIcon && (
           <div className="d-inline-block">
-            <Button variant="link" className="p-0 ml-2" style={{top: '-0.2rem'}}
+            <Button variant="link" className="p-0 ml-1"
                     disabled={attributes.disabledCheckbox}
                     onClick={() => {
                       'function' === typeof props?.onRemoveClick && props?.onRemoveClick();
+                    }}
+                    style={{
+                      top: '-0.2rem',
+                      color: isDisabled ? 'rgba(255, 255, 255, .4)' : COLOR_REDDISH
                     }}>
               <IconSquareMinus width="16" height="16"/>
             </Button>
