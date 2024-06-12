@@ -9,8 +9,9 @@ import * as PropTypes from 'prop-types';
 import cn from 'classname';
 import merge from 'deepmerge';
 import {nanoid} from 'nanoid';
-import {Button, Col, Form, Row} from 'react-bootstrap';
+import xmlFormatter from 'xml-formatter';
 import {camelCase, capitalCase} from 'change-case';
+import {Button, Col, Form, Row} from 'react-bootstrap';
 
 // types
 import type {Required} from 'utility-types';
@@ -72,6 +73,7 @@ interface Props {
   subConditions?: ConditionList;
   removeIcon?: boolean;
   disabledCheckbox?: boolean;
+  showCheckbox?: boolean;
 
   onRemoveClick?(): void,
 
@@ -125,6 +127,7 @@ const ConditionLogical = (props: Props) => {
   const newProps = merge({
     enabled: true,
     expanded: true,
+    showCheckbox: true,
     subConditions: {},
     removeIcon: false,
     onRemoveClick: () => {
@@ -154,7 +157,9 @@ const ConditionLogical = (props: Props) => {
       .map(({template}) => String(template || '').trim())
       .join(``);
 
-    return `<condition><sub_conditions>${templates}</sub_conditions></condition>`;
+    return xmlFormatter(
+      `<condition><sub_conditions>${templates}</sub_conditions></condition>`
+    );
   };
 
   const updateSubCondition = (id: string, values: Partial<ConditionType> = {}): void => {
@@ -203,7 +208,15 @@ const ConditionLogical = (props: Props) => {
     <div className={cn({'text-muted': !enabled})}>
       <Row>
         <Col col="6" className="checkbox-align pl-1 mt-1">
-          <Form.Check
+          {!newProps.showCheckbox && (<span className="position-relative" style={{top: 0}}>
+            <span className={cn('mr-1', {'text-muted': !enabled})}>
+              <IconCondition width="17" height="17"
+                             color={!enabled ? COLOR_DISABLED : COLOR_REDDISH}/>
+              {' '} <strong>Condition:</strong>
+              {' '} SubConditions
+            </span>
+          </span>)}
+          {newProps.showCheckbox && (<Form.Check
             type="switch"
             id={`locations_override-switch-${nanoid(5)}`}
             label={<span className="position-relative" style={{top: 0}}>
@@ -217,7 +230,7 @@ const ConditionLogical = (props: Props) => {
             checked={enabled}
             disabled={disabledCheckbox}
             onChange={e => setEnabled(e.target.checked)}
-          />
+          />)}
         </Col>
         <Col col="6" className="text-right" style={{top: -4}}>
           <div className="d-inline-block">

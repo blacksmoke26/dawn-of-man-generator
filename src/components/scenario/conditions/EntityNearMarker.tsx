@@ -39,6 +39,7 @@ interface Attributes extends ConditionAttributes {
 
 interface Props extends Attributes {
   removeIcon?: boolean;
+  showCheckbox?: boolean,
 
   onRemoveClick?(): void,
 
@@ -52,6 +53,7 @@ const EntityNearMarker = (props: DeepPartial<Props>) => {
     enabled: true,
     disabledCheckbox: false,
     removeIcon: false,
+    showCheckbox: true,
     expanded: true,
     onChange: () => {
     },
@@ -91,13 +93,13 @@ const EntityNearMarker = (props: DeepPartial<Props>) => {
 
   // Reflect prop changes
   React.useEffect(() => {
-    setAttribute('enabled', props.enabled);
-    setAttribute('disabledCheckbox', props.disabledCheckbox);
-    setAttribute('expanded', props.expanded);
+    props?.enabled !== undefined && setAttribute('enabled', props.enabled);
+    props?.disabledCheckbox !== undefined && setAttribute('disabledCheckbox', props.disabledCheckbox);
+    props?.expanded !== undefined && setAttribute('expanded', props.expanded);
 
-    if (props.enabled) {
-      props?.entityType && setAttribute('entityType', props.entityType);
-      props?.distance && setAttribute('distance', toEntityCount(props.distance));
+    if (props?.enabled) {
+      props?.entityType !== undefined && setAttribute('entityType', props.entityType);
+      props?.distance !== undefined && setAttribute('distance', toEntityCount(props.distance));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props]);
@@ -106,7 +108,7 @@ const EntityNearMarker = (props: DeepPartial<Props>) => {
 
   return (
     <div className={cn('mb-2', {'text-muted': isDisabled}, 'checkbox-align')}>
-      <ConditionHeader caption={CONDITION_NAME}
+      <ConditionHeader caption={CONDITION_NAME} showCheckbox={newProps.showCheckbox}
                        enabled={attributes.enabled}
                        onEnabled={(isEnabled: boolean) => setAttribute('enabled', isEnabled)}
                        disabledCheckbox={attributes.disabledCheckbox}
