@@ -19,7 +19,6 @@ import type {
   GeneralCondition,
   GeneralConditionKey,
   LogicalCondition,
-  SubConditions,
 } from '~/types/condition.types';
 
 // conditions sub-components
@@ -44,12 +43,14 @@ import {
   COLOR_DISABLED,
   COLOR_REDDISH,
   IconChevronDown,
+  IconChevronSimpleDown,
+  IconChevronSimpleUp,
   IconChevronUp,
+  IconClear,
   IconCondition,
   IconConditionAnd,
   IconConditionNot,
   IconConditionOr,
-  IconSquareMinus
 } from '~/components/icons/app';
 
 // elemental components
@@ -68,7 +69,7 @@ interface Props {
   enabled?: boolean,
   expanded?: boolean,
   operator: LogicalCondition;
-  subConditions?: SubConditions;
+  subConditions?: ConditionList;
   removeIcon?: boolean;
   disabledCheckbox?: boolean;
 
@@ -124,7 +125,7 @@ const ConditionLogical = (props: Props) => {
   const newProps = merge({
     enabled: true,
     expanded: true,
-    subConditions: [],
+    subConditions: {},
     removeIcon: false,
     onRemoveClick: () => {
     },
@@ -200,67 +201,64 @@ const ConditionLogical = (props: Props) => {
 
   return (
     <div className={cn({'text-muted': !enabled})}>
-      <div style={{background: '#333', padding: '11px 11px 2px 11px', borderRadius: 2}}>
-        <Row>
-          <Col col="6" className="checkbox-align">
-            <Form.Check
-              type="switch"
-              id={`locations_override-switch-${nanoid(5)}`}
-              label={<span className="position-relative" style={{top: -1}}>
-            <span className={cn('text-size-sm mr-1', {'text-muted': !enabled})}>
+      <Row>
+        <Col col="6" className="checkbox-align pl-1 mt-1">
+          <Form.Check
+            type="switch"
+            id={`locations_override-switch-${nanoid(5)}`}
+            label={<span className="position-relative" style={{top: 0}}>
+            <span className={cn('mr-1', {'text-muted': !enabled})}>
               <IconCondition width="17" height="17"
                              color={!enabled ? COLOR_DISABLED : COLOR_REDDISH}/>
-              {' '} <strong>Condition</strong>
+              {' '} <strong>Condition:</strong>
+              {' '} SubConditions
             </span>
             </span>}
-              checked={enabled}
-              disabled={disabledCheckbox}
-              onChange={e => setEnabled(e.target.checked)}
-            />
-          </Col>
-          <Col col="6" className="text-right" style={{top: -4}}>
-            <div className="d-inline-block">
-              <strong style={{color: '#ebeaea'}}
-                      className={cn('text-size-sm', {'text-muted': !enabled})}>
-                {conditionIcon(newProps.operator)}
-                {' '}
-                <span className="position-relative" style={{top: '0.01rem'}}>
+            checked={enabled}
+            disabled={disabledCheckbox}
+            onChange={e => setEnabled(e.target.checked)}
+          />
+        </Col>
+        <Col col="6" className="text-right" style={{top: -4}}>
+          <div className="d-inline-block">
+            <strong style={{color: '#ebeaea'}}
+                    className={cn('text-size-sm', {'text-muted': !enabled})}>
+              {conditionIcon(newProps.operator)}
+              {' '}
+              <span className="position-relative" style={{top: '0.01rem'}}>
                 {newProps.operator?.toUpperCase()}
               </span>
-              </strong>
-            </div>
-            {newProps?.removeIcon && (
-              <div className="d-inline-block">
-                <Button variant="link" className="p-0 ml-2 mr-1"
-                        style={{
-                          top: '-0.01rem',
-                          color: COLOR_REDDISH
-                        }}
-                        title="Remove condition"
-                        onClick={() => {
-                          'function' === typeof newProps?.onRemoveClick && newProps?.onRemoveClick();
-                        }}>
-                  <IconSquareMinus width="16" height="16"/>
-                </Button>
-              </div>
-            )}
-            <div className="d-inline-block">
-              <Button variant="link" className="p-0" style={{top: '-0.062rem'}}
+            </strong>
+          </div>
+          <div className="d-inline-block ml-2">
+            <Button variant="link" className="p-0" style={{top: '-0.080rem'}}
+                    disabled={disabledCheckbox}
+                    onClick={() => {
+                      setExpanded(!expanded);
+                    }}>
+              {!expanded
+                ? <IconChevronSimpleUp width="16" height="16"/>
+                : <IconChevronSimpleDown width="16" height="16"/>}
+            </Button>
+          </div>
+          {newProps?.removeIcon && (
+            <div className="d-inline-block ml-1">
+              <Button variant="link" className="p-0"
+                      style={{top: '-0.10rem', color: disabledCheckbox ? 'rgba(255, 255, 255, 0.4)' : COLOR_REDDISH}}
+                      title="Remove condition"
                       disabled={disabledCheckbox}
                       onClick={() => {
-                        setExpanded(!expanded);
+                        'function' === typeof newProps?.onRemoveClick && newProps?.onRemoveClick();
                       }}>
-                {!expanded
-                  ? <IconChevronUp width="16" height="16"/>
-                  : <IconChevronDown width="16" height="16"/>}
+                <IconClear width="16" height="16"/>
               </Button>
             </div>
-          </Col>
-        </Row>
-      </div>
+          )}
+        </Col>
+      </Row>
       {expanded && (
         <>
-          <div className="mt-2 mb-2 pl-3">
+          <div className="mt-2 mb-2">
             <Row className={cn({'text-muted': false}, 'checkbox-align')}>
               <Col xs="8">
                 <div className="d-inline-block" style={{width: '80%'}}>
@@ -270,8 +268,9 @@ const ConditionLogical = (props: Props) => {
                     value={null}
                     formatOptionLabel={(option: Option | any) => (
                       <span>
-                  <IconCondition width="17" height="17" color={COLOR_REDDISH}/>
-                        {' '} {option?.label}</span>
+                        <IconCondition width="17" height="17" color={COLOR_REDDISH}/>
+                        {' '} {option?.label}
+                      </span>
                     )}
                     options={GENERAL_CONDITIONS.map(value => ({label: capitalCase(value), value}))}
                     placeholder="Choose condition to insert..."
@@ -284,7 +283,7 @@ const ConditionLogical = (props: Props) => {
                             expanded: true,
                             template: '',
                           },
-                          defaultsParams?.[defaultConfigKey] || {}
+                          defaultsParams?.[defaultConfigKey] || {},
                         );
                         setSubConditions(current => ({...current, [nanoid(10)]: newCondition}));
                       }
@@ -316,12 +315,12 @@ const ConditionLogical = (props: Props) => {
                     <Button variant="link" className="p-0 ml-1"
                             style={{
                               top: '-0.20rem',
-                              color: isDisabled ? 'rgba(255, 255, 255, .4)' : COLOR_REDDISH
+                              color: isDisabled ? 'rgba(255, 255, 255, .4)' : COLOR_REDDISH,
                             }}
                             title="Remove all sub conditions"
                             disabled={isDisabled}
                             onClick={() => setSubConditions({})}>
-                      <IconSquareMinus width="16" height="16"/>
+                      <IconClear width="16" height="16"/>
                     </Button>
                   </div>
                 </div>
@@ -336,7 +335,7 @@ const ConditionLogical = (props: Props) => {
 
               return (
                 <React.Fragment key={_id}>
-                  <div className="ml-3 pl-3" style={{borderLeft: '2px solid #616978'}}>
+                  <div className="ml-1 pl-3" style={{borderLeft: '2px solid #616978'}}>
                     <ConditionComponent
                       {...componentProps}
                       disabledCheckbox={!enabled}
@@ -362,11 +361,11 @@ const ConditionLogical = (props: Props) => {
 ConditionLogical.propTypes = {
   enabled: PropTypes.bool,
   operator: PropTypes.oneOf(LOGICAL_CONDITION),
-  subConditions: PropTypes.arrayOf(
-    PropTypes.shape({
-      internalName: PropTypes.oneOf(GENERAL_CONDITIONS).isRequired
-    })
-  ),
+  subConditions: PropTypes.shape({
+    subConditions: PropTypes.shape({
+      internalName: PropTypes.oneOf(GENERAL_CONDITIONS).isRequired,
+    }),
+  }),
   onChange: PropTypes.func,
 };
 
