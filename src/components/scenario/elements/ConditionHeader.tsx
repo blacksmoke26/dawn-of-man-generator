@@ -15,10 +15,10 @@ import {Button, Col, Form, Row} from 'react-bootstrap';
 import {
   COLOR_DISABLED,
   COLOR_REDDISH,
-  IconChevronDown,
-  IconChevronUp,
+  IconChevronDown, IconChevronSimpleDown, IconChevronSimpleUp,
+  IconChevronUp, IconClear,
   IconCondition,
-  IconSquareMinus
+  IconSquareMinus,
 } from '~/components/icons/app';
 
 // types
@@ -97,8 +97,23 @@ export const ConditionHeader = (props: Props) => {
   return (
     <Row className={cn('mb-1', {'text-muted': isDisabled}, 'checkbox-align')}>
       <Col xs="6">
-        <IconCondition width="17" height="17" color={isDisabled ? COLOR_DISABLED : COLOR_REDDISH}/>
-        {' '} <strong>Condition</strong>: {props.caption}
+        <Form.Check
+          type="switch"
+          disabled={attributes.disabledCheckbox}
+          id={`condition-switch-${nanoid(5)}`}
+          label={
+            <span>
+              <IconCondition width="17" height="17" color={isDisabled ? COLOR_DISABLED : COLOR_REDDISH}/>
+              {' '} <strong>Condition</strong>: {props.caption}
+            </span>
+          }
+          className="ml-1 pl-3 mt-1"
+          checked={attributes.enabled}
+          onChange={e => {
+            'function' === typeof props?.onEnabled && props?.onEnabled(e.target.checked);
+            setAttribute('enabled', e.target.checked);
+          }}
+        />
       </Col>
       <Col xs="6" className="text-right">
         <div className="d-inline-block">
@@ -110,23 +125,9 @@ export const ConditionHeader = (props: Props) => {
                     'function' === typeof props?.onExpandedClick && props?.onExpandedClick(currentState);
                   }}>
             {!attributes.expanded
-              ? <IconChevronUp width="16" height="16"/>
-              : <IconChevronDown width="16" height="16"/>}
+              ? <IconChevronSimpleUp width="16" height="16"/>
+              : <IconChevronSimpleDown width="16" height="16"/>}
           </Button>
-        </div>
-        <div className="d-inline-block">
-          <Form.Check
-            type="switch"
-            disabled={attributes.disabledCheckbox}
-            id={`condition-switch-${nanoid(5)}`}
-            label=""
-            className="ml-1 pl-3"
-            checked={attributes.enabled}
-            onChange={e => {
-              'function' === typeof props?.onEnabled && props?.onEnabled(e.target.checked);
-              setAttribute('enabled', e.target.checked);
-            }}
-          />
         </div>
         {newProps?.removeIcon && (
           <div className="d-inline-block">
@@ -139,7 +140,7 @@ export const ConditionHeader = (props: Props) => {
                       top: '-0.2rem',
                       color: isDisabled ? 'rgba(255, 255, 255, .4)' : COLOR_REDDISH
                     }}>
-              <IconSquareMinus width="16" height="16"/>
+              <IconClear width="16" height="16"/>
             </Button>
           </div>
         )}
