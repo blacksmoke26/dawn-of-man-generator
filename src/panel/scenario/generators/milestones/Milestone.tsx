@@ -14,7 +14,7 @@ import {Button, Col, Form, Row} from 'react-bootstrap';
 
 // elemental components
 import Select, {Option} from '~/components/ui/Select';
-import Condition, {ConditionsState, ConditionRegistry} from '~/components/scenario/generic/Condition';
+import Condition, {ConditionRegistry, ConditionsState} from '~/components/scenario/generic/Condition';
 
 // utils
 import {toString} from '~/helpers/string';
@@ -25,13 +25,7 @@ import {CONDITIONS_OPTIONS, LOGICAL_CONDITION} from '~/utils/condition';
 import type {Required} from 'utility-types';
 import type {Milestone as MilestoneType} from '~/types/milestone.types';
 import type {GeneralCondition, LogicalCondition} from '~/types/condition.types';
-import {
-  COLOR_REDDISH, IconChevronDown,
-  IconChevronSimpleDown,
-  IconChevronSimpleUp, IconChevronUp,
-  IconClear,
-  IconMilestone,
-} from '~/components/icons/app';
+import {COLOR_REDDISH, IconChevronDown, IconChevronUp, IconClear, IconMilestone} from '~/components/icons/app';
 
 const isEqual = require('is-equal');
 
