@@ -16,11 +16,11 @@ I will implement events editor in future versions. Collaboration warmly accepted
 
 ### Version History
 
-| Version                                              | Status  | EOL | Release    |
-|------------------------------------------------------|---------|-----|------------|
-| [2.x](https://dev--dawn-of-man-mod-gen.netlify.app/) | Nightly | No  | N/A        |
-| [2.1](https://dawn-of-man-mod-gen.netlify.app/)      | Current | No  | 2024-06-13 |
-| [2.0](https://2-0--dawn-of-man-mod-gen.netlify.app/) | Stable  | No  | 2024-06-07 |
+| Version                                                       | Status  | EOL | Release    |
+|---------------------------------------------------------------|---------|-----|------------|
+| [2.x](https://dev--dawn-of-man-mod-gen.netlify.app/)          | Nightly | No  | N/A        |
+| [2.1](https://dawn-of-man-mod-gen.netlify.app/)               | Current | No  | 2024-06-14 |
+| [2.0](https://2-0-1-hotfix--dawn-of-man-mod-gen.netlify.app/) | Stable  | No  | 2024-06-07 |
 
 ### Stalled Versions
 
