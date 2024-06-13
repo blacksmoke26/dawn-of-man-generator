@@ -43,10 +43,12 @@ export interface ChangedValues {
 export interface Props {
   id?: string;
   disabled?: boolean;
+  disabledCheckbox?: boolean;
   expanded?: boolean;
   conditions?: MilestoneType['conditions'];
 
   onChange?(template: string, values: ChangedValues): void,
+
   onRemoveClick?(): void,
 }
 
@@ -68,8 +70,8 @@ const conditionsToValues = (conditions: KVDocument): ChangedValues => {
 
 const toTemplateText = (milestoneId: string, attributes: KVDocument): string => {
   return xmlFormatter(
-    `<milestone id="${milestoneId.trim() || 'untitled'}">\n\t`
-    + Object.values(attributes).map((attr => attr.template)).join('\t\n')
+    `<milestone id="${milestoneId.trim() || 'untitled'}">`
+    + Object.values(attributes).map((attr => attr.template)).join('')
     + '</milestone>',
   );
 };
@@ -80,6 +82,7 @@ const Milestone = (props: Props) => {
     id: '',
     conditions: {},
     disabled: false,
+    disabledCheckbox: false,
     expanded: true,
     onChange: () => {
     },
@@ -90,6 +93,7 @@ const Milestone = (props: Props) => {
   const [milestoneId, setMilestoneId] = React.useState<string>(toString(newProps.id));
   const [conditions, setConditions] = React.useState<ConditionsState>(newProps?.conditions as any);
   const [disabled, setDisabled] = React.useState<boolean>(newProps.disabled);
+  const [disabledCheckbox, setDisabledCheckbox] = React.useState<boolean>(newProps.disabledCheckbox);
   const [expanded, setExpanded] = React.useState<boolean>(newProps.expanded);
   const [attributes, setAttributes] = React.useState<KVDocument>({});
 
@@ -98,6 +102,8 @@ const Milestone = (props: Props) => {
       return {...current, [id]: merge(current?.[id] || {}, values as Partial<ConditionsState>)};
     });
   };
+
+  const isDisabled = disabledCheckbox || disabled;
 
   const removeCondition = (id: string): void => {
     setConditions(current => {
@@ -109,10 +115,10 @@ const Milestone = (props: Props) => {
 
   // Reflect state changes
   React.useEffect(() => {
-    const template = disabled ? '' : toTemplateText(milestoneId, attributes);
-    typeof newProps.onChange === 'function' && newProps.onChange(template, disabled ? {} : conditionsToValues(attributes));
+    const template = isDisabled ? '' : toTemplateText(milestoneId, attributes);
+    typeof newProps.onChange === 'function' && newProps.onChange(template, isDisabled ? {} : conditionsToValues(attributes));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [disabled, milestoneId, attributes]);
+  }, [isDisabled, milestoneId, attributes]);
 
   // Reflect prop changes
   React.useEffect(() => {
@@ -121,6 +127,7 @@ const Milestone = (props: Props) => {
     props?.conditions !== undefined && setConditions(props.conditions as any);
     //console.log('props.conditions:', props?.conditions);
     props?.disabled !== undefined && setDisabled(props.disabled);
+    props?.disabledCheckbox !== undefined && setDisabledCheckbox(props.disabledCheckbox);
     //props?.expanded !== undefined && setExpanded(props.expanded);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props]);
@@ -135,8 +142,8 @@ const Milestone = (props: Props) => {
     for (const [_id, condition] of Object.entries(conditions)) {
       const values = {
         ...condition,
-        enabled: !disabled,
-        disabledCheckbox: disabled,
+        enabled: !isDisabled,
+        disabledCheckbox: isDisabled,
       } as ConditionRegistry;
 
       nodes.push(
@@ -144,7 +151,7 @@ const Milestone = (props: Props) => {
           <div className="ml-2 pl-3" style={{borderLeft: '2px solid #616978'}}>
             <Condition id={_id} internalName={condition.internalName}
                        values={values}
-                       disabledCheckbox={disabled}
+                       disabledCheckbox={isDisabled}
                        onChange={(template: string, values) => {
                          const nextState = {...omitProps(values), template};
                          setAttributes(prevState => {
@@ -174,7 +181,7 @@ const Milestone = (props: Props) => {
   };
 
   return (
-    <div className={cn('mt-0 checkbox-align', {'text-muted': disabled})}>
+    <div className={cn('mt-0 checkbox-align', {'text-muted': isDisabled})}>
       <Row className="mb-2 mt-2">
         <Col sm="2">
           <div className="position-relative" style={{top: 7}}><IconMilestone width="16" height="16"/> Milestone ID</div>
@@ -185,9 +192,9 @@ const Milestone = (props: Props) => {
               <Form.Control
                 type="text"
                 size="sm"
-                disabled={disabled}
+                disabled={isDisabled}
                 className="pull-left"
-                aria-disabled={disabled}
+                aria-disabled={isDisabled}
                 id={`condition-${nanoid(5)}`}
                 placeholder="e.g., survival_5_weeks"
                 value={milestoneId}
@@ -202,8 +209,11 @@ const Milestone = (props: Props) => {
             </Col>
             <Col sm="4" className="text-right">
               <div className="d-inline-block p-0">
-                <Button title={expanded? 'Collapse milestone panel' : 'Expand milestone panel'} variant="link" className="p-0" style={{top: '0.19rem'}}
-                        onClick={() => setExpanded(!expanded)}>
+                <Button
+                  disabled={isDisabled}
+                  title={expanded ? 'Collapse milestone panel' : 'Expand milestone panel'}
+                  variant="link" className="p-0" style={{top: '0.19rem'}}
+                  onClick={() => setExpanded(!expanded)}>
                   {!expanded
                     ? <IconChevronUp width="16" height="16"/>
                     : <IconChevronDown width="16" height="16"/>}
@@ -215,16 +225,19 @@ const Milestone = (props: Props) => {
                   style={{top: 7}}
                   id={`allow_milestone-switch-${nanoid(5)}`}
                   label=""
+                  disabled={disabledCheckbox}
                   checked={!disabled}
                   onChange={e => setDisabled(!e.target.checked)}
                 />
               </div>
               <div className="d-inline-block">
-                <Button variant="link" className="p-0"
-                        style={{top: 2, color: COLOR_REDDISH}}
-                        title="Remove milestone"
-                        onClick={() => newProps.onRemoveClick()}>
-                  <IconClear width="18" height="18"/>
+                <Button
+                  variant="link" className="p-0"
+                  style={{top: 2, color: isDisabled ? 'rgba(255, 255, 255, .4)' : COLOR_REDDISH}}
+                  title="Remove milestone"
+                  disabled={isDisabled}
+                  onClick={() => newProps.onRemoveClick()}>
+                  <IconClear width="20" height="20" style={{top: 0}}/>
                 </Button>
               </div>
             </Col>
@@ -274,6 +287,7 @@ const Milestone = (props: Props) => {
 // Properties validation
 Milestone.propTypes = {
   id: PropTypes.string,
+  disabledCheckbox: PropTypes.bool,
   disabled: PropTypes.bool,
   conditions: PropTypes.object,
   onRemoveClick: PropTypes.func,
