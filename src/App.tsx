@@ -19,13 +19,11 @@ import ScenarioContainer from '~/panel/scenario/ScenarioContainer';
 import {useAppDispatch} from '~redux/hooks';
 import {updateInit} from '~redux/reducers';
 
-
 const KEY_ENVIRONMENT: string = 'environment';
 const KEY_SCENARIO: string = 'scenario';
 
 const App = () => {
   const dispatch = useAppDispatch();
-
   React.useEffect(() => {
     dispatch(updateInit(true));
     // eslint-disable-next-line
