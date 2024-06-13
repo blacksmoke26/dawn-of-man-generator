@@ -16,7 +16,7 @@ import {
   Flower2Icon,
   HammerIcon,
   LeafIcon,
-  LucideProps, MilestoneIcon,
+  LucideProps, MapPinIcon, MilestoneIcon,
   MountainIcon,
   PlusIcon,
   RotateCcwIcon,
@@ -65,6 +65,10 @@ export const IconBlock = (props: LucideProps) => (
 
 export const IconNew = (props: LucideProps) => (
   <PlusIcon {...merge(iconDefaultProps, props)}/>
+);
+
+export const IconMapPin = (props: LucideProps) => (
+  <MapPinIcon {...merge(iconDefaultProps, props)}/>
 );
 
 export const IconSpring = (props: LucideProps) => (

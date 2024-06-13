@@ -13,7 +13,7 @@ import SyntaxHighlighter from 'react-syntax-highlighter';
 import {anOldHope} from 'react-syntax-highlighter/dist/esm/styles/hljs';
 
 // icons
-import {IconBlock} from '~/components/icons/app';
+import {IconBlock, IconMapPin} from '~/components/icons/app';
 
 // elemental components
 import Accordion from '~/components/ui/Accordion';
@@ -40,6 +40,7 @@ import {nodesToLanguageStrings} from '~/utils/location';
 import type {Json} from '~/types/json.types';
 import DisasterContainer from '~/panel/scenario/generators/disaster/DisasterContainer';
 import MilestoneContainer from '~/panel/scenario/generators/milestones/MilestoneContainer';
+import {MilestoneIcon, ThermometerSnowflakeIcon} from 'lucide-react';
 
 const SCENARIO_NAME: string = 'scenario';
 
@@ -153,16 +154,16 @@ const ScenarioContainer = () => {
         <hr className="mt-1"/>
         <Visible onChange={v => updateText('visible', v)}/>
       </Accordion>
-      <Accordion header={<><IconBlock width="17" height="17"/> Disasters</>} eventKey="disasters">
+      <Accordion header={<><ThermometerSnowflakeIcon className="d-inline-block" width="17" height="17"/> Disasters</>} eventKey="disasters">
         <DisasterContainer onChange={(template: string) => updateText('disasters', template)}/>
       </Accordion>
-      <Accordion header={<><IconBlock width="17" height="17"/> Milestones</>} eventKey="milestones">
+      <Accordion header={<><MilestoneIcon className="d-inline-block" width="17" height="17"/> Milestones</>} eventKey="milestones">
         <MilestoneContainer
           onChange={(template: string) => {
             setTimeout(() => updateText('milestones', template), 50);
           }}/>
       </Accordion>
-      <Accordion header={<><IconBlock width="17" height="17"/> Locations</>} eventKey="locations" noBodyPad={true}>
+      <Accordion header={<><IconMapPin className="d-inline-block" width="17" height="17"/> Locations</>} eventKey="locations" noBodyPad={true}>
         <LocationContainer onChange={(template: string, list) => {
           updateText('locations', template);
           updateLangString('locations', template.trim() ? nodesToLanguageStrings(list) as any : '');
