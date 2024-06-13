@@ -45,7 +45,7 @@ export const isObject = (obj: any): boolean => {
  * const result = onlyKeys({a: 1, b: 2, c: 3}, ['a', 'b'], true);
  * console.log('Result:', result); // {c: 3}
  */
-export const onlyKeys = <T extends Record<string, any> = Record<string, any>>(obj: T, keys: $Keys<T>[] = [], excludeMode: boolean = false): T => {
+export const onlyKeys = <T extends Record<string, any> = Record<string, any>>(obj: T, keys: ($Keys<T>|string)[] = [], excludeMode: boolean = false): T => {
   const objKeys = Object.keys(obj as Record<string, any>);
 
   if (!objKeys.length || !keys.length) return {} as T;
