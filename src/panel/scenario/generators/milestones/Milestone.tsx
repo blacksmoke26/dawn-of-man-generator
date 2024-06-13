@@ -125,8 +125,9 @@ const Milestone = (props: Props) => {
     //props?.id && setDisabled(props.);
     props?.id !== undefined && setMilestoneId(props.id);
     props?.conditions !== undefined && setConditions(props.conditions as any);
+    //console.log('props.conditions:', props?.conditions);
     props?.disabled !== undefined && setDisabled(props.disabled);
-    props?.expanded !== undefined && setExpanded(props.expanded);
+    //props?.expanded !== undefined && setExpanded(props.expanded);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props]);
 
@@ -207,10 +208,8 @@ const Milestone = (props: Props) => {
             </Col>
             <Col sm="4" className="text-right">
               <div className="d-inline-block p-0">
-                <Button variant="link" className="p-0" style={{top: '0.19rem'}}
-                        onClick={() => {
-                          setExpanded(!expanded);
-                        }}>
+                <Button title={expanded? 'Collapse milestone panel' : 'Expand milestone panel'} variant="link" className="p-0" style={{top: '0.19rem'}}
+                        onClick={() => setExpanded(!expanded)}>
                   {!expanded
                     ? <IconChevronUp width="16" height="16"/>
                     : <IconChevronDown width="16" height="16"/>}
@@ -228,9 +227,8 @@ const Milestone = (props: Props) => {
               </div>
               <div className="d-inline-block">
                 <Button variant="link" className="p-0"
-                        style={{top: 2, color: disabled ? 'rgba(255, 255, 255, 0.4)' : COLOR_REDDISH}}
+                        style={{top: 2, color: COLOR_REDDISH}}
                         title="Remove milestone"
-                        disabled={disabled}
                         onClick={() => newProps.onRemoveClick()}>
                   <IconClear width="18" height="18"/>
                 </Button>
@@ -239,43 +237,41 @@ const Milestone = (props: Props) => {
           </Row>
         </Col>
       </Row>
-      {expanded && (
-        <React.Fragment>
-          <div className="mt-2 mb-3">
-            <Select
-              isDisabled={disabled}
-              menuPortalTarget={document.body}
-              options={CONDITIONS_OPTIONS}
-              value={null}
-              placeholder="Add milestone condition..."
-              onChange={(option: Option | any, {action}): void => {
-                if (action === 'select-option' && option) {
-                  const conditionId: string = nanoid(10).toLowerCase();
-                  const values = {
-                    internalName: option.value as string,
-                    disabledCheckbox: false,
-                    enabled: true,
-                    expanded: true,
-                    template: '',
-                  } as ConditionRegistry;
+      <div className={cn({'d-none invisible': !expanded})}>
+        <div className="mt-2 mb-3">
+          <Select
+            isDisabled={disabled}
+            menuPortalTarget={document.body}
+            options={CONDITIONS_OPTIONS}
+            value={null}
+            placeholder="Add milestone condition..."
+            onChange={(option: Option | any, {action}): void => {
+              if (action === 'select-option' && option) {
+                const conditionId: string = nanoid(10).toLowerCase();
+                const values = {
+                  internalName: option.value as string,
+                  disabledCheckbox: false,
+                  enabled: true,
+                  expanded: true,
+                  template: '',
+                } as ConditionRegistry;
 
-                  if (LOGICAL_CONDITION.includes(option.value)) {
-                    values['subConditions'] = {};
-                    values['operator'] = option.value;
-                  }
-                  updateSubCondition(conditionId, values);
-                  setAttributes(current => ({
-                    ...current, [conditionId]: {
-                      template: '',
-                    },
-                  }));
+                if (LOGICAL_CONDITION.includes(option.value)) {
+                  values['subConditions'] = {};
+                  values['operator'] = option.value;
                 }
-              }}
-            />
-          </div>
-          {renderConditions()}
-        </React.Fragment>
-      )}
+                updateSubCondition(conditionId, values);
+                setAttributes(current => ({
+                  ...current, [conditionId]: {
+                    template: '',
+                  },
+                }));
+              }
+            }}
+          />
+        </div>
+        {renderConditions()}
+      </div>
       <div className="mb-3"></div>
     </div>
   );
