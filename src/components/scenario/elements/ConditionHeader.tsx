@@ -99,10 +99,19 @@ export const ConditionHeader = (props: Props) => {
     <Row className={cn('mb-1', {'text-muted': isDisabled}, 'checkbox-align')}>
       <Col xs="6">
         {!newProps.showCheckbox && (
-          <span>
+          <a href="#"
+             className={cn({'text-muted': isDisabled})}
+             onClick={e => {
+            e.preventDefault();
+            if ( !isDisabled ) {
+              const currentState = !attributes.expanded;
+              setAttribute('expanded', currentState);
+              'function' === typeof props?.onExpandedClick && props?.onExpandedClick(currentState);
+            }
+          }} style={{cursor: !isDisabled ? 'pointer' : 'default', color: '#FFF'}}>
               <IconCondition width="17" height="17" color={isDisabled ? COLOR_DISABLED : COLOR_REDDISH}/>
             {' '} <strong>Condition</strong>: {props.caption}
-            </span>
+            </a>
         )}
         {newProps.showCheckbox && (
           <Form.Check
