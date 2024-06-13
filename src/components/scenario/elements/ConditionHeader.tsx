@@ -15,10 +15,8 @@ import {Button, Col, Form, Row} from 'react-bootstrap';
 import {
   COLOR_DISABLED,
   COLOR_REDDISH,
-  IconChevronDown, IconChevronSimpleDown, IconChevronSimpleUp,
-  IconChevronUp, IconClear,
-  IconCondition,
-  IconSquareMinus,
+  IconChevronSimpleDown, IconChevronSimpleUp,
+  IconClear, IconCondition,
 } from '~/components/icons/app';
 
 // types
@@ -138,7 +136,7 @@ export const ConditionHeader = (props: Props) => {
                     }}
                     style={{
                       top: '-0.2rem',
-                      color: isDisabled ? 'rgba(255, 255, 255, .4)' : COLOR_REDDISH
+                      color: isDisabled ? 'rgba(255, 255, 255, .4)' : COLOR_REDDISH,
                     }}>
               <IconClear width="16" height="16"/>
             </Button>
