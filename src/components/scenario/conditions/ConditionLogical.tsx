@@ -108,12 +108,12 @@ const subConditionToValues = (conditions: ConditionList): ChangedValues => {
   let index = 0;
 
   for (const [, condition] of Object.entries(conditions)) {
-    if ( !condition.enabled ) {
+    if (!condition.enabled) {
       continue;
     }
     index++;
     const attributes = onlyKeys(condition, [
-      'internalName','expanded', 'disabledCheckbox', 'enabled', 'template'
+      'internalName', 'expanded', 'disabledCheckbox', 'enabled', 'template',
     ], true) as KVDocument;
 
     subConditions[`condition_${index}`] = {type: condition.internalName, ...attributes};
@@ -180,7 +180,7 @@ const ConditionLogical = (props: Props) => {
   React.useEffect(() => {
     const template = enabled ? toTemplateText(subConditions) : '';
     typeof newProps.onChange === 'function' && newProps.onChange(
-      template, enabled ? subConditionToValues(subConditions) : {} as ChangedValues
+      template, enabled ? subConditionToValues(subConditions) : {} as ChangedValues,
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enabled, subConditions]);
@@ -225,15 +225,30 @@ const ConditionLogical = (props: Props) => {
   return (
     <div className={cn({'text-muted': !enabled})}>
       <Row>
-        <Col col="6" className="checkbox-align pl-1 mt-1">
-          {!newProps.showCheckbox && (<span className="position-relative" style={{top: 0}}>
+        <Col col="6" className="checkbox-align mt-1">
+          {!newProps.showCheckbox && (
             <span className={cn('mr-1', {'text-muted': !enabled})}>
-              <IconCondition width="17" height="17"
-                             color={!enabled ? COLOR_DISABLED : COLOR_REDDISH}/>
-              {' '} <strong>Condition:</strong>
-              {' '} SubConditions
+              <a href="#"
+                 className={cn({'text-muted': isDisabled})}
+                 onClick={e => {
+                   e.preventDefault();
+                   if (!isDisabled) {
+                     setExpanded(!expanded);
+                   }
+                 }} style={{
+                cursor: !isDisabled ? 'pointer' : 'default',
+                color: '#FFF',
+              }}>
+                <span className="position-relative" style={{top: 0}}>
+
+                <IconCondition width="17" height="17"
+                               color={!enabled ? COLOR_DISABLED : COLOR_REDDISH}/>
+                  {' '} <strong>Condition:</strong>
+                  {' '} SubConditions
+              </span>
+              </a>
             </span>
-          </span>)}
+          )}
           {newProps.showCheckbox && (<Form.Check
             type="switch"
             id={`locations_override-switch-${nanoid(5)}`}
