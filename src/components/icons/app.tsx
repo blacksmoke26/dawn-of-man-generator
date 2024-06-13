@@ -16,7 +16,7 @@ import {
   Flower2Icon,
   HammerIcon,
   LeafIcon,
-  LucideProps,
+  LucideProps, MilestoneIcon,
   MountainIcon,
   PlusIcon,
   RotateCcwIcon,
@@ -127,11 +127,14 @@ export const IconChevronDown = (props: LucideProps) => (
   <SquareChevronDownIcon {...merge(iconDefaultProps, props)}/>
 );
 
-
 export const IconChevronSimpleUp = (props: LucideProps) => (
   <ChevronUpIcon {...merge(iconDefaultProps, props)}/>
 );
 
 export const IconChevronSimpleDown = (props: LucideProps) => (
   <ChevronDownIcon {...merge(iconDefaultProps, props)}/>
+);
+
+export const IconMilestone = (props: LucideProps) => (
+  <MilestoneIcon {...merge(iconDefaultProps, props)}/>
 );
