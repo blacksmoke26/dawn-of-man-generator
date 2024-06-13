@@ -5,6 +5,7 @@
  */
 
 import merge from 'deepmerge';
+import {$Keys} from 'utility-types';
 
 /**
  * Merges multiple objects into one mega object
@@ -28,4 +29,30 @@ export const mergeAll = <T = Record<string, any>>(...obj: T[]): T => {
  */
 export const isObject = (obj: any): boolean => {
   return typeof obj === 'object' && obj !== null && ! Array.isArray(obj)
+};
+
+/**
+ * Get the object with only provided keys
+ * @param obj - Plain object
+ * @param keys - List of fields to have only
+ * @param [excludeMode=false] - Reverse: Skip those fields which are provided in `keys`
+ *
+ * @example Include mode
+ * const result = onlyKeys({a: 1, b: 2, c: 3}, ['a', 'b']);
+ * console.log('Result:', result); // {a: 1, b: 2}
+ *
+ * @example Exclude mode (`excludeMode` param as true)
+ * const result = onlyKeys({a: 1, b: 2, c: 3}, ['a', 'b'], true);
+ * console.log('Result:', result); // {c: 3}
+ */
+export const onlyKeys = <T extends Record<string, any> = Record<string, any>>(obj: T, keys: $Keys<T>[] = [], excludeMode: boolean = false): T => {
+  const objKeys = Object.keys(obj as Record<string, any>);
+
+  if (!objKeys.length || !keys.length) return {} as T;
+
+  const normalized = objKeys
+    .filter(key => excludeMode ? !keys.includes(key) : keys.includes(key))
+    .map((key) => [key, (obj as Record<string, any>)[key]])
+
+  return Object.fromEntries(normalized) as T;
 };
