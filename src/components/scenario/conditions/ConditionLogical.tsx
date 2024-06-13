@@ -232,7 +232,7 @@ const ConditionLogical = (props: Props) => {
         <Col col="6" className="checkbox-align mt-1">
           {!newProps.showCheckbox && (
             <span className={cn('mr-1', {'text-muted': !enabled})}>
-              <a href="#"
+              <a href="#disable"
                  className={cn({'text-muted': isDisabled})}
                  onClick={e => {
                    e.preventDefault();
