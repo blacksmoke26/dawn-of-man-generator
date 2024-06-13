@@ -6,16 +6,18 @@
 
 import React from 'react';
 import merge from 'deepmerge';
-import {Button, ButtonGroup, Form} from 'react-bootstrap';
 import {nanoid} from 'nanoid';
+import xmlFormatter from 'xml-formatter';
+import {Button, ButtonGroup, Form} from 'react-bootstrap';
+
+// icons
 import {IconClear, IconNew} from '~/components/icons/app';
+
+// components
+import Milestone from './Milestone';
 
 // types
 import type {Required} from 'utility-types';
-import Milestone from '~/panel/scenario/generators/milestones/Milestone';
-import xmlFormatter from 'xml-formatter';
-
-export type KVDocument = Record<string, any>;
 
 export interface MilestonesState {
   [key: string]: {
@@ -30,7 +32,9 @@ interface Props {
 }
 
 const toTemplateText = (milestones: MilestonesState): string => {
-  return xmlFormatter(
+  const template = Object.values(milestones).map((attr => attr.template)).join('').trim();
+
+  return !template ? '' : xmlFormatter(
     `<milestones>`
     + Object.values(milestones).map((attr => attr.template)).join('')
     + '</milestones>',
@@ -64,7 +68,7 @@ const MilestoneContainer = (props: Props) => {
     for (const [id] of Object.entries(milestones)) {
       nodes.push(
         <React.Fragment key={id}>
-          <div className="pl-2" style={{borderLeft: '2px solid rgb(97, 105, 120)'}}>
+          <div className="pl-2" style={{borderLeft: '2px solid rgb(133 107 99)'}}>
             <Milestone
               disabledCheckbox={!disabled}
               onChange={(template: string) => {
