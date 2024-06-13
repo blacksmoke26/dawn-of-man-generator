@@ -39,6 +39,7 @@ import {nodesToLanguageStrings} from '~/utils/location';
 // types
 import type {Json} from '~/types/json.types';
 import DisasterContainer from '~/panel/scenario/generators/disaster/DisasterContainer';
+import MilestoneContainer from '~/panel/scenario/generators/milestones/MilestoneContainer';
 
 const SCENARIO_NAME: string = 'scenario';
 
@@ -57,8 +58,9 @@ const ScenarioContainer = () => {
     loadingScreens: '',
     startingConditions: '',
     visible: '',
-    disasters: '',
     locations: '',
+    disasters: '',
+    milestones: '',
   });
 
   const [langStrings, setLangStrings] = React.useState<Json>({});
@@ -84,6 +86,7 @@ const ScenarioContainer = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [templateTexts]);
 
+  // noinspection com.intellij.reactbuddy.ExhaustiveDepsInspection
   /** Generate language string xml code */
   const toLanguageTemplateText = React.useCallback((): string => {
     const data: Array<string> = [];
@@ -152,6 +155,12 @@ const ScenarioContainer = () => {
       </Accordion>
       <Accordion header={<><IconBlock width="17" height="17"/> Disasters</>} eventKey="disasters">
         <DisasterContainer onChange={(template: string) => updateText('disasters', template)}/>
+      </Accordion>
+      <Accordion header={<><IconBlock width="17" height="17"/> Milestones</>} eventKey="milestones">
+        <MilestoneContainer
+          onChange={(template: string) => {
+            setTimeout(() => updateText('milestones', template), 50);
+          }}/>
       </Accordion>
       <Accordion header={<><IconBlock width="17" height="17"/> Locations</>} eventKey="locations" noBodyPad={true}>
         <LocationContainer onChange={(template: string, list) => {
