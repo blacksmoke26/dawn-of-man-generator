@@ -134,34 +134,36 @@ export const ConditionHeader = (props: Props) => {
         )}
       </Col>
       <Col xs="6" className="text-right">
-        <div className="d-inline-block">
-          <Button variant="link" className="p-0" style={{top: '-0.2rem'}}
-                  disabled={attributes.disabledCheckbox}
-                  onClick={() => {
-                    const currentState = !attributes.expanded;
-                    setAttribute('expanded', currentState);
-                    'function' === typeof props?.onExpandedClick && props?.onExpandedClick(currentState);
-                  }}>
-            {!attributes.expanded
-              ? <IconChevronSimpleUp width="16" height="16"/>
-              : <IconChevronSimpleDown width="16" height="16"/>}
-          </Button>
-        </div>
-        {newProps?.removeIcon && (
+        <div className="position-relative" style={{top: 3}}>
           <div className="d-inline-block">
-            <Button variant="link" className="p-0 ml-1"
+            <Button variant="link" className="p-0" style={{top: '-0.2rem'}}
                     disabled={attributes.disabledCheckbox}
                     onClick={() => {
-                      'function' === typeof props?.onRemoveClick && props?.onRemoveClick();
-                    }}
-                    style={{
-                      top: '-0.2rem',
-                      color: isDisabled ? 'rgba(255, 255, 255, .4)' : COLOR_REDDISH,
+                      const currentState = !attributes.expanded;
+                      setAttribute('expanded', currentState);
+                      'function' === typeof props?.onExpandedClick && props?.onExpandedClick(currentState);
                     }}>
-              <IconClear width="16" height="16"/>
+              {!attributes.expanded
+                ? <IconChevronSimpleUp width="16" height="16"/>
+                : <IconChevronSimpleDown width="16" height="16"/>}
             </Button>
           </div>
-        )}
+          {newProps?.removeIcon && (
+            <div className="d-inline-block">
+              <Button variant="link" className="p-0 ml-1"
+                      disabled={attributes.disabledCheckbox}
+                      onClick={() => {
+                        'function' === typeof props?.onRemoveClick && props?.onRemoveClick();
+                      }}
+                      style={{
+                        top: '-0.2rem',
+                        color: isDisabled ? 'rgba(255, 255, 255, .4)' : COLOR_REDDISH,
+                      }}>
+                <IconClear width="16" height="16"/>
+              </Button>
+            </div>
+          )}
+        </div>
       </Col>
     </Row>
   );
