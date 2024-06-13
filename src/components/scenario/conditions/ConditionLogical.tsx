@@ -59,10 +59,15 @@ import Select, {Option} from '~/components/ui/Select';
 
 // utils
 import {defaultsParams, GENERAL_CONDITIONS, LOGICAL_CONDITION} from '~/utils/condition';
+import {onlyKeys} from '~/helpers/object';
+
+const isEqual = require('is-equal');
+
+type KVDocument = Record<string, any>;
+type SubConditionsValues = Record<string, KVDocument>;
 
 export interface ChangedValues {
-  enabled: boolean,
-  subConditions: ConditionList;
+  subConditions: SubConditionsValues;
 }
 
 /** ConditionNot `props` type */
@@ -98,6 +103,36 @@ const componentsMap = {
   ValueReached,
 };
 
+const subConditionToValues = (conditions: ConditionList): ChangedValues => {
+  const subConditions: SubConditionsValues = {};
+  let index = 0;
+
+  for (const [id, condition] of Object.entries(conditions)) {
+    if ( !condition.enabled ) {
+      continue;
+    }
+    index++;
+    const attributes = onlyKeys(condition, [
+      'internalName','expanded', 'disabledCheckbox', 'enabled', 'template'
+    ], true) as KVDocument;
+
+    subConditions[`condition_${index}`] = {type: condition.internalName, ...attributes};
+  }
+
+  return {subConditions};
+};
+
+
+/** Generate xml code */
+const toTemplateText = (conditions: ConditionList): string => {
+  const templates = Object.values(conditions)
+    .map(({template}) => String(template || '').trim())
+    .join(``);
+
+  return xmlFormatter(
+    `<condition><sub_conditions>${templates}</sub_conditions></condition>`,
+  );
+};
 const conditionIcon = (operator: LogicalCondition) => {
   return operator === 'And'
     ? <IconConditionAnd/>
@@ -141,39 +176,22 @@ const ConditionLogical = (props: Props) => {
   const [expanded, setExpanded] = React.useState<boolean>(newProps.expanded as boolean);
   const [subConditions, setSubConditions] = React.useState<ConditionList>({});
 
-  const triggerHandler = () => {
-    typeof props.onChange === 'function' && props.onChange(toTemplateText(), {
-      enabled, subConditions,
-    });
-  };
-
-  /** Generate xml code */
-  const toTemplateText = (): string => {
-    if (!enabled) {
-      return '';
-    }
-
-    const templates = Object.values(subConditions)
-      .map(({template}) => String(template || '').trim())
-      .join(``);
-
-    return xmlFormatter(
-      `<condition><sub_conditions>${templates}</sub_conditions></condition>`
+  // Reflect state changes
+  React.useEffect(() => {
+    const template = enabled ? toTemplateText(subConditions) : '';
+    typeof newProps.onChange === 'function' && newProps.onChange(
+      template, enabled ? subConditionToValues(subConditions) : {} as ChangedValues
     );
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [enabled, subConditions]);
 
   const updateSubCondition = (id: string, values: Partial<ConditionType> = {}): void => {
-    setSubConditions(current => {
-      current[id] = merge(current[id], values);
-      return current;
-    });
-  };
-
-  const removeSubCondition = (id: string): void => {
-    setSubConditions(current => {
-      const _current = {...current};
-      delete _current[id];
-      return _current;
+    setSubConditions((prevState: ConditionList) => {
+      const nextState = {...prevState[id], ...values};
+      if (isEqual(prevState[id], nextState)) {
+        return prevState as ConditionList;
+      }
+      return {...prevState, [id]: nextState} as ConditionList;
     });
   };
 
@@ -343,8 +361,9 @@ const ConditionLogical = (props: Props) => {
           <div className="mt-3">
             {subConditionsList.map(([_id, condition], index) => {
               const ConditionComponent = createConditionComponent(condition);
-              const componentProps = {...condition} as Partial<ConditionType>;
-              delete componentProps?.internalName;
+              const componentProps = onlyKeys<Partial<ConditionType>>(condition, [
+                'internalName', 'template', 'enabled',
+              ], true);
 
               return (
                 <React.Fragment key={_id}>
@@ -353,10 +372,15 @@ const ConditionLogical = (props: Props) => {
                       {...componentProps}
                       disabledCheckbox={!enabled}
                       removeIcon={true}
-                      onRemoveClick={() => removeSubCondition(_id)}
+                      onRemoveClick={() => {
+                        setSubConditions(current => {
+                          const _current = {...current};
+                          delete _current[_id];
+                          return _current;
+                        });
+                      }}
                       onChange={(template: string, values: Record<string, any>) => {
                         updateSubCondition(_id, {...values, template});
-                        triggerHandler();
                       }}/>
                   </div>
                   {index < totalCount - 1 && <hr className="mt-2 mb-2"/>}
@@ -382,4 +406,4 @@ ConditionLogical.propTypes = {
   onChange: PropTypes.func,
 };
 
-export default ConditionLogical;
+export default React.memo(ConditionLogical);
