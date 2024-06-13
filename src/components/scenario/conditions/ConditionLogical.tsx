@@ -107,7 +107,7 @@ const subConditionToValues = (conditions: ConditionList): ChangedValues => {
   const subConditions: SubConditionsValues = {};
   let index = 0;
 
-  for (const [id, condition] of Object.entries(conditions)) {
+  for (const [, condition] of Object.entries(conditions)) {
     if ( !condition.enabled ) {
       continue;
     }
