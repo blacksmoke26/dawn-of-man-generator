@@ -386,7 +386,7 @@ const ConditionLogical = (props: Props) => {
 
               return (
                 <React.Fragment key={_id}>
-                  <div className="ml-1 pl-3" style={{borderLeft: '2px solid #616978'}}>
+                  <div style={{borderLeft: '2px solid #616978', paddingLeft: '1rem'}}>
                     <ConditionComponent
                       {...componentProps}
                       disabledCheckbox={!enabled}

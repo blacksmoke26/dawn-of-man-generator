@@ -148,7 +148,7 @@ const Milestone = (props: Props) => {
 
       nodes.push(
         <React.Fragment key={_id}>
-          <div className="ml-2 pl-3" style={{borderLeft: '2px solid #616978'}}>
+          <div className="ml-2 pl-3" style={{borderLeft: '2px solid rgb(97 137 97)'}}>
             <Condition id={_id} internalName={condition.internalName}
                        values={values}
                        disabledCheckbox={isDisabled}
