@@ -10,7 +10,7 @@ import cn from 'classname';
 import merge from 'deepmerge';
 import {nanoid} from 'nanoid';
 import xmlFormatter from 'xml-formatter';
-import {Col, Form, Row} from 'react-bootstrap';
+import {Button, Col, Form, Row} from 'react-bootstrap';
 
 // elemental components
 import Select, {Option} from '~/components/ui/Select';
@@ -25,6 +25,7 @@ import {CONDITIONS_OPTIONS, LOGICAL_CONDITION} from '~/utils/condition';
 import type {Required} from 'utility-types';
 import type {Milestone as MilestoneType} from '~/types/milestone.types';
 import type {GeneralCondition, LogicalCondition} from '~/types/condition.types';
+import {COLOR_REDDISH, IconClear, IconMilestone} from '~/components/icons/app';
 
 const isEqual = require('is-equal');
 
@@ -45,6 +46,7 @@ export interface Props {
   conditions?: MilestoneType['conditions'];
 
   onChange?(template: string, values: ChangedValues): void,
+  onRemoveClick?(): void,
 }
 
 const omitProps = <T extends KVDocument = KVDocument>(props: T): T => {
@@ -78,6 +80,8 @@ const Milestone = (props: Props) => {
     conditions: {},
     disabled: false,
     onChange: () => {
+    },
+    onRemoveClick: () => {
     },
   }, props);
 
@@ -155,7 +159,7 @@ const Milestone = (props: Props) => {
                        }}
             />
           </div>
-          {index < totalCount - 1 && <hr className="mt-2 mb-3"/>}
+          {index < totalCount - 1 && <hr className="mt-2 mb-2"/>}
         </React.Fragment>,
       );
       index++;
@@ -166,36 +170,53 @@ const Milestone = (props: Props) => {
 
   return (
     <div className={cn('mt-0 checkbox-align', {'text-muted': disabled})}>
-      <Form.Check
-        className="pull-right"
-        type="switch"
-        id={`allow_milestone-switch-${nanoid(5)}`}
-        label="Allow milestone for a current scenerio"
-        checked={!disabled}
-        onChange={e => setDisabled(!e.target.checked)}
-      />
-      <Row className="mb-1 mt-2">
-        <Col xs="2">
-          <div className="position-relative pl-3" style={{top: 7}}>ID</div>
+      <Row className="mb-2 mt-2">
+        <Col sm="2">
+          <div className="position-relative" style={{top: 7}}><IconMilestone width="16" height="16"/> Milestone ID</div>
         </Col>
-        <Col xs="3">
-          <Form.Control
-            type="text"
-            size="sm"
-            disabled={disabled}
-            className="pull-right"
-            aria-disabled={disabled}
-            id={`condition-${nanoid(5)}`}
-            placeholder="e.g., survival_5_weeks"
-            value={milestoneId}
-            onChange={e => {
-              setMilestoneId(e.target.value.replace(/(['" \t]|[^a-z_\d])+/ig, `_`));
-            }}
-            onKeyUp={e => {
-              // @ts-ignore
-              e.target.value = e.target.value.replace(/(['" \t]|[^a-z_\d])+/ig, `_`).toLowerCase();
-            }}
-          />
+        <Col sm="10">
+          <Row>
+            <Col sm="8" className="text-left">
+              <Form.Control
+                type="text"
+                size="sm"
+                disabled={disabled}
+                className="pull-left"
+                aria-disabled={disabled}
+                id={`condition-${nanoid(5)}`}
+                placeholder="e.g., survival_5_weeks"
+                value={milestoneId}
+                onChange={e => {
+                  setMilestoneId(e.target.value.replace(/(['" \t]|[^a-z_\d])+/ig, `_`));
+                }}
+                onKeyUp={e => {
+                  // @ts-ignore
+                  e.target.value = e.target.value.replace(/(['" \t]|[^a-z_\d])+/ig, `_`).toLowerCase();
+                }}
+              />
+            </Col>
+            <Col sm="4" className="text-right">
+              <div className="d-inline-block ml-1" title="Allow milestone for a current scenerio">
+                <Form.Check
+                  type="switch"
+                  style={{top: 7}}
+                  id={`allow_milestone-switch-${nanoid(5)}`}
+                  label=""
+                  checked={!disabled}
+                  onChange={e => setDisabled(!e.target.checked)}
+                />
+              </div>
+              <div className="d-inline-block ml-1">
+                <Button variant="link" className="p-0"
+                        style={{top: 2, color: disabled ? 'rgba(255, 255, 255, 0.4)' : COLOR_REDDISH}}
+                        title="Remove milestone"
+                        disabled={disabled}
+                        onClick={() => newProps.onRemoveClick()}>
+                  <IconClear width="18" height="18"/>
+                </Button>
+              </div>
+            </Col>
+          </Row>
         </Col>
       </Row>
       <div className="mt-2 mb-3">
@@ -231,6 +252,7 @@ const Milestone = (props: Props) => {
         />
       </div>
       {renderConditions()}
+      <div className="mb-3"></div>
     </div>
   );
 };
@@ -240,6 +262,7 @@ Milestone.propTypes = {
   id: PropTypes.string,
   disabled: PropTypes.bool,
   conditions: PropTypes.object,
+  onRemoveClick: PropTypes.func,
 };
 
 export default Milestone;
