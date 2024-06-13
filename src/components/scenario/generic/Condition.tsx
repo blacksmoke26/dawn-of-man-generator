@@ -32,6 +32,7 @@ import TimeElapsed from '~/components/scenario/conditions/TimeElapsed';
 import ValueEquals from '~/components/scenario/conditions/ValueEquals';
 import ValueReached from '~/components/scenario/conditions/ValueReached';
 
+// noinspection ES6ConvertRequireIntoImport
 const isEqual = require('is-equal');
 
 export interface ConditionRegistry {
@@ -103,7 +104,7 @@ export const toConditionProps = (conditions: ConditionRegistry): Record<string, 
 };
 
 /** Condition functional component */
-export const Condition = (props: Props) => {
+const Condition = (props: Props) => {
   const newProps = merge<Required<Props>>({
     id: '',
     internalName: '',
