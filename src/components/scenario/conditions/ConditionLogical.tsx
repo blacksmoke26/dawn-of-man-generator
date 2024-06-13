@@ -265,7 +265,7 @@ const ConditionLogical = (props: Props) => {
             onChange={e => setEnabled(e.target.checked)}
           />)}
         </Col>
-        <Col col="6" className="text-right" style={{top: -4}}>
+        <Col col="6" className="text-right" style={{top: 3}}>
           <div className="d-inline-block">
             <strong style={{color: '#ebeaea'}}
                     className={cn('text-size-sm', {'text-muted': !enabled})}>
