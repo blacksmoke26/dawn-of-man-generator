@@ -25,7 +25,13 @@ import {CONDITIONS_OPTIONS, LOGICAL_CONDITION} from '~/utils/condition';
 import type {Required} from 'utility-types';
 import type {Milestone as MilestoneType} from '~/types/milestone.types';
 import type {GeneralCondition, LogicalCondition} from '~/types/condition.types';
-import {COLOR_REDDISH, IconClear, IconMilestone} from '~/components/icons/app';
+import {
+  COLOR_REDDISH, IconChevronDown,
+  IconChevronSimpleDown,
+  IconChevronSimpleUp, IconChevronUp,
+  IconClear,
+  IconMilestone,
+} from '~/components/icons/app';
 
 const isEqual = require('is-equal');
 
@@ -43,6 +49,7 @@ export interface ChangedValues {
 export interface Props {
   id?: string;
   disabled?: boolean;
+  expanded?: boolean;
   conditions?: MilestoneType['conditions'];
 
   onChange?(template: string, values: ChangedValues): void,
@@ -79,6 +86,7 @@ const Milestone = (props: Props) => {
     id: '',
     conditions: {},
     disabled: false,
+    expanded: true,
     onChange: () => {
     },
     onRemoveClick: () => {
@@ -88,6 +96,7 @@ const Milestone = (props: Props) => {
   const [milestoneId, setMilestoneId] = React.useState<string>(toString(newProps.id));
   const [conditions, setConditions] = React.useState<ConditionsState>(newProps?.conditions as any);
   const [disabled, setDisabled] = React.useState<boolean>(newProps.disabled);
+  const [expanded, setExpanded] = React.useState<boolean>(newProps.expanded);
   const [attributes, setAttributes] = React.useState<KVDocument>({});
 
   const updateSubCondition = (id: string, values: Record<string, any> = {}): void => {
@@ -117,6 +126,7 @@ const Milestone = (props: Props) => {
     props?.id !== undefined && setMilestoneId(props.id);
     props?.conditions !== undefined && setConditions(props.conditions as any);
     props?.disabled !== undefined && setDisabled(props.disabled);
+    props?.expanded !== undefined && setExpanded(props.expanded);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props]);
 
@@ -196,7 +206,17 @@ const Milestone = (props: Props) => {
               />
             </Col>
             <Col sm="4" className="text-right">
-              <div className="d-inline-block ml-1" title="Allow milestone for a current scenerio">
+              <div className="d-inline-block p-0">
+                <Button variant="link" className="p-0" style={{top: '0.19rem'}}
+                        onClick={() => {
+                          setExpanded(!expanded);
+                        }}>
+                  {!expanded
+                    ? <IconChevronUp width="16" height="16"/>
+                    : <IconChevronDown width="16" height="16"/>}
+                </Button>
+              </div>
+              <div className="d-inline-block mr-1" title="Allow milestone for a current scenerio">
                 <Form.Check
                   type="switch"
                   style={{top: 7}}
@@ -206,7 +226,7 @@ const Milestone = (props: Props) => {
                   onChange={e => setDisabled(!e.target.checked)}
                 />
               </div>
-              <div className="d-inline-block ml-1">
+              <div className="d-inline-block">
                 <Button variant="link" className="p-0"
                         style={{top: 2, color: disabled ? 'rgba(255, 255, 255, 0.4)' : COLOR_REDDISH}}
                         title="Remove milestone"
@@ -219,39 +239,43 @@ const Milestone = (props: Props) => {
           </Row>
         </Col>
       </Row>
-      <div className="mt-2 mb-3">
-        <Select
-          isDisabled={disabled}
-          menuPortalTarget={document.body}
-          options={CONDITIONS_OPTIONS}
-          value={null}
-          placeholder="Add milestone condition..."
-          onChange={(option: Option | any, {action}): void => {
-            if (action === 'select-option' && option) {
-              const conditionId: string = nanoid(10).toLowerCase();
-              const values = {
-                internalName: option.value as string,
-                disabledCheckbox: false,
-                enabled: true,
-                expanded: true,
-                template: '',
-              } as ConditionRegistry;
+      {expanded && (
+        <React.Fragment>
+          <div className="mt-2 mb-3">
+            <Select
+              isDisabled={disabled}
+              menuPortalTarget={document.body}
+              options={CONDITIONS_OPTIONS}
+              value={null}
+              placeholder="Add milestone condition..."
+              onChange={(option: Option | any, {action}): void => {
+                if (action === 'select-option' && option) {
+                  const conditionId: string = nanoid(10).toLowerCase();
+                  const values = {
+                    internalName: option.value as string,
+                    disabledCheckbox: false,
+                    enabled: true,
+                    expanded: true,
+                    template: '',
+                  } as ConditionRegistry;
 
-              if (LOGICAL_CONDITION.includes(option.value)) {
-                values['subConditions'] = {};
-                values['operator'] = option.value;
-              }
-              updateSubCondition(conditionId, values);
-              setAttributes(current => ({
-                ...current, [conditionId]: {
-                  template: '',
-                },
-              }));
-            }
-          }}
-        />
-      </div>
-      {renderConditions()}
+                  if (LOGICAL_CONDITION.includes(option.value)) {
+                    values['subConditions'] = {};
+                    values['operator'] = option.value;
+                  }
+                  updateSubCondition(conditionId, values);
+                  setAttributes(current => ({
+                    ...current, [conditionId]: {
+                      template: '',
+                    },
+                  }));
+                }
+              }}
+            />
+          </div>
+          {renderConditions()}
+        </React.Fragment>
+      )}
       <div className="mb-3"></div>
     </div>
   );
