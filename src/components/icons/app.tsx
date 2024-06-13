@@ -11,7 +11,7 @@ import {
   AmpersandIcon,
   BlendIcon,
   BlocksIcon,
-  BrainCircuitIcon,
+  BrainCircuitIcon, ChevronDownIcon, ChevronUpIcon,
   EqualNotIcon,
   Flower2Icon,
   HammerIcon,
@@ -125,4 +125,13 @@ export const IconChevronUp = (props: LucideProps) => (
 
 export const IconChevronDown = (props: LucideProps) => (
   <SquareChevronDownIcon {...merge(iconDefaultProps, props)}/>
+);
+
+
+export const IconChevronSimpleUp = (props: LucideProps) => (
+  <ChevronUpIcon {...merge(iconDefaultProps, props)}/>
+);
+
+export const IconChevronSimpleDown = (props: LucideProps) => (
+  <ChevronDownIcon {...merge(iconDefaultProps, props)}/>
 );
