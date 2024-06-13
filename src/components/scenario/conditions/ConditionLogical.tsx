@@ -129,6 +129,10 @@ const toTemplateText = (conditions: ConditionList): string => {
     .map(({template}) => String(template || '').trim())
     .join(``);
 
+  if ( !templates.trim()) {
+    return '';
+  }
+
   return xmlFormatter(
     `<condition><sub_conditions>${templates}</sub_conditions></condition>`,
   );
