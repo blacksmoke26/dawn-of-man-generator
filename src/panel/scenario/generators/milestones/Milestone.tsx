@@ -14,14 +14,12 @@ import {Col, Form, Row} from 'react-bootstrap';
 
 // elemental components
 import Select, {Option} from '~/components/ui/Select';
+import Condition, {ConditionsState, ConditionRegistry} from '~/components/scenario/generic/Condition';
 
 // utils
 import {toString} from '~/helpers/string';
 import {onlyKeys} from '~/helpers/object';
 import {CONDITIONS_OPTIONS, LOGICAL_CONDITION} from '~/utils/condition';
-
-// components
-import {Condition, ConditionsState, ConditionRegistry} from './Condition';
 
 // types
 import type {Required} from 'utility-types';
