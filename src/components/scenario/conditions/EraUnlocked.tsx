@@ -33,6 +33,7 @@ interface Attributes extends ConditionAttributes {
 
 interface Props extends Attributes {
   removeIcon?: boolean;
+  showCheckbox?: boolean,
 
   onRemoveClick?(): void,
 
@@ -46,6 +47,7 @@ const EraUnlocked = (props: DeepPartial<Props>) => {
     enabled: true,
     disabledCheckbox: false,
     removeIcon: false,
+    showCheckbox: true,
     expanded: true,
     onChange: () => {
     },
@@ -82,12 +84,12 @@ const EraUnlocked = (props: DeepPartial<Props>) => {
 
   // Reflect prop changes
   React.useEffect(() => {
-    setAttribute('enabled', props.enabled);
-    setAttribute('disabledCheckbox', props.disabledCheckbox);
-    setAttribute('expanded', props.expanded);
+    props?.enabled !== undefined && setAttribute('enabled', props.enabled);
+    props?.disabledCheckbox !== undefined && setAttribute('disabledCheckbox', props.disabledCheckbox);
+    props?.expanded !== undefined && setAttribute('expanded', props.expanded);
 
-    if (props.enabled) {
-      props?.era && setAttribute('era', props.era);
+    if (props?.enabled) {
+      props?.era !== undefined && setAttribute('era', props.era);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props]);
@@ -96,7 +98,7 @@ const EraUnlocked = (props: DeepPartial<Props>) => {
 
   return (
     <div className={cn('mb-2', {'text-muted': isDisabled}, 'checkbox-align')}>
-      <ConditionHeader caption={CONDITION_NAME}
+      <ConditionHeader caption={CONDITION_NAME} showCheckbox={newProps.showCheckbox}
                        enabled={attributes.enabled}
                        onEnabled={(isEnabled: boolean) => setAttribute('enabled', isEnabled)}
                        disabledCheckbox={attributes.disabledCheckbox}

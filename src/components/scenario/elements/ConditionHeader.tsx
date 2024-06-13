@@ -29,6 +29,8 @@ export interface Props {
   enabled?: boolean;
   /** Whatever the checkbox (toggle enable) is disabled or not */
   disabledCheckbox?: boolean;
+  /** Show toggle disable checkbox */
+  showCheckbox?: boolean;
   /** The expended icon state (up/down) */
   expanded?: boolean;
   /** Show remove icon button */
@@ -52,7 +54,7 @@ export interface Props {
   onExpandedClick?(isExpanded: boolean): void;
 }
 
-export type Attributes = Required<Omit<Props, 'onRemoveClick' | 'onEnabled' | 'onExpandedClick' | 'caption'>>;
+export type Attributes = Required<Omit<Props, 'onRemoveClick' | 'onEnabled' | 'onExpandedClick' | 'caption' | 'showCheckbox'>>;
 
 export const ConditionHeader = (props: Props) => {
   const newProps = merge<Props>({
@@ -60,6 +62,7 @@ export const ConditionHeader = (props: Props) => {
     disabledCheckbox: false,
     removeIcon: false,
     expanded: true,
+    showCheckbox: true,
     onEnabled: () => {
     },
     onRemoveClick: () => {
@@ -95,23 +98,31 @@ export const ConditionHeader = (props: Props) => {
   return (
     <Row className={cn('mb-1', {'text-muted': isDisabled}, 'checkbox-align')}>
       <Col xs="6">
-        <Form.Check
-          type="switch"
-          disabled={attributes.disabledCheckbox}
-          id={`condition-switch-${nanoid(5)}`}
-          label={
-            <span>
+        {!newProps.showCheckbox && (
+          <span>
               <IconCondition width="17" height="17" color={isDisabled ? COLOR_DISABLED : COLOR_REDDISH}/>
-              {' '} <strong>Condition</strong>: {props.caption}
+            {' '} <strong>Condition</strong>: {props.caption}
             </span>
-          }
-          className="ml-1 pl-3 mt-1"
-          checked={attributes.enabled}
-          onChange={e => {
-            'function' === typeof props?.onEnabled && props?.onEnabled(e.target.checked);
-            setAttribute('enabled', e.target.checked);
-          }}
-        />
+        )}
+        {newProps.showCheckbox && (
+          <Form.Check
+            type="switch"
+            disabled={attributes.disabledCheckbox}
+            id={`condition-switch-${nanoid(5)}`}
+            label={
+              <span>
+              <IconCondition width="17" height="17" color={isDisabled ? COLOR_DISABLED : COLOR_REDDISH}/>
+                {' '} <strong>Condition</strong>: {props.caption}
+            </span>
+            }
+            className="ml-1 pl-3 mt-1"
+            checked={attributes.enabled}
+            onChange={e => {
+              'function' === typeof props?.onEnabled && props?.onEnabled(e.target.checked);
+              setAttribute('enabled', e.target.checked);
+            }}
+          />
+        )}
       </Col>
       <Col xs="6" className="text-right">
         <div className="d-inline-block">
