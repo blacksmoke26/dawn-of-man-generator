@@ -5,3 +5,5 @@
  */
 
 export type Json = { [p: string]: any };
+
+export type KVDocument<T = any> = { [p: string]: T };
