@@ -6,12 +6,11 @@
  */
 
 import React from 'react';
-import PropTypes from 'prop-types';
 import merge from 'deepmerge';
 import {nanoid} from 'nanoid';
 import {Form} from 'react-bootstrap';
 import {capitalCase} from 'change-case';
-import xmlFormatter from 'xml-formatter';
+import cn from 'classname';
 
 // elemental components
 import Accordion from '~/components/ui/Accordion';
@@ -21,106 +20,18 @@ import Select, {Option} from '~/components/ui/Select';
 import ObjectOverridePrototype from './ObjectOverridePrototype';
 
 // utils
-import * as objects from '~/utils/objects';
+import {
+  propTypes,
+  defaultValues,
+  optionsByType,
+  toTemplateText,
+  valuesToTemplates,
+  Props,
+} from './utils/object-override';
 
 // types
 import type {Required} from 'utility-types';
 import type {KVDocument} from '~/types/json.types';
-import type {ObjectAttributes, ObjectType} from '~/utils/objects';
-
-type ObjectsList = KVDocument<ObjectAttributes>;
-
-export interface Props {
-  type: ObjectType;
-  checked?: boolean;
-  optionIcon?: React.ReactElement;
-  values?: ObjectsList;
-
-  onChange?(template: string): void;
-}
-
-const defaultValues: Partial<Props> = {
-  checked: true,
-  values: {},
-};
-
-/**
- * Returns the list of objects for the given type
- * @param type - The type of object
- */
-const typeToList = (type: ObjectType) => {
-  switch (type) {
-    case 'deposit':
-      return objects.deposits;
-    case 'prop':
-      return objects.props;
-    case 'tree':
-      return objects.trees;
-    case 'detail':
-      return objects.details;
-  }
-};
-
-/**
- * Returns react-select options by given type
- * @param type - The type of object
- * @param [excluded] - The list of excluded values
- * @returns The react-select options
- */
-const optionsByType = (type: ObjectType, excluded: string[] = []): Option[] => {
-  const options: Option[] = [];
-
-  const list = typeToList(type) as unknown as string[];
-  const excludedCount = excluded.length;
-
-  for (const value of list) {
-    if (excludedCount && excluded.includes(value)) {
-      continue;
-    }
-
-    options.push({label: value, value});
-  }
-
-  return options;
-};
-
-/**
- * Generates the template text for the given type and values
- * @param type - The type of object
- * @param values - The values of the object
- * @returns The template text
- */
-
-const toTemplateText = (type: ObjectType, values: KVDocument<string>): string => {
-  if (!Object.keys(values).length) {
-    return '';
-  }
-
-  const template: string = Object.values(values).join('').trim();
-
-  if (!template) {
-    return '';
-  }
-
-  return xmlFormatter(
-    `<${type}_override_prototypes>
-      ${template}
-    </${type}_override_prototypes>`,
-  );
-};
-
-/**
- * Converts the values to templates
- * @param values - The values of the object
- * @returns The values to templates
- */
-const valuesToTemplates = (values: ObjectsList | undefined): KVDocument<string> => {
-  const templates: KVDocument<string> = {};
-  Object.keys(values || {}).forEach(id => {
-    templates[id] = id;
-  });
-  return templates;
-};
 
 /** ObjectOverride functional component */
 const ObjectOverride = (props: Props) => {
@@ -141,17 +52,19 @@ const ObjectOverride = (props: Props) => {
 
   return (
     <Accordion
+      noCard={newProps.noCard}
       eventKey={`${newProps.type}_override_panel`}
       header={(
         <div
           className="float-left">
+          {newProps?.optionIcon} {' '}
           {`Override ${capitalCase(newProps.type)} Prototypes`}
         </div>
       )}
       headerProps={{className: 'pb-1'}}
       headerAfter={(
       <>
-        <div className="float-right text-right position-relative" style={{height: 30, top: -4}}>
+        <div className="float-right text-right position-relative" style={{height: 15, top: -4}}>
           <Form.Check
             className="d-inline-block position-relative ml-2 p-0"
             type="switch"
@@ -164,6 +77,7 @@ const ObjectOverride = (props: Props) => {
         <div className="clearfix"></div>
       </>
     )}>
+      <div className={cn({'panel-border ml-1': newProps?.noCard})}>
       <div className="mt-2 mb-3">
         <Select
           formatOptionLabel={(option: Option | any) => (
@@ -194,6 +108,7 @@ const ObjectOverride = (props: Props) => {
           <ObjectOverridePrototype
             {...componentProps}
             key={id}
+              noCard={newProps.objectNoCard}
             name={id}
             type={newProps.type}
             disabled={!checked}
@@ -209,39 +124,12 @@ const ObjectOverride = (props: Props) => {
           />
         );
       })}
+      </div>
     </Accordion>
   );
 };
 
 // Properties validation
-ObjectOverride.propTypes = {
-  type: PropTypes.oneOf(objects.objects).isRequired,
-  checked: PropTypes.bool,
-  values: PropTypes.objectOf(
-    PropTypes.shape({
-      density: PropTypes.exact({
-        disabled: PropTypes.bool,
-        value: PropTypes.number,
-      }),
-      altitude: PropTypes.exact({
-        disabled: PropTypes.bool,
-        min: PropTypes.number,
-        max: PropTypes.number,
-      }),
-      angle: PropTypes.exact({
-        disabled: PropTypes.bool,
-        min: PropTypes.number,
-        max: PropTypes.number,
-      }),
-      humidity: PropTypes.exact({
-        disabled: PropTypes.bool,
-        min: PropTypes.number,
-        max: PropTypes.number,
-      }),
-    }),
-  ),
-  optionIcon: PropTypes.element,
-  onChange: PropTypes.func,
-};
+ObjectOverride.propTypes = propTypes;
 
 export default ObjectOverride;
