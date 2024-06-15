@@ -20,56 +20,30 @@ import Accordion from '~/components/ui/Accordion';
 
 // utils
 import * as random from '~/utils/random';
-import {isObject} from '~/helpers/object';
 import * as Defaults from '~/utils/defaults';
 
 // icons
-import {COLOR_GRAYED, COLOR_REDDISH, IconRestore, IconShuffle} from '~/components/icons/app';
+import {IconShuffle, IconRestore, COLOR_REDDISH, COLOR_GRAYED} from '~/components/icons/app';
 
 // types
 import type {Required} from 'utility-types';
+import type {
+  ObjectType,
+  AngleObject,
+  DensityObject,
+  AltitudeObject,
+  HumidityObject,
+  ObjectAttributesCasual,
+} from '~/utils/objects';
+import {isObject} from '~/helpers/object';
 
-export interface DensityObject {
-  disabled: boolean;
-  value: number;
-}
-
-export interface AltitudeObject {
-  disabled: boolean;
-  min: number;
-  max: number;
-}
-
-export interface AngleObject {
-  disabled: boolean;
-  min: number;
-  max: number;
-}
-
-export interface HumidityObject {
-  disabled: boolean;
-  min: number;
-  max: number;
-}
-
-export type ObjectType = 'tree' | 'detail' | 'prop' | 'deposit';
-
-export interface ChangedValues {
-  name: string;
-  type: ObjectType;
-  density?: { value: number };
-  altitude?: {
-    min: number;
-    max: number;
-  };
-  angle?: {
-    min: number;
-    max: number;
-  };
-  humidity?: {
-    min: number;
-    max: number;
-  };
+export type ChangedValues = ObjectAttributesCasual & {
+  name?: string;
+  type?: ObjectType;
+  density?: Omit<DensityObject, 'disabled'>;
+  altitude?: Omit<AltitudeObject, 'disabled'>;
+  angle?: Omit<AngleObject, 'disabled'>;
+  humidity?: Omit<HumidityObject, 'disabled'>;
 }
 
 export interface Props {
@@ -158,7 +132,13 @@ const toTemplateText = (values: ChangedValues): string => {
 
 /** ObjectOverridePrototype functional component */
 const ObjectOverridePrototype = (props: Props = defaultValues) => {
-  const newProps = merge<Required<Props>>(defaultValues, props);
+  const newProps = merge<Required<Props>>(defaultValues, {
+    ...props,
+    density: props?.density || {} as DensityObject,
+    angle: props?.angle || {} as AngleObject,
+    altitude: props?.altitude || {} as AltitudeObject,
+    humidity: props?.humidity || {} as HumidityObject,
+  });
 
   const [name, setName] = React.useState<string>(newProps.name);
   const [expanded, setExpanded] = React.useState<boolean>(newProps.expanded);
@@ -182,9 +162,10 @@ const ObjectOverridePrototype = (props: Props = defaultValues) => {
     props?.checked !== undefined && setChecked(props.checked);
     props?.disabled !== undefined && setDisabled(props.disabled);
     props?.expanded !== undefined && setExpanded(props.expanded);
+
     isObject(props?.density) && setDensity(current => merge(current, props.density as DensityObject));
-    isObject(props?.angle) && setAngle(current => merge(current, props.angle as AltitudeObject));
-    isObject(props?.altitude) && setAltitude(current => merge(current, props.altitude as AngleObject));
+    isObject(props?.angle) && setAngle(current => merge(current, props.angle as AngleObject));
+    isObject(props?.altitude) && setAltitude(current => merge(current, props.altitude as AltitudeObject));
     isObject(props?.humidity) && setHumidity(current => merge(current, props.humidity as HumidityObject));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props]);
@@ -199,7 +180,9 @@ const ObjectOverridePrototype = (props: Props = defaultValues) => {
     isAltitudeEnabled && (values.altitude = {min: altitude.min, max: altitude.max});
     isHumidityEnabled && (values.humidity = {min: humidity.min, max: humidity.max});
 
-    newProps.onChange(toTemplateText(values), values);
+    const template = toTemplateText(values).trim();
+
+    newProps.onChange(template, template ? values : {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     name, density, angle, altitude, humidity,
@@ -236,6 +219,7 @@ const ObjectOverridePrototype = (props: Props = defaultValues) => {
       activeKey={expanded ? name : ''}
       defaultActiveKey={expanded ? name : ''}
       header={<PanelHeader name={name} icon={newProps?.icon} onClick={() => setExpanded(c => !c)}/>}
+      headerProps={{className: 'pb-1 pt-2'}}
       headerAfter={(
         <>
           <div className="float-right text-right position-relative" style={{height: 30, top: -4}}>
