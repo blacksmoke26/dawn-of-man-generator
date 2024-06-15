@@ -11,7 +11,7 @@ import xmlFormatter from 'xml-formatter';
 import {ButtonGroup, Button, Modal, Form, Alert, Row, Col} from 'react-bootstrap';
 
 // icons
-import {IconCheck, IconCodeXml, IconEraser, IconImport, IconWandSparkles} from '~/components/icons/app';
+import {IconCheck, IconCodeXml, IconEraser, IconWandSparkles} from '~/components/icons/app';
 
 // utils
 import {validate, ValidationError} from '~/helpers/xml';
@@ -69,8 +69,10 @@ function XmlTextLoader() {
 
   return (
     <>
-      <Button variant="secondary" onClick={() => setShowModel(true)}>
-        <IconImport/> Import from XML
+      <Button
+        title="Import environment from XML string"
+        variant="secondary" onClick={() => setShowModel(true)}>
+        <IconCodeXml/> Import XML
       </Button>
       <Modal
         size="xl"

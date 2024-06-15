@@ -48,18 +48,19 @@ const TemplateXMLViewer = () => {
           <div className="float-left">
             <ButtonGroup size="sm">
               <Button
+                title="Copy to Clipboard"
                 variant="secondary"
                 onClick={() => copyClipboard(template)}>
-                <IconCopy/> Copy to Clipboard
+                <IconCopy/> Copy
               </Button>
               <Button
-                title={`File '${SCENARIO_FILENAME}' will be downloaded`}
+                title={`Download XML file: '${SCENARIO_FILENAME}'`}
                 variant="secondary"
                 onClick={() => {
                   const blob = new Blob([template], {type: 'text/xml;charset=utf-8'});
                   FileSaver.saveAs(blob, SCENARIO_FILENAME);
                 }}>
-                <IconDownload/> Download File
+                <IconDownload/> Download
               </Button>
             </ButtonGroup>
           </div>
@@ -106,12 +107,13 @@ const TemplateXMLViewer = () => {
         <div className="float-left">
           <ButtonGroup size="sm">
             <Button
+              title="Copy to Clipboard"
               variant="secondary"
               onClick={() => copyClipboard(template)}>
-              <IconCopy/> Copy to Clipboard
+              <IconCopy/> Copy
             </Button>
             <Button
-              title={`File '${STRINGS_FILENAME}' will be downloaded`}
+              title={`Download XML File: '${STRINGS_FILENAME}'`}
               variant="secondary"
               onClick={() => {
                 const blob = new Blob([template], {type: 'text/xml;charset=utf-8'});

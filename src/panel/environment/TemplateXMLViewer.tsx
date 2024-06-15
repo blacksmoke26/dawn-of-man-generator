@@ -46,17 +46,19 @@ const TemplateXMLViewer = () => {
         <div className="float-left">
           <ButtonGroup size="sm">
             <Button
+              title="Copy to Clipboard"
               variant="secondary"
               onClick={() => copyClipboard(template)}>
-              <IconCopy/> Copy to Clipboard
+              <IconCopy/> Copy
             </Button>
             <Button
+              title="Download XML file"
               variant="secondary"
               onClick={() => {
                 const blob = new Blob([template], {type: 'text/xml;charset=utf-8'});
                 FileSaver.saveAs(blob, `${fileName || 'custom'}.xml`);
               }}>
-              <IconDownload/> Download File
+              <IconDownload/> Download
             </Button>
             <XmlTextLoader/>
           </ButtonGroup>
