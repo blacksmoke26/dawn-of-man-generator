@@ -44,6 +44,10 @@ const defaultValues: Partial<Props> = {
   values: {},
 };
 
+/**
+ * Returns the list of objects for the given type
+ * @param type - The type of object
+ */
 const typeToList = (type: ObjectType) => {
   switch (type) {
     case 'deposit':
@@ -57,6 +61,12 @@ const typeToList = (type: ObjectType) => {
   }
 };
 
+/**
+ * Returns react-select options by given type
+ * @param type - The type of object
+ * @param [excluded] - The list of excluded values
+ * @returns The react-select options
+ */
 const optionsByType = (type: ObjectType, excluded: string[] = []): Option[] => {
   const options: Option[] = [];
 
@@ -73,6 +83,13 @@ const optionsByType = (type: ObjectType, excluded: string[] = []): Option[] => {
 
   return options;
 };
+
+/**
+ * Generates the template text for the given type and values
+ * @param type - The type of object
+ * @param values - The values of the object
+ * @returns The template text
+ */
 
 const toTemplateText = (type: ObjectType, values: KVDocument<string>): string => {
   if (!Object.keys(values).length) {
@@ -92,6 +109,11 @@ const toTemplateText = (type: ObjectType, values: KVDocument<string>): string =>
   );
 };
 
+/**
+ * Converts the values to templates
+ * @param values - The values of the object
+ * @returns The values to templates
+ */
 const valuesToTemplates = (values: ObjectsList | undefined): KVDocument<string> => {
   const templates: KVDocument<string> = {};
   Object.keys(values || {}).forEach(id => {
@@ -191,11 +213,35 @@ const ObjectOverride = (props: Props) => {
   );
 };
 
+// Properties validation
 ObjectOverride.propTypes = {
   type: PropTypes.oneOf(objects.objects).isRequired,
   checked: PropTypes.bool,
-  values: PropTypes.object,
+  values: PropTypes.objectOf(
+    PropTypes.shape({
+      density: PropTypes.exact({
+        disabled: PropTypes.bool,
+        value: PropTypes.number,
+      }),
+      altitude: PropTypes.exact({
+        disabled: PropTypes.bool,
+        min: PropTypes.number,
+        max: PropTypes.number,
+      }),
+      angle: PropTypes.exact({
+        disabled: PropTypes.bool,
+        min: PropTypes.number,
+        max: PropTypes.number,
+      }),
+      humidity: PropTypes.exact({
+        disabled: PropTypes.bool,
+        min: PropTypes.number,
+        max: PropTypes.number,
+      }),
+    }),
+  ),
   optionIcon: PropTypes.element,
+  onChange: PropTypes.func,
 };
 
 export default ObjectOverride;
