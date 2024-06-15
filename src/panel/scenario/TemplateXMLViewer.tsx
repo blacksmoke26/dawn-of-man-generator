@@ -40,7 +40,7 @@ const TemplateXMLViewer = () => {
           <SyntaxHighlighter
             style={anOldHope}
             language="xml"
-            customStyle={{height: '44vh', fontSize: 16, overflowY: 'scroll'}}>
+            customStyle={{height: '44vh', fontSize: 15, overflowY: 'scroll'}}>
             {template.trim()}
           </SyntaxHighlighter>
         </div>
@@ -99,7 +99,7 @@ const TemplateXMLViewer = () => {
         <SyntaxHighlighter
           style={anOldHope}
           language="xml"
-          customStyle={{height: '20.3vh', fontSize: 16, overflowY: 'scroll'}}>
+          customStyle={{height: '20.3vh', fontSize: 15, overflowY: 'scroll'}}>
           {strings.trim()}
         </SyntaxHighlighter>
       </div>

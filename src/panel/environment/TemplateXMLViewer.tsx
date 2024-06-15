@@ -38,7 +38,7 @@ const TemplateXMLViewer = () => {
         <SyntaxHighlighter
           style={anOldHope}
           language="xml"
-          customStyle={{height: '63.6vh', fontSize: 16, overflowY: 'scroll'}}>
+          customStyle={{height: '63.6vh', fontSize: 15, overflowY: 'scroll'}}>
           {template.trim()}
         </SyntaxHighlighter>
       </div>
