@@ -8,28 +8,17 @@ import React from 'react';
 import merge from 'deepmerge';
 
 import {
-  AmpersandIcon,
-  BlendIcon,
-  BlocksIcon,
-  BrainCircuitIcon, ChevronDownIcon, ChevronUpIcon,
-  EqualNotIcon,
-  Flower2Icon,
-  HammerIcon,
-  LeafIcon,
-  LucideProps, MapPinIcon, MilestoneIcon,
-  MountainIcon,
-  PlusIcon,
-  RotateCcwIcon,
-  ShuffleIcon,
-  SnowflakeIcon,
-  SproutIcon,
-  SquareChevronDownIcon,
-  SquareChevronUpIcon,
-  SquareXIcon,
-  SunIcon,
-  ThermometerSnowflakeIcon,
-  TreesIcon,
-  XIcon,
+  WandSparklesIcon, XIcon,
+  AmpersandIcon, BlendIcon, BlocksIcon,
+  BrainCircuitIcon, CheckIcon, ChevronDownIcon,
+  ChevronUpIcon, CodeXmlIcon, CopyIcon, DownloadIcon,
+  EqualNotIcon, EraserIcon, FileInputIcon, Flower2Icon,
+  HammerIcon, LeafIcon, MapPinIcon, MilestoneIcon,
+  MountainIcon, PencilLineIcon, PlusIcon, RotateCcwIcon,
+  ShuffleIcon, SnowflakeIcon, SproutIcon, SquareXIcon,
+  SquareChevronDownIcon, SquareChevronUpIcon, SunIcon,
+  SwordsIcon, ThermometerSnowflakeIcon, TreesIcon, VeganIcon,
+  type LucideProps
 } from 'lucide-react';
 
 export const COLOR_DISABLED: string = 'rgba(255, 255, 255, .5';
@@ -143,4 +132,44 @@ export const IconChevronSimpleDown = (props: LucideProps) => (
 
 export const IconMilestone = (props: LucideProps) => (
   <MilestoneIcon {...merge(iconDefaultProps, props)}/>
+);
+
+export const IconCopy = (props: LucideProps) => (
+  <CopyIcon {...merge(iconDefaultProps, props)}/>
+);
+
+export const IconDownload = (props: LucideProps) => (
+  <DownloadIcon {...merge(iconDefaultProps, props)}/>
+);
+
+export const IconImport = (props: LucideProps) => (
+  <FileInputIcon {...merge(iconDefaultProps, props)}/>
+);
+
+export const IconEraser = (props: LucideProps) => (
+  <EraserIcon {...merge(iconDefaultProps, props)}/>
+);
+
+export const IconWandSparkles = (props: LucideProps) => (
+  <WandSparklesIcon {...merge(iconDefaultProps, props)}/>
+);
+
+export const IconCheck = (props: LucideProps) => (
+  <CheckIcon {...merge(iconDefaultProps, props)}/>
+);
+
+export const IconCodeXml = (props: LucideProps) => (
+  <CodeXmlIcon {...merge(iconDefaultProps, props)}/>
+);
+
+export const IconEnvironment = (props: LucideProps) => (
+  <VeganIcon {...merge(iconDefaultProps, props)}/>
+);
+
+export const IconScenario = (props: LucideProps) => (
+  <SwordsIcon {...merge(iconDefaultProps, props)}/>
+);
+
+export const IconPencilLine = (props: LucideProps) => (
+  <PencilLineIcon {...merge(iconDefaultProps, props)}/>
 );

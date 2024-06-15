@@ -8,7 +8,7 @@ import React from 'react';
 
 export const Footer = () => {
   return (
-    <footer className="mt-3 mb-3 text-size-xs text-center">
+    <footer className="mt-2 mb-2 text-size-xs text-center">
       Copyright &copy; 2019-{(new Date()).getFullYear()} {' '}
       <a href="https://github.com/blacksmoke26"
          rel="noopener noreferrer" target="_blank">Junaid Atari</a>

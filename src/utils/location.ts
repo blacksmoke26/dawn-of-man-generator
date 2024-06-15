@@ -72,8 +72,11 @@ export const randomSeed = (): string => String(randomInt(0, 99999999)).padStart(
 /**
  * @public
  * @static
+ * @param [custom] - List of custom environments
  * Random Environment */
-export const randomEnvironment = (): string => (uniqueRandomArray(environments)() as string);
+export const randomEnvironment = (custom: string[] = []): string => {
+  return (uniqueRandomArray([...environments, ...custom])() as string);
+};
 
 /**
  * @public
@@ -95,8 +98,9 @@ export const randomPosition = (): [number, number] => [
 /**
  * @public
  * @static
+ * @param [customEnvironments] - List of custom environments
  * Randomize location values */
-export const randomizeLocation = (): LocationProps => {
+export const randomizeLocation = (customEnvironments: string[] = []): LocationProps => {
   const coordinates = randomCoordinates();
   const name = randomName();
 
@@ -106,7 +110,7 @@ export const randomizeLocation = (): LocationProps => {
     seed: randomSeed(),
     coordinates,
     river: randomRiver(),
-    environment: randomEnvironment(),
+    environment: randomEnvironment(customEnvironments),
     lakes: randomLakes(),
     position: randomPosition()
   };

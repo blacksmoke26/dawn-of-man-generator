@@ -5,12 +5,7 @@
  */
 
 import React from 'react';
-import FileSaver from 'file-saver';
 import xmlFormatter from 'xml-formatter';
-import copyClipboard from 'clipboard-copy';
-import {Button, ButtonGroup} from 'react-bootstrap';
-import SyntaxHighlighter from 'react-syntax-highlighter';
-import {anOldHope} from 'react-syntax-highlighter/dist/esm/styles/hljs';
 
 // elemental components
 import Accordion from '~/components/ui/Accordion';
@@ -33,93 +28,112 @@ import DetailPanel from './generators/detail/DetailPanel';
 import PropPanel from './generators/props/PropPanel';
 import SeasonsPanel from './generators/seasons/SeasonsPanel';
 
-/** EnvironmentContainer functional component */
-function EnvironmentContainer() {
-  const [noiseAmplitudes, setNoiseAmplitudes] = React.useState<string>('');
-  const [distanceHeightOffset, setDistanceHeightOffset] = React.useState<string>('');
-  const [fordDistanceFactor, setFordDistanceFactor] = React.useState<string>('');
-  const [backdropScale, setBackdropScale] = React.useState<string>('');
-  const [sunAngleFactor, setSunAngleFactor] = React.useState<string>('');
-  const [resourceFactor, setResourceFactor] = React.useState<string>('');
-  const [deposits, setDeposits] = React.useState<string>('');
-  const [trees, setTrees] = React.useState<string>('');
-  const [seasons, setSeasons] = React.useState<string>('');
-  const [detail, setDetail] = React.useState<string>('');
-  const [prop, setProp] = React.useState<string>('');
+// redux
+import {updateTemplate} from '~redux/reducers';
+import {useAppDispatch, useAppSelector} from '~redux/hooks';
 
-  /** Generate xml code */
-  const toTemplateText = (): string => {
-    const xml: string = `
+// types
+import type {Json} from '~/types/json.types';
+
+/** Generate xml code */
+const toTemplateText = (templates: Json): string => {
+  const xml: string = `
 		<?xml version="1.0" encoding="utf-8"?>
 		<environment>
-			${noiseAmplitudes} ${resourceFactor}
-			${distanceHeightOffset} ${fordDistanceFactor}
-			${sunAngleFactor} ${backdropScale} ${deposits}
-			${detail} ${prop} ${trees} ${seasons}
+			${Object.values(templates).join('')}
 		</environment>`;
 
-    return xmlFormatter(xml, {indentation: '  '});
+  return xmlFormatter(xml, {indentation: '  '});
+};
+
+/** EnvironmentContainer functional component */
+function EnvironmentContainer() {
+  const dispatch = useAppDispatch();
+
+  const environmentTemplate = useAppSelector(({templates}) => (templates.environment));
+
+  const [templates, setTemplates] = React.useState<Json>({
+    noiseAmplitudes: '',
+    resourceFactor: '',
+    distanceHeightOffset: '',
+    fordDistanceFactor: '',
+    sunAngleFactor: '',
+    backdropScale: '',
+    deposits: '',
+    trees: '',
+    detail: '',
+    prop: '',
+    seasons: '',
+  });
+
+  React.useEffect(() => {
+    const text = toTemplateText(templates);
+    if (text !== environmentTemplate) {
+      dispatch(updateTemplate({type: 'environment', text}));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [templates, environmentTemplate]);
+
+  /** Update templates raw texts */
+  const updateTemplateText = (name: string, value: string): void => {
+    setTemplates(current => ({
+      ...current,
+      [name]: value,
+    }));
   };
 
   return (
     <>
-      <Accordion header={<><IconBlock width="17" height="17"/> Noise Amplitudes</>} eventKey="environment_noise_amplitudes">
-        <NoiseAmplitudes onChange={v => setNoiseAmplitudes(v)}/>
+      <Accordion
+        eventKey="environment_noise_amplitudes"
+        defaultActiveKey="environment_noise_amplitudes"
+        header={<span className="text-size-sm"><IconBlock width="17" height="17"/> Noise Amplitudes</span>}>
+        <NoiseAmplitudes onChange={tpl => updateTemplateText('noiseAmplitudes', tpl)}/>
       </Accordion>
 
-      <Accordion header={<><IconBlock width="17" height="17"/> Terrain Features</>} eventKey="environment_terrain">
-        <ResourceFactor onChange={v => setResourceFactor(v)}/>
+      <Accordion
+        header={<span className="text-size-sm"><IconBlock width="17" height="17"/> Terrain Features</span>}
+        eventKey="environment_terrain">
+        <ResourceFactor onChange={v => updateTemplateText('resourceFactor', v)}/>
         <hr className="mt-1"/>
-        <DistanceHeightOffset onChange={v => setDistanceHeightOffset(v)}/>
+        <DistanceHeightOffset onChange={v => updateTemplateText('distanceHeightOffset', v)}/>
         <hr className="mt-1"/>
-        <FordDistanceFactor onChange={v => setFordDistanceFactor(v)}/>
+        <FordDistanceFactor onChange={v => updateTemplateText('fordDistanceFactor', v)}/>
         <hr className="mt-1"/>
-        <SunAngleFactor onChange={v => setSunAngleFactor(v)}/>
+        <SunAngleFactor onChange={v => updateTemplateText('sunAngleFactor', v)}/>
         <hr className="mt-1"/>
-        <BackdropScale onChange={v => setBackdropScale(v)}/>
+        <BackdropScale onChange={v => updateTemplateText('backdropScale', v)}/>
       </Accordion>
 
-      <Accordion header={<><IconBlock width="17" height="17"/> Deposit (terrain)</>} eventKey="deposit_terrain">
-        <DepositPanel onChange={v => setDeposits(v)}/>
+      <Accordion
+        header={<span className="text-size-sm"><IconBlock width="17" height="17"/> Deposit (terrain)</span>}
+        eventKey="deposit_terrain">
+        <DepositPanel onChange={v => updateTemplateText('deposits', v)}/>
       </Accordion>
 
-      <Accordion header={<><IconBlock width="17" height="17"/> Detail (terrain)</>} eventKey="deposit_terrain">
-        <DetailPanel onChange={v => setDetail(v)}/>
+      <Accordion
+        header={<span className="text-size-sm"><IconBlock width="17" height="17"/> Detail (terrain)</span>}
+        eventKey="deposit_terrain">
+        <DetailPanel onChange={v => updateTemplateText('detail', v)}/>
       </Accordion>
 
-      <Accordion header={<><IconBlock width="17" height="17"/> Prop (terrain)</>} eventKey="deposit_terrain">
-        <PropPanel onChange={v => setProp(v)}/>
+      <Accordion
+        header={<span className="text-size-sm"><IconBlock width="17" height="17"/> Prop (terrain)</span>}
+        eventKey="deposit_terrain">
+        <PropPanel onChange={v => updateTemplateText('prop', v)}/>
       </Accordion>
 
-      <Accordion header={<><IconBlock width="17" height="17"/> Tree (terrain)</>} eventKey="deposit_terrain">
-        <TreesPanel onChange={v => setTrees(v)}/>
+      <Accordion
+        header={<span className="text-size-sm"><IconBlock width="17" height="17"/> Tree (terrain)</span>}
+        eventKey="deposit_terrain">
+        <TreesPanel onChange={v => updateTemplateText('trees', v)}/>
       </Accordion>
 
-      <Accordion header={<><IconBlock width="17" height="17"/> Season (atmosphere)</>} eventKey="deposit_terrain">
-        <SeasonsPanel onChange={v => setSeasons(v)}/>
+      <Accordion
+        header={<span className="text-size-sm"><IconBlock width="17" height="17"/> Season (atmosphere)</span>}
+        eventKey="deposit_terrain">
+        <SeasonsPanel onChange={v => updateTemplateText('seasons', v)}/>
       </Accordion>
-
-      <hr/>
-      <div className="syntax-highlighter pl-2 pr-2">
-        <SyntaxHighlighter style={anOldHope} language="xml">
-          {toTemplateText()}
-        </SyntaxHighlighter>
-      </div>
-      <div className="mt-2 ml-2 mb-2">
-        <ButtonGroup size="sm">
-          <Button variant="secondary"
-                  onClick={() => copyClipboard(toTemplateText())}>
-            Copy to Clipboard
-          </Button>
-          <Button variant="secondary"
-                  onClick={() => {
-                    const blob = new Blob([toTemplateText()], {type: 'text/xml;charset=utf-8'});
-                    FileSaver.saveAs(blob, 'my-environment.xml');
-                  }}>
-            Download File
-          </Button>
-        </ButtonGroup>
-      </div>
     </>
   );
 }

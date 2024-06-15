@@ -4,15 +4,15 @@
  * @since 2020-08-29
  */
 
-import {createSlice} from '@reduxjs/toolkit';
 import merge from 'deepmerge';
-
-// types
-import type {PayloadAction} from '@reduxjs/toolkit';
-import type {AppState, Environment, Scenario} from './reducers.types';
+import {createSlice} from '@reduxjs/toolkit';
 
 // utils
 import {jsonToRedux} from '~/data/environments/parser';
+
+// types
+import type {PayloadAction} from '@reduxjs/toolkit';
+import type {AppState, Environment, Scenario, TemplateType} from './reducers.types';
 
 /**
  * @private
@@ -21,6 +21,16 @@ const initialState: AppState = {
   environment: {},
   scenario: {},
   initiated: false,
+  templates: {
+    environment: '',
+    scenario: '',
+  },
+  strings: {
+    environment: '',
+    scenario: '',
+  },
+  fileName: 'custom',
+  scenarioName: 'scenario',
 };
 
 const appSlice = createSlice({
@@ -42,10 +52,37 @@ const appSlice = createSlice({
     },
     updateScenario(state, action: PayloadAction<Scenario>) {
       state.scenario = merge(state.scenario as Scenario, action.payload as Scenario);
-    }
-  }
+    },
+    updateTemplate(state, action: PayloadAction<{ type: TemplateType, text: string }>) {
+      state.templates = {
+        ...state.templates,
+        [action.payload.type]: action.payload.text,
+      };
+    },
+    updateString(state, action: PayloadAction<{ type: TemplateType, text: string }>) {
+      state.strings = {
+        ...state.strings,
+        [action.payload.type]: action.payload.text,
+      };
+    },
+    updateFilename(state, action: PayloadAction<string>) {
+      state.fileName = action.payload.trim();
+    },
+    updateScenarioName(state, action: PayloadAction<string>) {
+      state.scenarioName = action.payload.trim();
+    },
+  },
 });
 
-export const {updateEnvironment, updateEnvironmentRaw, updateScenario, updateInit} = appSlice.actions;
+export const {
+  updateEnvironment,
+  updateEnvironmentRaw,
+  updateScenario,
+  updateInit,
+  updateTemplate,
+  updateString,
+  updateFilename,
+  updateScenarioName,
+} = appSlice.actions;
 
 export const reducer = appSlice.reducer;

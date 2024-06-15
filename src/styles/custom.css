@@ -120,3 +120,7 @@
 	border-left: 2px solid #616978;
 	padding-left: 1rem;
 }
+
+.nav-tabs-bottom .nav-link {
+	background-color: #262d3c;
+}

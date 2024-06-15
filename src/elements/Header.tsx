@@ -8,7 +8,7 @@ import React from 'react';
 
 export const Header = () => {
   return (
-    <h2 className="font-weight-light mb-4 text-center">
+    <h2 className="font-weight-light mb-0 text-center">
       <a href="https://store.steampowered.com/app/858810"
          target="_blank" rel="noopener noreferrer">
         Dawn of Man
