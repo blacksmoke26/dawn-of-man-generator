@@ -1,4 +1,5 @@
 import React from 'react';
+import {Container} from 'react-bootstrap';
 
 // styles
 import '~/styles/uikit/bootstrap.min.css';
@@ -9,8 +10,11 @@ import 'rc-slider/assets/index.css';
 import '~/styles/custom.css';
 import '~/styles/global.css';
 
-import {Container} from 'react-bootstrap';
-import ObjectOverrideComponent, {Props} from '../components/environment/ObjectOverride';
+// components
+import ObjectOverrideComponent from '../components/environment/ObjectOverride';
+
+// types
+import type {Props} from '~/components/environment/utils/object-override';
 
 /**
  * Primary UI component for user interaction
