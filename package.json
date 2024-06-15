@@ -40,6 +40,7 @@
     "xml-formatter": "^3.6.2"
   },
   "devDependencies": {
+    "@babel/runtime": "^7.24.7",
     "@chromatic-com/storybook": "1.5.0",
     "@craco/craco": "^7.1.0",
     "@faker-js/faker": "^8.4.1",
