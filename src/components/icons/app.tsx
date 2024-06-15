@@ -8,7 +8,9 @@ import React from 'react';
 import merge from 'deepmerge';
 
 import {
+  type LucideProps,
   WandSparklesIcon, XIcon,
+  VeganIcon, PowerOffIcon, PowerIcon,
   AmpersandIcon, BlendIcon, BlocksIcon,
   BrainCircuitIcon, CheckIcon, ChevronDownIcon,
   ChevronUpIcon, CodeXmlIcon, CopyIcon, DownloadIcon,
@@ -17,8 +19,8 @@ import {
   MountainIcon, PencilLineIcon, PlusIcon, RotateCcwIcon,
   ShuffleIcon, SnowflakeIcon, SproutIcon, SquareXIcon,
   SquareChevronDownIcon, SquareChevronUpIcon, SunIcon,
-  SwordsIcon, ThermometerSnowflakeIcon, TreesIcon, VeganIcon,
-  type LucideProps
+  ArrowDownWideNarrowIcon, ArrowUpWideNarrowIcon,
+  SwordsIcon, ThermometerSnowflakeIcon, TreesIcon,
 } from 'lucide-react';
 
 export const COLOR_DISABLED: string = 'rgba(255, 255, 255, .5';
@@ -172,4 +174,20 @@ export const IconScenario = (props: LucideProps) => (
 
 export const IconPencilLine = (props: LucideProps) => (
   <PencilLineIcon {...merge(iconDefaultProps, props)}/>
+);
+
+export const IconRaiseUp = (props: LucideProps) => (
+  <ArrowUpWideNarrowIcon {...merge(iconDefaultProps, props)}/>
+);
+
+export const IconRaiseDown = (props: LucideProps) => (
+  <ArrowDownWideNarrowIcon {...merge(iconDefaultProps, props)}/>
+);
+
+export const IconEnabled = (props: LucideProps) => (
+  <PowerIcon {...merge(iconDefaultProps, props)}/>
+);
+
+export const IconDisabled = (props: LucideProps) => (
+  <PowerOffIcon {...merge(iconDefaultProps, props)}/>
 );

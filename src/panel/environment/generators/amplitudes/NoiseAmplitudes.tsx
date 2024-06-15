@@ -12,10 +12,13 @@ import merge from 'deepmerge';
 import * as PropTypes from 'prop-types';
 import {Button, ButtonGroup, Form} from 'react-bootstrap';
 
-// Components
+// components
 import Slider from '~/components/ui/Slider';
 
-// Utils
+// icons
+import {IconShuffle, IconRaiseDown, IconRaiseUp, IconEnabled, IconDisabled} from '~/components/icons/app';
+
+// utils
 import * as random from '~/utils/random';
 
 // redux
@@ -87,7 +90,7 @@ const NoiseAmplitudes = (props: Props) => {
   const toggleFrequency = (name: $Keys<FrequencyEnabled>, status: boolean): void => {
     setFreqEnabled(current => ({
       ...current,
-      [name]: status
+      [name]: status,
     }));
   };
 
@@ -128,7 +131,7 @@ const NoiseAmplitudes = (props: Props) => {
         freq6: true,
         freq7: true,
         freq8: true,
-      })
+      });
     }
   }, [environment]);
 
@@ -404,29 +407,50 @@ const NoiseAmplitudes = (props: Props) => {
 
       <div className="mt-2">
         <ButtonGroup size="sm">
-          <Button disabled={!enabled} variant="secondary" size="sm"
-                  onClick={() => {
-                    setFreqEnabled({freq2: true, freq3: true, freq4: true, freq5: true, freq6: true, freq7: true, freq8: true});
-                  }}>Enable All</Button>
-          <Button disabled={!enabled} variant="secondary" size="sm"
-                  onClick={() => {
-                    setFreqEnabled({freq2: false, freq3: false, freq4: false, freq5: false, freq6: false, freq7: false, freq8: false});
-                  }}>Disable All</Button>
-          <Button disabled={!enabled} variant="secondary" size="sm"
-                  onClick={() => {
-                    const values = filterEnabledFrequencies<number>(Object.values(random.randomFrequencies(null))) as ValueFrequencies;
-                    setFrequencies((current) => ({...current, ...values}));
-                  }}>Randomize All</Button>
-          <Button disabled={!enabled} variant="secondary" size="sm"
-                  onClick={() => {
-                    const values = filterEnabledFrequencies<number>(Object.values(random.randomFrequencies(0))) as ValueFrequencies;
-                    setFrequencies((current) => ({...current, ...values}));
-                  }}>Min All</Button>
-          <Button disabled={!enabled} variant="secondary" size="sm"
-                  onClick={() => {
-                    const values = filterEnabledFrequencies<number>(Object.values(random.randomFrequencies(1))) as ValueFrequencies;
-                    setFrequencies((current) => ({...current, ...values}));
-                  }}>Max All</Button>
+          <Button
+            disabled={!enabled} variant="secondary" size="sm"
+            onClick={() => {
+              setFreqEnabled({
+                freq2: true,
+                freq3: true,
+                freq4: true,
+                freq5: true,
+                freq6: true,
+                freq7: true,
+                freq8: true,
+              });
+            }}><IconEnabled/> Enable</Button>
+          <Button
+            disabled={!enabled} variant="secondary" size="sm"
+            onClick={() => {
+              setFreqEnabled({
+                freq2: false,
+                freq3: false,
+                freq4: false,
+                freq5: false,
+                freq6: false,
+                freq7: false,
+                freq8: false,
+              });
+            }}><IconDisabled/> Disable</Button>
+          <Button
+            disabled={!enabled} variant="secondary" size="sm"
+            onClick={() => {
+              const values = filterEnabledFrequencies<number>(Object.values(random.randomFrequencies(null))) as ValueFrequencies;
+              setFrequencies((current) => ({...current, ...values}));
+            }}><IconShuffle/> Randomize</Button>
+          <Button
+            disabled={!enabled} variant="secondary" size="sm"
+            onClick={() => {
+              const values = filterEnabledFrequencies<number>(Object.values(random.randomFrequencies(0))) as ValueFrequencies;
+              setFrequencies((current) => ({...current, ...values}));
+            }}><IconRaiseDown/> Min</Button>
+          <Button
+            disabled={!enabled} variant="secondary" size="sm"
+            onClick={() => {
+              const values = filterEnabledFrequencies<number>(Object.values(random.randomFrequencies(1))) as ValueFrequencies;
+              setFrequencies((current) => ({...current, ...values}));
+            }}><IconRaiseUp/> Max</Button>
         </ButtonGroup>
       </div>
     </>
