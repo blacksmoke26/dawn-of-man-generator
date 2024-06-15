@@ -1,3 +1,5 @@
+// noinspection com.intellij.reactbuddy.ExhaustiveDepsInspection
+
 /**
  * @author Junaid Atari <mj.atari@gmail.com>
  * @see https://github.com/blacksmoke26/dawn-of-man-generator
@@ -10,13 +12,12 @@ import cn from 'classname';
 import merge from 'deepmerge';
 import {Button, ButtonGroup, Col, Form, Row} from 'react-bootstrap';
 
-// types
-import type {Json} from '~/types/json.types';
-import type {SpringSeasonProps} from '~/utils/seasons.types';
-
-// components
+// elemental components
 import Slider from '~/components/ui/Slider';
 import Range from '~/components/ui/Range';
+
+// icons
+import {IconRestore, IconShuffle} from '~/components/icons/app';
 
 // utils
 import {isObject} from '~/helpers/object';
@@ -26,6 +27,10 @@ import {normalizeSpring, randomizeSpring, seasonsPropsDefault, SpringConfig} fro
 
 // redux
 import {useAppSelector} from '~redux/hooks';
+
+// types
+import type {Json} from '~/types/json.types';
+import type {SpringSeasonProps} from '~/utils/seasons.types';
 
 /** Transform extended value into a selection object */
 const extValueToSeason = (data: Json | boolean): SpringSeasonProps | boolean => {
@@ -113,9 +118,9 @@ const Spring = (props: Props) => {
   };
 
   return (
-    <>
+    <div className="panel-border ml-1">
       <Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled})}>
-        <Form.Label className="text-size-sm" column={true} sm="2">
+        <Form.Label column={true} sm="2">
 					<span style={{textDecoration: 'underline dotted'}}
                 title="How long this season is, in terms of a fraction of a
 						year, all season durations have to add up to 1.">
@@ -146,7 +151,7 @@ const Spring = (props: Props) => {
         </Col>
       </Form.Group>
       <Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled})}>
-        <Form.Label className="text-size-sm" column={true} sm="2">
+        <Form.Label column={true} sm="2">
 					<span style={{textDecoration: 'underline dotted'}}
                 title="How likely it is to rain/snow in this season.">
 						Precipitation Chance
@@ -176,7 +181,7 @@ const Spring = (props: Props) => {
         </Col>
       </Form.Group>
       <Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled})}>
-        <Form.Label className="text-size-sm" column={true} sm="2">
+        <Form.Label column={true} sm="2">
 					<span style={{textDecoration: 'underline dotted'}}
                 title="How likely it is for it to be windy in this season.">
 						Windy Chance
@@ -206,7 +211,7 @@ const Spring = (props: Props) => {
         </Col>
       </Form.Group>
       <Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled})}>
-        <Form.Label className="text-size-sm" column={true} sm="2">
+        <Form.Label column={true} sm="2">
 					<span style={{textDecoration: 'underline dotted'}}
                 title="How likely it is for it to be very windy in this season.">
 						Very Windy Chance
@@ -236,7 +241,7 @@ const Spring = (props: Props) => {
         </Col>
       </Form.Group>
       <Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled})}>
-        <Form.Label className="text-size-sm" column={true} sm="2">
+        <Form.Label column={true} sm="2">
 					<span style={{textDecoration: 'underline dotted'}}
                 title="Fish in banks will replenish by this amount at the beginning of this season.">
 						Fish Boost
@@ -266,7 +271,7 @@ const Spring = (props: Props) => {
         </Col>
       </Form.Group>
       <Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled})}>
-        <Form.Label className="text-size-sm" column={true} sm="2">
+        <Form.Label column={true} sm="2">
 					<span style={{textDecoration: 'underline dotted'}}
                 title="Temperature will randomly oscillate between these 2 values (in Celsius)">
 						Temperature
@@ -304,15 +309,19 @@ const Spring = (props: Props) => {
       </Form.Group>
       <div className="mt-3">
         <ButtonGroup>
-          <Button disabled={!enabled} variant="secondary" size="sm"
-                  onClick={() => setSeason(randomizeSpring())}>Randomize</Button>
-          <Button disabled={!enabled} variant="secondary" size="sm"
-                  onClick={() => setSeason(seasonsPropsDefault().spring as SpringSeasonProps)}>
-            Set Defaults
+          <Button
+            disabled={!enabled} variant="secondary" size="sm"
+            onClick={() => setSeason(randomizeSpring())}>
+            <IconShuffle width="14" height="14"/> Randomize
+          </Button>
+          <Button
+            disabled={!enabled} variant="secondary" size="sm"
+            onClick={() => setSeason(seasonsPropsDefault().spring as SpringSeasonProps)}>
+            <IconRestore width="14" height="14"/> Restore
           </Button>
         </ButtonGroup>
       </div>
-    </>
+    </div>
   );
 };
 

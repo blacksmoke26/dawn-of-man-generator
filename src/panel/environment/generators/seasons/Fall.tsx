@@ -1,3 +1,5 @@
+// noinspection com.intellij.reactbuddy.ExhaustiveDepsInspection
+
 /**
  * @author Junaid Atari <mj.atari@gmail.com>
  * @see https://github.com/blacksmoke26/dawn-of-man-generator
@@ -10,9 +12,12 @@ import cn from 'classname';
 import merge from 'deepmerge';
 import {Button, ButtonGroup, Col, Form, Row} from 'react-bootstrap';
 
-// types
-import type {Json} from '~/types/json.types';
-import type {FallSeasonProps} from '~/utils/seasons.types';
+// elemental components
+import Slider from '~/components/ui/Slider';
+import Range from '~/components/ui/Range';
+
+// icons
+import {IconRestore, IconShuffle} from '~/components/icons/app';
 
 // utils
 import * as random from '~/utils/random';
@@ -20,12 +25,12 @@ import * as Defaults from '~/utils/defaults';
 import {isObject} from '~/helpers/object';
 import {FallConfig, normalizeFall, randomizeFall, seasonsPropsDefault} from '~/utils/seasons';
 
-// components
-import Slider from '~/components/ui/Slider';
-import Range from '~/components/ui/Range';
-
 // redux
 import {useAppSelector} from '~redux/hooks';
+
+// types
+import type {Json} from '~/types/json.types';
+import type {FallSeasonProps} from '~/utils/seasons.types';
 
 /** Transform extended value into a selection object */
 const extValueToSeason = (data: Json | boolean): FallSeasonProps | boolean => {
@@ -113,40 +118,40 @@ const Fall = (props: Props) => {
   };
 
   return (
-    <>
+    <div className="panel-border ml-1">
       <Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled})}>
-          <Form.Label className="text-size-sm" column={true} sm="2">
+        <Form.Label column={true} sm="2">
 					<span style={{textDecoration: 'underline dotted'}}
                 title="How long this season is, in terms of a fraction of a
 						year, all season durations have to add up to 1.">
 						Duration
 					</span>
-          </Form.Label>
-          <Col sm="10">
-            <code className={cn('text-size-xs', {'text-muted': !enabled})}>{season.duration}</code>
-            <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                    onClick={() => updateValue('duration', random.randomFloat())}>Random</Button>
-            <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                    onClick={() => updateValue('duration', FallConfig.duration)}>Default</Button>
-            <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                    onClick={() => updateValue('duration', 0)}>%</Button>
-            <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                    onClick={() => updateValue('duration', 0.25)}>25%</Button>
-            <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                    onClick={() => updateValue('duration', 0.50)}>50%</Button>
-            <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                    onClick={() => updateValue('duration', 0.75)}>75%</Button>
-            <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                    onClick={() => updateValue('duration', 1)}>100%</Button>
-            <Slider
-              disabled={!enabled}
-              min={0} max={1} step={0.01}
-              value={season.duration}
-              onChange={v => updateValue('duration', v)}/>
-          </Col>
+        </Form.Label>
+        <Col sm="10">
+          <code className={cn('text-size-xs', {'text-muted': !enabled})}>{season.duration}</code>
+          <Button disabled={!enabled} className="button-reset-sm" variant="link"
+                  onClick={() => updateValue('duration', random.randomFloat())}>Random</Button>
+          <Button disabled={!enabled} className="button-reset-sm" variant="link"
+                  onClick={() => updateValue('duration', FallConfig.duration)}>Default</Button>
+          <Button disabled={!enabled} className="button-reset-sm" variant="link"
+                  onClick={() => updateValue('duration', 0)}>%</Button>
+          <Button disabled={!enabled} className="button-reset-sm" variant="link"
+                  onClick={() => updateValue('duration', 0.25)}>25%</Button>
+          <Button disabled={!enabled} className="button-reset-sm" variant="link"
+                  onClick={() => updateValue('duration', 0.50)}>50%</Button>
+          <Button disabled={!enabled} className="button-reset-sm" variant="link"
+                  onClick={() => updateValue('duration', 0.75)}>75%</Button>
+          <Button disabled={!enabled} className="button-reset-sm" variant="link"
+                  onClick={() => updateValue('duration', 1)}>100%</Button>
+          <Slider
+            disabled={!enabled}
+            min={0} max={1} step={0.01}
+            value={season.duration}
+            onChange={v => updateValue('duration', v)}/>
+        </Col>
       </Form.Group>
       <Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled})}>
-        <Form.Label className="text-size-sm" column={true} sm="2">
+        <Form.Label column={true} sm="2">
 					<span style={{textDecoration: 'underline dotted'}}
                 title="How likely it is to rain/snow in this season.">
 						Precipitation Chance
@@ -176,7 +181,7 @@ const Fall = (props: Props) => {
         </Col>
       </Form.Group>
       <Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled})}>
-        <Form.Label className="text-size-sm" column={true} sm="2">
+        <Form.Label column={true} sm="2">
 					<span style={{textDecoration: 'underline dotted'}}
                 title="How likely it is for it to be windy in this season.">
 						Windy Chance
@@ -206,7 +211,7 @@ const Fall = (props: Props) => {
         </Col>
       </Form.Group>
       <Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled})}>
-        <Form.Label className="text-size-sm" column={true} sm="2">
+        <Form.Label column={true} sm="2">
 					<span style={{textDecoration: 'underline dotted'}}
                 title="How likely it is for it to be very windy in this season.">
 						Very Windy Chance
@@ -236,7 +241,7 @@ const Fall = (props: Props) => {
         </Col>
       </Form.Group>
       <Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled})}>
-        <Form.Label className="text-size-sm" column={true} sm="2">
+        <Form.Label column={true} sm="2">
 					<span style={{textDecoration: 'underline dotted'}}
                 title="Temperature will randomly oscillate between these 2 values (in Celsius)">
 						Temperature
@@ -274,17 +279,21 @@ const Fall = (props: Props) => {
       </Form.Group>
       <div className="mt-3">
         <ButtonGroup>
-          <Button disabled={!enabled} variant="secondary" size="sm"
-                  onClick={() => setSeason(randomizeFall())}>Randomize</Button>
-          <Button disabled={!enabled} variant="secondary" size="sm"
-                  onClick={() => {
-                    setSeason(seasonsPropsDefault().fall as FallSeasonProps);
-                  }}>
-            Set Defaults
+          <Button
+            disabled={!enabled} variant="secondary" size="sm"
+            onClick={() => setSeason(randomizeFall())}>
+            <IconShuffle width="14" height="14"/> Randomize
+          </Button>
+          <Button
+            disabled={!enabled} variant="secondary" size="sm"
+            onClick={() => {
+              setSeason(seasonsPropsDefault().fall as FallSeasonProps);
+            }}>
+            <IconRestore width="14" height="14"/> Restore
           </Button>
         </ButtonGroup>
       </div>
-    </>
+    </div>
   );
 };
 
