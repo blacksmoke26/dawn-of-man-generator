@@ -51,6 +51,7 @@ export interface Props {
   type: ObjectType;
   icon?: React.ReactElement;
   disabled?: boolean;
+  noCard?: boolean;
   expanded?: boolean;
   checked?: boolean;
   density?: DensityObject;
@@ -83,6 +84,7 @@ const defaultValues: Props = {
   name: '',
   disabled: false,
   expanded: true,
+  noCard: false,
   checked: true,
   density: {disabled: false, value: Defaults.DENSITY_DEFAULT},
   angle: {disabled: true, min: Defaults.ANGLE_MIN_DEFAULT, max: Defaults.ANGLE_MAX_DEFAULT},
@@ -216,6 +218,7 @@ const ObjectOverridePrototype = (props: Props = defaultValues) => {
   return (
     <Accordion
       eventKey={name}
+      noCard={newProps?.noCard}
       activeKey={expanded ? name : ''}
       defaultActiveKey={expanded ? name : ''}
       header={<PanelHeader name={name} icon={newProps?.icon} onClick={() => setExpanded(c => !c)}/>}
@@ -269,87 +272,88 @@ const ObjectOverridePrototype = (props: Props = defaultValues) => {
       )}
       accordion={{'aria-disabled': disabled, flush: true}}>
       <div className="clearfix"></div>
-      {/*<editor-fold desc="Attribute: Density">*/}
-      <Form.Group
-        as={Row}
-        className={cn('mb-2 checkbox-align', {'text-muted': !isDensityEnabled})}>
-        <Form.Label className="text-size-sm" column={true} sm="2">
-          <Form.Check
-            disabled={!isEnabled}
-            className={cn('text-size-xs', {'text-white': isEnabled})}
-            type="switch"
-            id={`switch-${nanoid(5)}`}
-            label={(
-              <span
-                style={{textDecoration: 'underline dotted'}}
-                title="The amount of objects of this type to place, has to be in the range.">
+      <div className={cn({'panel-border ml-1': newProps?.noCard})}>
+        {/*<editor-fold desc="Attribute: Density">*/}
+        <Form.Group
+          as={Row}
+          className={cn('mb-2 checkbox-align', {'text-muted': !isDensityEnabled})}>
+          <Form.Label className="text-size-sm" column={true} sm="2">
+            <Form.Check
+              disabled={!isEnabled}
+              className={cn('text-size-xs', {'text-white': isEnabled})}
+              type="switch"
+              id={`switch-${nanoid(5)}`}
+              label={(
+                <span
+                  style={{textDecoration: 'underline dotted'}}
+                  title="The amount of objects of this type to place, has to be in the range.">
                 Density:
               </span>
-            )}
-            checked={!density.disabled}
-            onChange={e => {
-              setDensity(current => ({...current, disabled: !e.target.checked}));
-            }}
-          />
-        </Form.Label>
-        <Col sm="10">
+              )}
+              checked={!density.disabled}
+              onChange={e => {
+                setDensity(current => ({...current, disabled: !e.target.checked}));
+              }}
+            />
+          </Form.Label>
+          <Col sm="10">
           <span className="text-size-xs font-family-code">
             Value: <code className={cn({'text-muted': !isDensityEnabled})}>{density.value}</code>
           </span>
-          <Button
-            disabled={!isDensityEnabled}
-            className={cn('button-reset-sm', {'text-white': isDensityEnabled})} variant="link"
-            onClick={() => {
-              setDensity(current => ({...current, value: random.randomDensity()}));
-            }}>
-            Random
-          </Button>
-          <Button
-            disabled={!isDensityEnabled}
-            className={cn('button-reset-sm', {'text-white': isDensityEnabled})} variant="link"
-            onClick={() => {
-              setDensity(current => ({...current, value: Defaults.DENSITY_DEFAULT}));
-            }}>
-            Reset
-          </Button>
-          <Slider
-            disabled={!isDensityEnabled}
-            step={0.01} min={Defaults.DENSITY_MIN}
-            max={Defaults.DENSITY_MAX}
-            value={density.value}
-            onChange={(value: any) => {
-              setDensity(current => ({...current, value: value}));
-            }}/>
-        </Col>
-      </Form.Group>
-      {/*</editor-fold>*/}
+            <Button
+              disabled={!isDensityEnabled}
+              className={cn('button-reset-sm', {'text-white': isDensityEnabled})} variant="link"
+              onClick={() => {
+                setDensity(current => ({...current, value: random.randomDensity()}));
+              }}>
+              Random
+            </Button>
+            <Button
+              disabled={!isDensityEnabled}
+              className={cn('button-reset-sm', {'text-white': isDensityEnabled})} variant="link"
+              onClick={() => {
+                setDensity(current => ({...current, value: Defaults.DENSITY_DEFAULT}));
+              }}>
+              Reset
+            </Button>
+            <Slider
+              disabled={!isDensityEnabled}
+              step={0.01} min={Defaults.DENSITY_MIN}
+              max={Defaults.DENSITY_MAX}
+              value={density.value}
+              onChange={(value: any) => {
+                setDensity(current => ({...current, value: value}));
+              }}/>
+          </Col>
+        </Form.Group>
+        {/*</editor-fold>*/}
 
-      {/*<editor-fold desc="Attribute: Altitude">*/}
-      <Form.Group
-        as={Row}
-        className={cn('mb-2 checkbox-align', {'text-muted': !isAltitudeEnabled})}>
-        <Form.Label className="text-size-sm" column={true} sm="2">
-          <Form.Check
-            disabled={!isEnabled}
-            className={cn('text-size-xs', {'text-white': isEnabled})}
-            type="switch"
-            id={`switch-${nanoid(5)}`}
-            label={(
-              <span style={{textDecoration: 'underline dotted'}}
-                    title="The min and max altitudes at which this object is
+        {/*<editor-fold desc="Attribute: Altitude">*/}
+        <Form.Group
+          as={Row}
+          className={cn('mb-2 checkbox-align', {'text-muted': !isAltitudeEnabled})}>
+          <Form.Label className="text-size-sm" column={true} sm="2">
+            <Form.Check
+              disabled={!isEnabled}
+              className={cn('text-size-xs', {'text-white': isEnabled})}
+              type="switch"
+              id={`switch-${nanoid(5)}`}
+              label={(
+                <span style={{textDecoration: 'underline dotted'}}
+                      title="The min and max altitudes at which this object is
 										placed, in meters. 0 means water level, negative values
 										might make sense for certain objects like reeds or rocks
 										that are placed underwater.">
 											Altitude:
 										</span>
-            )}
-            checked={!altitude.disabled}
-            onChange={e => {
-              setAltitude(current => ({...current, disabled: !e.target.checked}));
-            }}
-          />
-        </Form.Label>
-        <Col sm="10">
+              )}
+              checked={!altitude.disabled}
+              onChange={e => {
+                setAltitude(current => ({...current, disabled: !e.target.checked}));
+              }}
+            />
+          </Form.Label>
+          <Col sm="10">
           <span className="text-size-xs font-family-code">
             Min: <code className={cn({'text-muted': !isAltitudeEnabled})}>
               {altitude.min}
@@ -359,66 +363,66 @@ const ObjectOverridePrototype = (props: Props = defaultValues) => {
               {altitude.max}
             </code>
           </span>
-          <Button
-            disabled={!isAltitudeEnabled}
-            className={cn('button-reset-sm', {'text-white': isAltitudeEnabled})} variant="link"
-            onClick={() => {
-              const [min, max] = random.randomAltitude();
-              setAltitude(current => ({...current, min, max}));
-            }}>
-            Random
-          </Button>
-          <Button
-            disabled={!isAltitudeEnabled}
-            className={cn('button-reset-sm', {'text-white': isAltitudeEnabled})} variant="link"
-            onClick={() => {
-              setAltitude(current => ({
-                ...current, min: Defaults.ALTITUDE_MIN_DEFAULT,
-                max: Defaults.ALTITUDE_MAX_DEFAULT,
-              }));
-            }}>
-            Reset
-          </Button>
-          <Range
-            disabled={!isAltitudeEnabled}
-            step={1}
-            min={Defaults.ALTITUDE_MIN}
-            max={Defaults.ALTITUDE_MAX}
-            value={[altitude.min, altitude.max]}
-            onChange={value => {
-              const [min, max] = value as [number, number];
-              setAltitude(current => ({...current, min, max}));
-            }}/>
-        </Col>
-      </Form.Group>
-      {/*</editor-fold>*/}
+            <Button
+              disabled={!isAltitudeEnabled}
+              className={cn('button-reset-sm', {'text-white': isAltitudeEnabled})} variant="link"
+              onClick={() => {
+                const [min, max] = random.randomAltitude();
+                setAltitude(current => ({...current, min, max}));
+              }}>
+              Random
+            </Button>
+            <Button
+              disabled={!isAltitudeEnabled}
+              className={cn('button-reset-sm', {'text-white': isAltitudeEnabled})} variant="link"
+              onClick={() => {
+                setAltitude(current => ({
+                  ...current, min: Defaults.ALTITUDE_MIN_DEFAULT,
+                  max: Defaults.ALTITUDE_MAX_DEFAULT,
+                }));
+              }}>
+              Reset
+            </Button>
+            <Range
+              disabled={!isAltitudeEnabled}
+              step={1}
+              min={Defaults.ALTITUDE_MIN}
+              max={Defaults.ALTITUDE_MAX}
+              value={[altitude.min, altitude.max]}
+              onChange={value => {
+                const [min, max] = value as [number, number];
+                setAltitude(current => ({...current, min, max}));
+              }}/>
+          </Col>
+        </Form.Group>
+        {/*</editor-fold>*/}
 
-      {/*<editor-fold desc="Attribute: Angle">*/}
-      <Form.Group
-        as={Row}
-        className={cn('mb-2 checkbox-align', {'text-muted': !isAngleEnabled})}>
-        <Form.Label className="text-size-sm" column={true} sm="2">
-          <Form.Check
-            disabled={!isEnabled}
-            className={cn('text-size-xs', {'text-white': isEnabled})}
-            type="switch"
-            id={`switch-${nanoid(5)}`}
-            label={(
-              <span style={{textDecoration: 'underline dotted'}}
-                    title="The min and max slope angles in degrees at which this object
+        {/*<editor-fold desc="Attribute: Angle">*/}
+        <Form.Group
+          as={Row}
+          className={cn('mb-2 checkbox-align', {'text-muted': !isAngleEnabled})}>
+          <Form.Label className="text-size-sm" column={true} sm="2">
+            <Form.Check
+              disabled={!isEnabled}
+              className={cn('text-size-xs', {'text-white': isEnabled})}
+              type="switch"
+              id={`switch-${nanoid(5)}`}
+              label={(
+                <span style={{textDecoration: 'underline dotted'}}
+                      title="The min and max slope angles in degrees at which this object
 											is placed. Values range from 0 (flat), to 60 (very steep). Negative
 											values of up to -10 are allowed to ensure you get max density at 0
 											degrees, as there is a transition zone.">
 											Angle:
 										</span>
-            )}
-            checked={!angle.disabled}
-            onChange={e => {
-              setAngle(current => ({...current, disabled: !e.target.checked}));
-            }}
-          />
-        </Form.Label>
-        <Col sm="10">
+              )}
+              checked={!angle.disabled}
+              onChange={e => {
+                setAngle(current => ({...current, disabled: !e.target.checked}));
+              }}
+            />
+          </Form.Label>
+          <Col sm="10">
           <span className="text-size-xs font-family-code">
             Min: <code className={cn({'text-muted': !isAngleEnabled})}>
               {angle.min}
@@ -428,65 +432,65 @@ const ObjectOverridePrototype = (props: Props = defaultValues) => {
               {angle.max}
             </code>
           </span>
-          <Button
-            disabled={!isAngleEnabled}
-            className={cn('button-reset-sm', {'text-white': isAngleEnabled})} variant="link"
-            onClick={() => {
-              const [min, max] = random.randomAltitude();
-              setAngle(current => ({...current, min, max}));
-            }}>
-            Random
-          </Button>
-          <Button
-            disabled={!isAngleEnabled}
-            className={cn('button-reset-sm', {'text-white': isAngleEnabled})} variant="link"
-            onClick={() => {
-              setAngle(current => ({
-                ...current, min: Defaults.ANGLE_MIN_DEFAULT,
-                max: Defaults.ANGLE_MAX_DEFAULT,
-              }));
-            }}>
-            Reset
-          </Button>
-          <Range
-            disabled={!isAngleEnabled}
-            min={Defaults.ANGLE_MIN}
-            max={Defaults.ANGLE_MAX}
-            step={1}
-            value={[angle.min, angle.max]}
-            onChange={value => {
-              const [min, max] = value as [number, number];
-              setAngle(current => ({...current, min, max}));
-            }}/>
-        </Col>
-      </Form.Group>
-      {/*</editor-fold>*/}
+            <Button
+              disabled={!isAngleEnabled}
+              className={cn('button-reset-sm', {'text-white': isAngleEnabled})} variant="link"
+              onClick={() => {
+                const [min, max] = random.randomAltitude();
+                setAngle(current => ({...current, min, max}));
+              }}>
+              Random
+            </Button>
+            <Button
+              disabled={!isAngleEnabled}
+              className={cn('button-reset-sm', {'text-white': isAngleEnabled})} variant="link"
+              onClick={() => {
+                setAngle(current => ({
+                  ...current, min: Defaults.ANGLE_MIN_DEFAULT,
+                  max: Defaults.ANGLE_MAX_DEFAULT,
+                }));
+              }}>
+              Reset
+            </Button>
+            <Range
+              disabled={!isAngleEnabled}
+              min={Defaults.ANGLE_MIN}
+              max={Defaults.ANGLE_MAX}
+              step={1}
+              value={[angle.min, angle.max]}
+              onChange={value => {
+                const [min, max] = value as [number, number];
+                setAngle(current => ({...current, min, max}));
+              }}/>
+          </Col>
+        </Form.Group>
+        {/*</editor-fold>*/}
 
-      {/*<editor-fold desc="Attribute: Humidity">*/}
-      <Form.Group
-        as={Row}
-        className={cn('mb-2 checkbox-align', {'text-muted': !isHumidityEnabled})}>
-        <Form.Label className="text-size-sm" column={true} sm="2">
-          <Form.Check
-            disabled={!isEnabled}
-            className={cn('text-size-xs', {'text-white': isEnabled})}
-            type="switch"
-            id={`switch-${nanoid(5)}`}
-            label={(
-              <span
-                style={{textDecoration: 'underline dotted'}}
-                title="The min and max humidity at which this detail object is placed,
+        {/*<editor-fold desc="Attribute: Humidity">*/}
+        <Form.Group
+          as={Row}
+          className={cn('mb-2 checkbox-align', {'text-muted': !isHumidityEnabled})}>
+          <Form.Label className="text-size-sm" column={true} sm="2">
+            <Form.Check
+              disabled={!isEnabled}
+              className={cn('text-size-xs', {'text-white': isEnabled})}
+              type="switch"
+              id={`switch-${nanoid(5)}`}
+              label={(
+                <span
+                  style={{textDecoration: 'underline dotted'}}
+                  title="The min and max humidity at which this detail object is placed,
 											humidity is close to 1 near rivers and forests, and 0 in other places.">
                 Humidity:
               </span>
-            )}
-            checked={!humidity.disabled}
-            onChange={e => {
-              setHumidity(current => ({...current, disabled: !e.target.checked}));
-            }}
-          />
-        </Form.Label>
-        <Col sm="10">
+              )}
+              checked={!humidity.disabled}
+              onChange={e => {
+                setHumidity(current => ({...current, disabled: !e.target.checked}));
+              }}
+            />
+          </Form.Label>
+          <Col sm="10">
           <span className="text-size-xs font-family-code">
             Min: <code className={cn({'text-muted': !isHumidityEnabled})}>
               {humidity.min}
@@ -496,39 +500,39 @@ const ObjectOverridePrototype = (props: Props = defaultValues) => {
               {humidity.max}
             </code>
           </span>
-          <Button
-            disabled={!isHumidityEnabled}
-            className={cn('button-reset-sm', {'text-white': isHumidityEnabled})} variant="link"
-            onClick={() => {
-              const [min, max] = random.randomHumidity();
-              setHumidity(current => ({...current, min, max}));
-            }}>
-            Random
-          </Button>
-          <Button
-            disabled={!isHumidityEnabled}
-            className={cn('button-reset-sm', {'text-white': isHumidityEnabled})} variant="link"
-            onClick={() => {
-              setHumidity(current => ({
-                ...current, min: Defaults.HUMIDITY_MIN_DEFAULT,
-                max: Defaults.HUMIDITY_MAX_DEFAULT,
-              }));
-            }}>
-            Reset
-          </Button>
-          <Range
-            disabled={!isHumidityEnabled}
-            min={Defaults.HUMIDITY_MIN}
-            max={Defaults.HUMIDITY_MAX}
-            step={0.1}
-            value={[humidity.min, humidity.max]}
-            onChange={value => {
-              const [min, max] = value as [number, number];
-              setHumidity(current => ({...current, min, max}));
-            }}/>
-        </Col>
-      </Form.Group>
-      {/*</editor-fold>*/}
+            <Button
+              disabled={!isHumidityEnabled}
+              className={cn('button-reset-sm', {'text-white': isHumidityEnabled})} variant="link"
+              onClick={() => {
+                const [min, max] = random.randomHumidity();
+                setHumidity(current => ({...current, min, max}));
+              }}>
+              Random
+            </Button>
+            <Button
+              disabled={!isHumidityEnabled}
+              className={cn('button-reset-sm', {'text-white': isHumidityEnabled})} variant="link"
+              onClick={() => {
+                setHumidity(current => ({
+                  ...current, min: Defaults.HUMIDITY_MIN_DEFAULT,
+                  max: Defaults.HUMIDITY_MAX_DEFAULT,
+                }));
+              }}>
+              Reset
+            </Button>
+            <Range
+              disabled={!isHumidityEnabled}
+              min={Defaults.HUMIDITY_MIN}
+              max={Defaults.HUMIDITY_MAX}
+              step={0.1}
+              value={[humidity.min, humidity.max]}
+              onChange={value => {
+                const [min, max] = value as [number, number];
+                setHumidity(current => ({...current, min, max}));
+              }}/>
+          </Col>
+        </Form.Group>
+        {/*</editor-fold>*/}</div>
     </Accordion>
   );
 };
@@ -536,6 +540,7 @@ const ObjectOverridePrototype = (props: Props = defaultValues) => {
 // Properties validation
 ObjectOverridePrototype.propTypes = {
   name: PropTypes.string.isRequired,
+  noCard: PropTypes.bool,
   type: PropTypes.oneOf(['tree', 'detail', 'prop', 'deposit']).isRequired,
   icon: PropTypes.element,
   checked: PropTypes.bool,
