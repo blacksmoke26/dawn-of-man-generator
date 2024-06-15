@@ -85,6 +85,9 @@
       "last 1 safari version"
     ]
   },
+  "resolutions": {
+    "**/@babel/runtime": "7.5.0"
+  },
   "packageManager": "yarn@1.22.18",
   "engines": {
     "node": "^22"
