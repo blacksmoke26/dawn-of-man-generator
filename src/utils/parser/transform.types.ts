@@ -92,3 +92,14 @@ export interface TransformNumericArrayOptions {
   /** Null or none-exist value transformer (Defaults to {}) */
   nullResolver?(wrapperKey: string): any,
 }
+
+/** transformString() options argument type */
+export interface TransformStringOptions {
+  /** Path to node (e.g., 'abc.def') */
+  root?: string,
+  /** Wrapper object key (e.g., 'overrideDetails') */
+  wrapperKey?: string,
+
+  /** Null or none-exist value transformer (Defaults to {}) */
+  nullResolver?(wrapperKey: string): any,
+}

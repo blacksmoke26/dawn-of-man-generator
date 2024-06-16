@@ -13,13 +13,14 @@ import {isObject} from '~/helpers/object';
 // types
 import type {Required} from 'utility-types';
 import type {Json} from '~/types/json.types';
-import type {
+import {
   TransformObjectOptions,
   TransformOverrideObjectOptions,
   TransformNumericOptions,
   TransformBooleanOptions,
   TransformSplitStringArrayOptions,
   TransformNumericArrayOptions,
+  TransformStringOptions,
 } from './transform.types';
 
 /**
@@ -232,4 +233,22 @@ export const transformNumericArray = (json: Json, options: TransformNumericArray
   return !list.length ? {} : {
     [opt.wrapperKey]: list,
   };
+};
+
+/**
+ * @public
+ * @static
+ * Transform string node into an object */
+export const transformString = (json: Json, options: TransformStringOptions): Json => {
+  const opt = merge<Required<TransformStringOptions>>({
+    wrapperKey: '',
+    nullResolver: () => ({}),
+  }, options);
+
+  const parsed = op.get<string | Json[] | null>(json, opt.root, null);
+  const isString: boolean = typeof parsed === 'string';
+
+  return parsed === null || !isString
+    ? opt.nullResolver(opt.wrapperKey)
+    : {[opt.wrapperKey]: isString ? String(parsed || '').trim() : parsed};
 };
