@@ -18,7 +18,6 @@ import Milestone from './Milestone';
 
 // types
 import type {Required} from 'utility-types';
-import {toLanguageString} from '~/utils/strings';
 
 export interface MilestonesState {
   [key: string]: {
