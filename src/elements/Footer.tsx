@@ -10,6 +10,8 @@ export const Footer = () => {
   return (
     <footer className="mt-2 mb-2 text-size-xs text-center">
       Copyright &copy; 2019-{(new Date()).getFullYear()} {' '}
+      <span style={{color: 'rgb(235, 60, 84)', fontSize: 16}}>❤️</span>
+      {' '}
       <a href="https://github.com/blacksmoke26"
          rel="noopener noreferrer" target="_blank">Junaid Atari</a>
       <br/>

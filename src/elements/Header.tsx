@@ -16,7 +16,7 @@ export const Header = () => {
       {' - '}
       <a href="https://steamcommunity.com/app/858810/discussions/1/"
          rel="noopener noreferrer" target="_blank">
-        Environment/Scenario Generator 2.1
+        Environment/Scenario Generator 2.2
       </a>
     </h2>
   );
