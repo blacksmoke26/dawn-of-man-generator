@@ -1,6 +1,6 @@
 [![GitHub release](https://img.shields.io/github/v/release/blacksmoke26/dawn-of-man-generator)](https://github.com/blacksmoke26/dawn-of-man-generator/releases/latest) [![GitHub issues](https://img.shields.io/github/issues/blacksmoke26/dawn-of-man-generator?style=plastic)](https://github.com/blacksmoke26/dawn-of-man-generator/issues) [![Netlify Status](https://api.netlify.com/api/v1/badges/d15bd739-2ab5-4f27-bd99-9cf624936425/deploy-status)](https://app.netlify.com/sites/dawn-of-man-mod-gen/deploys)
 
-## Dawn of Man - Environment/Scenario Generator v2.1
+## Dawn of Man - Environment/Scenario Generator v2.2
 
 I love this game, Yeah! So that's why I created this utility in the first place. A really cool web app made on the top
 of TypeScript / [ReactJS](https://reactjs.org/docs/hooks-intro.html) to generate environment and location data. It
@@ -16,25 +16,26 @@ I will implement events editor in future versions. Collaboration warmly accepted
 
 ### Version History
 
-| Version                                                       | Status  | EOL | Release    |
-|---------------------------------------------------------------|---------|-----|------------|
-| [2.x](https://dev--dawn-of-man-mod-gen.netlify.app/)          | Nightly | No  | N/A        |
-| [2.1](https://dawn-of-man-mod-gen.netlify.app/)               | Current | No  | 2024-06-14 |
-| [2.0](https://2-0-1-hotfix--dawn-of-man-mod-gen.netlify.app/) | Stable  | No  | 2024-06-07 |
+| Version                                              | Status  | EOL | Release    |
+|------------------------------------------------------|---------|-----|------------|
+| [2.x](https://dev--dawn-of-man-mod-gen.netlify.app/) | Nightly | No  | N/A        |
+| [2.2](https://dawn-of-man-mod-gen.netlify.app/)      | Current | No  | 2024-06-16 |
+| [2.1](https://2-1--dawn-of-man-mod-gen.netlify.app/) | Stable  | No  | 2024-06-13 |
 
 ### Stalled Versions
 
-| Version                                              | Status | EOL | Release    |
-|------------------------------------------------------|--------|-----|------------|
-| [0.9](https://0-9--dawn-of-man-mod-gen.netlify.app/) | Stable | Yes | 2020-09-01 |
-| [0.8](https://0-8--dawn-of-man-mod-gen.netlify.app/) | N/A    | Yes | 2020-08-30 |
-| [0.7](https://0-6--dawn-of-man-mod-gen.netlify.app/) | N/A    | Yes | 2020-08-29 |
-| [0.6](https://0-6--dawn-of-man-mod-gen.netlify.app/) | N/A    | Yes | 2020-08-27 |
-| [0.5](https://0-5--dawn-of-man-mod-gen.netlify.app/) | N/A    | Yes | 2020-08-21 |
-| [0.4](https://0-4--dawn-of-man-mod-gen.netlify.app/) | N/A    | Yes | 2020-08-21 |
-| [0.3](https://0-3--dawn-of-man-mod-gen.netlify.app/) | N/A    | Yes | 2020-08-21 |
-| [0.2](https://0-2--dawn-of-man-mod-gen.netlify.app/) | N/A    | Yes | 2019-12-10 |
-| [0.1](https://0-1--dawn-of-man-mod-gen.netlify.app/) | N/A    | Yes | 2019-11-19 |
+| Version                                                       | Status | EOL | Release    |
+|---------------------------------------------------------------|--------|-----|------------|
+| [2.0](https://2-0-1-hotfix--dawn-of-man-mod-gen.netlify.app/) | Stable | Yes | 2024-06-07 |
+| [0.9](https://0-9--dawn-of-man-mod-gen.netlify.app/)          | Stable | Yes | 2020-09-01 |
+| [0.8](https://0-8--dawn-of-man-mod-gen.netlify.app/)          | N/A    | Yes | 2020-08-30 |
+| [0.7](https://0-6--dawn-of-man-mod-gen.netlify.app/)          | N/A    | Yes | 2020-08-29 |
+| [0.6](https://0-6--dawn-of-man-mod-gen.netlify.app/)          | N/A    | Yes | 2020-08-27 |
+| [0.5](https://0-5--dawn-of-man-mod-gen.netlify.app/)          | N/A    | Yes | 2020-08-21 |
+| [0.4](https://0-4--dawn-of-man-mod-gen.netlify.app/)          | N/A    | Yes | 2020-08-21 |
+| [0.3](https://0-3--dawn-of-man-mod-gen.netlify.app/)          | N/A    | Yes | 2020-08-21 |
+| [0.2](https://0-2--dawn-of-man-mod-gen.netlify.app/)          | N/A    | Yes | 2019-12-10 |
+| [0.1](https://0-1--dawn-of-man-mod-gen.netlify.app/)          | N/A    | Yes | 2019-11-19 |
 
 *(more features are coming)*
 
@@ -64,8 +65,7 @@ https://dawn-of-man-mod-gen.netlify.com/
 
 1. [TypeScript](https://typescriptlang.org)
 2. [React](https://reactjs.org)
-3. [Redux](https://redux.js.org)
-4. [Redux Thunk](https://github.com/reduxjs/redux-thunk)
+3. [Redux Toolkit](https://redux-toolkit.js.org/)
 5. [React Bootstrap](https://react-bootstrap.github.io/)
 6. [Flow](https://flow.org/)
 7. [RC Slider](http://react-component.github.io/slider/)

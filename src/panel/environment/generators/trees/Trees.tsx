@@ -68,7 +68,7 @@ const Trees = ( props: Props ) => {
 			<Row className="mb-1">
 				<Col xs="10">
 					Present Trees {' '}
-					<code className="pl-2 text-size-xs">
+					<code className={cn('pl-2 text-size-xs', {'text-muted': !enabled})}>
 						{!trees.length ? '<None>' : trees.join(' ').trim()}
 					</code>
 					<Button disabled={!enabled} className="button-reset-sm" variant="link"

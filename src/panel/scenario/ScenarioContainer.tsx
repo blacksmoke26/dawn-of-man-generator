@@ -5,48 +5,81 @@
  */
 
 import React from 'react';
-import FileSaver from 'file-saver';
 import xmlFormatter from 'xml-formatter';
-import copyClipboard from 'clipboard-copy';
-import {Button, ButtonGroup} from 'react-bootstrap';
-import SyntaxHighlighter from 'react-syntax-highlighter';
-import {anOldHope} from 'react-syntax-highlighter/dist/esm/styles/hljs';
-
-// icons
-import {IconBlock, IconMapPin} from '~/components/icons/app';
 
 // elemental components
 import Accordion from '~/components/ui/Accordion';
 
 // components
-import HardcoreModeAllowed from './generators/general/HardcoreModeAllowed';
 import Category from './generators/general/Category';
 import MapSize from './generators/general/MapSize';
-import NomadModeAllowed from './generators/general/NomadModeAllowed';
 import Visible from './generators/general/Visible';
-import GroupID from '~/panel/scenario/generators/general/GroupID';
-import ShowCompletionIcon from './generators/general/ShowCompletionIcon';
-import RequiredScenario from './generators/general/RequiredScenario';
-import CustomSettlementNameAllowed from './generators/general/CustomSettlementNameAllowed';
-import StartingCondition from './generators/general/StartingCondition';
 import LoadingScreen from './generators/general/LoadingScreen';
-import RequiredMilestone from '~/panel/scenario/generators/general/RequiredMilestone';
+import GroupID from './generators/general/GroupID';
+import RequiredScenario from './generators/general/RequiredScenario';
+import NomadModeAllowed from './generators/general/NomadModeAllowed';
+import StartingCondition from './generators/general/StartingCondition';
+import DisasterContainer from './generators/disaster/DisasterContainer';
 import LocationContainer from './generators/location/LocationContainer';
+import ShowCompletionIcon from './generators/general/ShowCompletionIcon';
+import HardcoreModeAllowed from './generators/general/HardcoreModeAllowed';
+import MilestoneContainer from './generators/milestones/MilestoneContainer';
+import CustomSettlementNameAllowed from './generators/general/CustomSettlementNameAllowed';
+import RequiredMilestone from './generators/general/RequiredMilestone';
+
+// icons
+import {IconBlock, IconMapPin, IconMilestone, IconStorm} from '~/components/icons/app';
 
 // utils
 import {nodesToLanguageStrings} from '~/utils/location';
 
-// types
-import type {Json} from '~/types/json.types';
-import DisasterContainer from '~/panel/scenario/generators/disaster/DisasterContainer';
-import MilestoneContainer from '~/panel/scenario/generators/milestones/MilestoneContainer';
-import {MilestoneIcon, ThermometerSnowflakeIcon} from 'lucide-react';
+// redux
+import {useAppDispatch, useAppSelector} from '~redux/hooks';
+import {updateTemplate, updateString} from '~redux/reducers';
 
-const SCENARIO_NAME: string = 'scenario';
+// types
+import type {Json, KVDocument} from '~/types/json.types';
+
+/** Generate xml code */
+const toTemplateText = (templates: KVDocument<string>): string => {
+  const xml: string = `
+		<?xml version="1.0" encoding="utf-8"?>
+		<scenario>
+			${Object.values(templates).join('')}
+		</scenario>`;
+
+  return xmlFormatter(xml, {indentation: '  '});
+};
+
+/** Generate language string xml code */
+const toLanguageText = (strings: KVDocument<string | Json>): string => {
+  const data: Array<string> = [];
+
+  for (const nodes of Object.values(strings)) {
+    if ('string' === typeof nodes) {
+      data.push(nodes);
+      continue;
+    }
+
+    for (const [key, label] of Object.entries(nodes)) {
+      data.push(`<string name="${key}">${label}</string>`);
+    }
+  }
+
+  return xmlFormatter(`
+			<?xml version="1.0" encoding="utf-8"?>
+			<strings>${data.join('')}</strings>
+		`, {indentation: '  ', collapseContent: true});
+};
 
 /** ScenarioContainer functional component */
 const ScenarioContainer = () => {
-  const [templateTexts, setTemplateTexts] = React.useState<Json>({
+  const dispatch = useAppDispatch();
+
+  const templateText = useAppSelector(({templates}) => templates.scenario);
+  const stringsText = useAppSelector(({strings}) => strings.scenario);
+
+  const [templateTexts, setTemplateTexts] = React.useState<KVDocument<string>>({
     hardcoreModeAllowed: '',
     nomadModeAllowed: '',
     category: '',
@@ -63,73 +96,46 @@ const ScenarioContainer = () => {
     disasters: '',
     milestones: '',
   });
-
-  const [langStrings, setLangStrings] = React.useState<Json>({});
+  const [langStrings, setLangStrings] = React.useState<KVDocument<string>>({
+    milestones: '',
+    locations: '',
+  });
 
   /** Update templates raw texts */
-  const updateText = React.useCallback((name: string, value: string): void => {
+  const updateText = (name: string, value: string): void => {
     setTemplateTexts(current => ({
       ...current,
       [name]: value,
     }));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  /** Generate xml code */
-  const toTemplateText = React.useCallback((): string => {
-    const xml: string = `
-		<?xml version="1.0" encoding="utf-8"?>
-		<scenario>
-			${Object.values(templateTexts).join('')}
-		</scenario>`;
-
-    return xmlFormatter(xml, {indentation: '  '});
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [templateTexts]);
-
-  // noinspection com.intellij.reactbuddy.ExhaustiveDepsInspection
-  /** Generate language string xml code */
-  const toLanguageTemplateText = React.useCallback((): string => {
-    const data: Array<string> = [];
-
-    for (const nodes of Object.values(langStrings)) {
-      for (const [key, label] of Object.entries(nodes)) {
-        data.push(`<string name="${key}">${label}</string>`);
-      }
+  };
+  React.useEffect(() => {
+    const text = toTemplateText(templateTexts);
+    if (text !== templateText) {
+      dispatch(updateTemplate({type: 'scenario', text}));
     }
-
-    return xmlFormatter(`
-			<?xml version="1.0" encoding="utf-8"?>
-			<strings>${data.join('')}</strings>
-		`, {indentation: '  ', collapseContent: true});
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [langStrings, templateTexts]);
+  }, [templateTexts, templateText]);
+
+  React.useEffect(() => {
+    const text = toLanguageText(langStrings);
+    if (text !== stringsText) {
+      dispatch(updateString({type: 'scenario', text}));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [langStrings, stringsText]);
 
   /** Update language strings data */
-  const updateLangString = React.useCallback((name: string, data: string): void => {
+  const updateLangString = (name: string, strings: string): void => {
     setLangStrings(current => ({
-      ...current,
-      [name]: data,
+      ...current, [name]: strings,
     }));
-  }, []);
-
-  /** Download file button click handler */
-  const downloadFileClick = React.useCallback((): void => {
-    const blob = new Blob([toTemplateText()], {type: 'text/xml;charset=utf-8'});
-    FileSaver.saveAs(blob, `${SCENARIO_NAME}.xml`);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [templateTexts]);
-
-  /** Download language file button click handler */
-  const downloadLanguageFileClick = React.useCallback((): void => {
-    const blob = new Blob([toLanguageTemplateText()], {type: 'text/xml;charset=utf-8'});
-    FileSaver.saveAs(blob, `en_${SCENARIO_NAME}.lng.xml`);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [langStrings]);
+  };
 
   return (
     <>
-      <Accordion header={<><IconBlock width="17" height="17"/> General</>} eventKey="general">
+      <Accordion
+        header={<span className="text-size-sm"><IconBlock width="17" height="17"/> General</span>}
+        eventKey="general" defaultActiveKey="general">
         <HardcoreModeAllowed onChange={v => updateText('hardcoreModeAllowed', v)}/>
         <hr className="mt-1"/>
         <NomadModeAllowed onChange={v => updateText('nomadModeAllowed', v)}/>
@@ -154,56 +160,40 @@ const ScenarioContainer = () => {
         <hr className="mt-1"/>
         <Visible onChange={v => updateText('visible', v)}/>
       </Accordion>
-      <Accordion header={<><ThermometerSnowflakeIcon className="d-inline-block" width="17" height="17"/> Disasters</>} eventKey="disasters">
+      <Accordion
+        header={(
+          <span className="text-size-sm">
+            <IconStorm className="d-inline-block" width="17" height="17"/> Disasters
+          </span>
+        )}
+        eventKey="disasters">
         <DisasterContainer onChange={(template: string) => updateText('disasters', template)}/>
       </Accordion>
-      <Accordion header={<><MilestoneIcon className="d-inline-block" width="17" height="17"/> Milestones</>} eventKey="milestones">
+      <Accordion
+        header={(
+          <span className="text-size-sm">
+            <IconMilestone
+              className="d-inline-block" width="17"
+              height="17"/> Milestones
+          </span>
+        )}
+        eventKey="milestones">
         <MilestoneContainer
-          onChange={(template: string) => {
-            setTimeout(() => updateText('milestones', template), 50);
+          onChange={(template: string, strings: string) => {
+            setTimeout(() => {
+              updateText('milestones', template);
+              updateLangString('milestones', strings);
+            }, 50);
           }}/>
       </Accordion>
-      <Accordion header={<><IconMapPin className="d-inline-block" width="17" height="17"/> Locations</>} eventKey="locations" noBodyPad={true}>
+      <Accordion
+        header={<span className="text-size-sm"><IconMapPin className="d-inline-block" width="17" height="17"/> Locations</span>}
+        eventKey="locations" noBodyPad={true}>
         <LocationContainer onChange={(template: string, list) => {
           updateText('locations', template);
           updateLangString('locations', template.trim() ? nodesToLanguageStrings(list) as any : '');
         }}/>
       </Accordion>
-      <div className="syntax-highlighter pl-2 pr-2">
-        <SyntaxHighlighter style={anOldHope} language="xml">
-          {toTemplateText()}
-        </SyntaxHighlighter>
-      </div>
-      <div className="mt-2 ml-2">
-        <ButtonGroup size="sm">
-          <Button variant="secondary"
-                  onClick={() => copyClipboard(toTemplateText())}>
-            Copy to Clipboard
-          </Button>
-          <Button variant="secondary"
-                  onClick={() => downloadFileClick()}>
-            Download File
-          </Button>
-        </ButtonGroup>
-      </div>
-      <hr className="mt-2 mb-2"/>
-      <div className="syntax-highlighter pl-2 pr-2">
-        <SyntaxHighlighter style={anOldHope} language="xml">
-          {toLanguageTemplateText()}
-        </SyntaxHighlighter>
-      </div>
-      <div className="mt-2 ml-2 mb-2">
-        <ButtonGroup size="sm">
-          <Button variant="secondary"
-                  onClick={() => copyClipboard(toLanguageTemplateText())}>
-            Copy to Clipboard
-          </Button>
-          <Button variant="secondary"
-                  onClick={() => downloadLanguageFileClick()}>
-            Download File
-          </Button>
-        </ButtonGroup>
-      </div>
     </>
   );
 };

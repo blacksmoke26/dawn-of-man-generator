@@ -65,7 +65,9 @@ const TreesEverywhere = ( props: Props ) => {
 		<div className={cn('mb-2 checkbox-align', {'text-muted': !enabled})}>
 			<Row className="mb-1">
 				<Col xs="10">
-					Trees Everywhere <code className="ml-1 text-size-xs">{value ? '<true>' : '<false>'}</code>
+					Trees Everywhere <code className={cn('ml-1 text-size-xs', {'text-muted': !enabled})}>
+					{value ? '<true>' : '<false>'}
+				</code>
 					<Button disabled={!enabled} className="button-reset-sm" variant="link"
 									onClick={() => setValue(random.randomTreesEverywhere())}>
 						Random

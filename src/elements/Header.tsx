@@ -8,7 +8,7 @@ import React from 'react';
 
 export const Header = () => {
   return (
-    <h2 className="font-weight-light mb-4 text-center">
+    <h2 className="font-weight-light mb-0 text-center">
       <a href="https://store.steampowered.com/app/858810"
          target="_blank" rel="noopener noreferrer">
         Dawn of Man
@@ -16,7 +16,7 @@ export const Header = () => {
       {' - '}
       <a href="https://steamcommunity.com/app/858810/discussions/1/"
          rel="noopener noreferrer" target="_blank">
-        Environment/Scenario Generator 2.1
+        Environment/Scenario Generator 2.2
       </a>
     </h2>
   );

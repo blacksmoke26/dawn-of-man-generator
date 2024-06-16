@@ -1,3 +1,5 @@
+// noinspection com.intellij.reactbuddy.ExhaustiveDepsInspection
+
 /**
  * @author Junaid Atari <mj.atari@gmail.com>
  * @see https://github.com/blacksmoke26/dawn-of-man-generator
@@ -10,13 +12,12 @@ import cn from 'classname';
 import merge from 'deepmerge';
 import {Button, ButtonGroup, Col, Form, Row} from 'react-bootstrap';
 
-// types
-import type {Json} from '~/types/json.types';
-import type {SummerSeasonProps} from '~/utils/seasons.types';
-
-// components
+// elemental components
 import Slider from '~/components/ui/Slider';
 import Range from '~/components/ui/Range';
+
+// icons
+import {IconRestore, IconShuffle} from '~/components/icons/app';
 
 // utils
 import * as random from '~/utils/random';
@@ -26,6 +27,10 @@ import {normalizeSummer, randomizeSummer, seasonsPropsDefault, SummerConfig} fro
 
 // redux
 import {useAppSelector} from '~redux/hooks';
+
+// types
+import type {Json} from '~/types/json.types';
+import type {SummerSeasonProps} from '~/utils/seasons.types';
 
 /** Transform extended value into a selection object */
 const extValueToSeason = (data: Json | boolean): SummerSeasonProps | boolean => {
@@ -117,9 +122,9 @@ const Summer = (props: Props) => {
   };
 
   return (
-    <>
+    <div className="panel-border ml-1">
       <Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled})}>
-        <Form.Label className="text-size-sm" column={true} sm="2">
+        <Form.Label column={true} sm="2">
 					<span style={{textDecoration: 'underline dotted'}}
                 title="How long this season is, in terms of a fraction of a
 						year, all season durations have to add up to 1.">
@@ -150,7 +155,7 @@ const Summer = (props: Props) => {
         </Col>
       </Form.Group>
       <Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled})}>
-        <Form.Label className="text-size-sm" column={true} sm="2">
+        <Form.Label column={true} sm="2">
 					<span style={{textDecoration: 'underline dotted'}}
                 title="How likely it is to rain/snow in this season.">
 						Precipitation Chance
@@ -180,14 +185,14 @@ const Summer = (props: Props) => {
         </Col>
       </Form.Group>
       <Form.Group as={Row} className={cn('mb-2', {'text-muted': !isWindEnabled})}>
-        <Form.Label className="text-size-sm" column={true} sm="2">
+        <Form.Label column={true} sm="2">
           <Form.Check
             disabled={!enabled}
             className="text-size-xs"
             type="switch"
             id={`switch-seasons-wind-enabled`}
             label={<span style={{textDecoration: 'underline dotted'}}
-                 title="The speed of wind between a range">
+                         title="The speed of wind between a range">
               Wind:
             </span>}
             checked={windEnabled}
@@ -225,7 +230,7 @@ const Summer = (props: Props) => {
         </Col>
       </Form.Group>
       <Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled})}>
-        <Form.Label className="text-size-sm" column={true} sm="2">
+        <Form.Label column={true} sm="2">
 					<span style={{textDecoration: 'underline dotted'}}
                 title="How likely it is for it to be windy in this season.">
 						Windy Chance
@@ -254,9 +259,8 @@ const Summer = (props: Props) => {
             onChange={v => updateValue('windyChance', v)}/>
         </Col>
       </Form.Group>
-
       <Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled})}>
-        <Form.Label className="text-size-sm" column={true} sm="2">
+        <Form.Label column={true} sm="2">
 					<span style={{textDecoration: 'underline dotted'}}
                 title="Temperature will randomly oscillate between these 2 values (in Celsius)">
 						Temperature
@@ -294,15 +298,19 @@ const Summer = (props: Props) => {
       </Form.Group>
       <div className="mt-3">
         <ButtonGroup>
-          <Button disabled={!enabled} variant="secondary" size="sm"
-                  onClick={() => setSeason(randomizeSummer())}>Randomize</Button>
-          <Button disabled={!enabled} variant="secondary" size="sm"
-                  onClick={() => setSeason(seasonsPropsDefault().summer as SummerSeasonProps)}>
-            Set Defaults
+          <Button
+            disabled={!enabled} variant="secondary" size="sm"
+            onClick={() => setSeason(randomizeSummer())}>
+            <IconShuffle width="14" height="14"/> Randomize
+          </Button>
+          <Button
+            disabled={!enabled} variant="secondary" size="sm"
+            onClick={() => setSeason(seasonsPropsDefault().summer as SummerSeasonProps)}>
+            <IconRestore width="14" height="14"/> Restore
           </Button>
         </ButtonGroup>
       </div>
-    </>
+    </div>
   );
 };
 

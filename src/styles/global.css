@@ -4,10 +4,6 @@
  * @since 2020-08-29
  */
 
-:root {
-	color-scheme: dark;
-}
-
 ::-webkit-scrollbar { width: 8px; height: 8px;}
 ::-webkit-scrollbar-button {  background-color: #666; }
 ::-webkit-scrollbar-track {  background-color: #323232;}
@@ -49,7 +45,6 @@
 	margin-left: .3rem;
 	font-size: .75rem;
 	position: relative;
-	top: -2px;
 }
 
 .button-reset-sm:first-of-type {

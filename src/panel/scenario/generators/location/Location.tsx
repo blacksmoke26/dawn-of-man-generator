@@ -10,22 +10,26 @@ import cn from 'classname';
 import slugify from 'slugify';
 import merge from 'deepmerge';
 import {nanoid} from 'nanoid';
+import {capitalCase} from 'change-case';
 import {Button, ButtonGroup, Col, Form, InputGroup, Row} from 'react-bootstrap';
-
-// types
-import type {Json} from '~/types/json.types';
-import type {LocationProps} from '~/utils/location';
-
-// utils
-import * as location from '~/utils/location';
 
 // components
 import Slider from '~/components/ui/Slider';
 import {labels} from '~/data/environments/builtin';
-import {POSITION_MAX, POSITION_MIN} from '~/utils/defaults';
 
 // icons
 import {IconRestore, IconShuffle} from '~/components/icons/app';
+
+// utils
+import * as location from '~/utils/location';
+import {POSITION_MAX, POSITION_MIN} from '~/utils/defaults';
+
+// redux
+import {useAppSelector} from '~redux/hooks';
+
+// types
+import type {Json} from '~/types/json.types';
+import type {LocationProps} from '~/utils/location';
 
 export interface Props {
   enabled?: boolean,
@@ -42,6 +46,8 @@ const Location = (props: Props) => {
     onChange: () => {
     },
   }, props);
+
+  const fileName = useAppSelector(({fileName}) => fileName);
 
   const [values, setValues] = React.useState<LocationProps>(props.values as LocationProps);
   const [enabled, setEnabled] = React.useState<boolean>(props.enabled as boolean);
@@ -88,6 +94,12 @@ const Location = (props: Props) => {
     const [n, s] = values.position as number[];
     updateValue('position', [north ?? n, south ?? s]);
   };
+
+  const environments = [...labels, {
+    label: capitalCase(fileName),
+    value: fileName,
+    desc: 'Custom tailored environment for the free play scenario',
+  }];
 
   return (
     <>
@@ -159,11 +171,11 @@ const Location = (props: Props) => {
             }}/>
             <Button disabled={!enabled} variant="secondary" size="sm" title="Randomize"
                     onClick={() => {
-                      updateValue('environment', location.randomEnvironment());
+                      updateValue('environment', location.randomEnvironment([fileName]));
                     }}><IconShuffle/></Button>
           </InputGroup>
           <ul className="list-unstyled list-inline mb-0 mt-1">
-            {labels.map((v: Json) => (
+            {environments.map((v: Json) => (
               <li className="list-inline-item text-size-xxs" key={`environment_key_${v.value}`}>
                 {enabled ? (
                   <a href="/" title={v.desc} data-value={v.value} onClick={e => {
@@ -329,7 +341,7 @@ const Location = (props: Props) => {
         <ButtonGroup>
           <Button disabled={!enabled} variant="secondary" size="sm"
                   onClick={() => {
-                    const randLocation = location.randomizeLocation();
+                    const randLocation = location.randomizeLocation([fileName]);
                     randLocation._id = values._id;
                     !isLakeEnabled && (randLocation.lakes = values.lakes);
                     !isRiverEnabled && (randLocation.river = values.river);

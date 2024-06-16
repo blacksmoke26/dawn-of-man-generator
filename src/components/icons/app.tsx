@@ -8,33 +8,26 @@ import React from 'react';
 import merge from 'deepmerge';
 
 import {
-  AmpersandIcon,
-  BlendIcon,
-  BlocksIcon,
-  BrainCircuitIcon, ChevronDownIcon, ChevronUpIcon,
-  EqualNotIcon,
-  Flower2Icon,
-  HammerIcon,
-  LeafIcon,
-  LucideProps, MapPinIcon, MilestoneIcon,
-  MountainIcon,
-  PlusIcon,
-  RotateCcwIcon,
-  ShuffleIcon,
-  SnowflakeIcon,
-  SproutIcon,
-  SquareChevronDownIcon,
-  SquareChevronUpIcon,
-  SquareXIcon,
-  SunIcon,
-  ThermometerSnowflakeIcon,
-  TreesIcon,
-  XIcon,
+  type LucideProps,
+  WandSparklesIcon, XIcon,
+  VeganIcon, PowerOffIcon, PowerIcon,
+  AmpersandIcon, BlendIcon, BlocksIcon,
+  BrainCircuitIcon, CheckIcon, ChevronDownIcon,
+  ChevronUpIcon, CodeXmlIcon, CopyIcon, DownloadIcon,
+  EqualNotIcon, EraserIcon, FileInputIcon, Flower2Icon,
+  HammerIcon, LeafIcon, MapPinIcon, MilestoneIcon,
+  MountainIcon, PencilLineIcon, PlusIcon, RotateCcwIcon,
+  ShuffleIcon, SnowflakeIcon, SproutIcon, SquareXIcon,
+  SquareChevronDownIcon, SquareChevronUpIcon, SunIcon,
+  ArrowDownWideNarrowIcon, ArrowUpWideNarrowIcon,
+  SwordsIcon, ThermometerSnowflakeIcon, TreesIcon,
 } from 'lucide-react';
 
 export const COLOR_DISABLED: string = 'rgba(255, 255, 255, .5';
 
 export const COLOR_REDDISH: string = '#ff8a65';
+
+export const COLOR_GRAYED: string = 'rgba(255, 255, 255, .4';
 
 export const iconDefaultProps: Partial<LucideProps> = {
   className: 'd-inline position-relative',
@@ -141,4 +134,60 @@ export const IconChevronSimpleDown = (props: LucideProps) => (
 
 export const IconMilestone = (props: LucideProps) => (
   <MilestoneIcon {...merge(iconDefaultProps, props)}/>
+);
+
+export const IconCopy = (props: LucideProps) => (
+  <CopyIcon {...merge(iconDefaultProps, props)}/>
+);
+
+export const IconDownload = (props: LucideProps) => (
+  <DownloadIcon {...merge(iconDefaultProps, props)}/>
+);
+
+export const IconImport = (props: LucideProps) => (
+  <FileInputIcon {...merge(iconDefaultProps, props)}/>
+);
+
+export const IconEraser = (props: LucideProps) => (
+  <EraserIcon {...merge(iconDefaultProps, props)}/>
+);
+
+export const IconWandSparkles = (props: LucideProps) => (
+  <WandSparklesIcon {...merge(iconDefaultProps, props)}/>
+);
+
+export const IconCheck = (props: LucideProps) => (
+  <CheckIcon {...merge(iconDefaultProps, props)}/>
+);
+
+export const IconCodeXml = (props: LucideProps) => (
+  <CodeXmlIcon {...merge(iconDefaultProps, props)}/>
+);
+
+export const IconEnvironment = (props: LucideProps) => (
+  <VeganIcon {...merge(iconDefaultProps, props)}/>
+);
+
+export const IconScenario = (props: LucideProps) => (
+  <SwordsIcon {...merge(iconDefaultProps, props)}/>
+);
+
+export const IconPencilLine = (props: LucideProps) => (
+  <PencilLineIcon {...merge(iconDefaultProps, props)}/>
+);
+
+export const IconRaiseUp = (props: LucideProps) => (
+  <ArrowUpWideNarrowIcon {...merge(iconDefaultProps, props)}/>
+);
+
+export const IconRaiseDown = (props: LucideProps) => (
+  <ArrowDownWideNarrowIcon {...merge(iconDefaultProps, props)}/>
+);
+
+export const IconEnabled = (props: LucideProps) => (
+  <PowerIcon {...merge(iconDefaultProps, props)}/>
+);
+
+export const IconDisabled = (props: LucideProps) => (
+  <PowerOffIcon {...merge(iconDefaultProps, props)}/>
 );

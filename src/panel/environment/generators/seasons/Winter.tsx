@@ -1,3 +1,5 @@
+// noinspection com.intellij.reactbuddy.ExhaustiveDepsInspection
+
 /**
  * @author Junaid Atari <mj.atari@gmail.com>
  * @see https://github.com/blacksmoke26/dawn-of-man-generator
@@ -10,22 +12,25 @@ import cn from 'classname';
 import merge from 'deepmerge';
 import {Button, ButtonGroup, Col, Form, Row} from 'react-bootstrap';
 
-// types
-import type {Json} from '~/types/json.types';
-import type {WinterSeasonProps} from '~/utils/seasons.types';
-
-// components
+// elemental components
 import Slider from '~/components/ui/Slider';
 import Range from '~/components/ui/Range';
 
+// icons
+import {IconRestore, IconShuffle} from '~/components/icons/app';
+
 // utils
-import * as random from './../../../../utils/random';
-import * as Defaults from './../../../../utils/defaults';
-import {normalizeWinter, randomizeWinter, seasonsPropsDefault, WinterConfig} from '~/utils/seasons';
 import {isObject} from '~/helpers/object';
+import * as random from '~/utils/random';
+import * as Defaults from '~/utils/defaults';
+import {normalizeWinter, randomizeWinter, seasonsPropsDefault, WinterConfig} from '~/utils/seasons';
 
 // redux
 import {useAppSelector} from '~redux/hooks';
+
+// types
+import type {Json} from '~/types/json.types';
+import type {WinterSeasonProps} from '~/utils/seasons.types';
 
 /** Transform extended value into a selection object */
 const extValueToSeason = (data: Json | boolean): WinterSeasonProps | boolean => {
@@ -104,7 +109,7 @@ function Winter(props: Props) {
 					<max_temperature value="${season.maxTemperatureValue}"/>
 			</season>`
         ) : '';
-      }, [season, enabled]
+      }, [season, enabled],
     )
   ;
 
@@ -117,9 +122,9 @@ function Winter(props: Props) {
   };
 
   return (
-    <>
+    <div className="panel-border ml-1">
       <Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled})}>
-        <Form.Label className="text-size-sm" column={true} sm="2">
+        <Form.Label column={true} sm="2">
 					<span style={{textDecoration: 'underline dotted'}}
                 title="How long this season is, in terms of a fraction of a
 						year, all season durations have to add up to 1.">
@@ -150,7 +155,7 @@ function Winter(props: Props) {
         </Col>
       </Form.Group>
       <Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled})}>
-        <Form.Label className="text-size-sm" column={true} sm="2">
+        <Form.Label column={true} sm="2">
 					<span style={{textDecoration: 'underline dotted'}}
                 title="How likely it is to rain/snow in this season.">
 						Precipitation Chance
@@ -180,7 +185,7 @@ function Winter(props: Props) {
         </Col>
       </Form.Group>
       <Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled})}>
-        <Form.Label className="text-size-sm" column={true} sm="2">
+        <Form.Label column={true} sm="2">
 					<span style={{textDecoration: 'underline dotted'}}
                 title="How likely it is for it to be windy in this season.">
 						Windy Chance
@@ -210,7 +215,7 @@ function Winter(props: Props) {
         </Col>
       </Form.Group>
       <Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled})}>
-        <Form.Label className="text-size-sm" column={true} sm="2">
+        <Form.Label column={true} sm="2">
 					<span style={{textDecoration: 'underline dotted'}}
                 title="How likely it is for it to be very windy in this season.">
 						Very Windy Chance
@@ -240,7 +245,7 @@ function Winter(props: Props) {
         </Col>
       </Form.Group>
       <Form.Group as={Row} className={cn('mb-2 checkbox-align', {'text-muted': !enabled})}>
-        <Form.Label className="text-size-sm" column={true} sm="2">
+        <Form.Label column={true} sm="2">
 					<span style={{textDecoration: 'underline dotted'}}
                 title="Define whether this season has reduced fauna, in which case
 						the number of animals will match the min value defined in scenario,
@@ -272,7 +277,7 @@ function Winter(props: Props) {
         </Col>
       </Form.Group>
       <Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled})}>
-        <Form.Label className="text-size-sm" column={true} sm="2">
+        <Form.Label column={true} sm="2">
 					<span style={{textDecoration: 'underline dotted'}}
                 title="Temperature will randomly oscillate between these 2 values (in Celsius)">
 						Temperature
@@ -310,15 +315,19 @@ function Winter(props: Props) {
       </Form.Group>
       <div className="mt-3">
         <ButtonGroup>
-          <Button disabled={!enabled} variant="secondary" size="sm"
-                  onClick={() => setSeason(randomizeWinter())}>Randomize</Button>
-          <Button disabled={!enabled} variant="secondary" size="sm"
-                  onClick={() => setSeason(seasonsPropsDefault().winter as WinterSeasonProps)}>
-            Set Defaults
+          <Button
+            disabled={!enabled} variant="secondary" size="sm"
+            onClick={() => setSeason(randomizeWinter())}>
+            <IconShuffle width="14" height="14"/> Randomize
+          </Button>
+          <Button
+            disabled={!enabled} variant="secondary" size="sm"
+            onClick={() => setSeason(seasonsPropsDefault().winter as WinterSeasonProps)}>
+            <IconRestore width="14" height="14"/> Restore
           </Button>
         </ButtonGroup>
       </div>
-    </>
+    </div>
   );
 }
 

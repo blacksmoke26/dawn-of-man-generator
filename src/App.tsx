@@ -5,42 +5,74 @@
  */
 
 import React from 'react';
-import {Container} from 'react-bootstrap';
+import {Col, Container, Row, Tabs, Tab} from 'react-bootstrap';
 
-// elemental components
+// components
 import Header from '~/elements/Header';
-import Accordion from '~/components/ui/Accordion';
 import Footer from '~/elements/Footer';
+
+// environment components
 import EnvironmentPresets from '~/panel/environment/Presets';
+import TemplateXMLViewer from '~/panel/environment/TemplateXMLViewer';
 import EnvironmentContainer from '~/panel/environment/EnvironmentContainer';
+
+// scenario components
 import ScenarioContainer from '~/panel/scenario/ScenarioContainer';
+import ScenarioTemplateXMLViewer from '~/panel/scenario/TemplateXMLViewer';
+
+// icons
+import {IconEnvironment, IconScenario} from '~/components/icons/app';
 
 // redux
-import {useAppDispatch} from '~redux/hooks';
 import {updateInit} from '~redux/reducers';
-
-const KEY_ENVIRONMENT: string = 'environment';
-const KEY_SCENARIO: string = 'scenario';
+import {useAppDispatch} from '~redux/hooks';
 
 const App = () => {
   const dispatch = useAppDispatch();
+
   React.useEffect(() => {
     dispatch(updateInit(true));
     // eslint-disable-next-line
   }, []);
 
   return (
-    <Container className="mt-4 mb-4">
+    <div className="mt-3">
       <Header/>
-      <Accordion header="Environment" eventKey={KEY_ENVIRONMENT} defaultActiveKey={KEY_ENVIRONMENT} noBodyPad={true}>
-        <EnvironmentPresets/>
-        <EnvironmentContainer/>
-      </Accordion>
-      <Accordion header="Scenario" eventKey={KEY_SCENARIO} noBodyPad={true}>
-        <ScenarioContainer/>
-      </Accordion>
-      <Footer/>
-    </Container>
+      <Container fluid={true}>
+        <Tabs defaultActiveKey="environment" className="nav-tabs-bottom">
+          <Tab as="div" eventKey="environment" title={
+            <div className="pl-4 pr-4" style={{fontSize: '0.95rem'}}>
+              <IconEnvironment width="16" height="16"/> Environment
+            </div>
+          }>
+            <Row>
+              <Col sm="6" className="pr-1" style={{height: '75vh', overflowY: 'scroll'}}>
+                <EnvironmentContainer/>
+              </Col>
+              <Col sm="6">
+                <EnvironmentPresets/>
+                <TemplateXMLViewer/>
+              </Col>
+            </Row>
+          </Tab>
+          <Tab as="div" eventKey="scenario" title={
+            <div className="pl-4 pr-4" style={{fontSize: '0.95rem'}}>
+              <IconScenario width="16" height="16"/> Scenario
+            </div>
+          }>
+            <Row>
+              <Col sm="6" className="pr-1" style={{height: '75vh', overflowY: 'scroll'}}>
+                <ScenarioContainer/>
+              </Col>
+              <Col sm="6">
+                <ScenarioTemplateXMLViewer/>
+              </Col>
+            </Row>
+          </Tab>
+        </Tabs>
+        <Footer/>
+      </Container>
+    </div>
   );
 };
 

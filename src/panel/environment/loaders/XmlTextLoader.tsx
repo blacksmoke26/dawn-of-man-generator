@@ -1,3 +1,5 @@
+// noinspection com.intellij.reactbuddy.ExhaustiveDepsInspection
+
 /**
  * @author Junaid Atari <mj.atari@gmail.com>
  * @see https://github.com/blacksmoke26/dawn-of-man-generator
@@ -8,13 +10,16 @@ import React from 'react';
 import xmlFormatter from 'xml-formatter';
 import {ButtonGroup, Button, Modal, Form, Alert, Row, Col} from 'react-bootstrap';
 
-// redux
-import {useAppDispatch} from '~redux/hooks';
-import {updateEnvironmentRaw} from '~redux/reducers';
+// icons
+import {IconCheck, IconCodeXml, IconEraser, IconWandSparkles} from '~/components/icons/app';
 
 // utils
 import {validate, ValidationError} from '~/helpers/xml';
 import {xmlToReduxJson} from '~/data/environments/loader';
+
+// redux
+import {useAppDispatch} from '~redux/hooks';
+import {updateEnvironmentRaw} from '~redux/reducers';
 
 /** XmlTextLoader functional component */
 function XmlTextLoader() {
@@ -49,7 +54,7 @@ function XmlTextLoader() {
   /** Prettify button click handler */
   const onPrettifyClick = React.useCallback((): void => {
     setValue(
-      xmlFormatter(value, {indentation: '  '})
+      xmlFormatter(value, {indentation: '  '}),
     );
     focusInput();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -64,25 +69,36 @@ function XmlTextLoader() {
 
   return (
     <>
-      <Button variant="light" onClick={() => setShowModel(true)}>Paste Text</Button>
-      <Modal size="xl"
-             show={showModel}
-             onShow={() => focusInput()}
-             onHide={() => setShowModel(false)}
-             backdrop="static"
-             keyboard={false}>
+      <Button
+        title="Import environment from XML string"
+        variant="secondary" onClick={() => setShowModel(true)}>
+        <IconCodeXml/> Import XML
+      </Button>
+      <Modal
+        size="xl"
+        show={showModel}
+        onShow={() => focusInput()}
+        onHide={() => setShowModel(false)}
+        backdrop="static"
+        keyboard={false}>
         <Modal.Header>
-          <Modal.Title>Import Environment XML</Modal.Title>
+          <Modal.Title><IconCodeXml width="20" height="20"/> Import Environment XML</Modal.Title>
           <button
             onClick={() => setShowModel(false)} type="button" className="close"><span aria-hidden="true">×</span><span
             className="sr-only">Close</span></button>
         </Modal.Header>
         <Modal.Body>
-          <Form.Control ref={inputRef} value={value} onChange={(e) => {
-            const val: string = String(e.currentTarget.value).trim();
-            setValue(val);
-            setTimeout(() => setError(''), 50);
-          }} placeholder="Paste environment xml text here..." as="textarea" className="font-family-code" style={{height: 500}}/>
+          <Form.Control
+            ref={inputRef}
+            value={value}
+            placeholder="Paste environment xml text here..."
+            as="textarea" className="font-family-code"
+            style={{height: 500}}
+            onChange={(e) => {
+              const val: string = String(e.currentTarget.value).trim();
+              setValue(val);
+              setTimeout(() => setError(''), 50);
+            }}/>
           {value.trim() && (error || xmlError.trim()) && (
             <Alert className="mt-3 mb-0" variant="danger">
               <strong>Error</strong>: {error || xmlError.trim()}
@@ -93,20 +109,29 @@ function XmlTextLoader() {
           <Row>
             <Col sm="6">
               <ButtonGroup size="sm">
-                <Button variant=""
-                        disabled={!isXmlValid}
-                        onClick={() => onPrettifyClick()}>Prettify</Button>
-                <Button variant=""
-                        disabled={!value.trim()}
-                        onClick={() => onClearClick()}>Clear</Button>
+                <Button
+                  variant=""
+                  disabled={!isXmlValid}
+                  onClick={() => onPrettifyClick()}>
+                  <IconWandSparkles/> Prettify</Button>
+                <Button
+                  variant=""
+                  disabled={!value.trim()}
+                  onClick={() => onClearClick()}>
+                  <IconEraser/> Clear</Button>
               </ButtonGroup>
             </Col>
             <Col sm="6" className="text-right">
               <ButtonGroup size="sm">
-                <Button variant="success"
-                        disabled={!isXmlValid}
-                        onClick={() => onImportClick()}>Import</Button>
                 <Button
+                  className="pl-2 pr-2"
+                  variant="success"
+                  disabled={!isXmlValid}
+                  onClick={() => onImportClick()}>
+                  <IconCheck/> Import
+                </Button>
+                <Button
+                  className="pl-3 pr-3"
                   variant="secondary"
                   onClick={() => setShowModel(false)}>
                   Discard

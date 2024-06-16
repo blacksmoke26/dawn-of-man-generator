@@ -18,17 +18,19 @@ import Milestone from './Milestone';
 
 // types
 import type {Required} from 'utility-types';
+import {toLanguageString} from '~/utils/strings';
 
 export interface MilestonesState {
   [key: string]: {
     template: string;
+    strings: string;
   };
 }
 
 interface Props {
   disabled?: boolean,
 
-  onChange(template: string): void,
+  onChange(template: string, strings: string): void,
 }
 
 const toTemplateText = (milestones: MilestonesState): string => {
@@ -57,7 +59,10 @@ const MilestoneContainer = (props: Props) => {
   // Reflect state changes
   React.useEffect(() => {
     const template = !disabled ? '' : toTemplateText(milestones);
-    typeof newProps.onChange === 'function' && newProps.onChange(template);
+    typeof newProps.onChange === 'function' && newProps.onChange(
+      template,
+      Object.values(milestones).map((attr => attr.strings)).join('\n')
+      );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [disabled, milestones]);
 
@@ -71,8 +76,10 @@ const MilestoneContainer = (props: Props) => {
           <div className="pl-2" style={{borderLeft: '2px solid rgb(133 107 99)'}}>
             <Milestone
               disabledCheckbox={!disabled}
-              onChange={(template: string) => {
-                setMilestones(current => ({...current, [id]: {template}}));
+              onChange={(template: string, values, strings) => {
+                setMilestones(current => ({
+                  ...current, [id]: {template, strings},
+                }));
               }}
               onRemoveClick={() => {
                 setMilestones(current => {
@@ -108,7 +115,12 @@ const MilestoneContainer = (props: Props) => {
         <ButtonGroup>
           <Button variant="secondary" size="sm" disabled={!disabled} onClick={() => {
             const milestoneId = nanoid(10).toLowerCase();
-            setMilestones(current => ({...current, [milestoneId]: {template: ''}}));
+            setMilestones(current => ({
+              ...current,
+              [milestoneId]: {
+                template: '', strings: '',
+              },
+            }));
           }}><IconNew/> New Milestone</Button>
           <Button variant="danger" size="sm" disabled={!disabled || total < 1} onClick={() => {
             setMilestones({});

@@ -6,20 +6,22 @@
 
 import React from 'react';
 
-// redux
-import {useAppDispatch} from '~redux/hooks';
-import {updateEnvironment} from '~redux/reducers';
-
 // components
-import XmlImporter from './XmlImporter';
 import Select, {Option} from '~/components/ui/Select';
+
+// icons
+import {IconEnvironment} from '~/components/icons/app';
 
 // utils
 import {labels, environments} from '~/data/environments/builtin';
 
+// redux
+import {useAppDispatch} from '~redux/hooks';
+import {updateEnvironment} from '~redux/reducers';
+
 // types
-import {$Keys} from 'utility-types';
-import {Json} from '~/types/json.types';
+import type {$Keys} from 'utility-types';
+import type {Json} from '~/types/json.types';
 
 /**
  * Presets functional component
@@ -34,7 +36,9 @@ const Presets = () => {
         formatOptionLabel={(option: Option | any) => {
           return (
             <div>
-              <div className="text-info">{option?.label}</div>
+              <div className="text-info" style={{color: '#8dccff'}}>
+                <IconEnvironment width="13" height="13"/> {option?.label}
+              </div>
               <div className="text-size-xxs text-muted">{option?.desc}</div>
             </div>
           );
@@ -46,7 +50,7 @@ const Presets = () => {
         }}
         menuPortalTarget={document.body}
         options={labels}
-        placeholder="Choose preset..."
+        placeholder="Choose to load built-in preset..."
         onChange={(option: Option | any, {action}): void => {
           if (action === 'select-option' && option) {
             const value = option.value as $Keys<typeof environments>;
@@ -55,7 +59,6 @@ const Presets = () => {
           }
         }}
       />
-      <XmlImporter/>
     </div>
   );
 };

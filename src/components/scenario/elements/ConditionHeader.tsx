@@ -99,7 +99,7 @@ export const ConditionHeader = (props: Props) => {
     <Row className={cn('mb-1', {'text-muted': isDisabled}, 'checkbox-align')}>
       <Col xs="6">
         {!newProps.showCheckbox && (
-          <a href="#"
+          <a href="#toggle"
              className={cn({'text-muted': isDisabled})}
              onClick={e => {
             e.preventDefault();

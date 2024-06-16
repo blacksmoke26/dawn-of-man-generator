@@ -7,14 +7,14 @@
 import React from 'react';
 import { ButtonGroup } from 'react-bootstrap';
 
-// Components
+// components
 import XmlTextLoader from './loaders/XmlTextLoader';
 
 /** XmlImporter functional component */
 const XmlImporter = () => {
 	return (
 		<>
-			<div className="mt-2 text-right mr-2">
+			<div className="mt-2 text-right">
 				<span className="text-muted mr-2 d-inline-block">Import environment xml by:</span>
 				<ButtonGroup size="sm">
 					<XmlTextLoader/>
