@@ -47,9 +47,7 @@ const Location = (props: Props) => {
     },
   }, props);
 
-  const {fileName} = useAppSelector(state => ({
-    fileName: state.fileName,
-  }));
+  const fileName = useAppSelector(({fileName}) => fileName);
 
   const [values, setValues] = React.useState<LocationProps>(props.values as LocationProps);
   const [enabled, setEnabled] = React.useState<boolean>(props.enabled as boolean);

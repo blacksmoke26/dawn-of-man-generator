@@ -76,10 +76,8 @@ const toLanguageText = (strings: KVDocument<string | Json>): string => {
 const ScenarioContainer = () => {
   const dispatch = useAppDispatch();
 
-  const {templateText, stringsText} = useAppSelector(({templates, strings}) => ({
-    templateText: templates.scenario,
-    stringsText: strings.scenario,
-  }));
+  const templateText = useAppSelector(({templates}) => templates.scenario);
+  const stringsText = useAppSelector(({strings}) => strings.scenario);
 
   const [templateTexts, setTemplateTexts] = React.useState<KVDocument<string>>({
     hardcoreModeAllowed: '',

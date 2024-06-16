@@ -22,13 +22,9 @@ import {useAppDispatch, useAppSelector} from '~redux/hooks';
 const TemplateXMLViewer = () => {
   const dispatch = useAppDispatch();
 
-  const {template, strings, scenarioName} = useAppSelector(({templates, strings, scenarioName}) => {
-    return {
-      template: templates.scenario,
-      strings: strings.scenario,
-      scenarioName,
-    };
-  });
+  const template = useAppSelector(({templates}) => templates.scenario);
+  const strings = useAppSelector(({strings}) => strings.scenario);
+  const scenarioName = useAppSelector(({scenarioName}) => scenarioName);
 
   const SCENARIO_FILENAME: string = `${scenarioName.trim() || 'scenario'}.xml`;
   const STRINGS_FILENAME: string = `${scenarioName.trim() || 'scenario'}.lng.xml`;

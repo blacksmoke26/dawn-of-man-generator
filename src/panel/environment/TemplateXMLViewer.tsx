@@ -25,12 +25,8 @@ import {useAppDispatch, useAppSelector} from '~redux/hooks';
 const TemplateXMLViewer = () => {
   const dispatch = useAppDispatch();
 
-  const {template, fileName} = useAppSelector(({templates, fileName}) => {
-    return {
-      template: templates.environment,
-      fileName,
-    };
-  });
+  const template = useAppSelector(({templates}) => templates.environment);
+  const fileName = useAppSelector(({fileName}) => fileName);
 
   return (
     <>
