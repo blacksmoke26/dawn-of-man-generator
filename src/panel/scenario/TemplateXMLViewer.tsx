@@ -115,7 +115,7 @@ const TemplateXMLViewer = () => {
                 const blob = new Blob([template], {type: 'text/xml;charset=utf-8'});
                 FileSaver.saveAs(blob, STRINGS_FILENAME);
               }}>
-              <IconDownload/> Download File
+              <IconDownload/> Download
             </Button>
           </ButtonGroup>
         </div>
