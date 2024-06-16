@@ -13,8 +13,8 @@ import { mergeAll } from '~/helpers/object';
 // types
 import type {Required} from 'utility-types';
 import type {Json} from '~/types/json.types';
-import type {JsonToReduxOptions} from './../../index.types';
-import type {TransformOverrideObjectOptions} from '../../utils/transform.types';
+import type {JsonToReduxOptions} from '~/utils/parser/index.types';
+import type {TransformOverrideObjectOptions} from '~/utils/parser/transform.types';
 
 // utils
 import { jsonToRedux as j2rs1 } from './modules/spring';

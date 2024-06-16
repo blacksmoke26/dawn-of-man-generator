@@ -10,7 +10,7 @@ import merge from 'deepmerge';
 // types
 import type {Required} from 'utility-types';
 import type {Json} from '~/types/json.types';
-import type {JsonToReduxOptions} from './../index.types';
+import type {JsonToReduxOptions} from '~/utils/parser/index.types';
 
 /** Convert environment json into redux data */
 export const jsonToRedux = (json: Json, options: JsonToReduxOptions = {}): Json => {

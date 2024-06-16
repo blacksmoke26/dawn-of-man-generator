@@ -6,10 +6,10 @@
 
 // types
 import type {Json} from '~/types/json.types';
-import type {JsonToReduxOptions} from './../index.types';
+import type {JsonToReduxOptions} from '~/utils/parser/index.types';
 
 // utils
-import { transformNumeric } from './../utils/transform';
+import { transformNumeric } from '~/utils/parser/transform';
 
 /** Convert environment json into redux data */
 export const jsonToRedux = ( json: Json, options: JsonToReduxOptions = {} ): Json => {
