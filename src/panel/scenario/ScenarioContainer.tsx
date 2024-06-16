@@ -38,7 +38,7 @@ import {useAppDispatch, useAppSelector} from '~redux/hooks';
 import {updateTemplate, updateString} from '~redux/reducers';
 
 // types
-import type {KVDocument} from '~/types/json.types';
+import type {Json, KVDocument} from '~/types/json.types';
 
 /** Generate xml code */
 const toTemplateText = (templates: KVDocument<string>): string => {
@@ -52,10 +52,15 @@ const toTemplateText = (templates: KVDocument<string>): string => {
 };
 
 /** Generate language string xml code */
-const toLanguageText = (strings: KVDocument<string>): string => {
+const toLanguageText = (strings: KVDocument<string | Json>): string => {
   const data: Array<string> = [];
 
   for (const nodes of Object.values(strings)) {
+    if ('string' === typeof nodes) {
+      data.push(nodes);
+      continue;
+    }
+
     for (const [key, label] of Object.entries(nodes)) {
       data.push(`<string name="${key}">${label}</string>`);
     }
@@ -93,7 +98,10 @@ const ScenarioContainer = () => {
     disasters: '',
     milestones: '',
   });
-  const [langStrings, setLangStrings] = React.useState<KVDocument<string>>({});
+  const [langStrings, setLangStrings] = React.useState<KVDocument<string>>({
+    milestones: '',
+    locations: '',
+  });
 
   /** Update templates raw texts */
   const updateText = (name: string, value: string): void => {
@@ -119,9 +127,9 @@ const ScenarioContainer = () => {
   }, [langStrings, stringsText]);
 
   /** Update language strings data */
-  const updateLangString = (name: string, data: string): void => {
+  const updateLangString = (name: string, strings: string): void => {
     setLangStrings(current => ({
-      ...current, [name]: data,
+      ...current, [name]: strings,
     }));
   };
 
@@ -164,11 +172,20 @@ const ScenarioContainer = () => {
         <DisasterContainer onChange={(template: string) => updateText('disasters', template)}/>
       </Accordion>
       <Accordion
-        header={<span className="text-size-sm"><IconMilestone className="d-inline-block" width="17" height="17"/> Milestones</span>}
+        header={(
+          <span className="text-size-sm">
+            <IconMilestone
+              className="d-inline-block" width="17"
+              height="17"/> Milestones
+          </span>
+        )}
         eventKey="milestones">
         <MilestoneContainer
-          onChange={(template: string) => {
-            setTimeout(() => updateText('milestones', template), 50);
+          onChange={(template: string, strings: string) => {
+            setTimeout(() => {
+              updateText('milestones', template);
+              updateLangString('milestones', strings);
+            }, 50);
           }}/>
       </Accordion>
       <Accordion
