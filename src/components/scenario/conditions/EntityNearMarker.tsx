@@ -24,12 +24,13 @@ import {toString} from '~/helpers/string';
 import {toInteger} from '~/helpers/number';
 import {toEntityCount} from '~/utils/units';
 import {ENTITIES, ENTITIES_OPTIONS} from '~/utils/entities';
+import {toEntityNearMarkerTemplate} from '~/utils/parser/templates';
 import {defaultsParams, DISTANCE_MAX, DISTANCE_MIN} from '~/utils/condition';
 
 // types
 import type {$Keys, DeepPartial} from 'utility-types';
 import type {EntityType} from '~/types/entity.types';
-import type {ConditionEntityNearMarker as ConditionAttributes,} from '~/types/condition.types';
+import type {ConditionEntityNearMarker as ConditionAttributes} from '~/types/condition.types';
 
 interface Attributes extends ConditionAttributes {
   enabled: boolean;
@@ -75,19 +76,13 @@ const EntityNearMarker = (props: DeepPartial<Props>) => {
     });
   };
 
-  const toTemplateText = (): string => {
-    return isDisabled || !String(attributes?.entityType ?? '').trim()
-      ? ''
-      : (
-        `<condition type="${CONDITION_NAME}"`
-        + ` entity_type="${attributes?.entityType}"`
-        + ` distance="${attributes?.distance}"/>`
-      );
-  };
-
   // Reflect state changes
   React.useEffect(() => {
-    typeof newProps.onChange === 'function' && newProps.onChange(toTemplateText(), attributes);
+    const args: [string, Attributes] = !attributes.enabled
+      ? ['', {} as Attributes]
+      : [toEntityNearMarkerTemplate(attributes), attributes];
+
+    typeof newProps.onChange === 'function' && newProps.onChange.apply(null, args);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [attributes]);
 
@@ -108,14 +103,15 @@ const EntityNearMarker = (props: DeepPartial<Props>) => {
 
   return (
     <div className={cn('mb-2', {'text-muted': isDisabled}, 'checkbox-align')}>
-      <ConditionHeader caption={CONDITION_NAME} showCheckbox={newProps.showCheckbox}
-                       enabled={attributes.enabled}
-                       onEnabled={(isEnabled: boolean) => setAttribute('enabled', isEnabled)}
-                       disabledCheckbox={attributes.disabledCheckbox}
-                       removeIcon={newProps.removeIcon}
-                       onRemoveClick={newProps.onRemoveClick}
-                       onExpandedClick={(state: boolean) => setAttribute('expanded', state)}
-                       expanded={attributes.expanded}/>
+      <ConditionHeader
+        caption={CONDITION_NAME} showCheckbox={newProps.showCheckbox}
+        enabled={attributes.enabled}
+        onEnabled={(isEnabled: boolean) => setAttribute('enabled', isEnabled)}
+        disabledCheckbox={attributes.disabledCheckbox}
+        removeIcon={newProps.removeIcon}
+        onRemoveClick={newProps.onRemoveClick}
+        onExpandedClick={(state: boolean) => setAttribute('expanded', state)}
+        expanded={attributes.expanded}/>
       {attributes?.expanded && (
         <>
           <Row className="mb-1 mt-2">
@@ -149,12 +145,13 @@ const EntityNearMarker = (props: DeepPartial<Props>) => {
               </div>
             </Col>
             <Col xs="6">
-          <span className="text-size-xs font-family-code">
-										Value: <code className={cn({'text-muted': isDisabled})}>{attributes.distance}</code>
-									</span>
-              <Button disabled={isDisabled}
-                      className="button-reset-sm" variant="link"
-                      onClick={() => setAttribute('distance', random.randomDistance())}>
+              <span className="text-size-xs font-family-code">
+                Value: <code className={cn({'text-muted': isDisabled})}>{attributes.distance}</code>
+              </span>
+              <Button
+                disabled={isDisabled}
+                className="button-reset-sm" variant="link"
+                onClick={() => setAttribute('distance', random.randomDistance())}>
                 Random
               </Button>
               <Slider

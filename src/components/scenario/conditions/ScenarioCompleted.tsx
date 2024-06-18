@@ -21,10 +21,14 @@ import ConditionHeader from './../elements/ConditionHeader';
 // utils
 import {toString} from '~/helpers/string';
 import {defaultsParams, GAME_MODES} from '~/utils/condition';
+import {toScenarioCompletedTemplate} from '~/utils/parser/templates';
 
 // types
 import type {$Keys, DeepPartial} from 'utility-types';
-import type {ConditionScenarioCompleted as ConditionAttributes, GameMode,} from '~/types/condition.types';
+import type {
+  GameMode,
+  ConditionScenarioCompleted as ConditionAttributes,
+} from '~/types/condition.types';
 
 interface Attributes extends ConditionAttributes {
   enabled: boolean;
@@ -70,21 +74,13 @@ const ScenarioCompleted = (props: DeepPartial<Props>) => {
     });
   };
 
-  const toTemplateText = (): string => {
-    return !attributes.enabled
-    || !String(attributes?.id ?? '').trim()
-    || !String(attributes?.gameMode ?? '').trim()
-      ? ''
-      : (
-        `<condition type="${CONDITION_NAME}"`
-        + ` id="${attributes?.id}"`
-        + ` game_mode="${attributes?.gameMode}"/>`
-      );
-  };
-
   // Reflect state changes
   React.useEffect(() => {
-    typeof newProps.onChange === 'function' && newProps.onChange(toTemplateText(), attributes);
+    const args: [string, Attributes] = !attributes.enabled
+      ? ['', {} as Attributes]
+      : [toScenarioCompletedTemplate(attributes), attributes];
+
+    typeof newProps.onChange === 'function' && newProps.onChange.apply(null, args);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [attributes]);
 
@@ -105,14 +101,15 @@ const ScenarioCompleted = (props: DeepPartial<Props>) => {
 
   return (
     <div className={cn('mb-2', {'text-muted': isDisabled}, 'checkbox-align')}>
-      <ConditionHeader caption={CONDITION_NAME} showCheckbox={newProps.showCheckbox}
-                       enabled={attributes.enabled}
-                       onEnabled={(isEnabled: boolean) => setAttribute('enabled', isEnabled)}
-                       disabledCheckbox={attributes.disabledCheckbox}
-                       removeIcon={newProps.removeIcon}
-                       onRemoveClick={newProps.onRemoveClick}
-                       onExpandedClick={(state: boolean) => setAttribute('expanded', state)}
-                       expanded={attributes.expanded}/>
+      <ConditionHeader
+        caption={CONDITION_NAME} showCheckbox={newProps.showCheckbox}
+        enabled={attributes.enabled}
+        onEnabled={(isEnabled: boolean) => setAttribute('enabled', isEnabled)}
+        disabledCheckbox={attributes.disabledCheckbox}
+        removeIcon={newProps.removeIcon}
+        onRemoveClick={newProps.onRemoveClick}
+        onExpandedClick={(state: boolean) => setAttribute('expanded', state)}
+        expanded={attributes.expanded}/>
       {attributes?.expanded && (
         <>
           <Row className="mb-1 mt-2">
@@ -129,7 +126,9 @@ const ScenarioCompleted = (props: DeepPartial<Props>) => {
                 id={`condition-${nanoid(5)}`}
                 placeholder="e.g., the_shepherds_herd"
                 value={toString(attributes?.id)}
-                onChange={e => setAttribute('id', e.target.value.replace(/['"]+/ig, ``))}
+                onChange={e => {
+                  setAttribute('id', e.target.value.replace(/['"]+/ig, ``));
+                }}
               />
             </Col>
           </Row>
@@ -143,7 +142,7 @@ const ScenarioCompleted = (props: DeepPartial<Props>) => {
                 isSearchable={false}
                 defaultValue={newProps?.gameMode ? {
                   label: capitalCase(newProps.gameMode as string),
-                  value: newProps.gameMode
+                  value: newProps.gameMode,
                 } : null}
                 menuPortalTarget={document.body}
                 options={GAME_MODES.map(value => ({label: capitalCase(value), value}))}

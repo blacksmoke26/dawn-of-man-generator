@@ -1,5 +1,3 @@
-// noinspection HtmlUnknownAttribute
-
 /**
  * @author Junaid Atari <mj.atari@gmail.com>
  * @see https://github.com/blacksmoke26/dawn-of-man-generator
@@ -21,10 +19,13 @@ import ConditionHeader from './../elements/ConditionHeader';
 // utils
 import {toString} from '~/helpers/string';
 import {defaultsParams, VALUE_EQUALS} from '~/utils/condition';
+import {toValueEqualsTemplate} from '~/utils/parser/templates';
 
 // types
 import type {$Keys, DeepPartial} from 'utility-types';
-import type {ConditionValueEquals as ConditionAttributes, ValueEqualsType} from '~/types/condition.types';
+import type {
+  ValueEqualsType, ConditionValueEquals as ConditionAttributes,
+} from '~/types/condition.types';
 
 interface Attributes extends ConditionAttributes {
   enabled: boolean;
@@ -68,21 +69,13 @@ const ValueEquals = (props: DeepPartial<Props>) => {
     });
   };
 
-  const toTemplateText = (): string => {
-    return !attributes.enabled
-    || !String(attributes?.id ?? '').trim()
-    || !String(attributes?.value ?? '').trim()
-      ? ''
-      : (
-        `<condition type="${CONDITION_NAME}"`
-        + ` id="${attributes?.id}"`
-        + ` value="${attributes?.value}"/>`
-      );
-  };
-
   // Reflect state changes
   React.useEffect(() => {
-    typeof newProps.onChange === 'function' && newProps.onChange(toTemplateText(), attributes);
+    const args: [string, Attributes] = !attributes.enabled
+      ? ['', {} as Attributes]
+      : [toValueEqualsTemplate(attributes), attributes];
+
+    typeof newProps.onChange === 'function' && newProps.onChange.apply(null, args);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [attributes]);
 
@@ -103,14 +96,15 @@ const ValueEquals = (props: DeepPartial<Props>) => {
 
   return (
     <div className={cn('mb-2', {'text-muted': isDisabled}, 'checkbox-align')}>
-      <ConditionHeader caption={CONDITION_NAME} showCheckbox={newProps.showCheckbox}
-                       enabled={attributes.enabled}
-                       onEnabled={(isEnabled: boolean) => setAttribute('enabled', isEnabled)}
-                       disabledCheckbox={attributes.disabledCheckbox}
-                       removeIcon={newProps.removeIcon}
-                       onRemoveClick={newProps.onRemoveClick}
-                       onExpandedClick={(state: boolean) => setAttribute('expanded', state)}
-                       expanded={attributes.expanded}/>
+      <ConditionHeader
+        caption={CONDITION_NAME} showCheckbox={newProps.showCheckbox}
+        enabled={attributes.enabled}
+        onEnabled={(isEnabled: boolean) => setAttribute('enabled', isEnabled)}
+        disabledCheckbox={attributes.disabledCheckbox}
+        removeIcon={newProps.removeIcon}
+        onRemoveClick={newProps.onRemoveClick}
+        onExpandedClick={(state: boolean) => setAttribute('expanded', state)}
+        expanded={attributes.expanded}/>
       {attributes?.expanded && (
         <>
           <Row className="mb-1 mt-2">
@@ -150,7 +144,9 @@ const ValueEquals = (props: DeepPartial<Props>) => {
                 id={`condition-${nanoid(5)}`}
                 placeholder="e.g., SomeValue"
                 value={toString(attributes?.value)}
-                onChange={e => setAttribute('value', e.target.value.replace(/['"]+/ig, ``))}
+                onChange={e => {
+                  setAttribute('value', e.target.value.replace(/['"]+/ig, ``));
+                }}
               />
             </Col>
           </Row>

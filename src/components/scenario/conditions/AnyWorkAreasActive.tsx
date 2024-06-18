@@ -20,6 +20,7 @@ import ConditionHeader from './../elements/ConditionHeader';
 // utils
 import * as random from '~/utils/random';
 import {toWorkers} from '~/utils/units';
+import {toAnyWorkAreasActiveTemplate} from '~/utils/parser/templates';
 import {defaultsParams, PERFORMERS_MAX, PERFORMERS_MIN} from '~/utils/condition';
 
 // types
@@ -70,19 +71,13 @@ const AnyWorkAreasActive = (props: DeepPartial<Props>) => {
     });
   };
 
-  const toTemplateText = (): string => {
-    return !attributes.enabled || !String(attributes?.workAreaId || '')?.trim()
-      ? ''
-      : (
-        `<condition type="${CONDITION_NAME}"`
-        + ` work_area_id="${attributes?.workAreaId}"`
-        + ` max_workers="${attributes.maxWorkers}"/>`
-      );
-  };
-
   // Reflect state changes
   React.useEffect(() => {
-    typeof newProps.onChange === 'function' && newProps.onChange(toTemplateText(), attributes);
+    const args: [string, Attributes] = !attributes.enabled
+      ? ['', {} as Attributes]
+      : [toAnyWorkAreasActiveTemplate(attributes), attributes];
+
+    typeof newProps.onChange === 'function' && newProps.onChange.apply(null, args);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [attributes]);
 
@@ -103,14 +98,15 @@ const AnyWorkAreasActive = (props: DeepPartial<Props>) => {
 
   return (
     <div className={cn('mb-2', {'text-muted': isDisabled}, 'checkbox-align')}>
-      <ConditionHeader caption={CONDITION_NAME} showCheckbox={newProps.showCheckbox}
-                       enabled={attributes.enabled}
-                       onEnabled={(isEnabled: boolean) => setAttribute('enabled', isEnabled)}
-                       disabledCheckbox={attributes.disabledCheckbox}
-                       removeIcon={newProps.removeIcon}
-                       onRemoveClick={newProps.onRemoveClick}
-                       onExpandedClick={(state: boolean) => setAttribute('expanded', state)}
-                       expanded={attributes.expanded}/>
+      <ConditionHeader
+        caption={CONDITION_NAME} showCheckbox={newProps.showCheckbox}
+        enabled={attributes.enabled}
+        onEnabled={(isEnabled: boolean) => setAttribute('enabled', isEnabled)}
+        disabledCheckbox={attributes.disabledCheckbox}
+        removeIcon={newProps.removeIcon}
+        onRemoveClick={newProps.onRemoveClick}
+        onExpandedClick={(state: boolean) => setAttribute('expanded', state)}
+        expanded={attributes.expanded}/>
       {attributes?.expanded && (
         <>
           <Row className="mb-1 mt-2">
@@ -129,7 +125,9 @@ const AnyWorkAreasActive = (props: DeepPartial<Props>) => {
                 id={`condition-${nanoid(5)}`}
                 placeholder="e.g., mountain_side"
                 value={attributes?.workAreaId || ''}
-                onChange={e => setAttribute('workAreaId', e.target.value.replace(/['"]+/ig, ``))}
+                onChange={e => {
+                  setAttribute('workAreaId', e.target.value.replace(/['"]+/ig, ``));
+                }}
               />
             </Col>
           </Row>
@@ -140,12 +138,13 @@ const AnyWorkAreasActive = (props: DeepPartial<Props>) => {
               </div>
             </Col>
             <Col xs="6">
-          <span className="text-size-xs font-family-code">
-										Value: <code className={cn({'text-muted': isDisabled})}>{attributes.maxWorkers}</code>
-									</span>
-              <Button disabled={isDisabled}
-                      className="button-reset-sm" variant="link"
-                      onClick={() => setAttribute('maxWorkers', random.randomWorkers())}>
+              <span className="text-size-xs font-family-code">
+                Value: <code className={cn({'text-muted': isDisabled})}>{attributes.maxWorkers}</code>
+              </span>
+              <Button
+                disabled={isDisabled}
+                className="button-reset-sm" variant="link"
+                onClick={() => setAttribute('maxWorkers', random.randomWorkers())}>
                 Random
               </Button>
               <Slider

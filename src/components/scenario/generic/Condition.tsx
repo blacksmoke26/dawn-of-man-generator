@@ -13,24 +13,25 @@ import {LOGICAL_CONDITION} from '~/utils/condition';
 
 // types
 import type {$Keys, Required} from 'utility-types';
+import type {ConditionList} from '../conditions/utils/condition-logical';
 
 // elemental components
-import ConditionLogical, {ConditionList} from '~/components/scenario/conditions/ConditionLogical';
-import AnyTasksActive from '~/components/scenario/conditions/AnyTasksActive';
-import AnyWorkAreasActive from '~/components/scenario/conditions/AnyWorkAreasActive';
-import EntityCountComparison from '~/components/scenario/conditions/EntityCountComparison';
-import EntityCountReached from '~/components/scenario/conditions/EntityCountReached';
-import EntityNearMarker from '~/components/scenario/conditions/EntityNearMarker';
-import EraUnlocked from '~/components/scenario/conditions/EraUnlocked';
-import InitGame from '~/components/scenario/conditions/InitGame';
-import IsAlive from '~/components/scenario/conditions/IsAlive';
-import IsGameInteractionPending from '~/components/scenario/conditions/IsGameInteractionPending';
-import NewGame from '~/components/scenario/conditions/NewGame';
-import ScenarioCompleted from '~/components/scenario/conditions/ScenarioCompleted';
-import TechUnlocked from '~/components/scenario/conditions/TechUnlocked';
-import TimeElapsed from '~/components/scenario/conditions/TimeElapsed';
-import ValueEquals from '~/components/scenario/conditions/ValueEquals';
-import ValueReached from '~/components/scenario/conditions/ValueReached';
+import ConditionLogical from '../conditions/ConditionLogical';
+import AnyTasksActive from '../conditions/AnyTasksActive';
+import AnyWorkAreasActive from '../conditions/AnyWorkAreasActive';
+import EntityCountComparison from '../conditions/EntityCountComparison';
+import EntityCountReached from '../conditions/EntityCountReached';
+import EntityNearMarker from '../conditions/EntityNearMarker';
+import EraUnlocked from '../conditions/EraUnlocked';
+import InitGame from '../conditions/InitGame';
+import IsAlive from '../conditions/IsAlive';
+import IsGameInteractionPending from '../conditions/IsGameInteractionPending';
+import NewGame from '../conditions/NewGame';
+import ScenarioCompleted from '../conditions/ScenarioCompleted';
+import TechUnlocked from '../conditions/TechUnlocked';
+import TimeElapsed from '../conditions/TimeElapsed';
+import ValueEquals from '../conditions/ValueEquals';
+import ValueReached from '../conditions/ValueReached';
 
 // noinspection ES6ConvertRequireIntoImport
 const isEqual = require('is-equal');

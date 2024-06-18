@@ -19,6 +19,7 @@ import ConditionHeader from './../elements/ConditionHeader';
 
 // utils
 import {toString} from '~/helpers/string';
+import {toNewGameTemplate} from '~/utils/parser/templates';
 import {defaultsParams, START_MODES} from '~/utils/condition';
 
 // types
@@ -39,18 +40,6 @@ interface Props extends Attributes {
 
   onChange?(template: string, values: Attributes): void,
 }
-
-const toTemplateText = (attributes: Attributes): string => {
-  if (!attributes.enabled) {
-    return '';
-  }
-
-  const startMode = attributes?.startMode?.trim()
-    ? `start_mode="${attributes?.startMode}"`
-    : '';
-
-  return `<condition type="${CONDITION_NAME}" ${startMode}/>`;
-};
 
 const CONDITION_NAME: string = 'NewGame';
 
@@ -82,7 +71,11 @@ const NewGame = (props: DeepPartial<Props>) => {
 
   // Reflect state changes
   React.useEffect(() => {
-    typeof newProps.onChange === 'function' && newProps.onChange(toTemplateText(attributes), attributes);
+    const args: [string, Attributes] = !attributes.enabled
+      ? ['', {} as Attributes]
+      : [toNewGameTemplate(attributes), attributes];
+
+    typeof newProps.onChange === 'function' && newProps.onChange.apply(null, args);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [attributes]);
 
@@ -102,14 +95,15 @@ const NewGame = (props: DeepPartial<Props>) => {
 
   return (
     <div className={cn('mb-2', {'text-muted': isDisabled}, 'checkbox-align')}>
-      <ConditionHeader caption={CONDITION_NAME} showCheckbox={newProps.showCheckbox}
-                       enabled={attributes.enabled}
-                       onEnabled={(isEnabled: boolean) => setAttribute('enabled', isEnabled)}
-                       disabledCheckbox={attributes.disabledCheckbox}
-                       removeIcon={newProps.removeIcon}
-                       onRemoveClick={newProps.onRemoveClick}
-                       onExpandedClick={(state: boolean) => setAttribute('expanded', state)}
-                       expanded={attributes.expanded}/>
+      <ConditionHeader
+        caption={CONDITION_NAME} showCheckbox={newProps.showCheckbox}
+        enabled={attributes.enabled}
+        onEnabled={(isEnabled: boolean) => setAttribute('enabled', isEnabled)}
+        disabledCheckbox={attributes.disabledCheckbox}
+        removeIcon={newProps.removeIcon}
+        onRemoveClick={newProps.onRemoveClick}
+        onExpandedClick={(state: boolean) => setAttribute('expanded', state)}
+        expanded={attributes.expanded}/>
       {attributes?.expanded && (
         <>
           <Row className="mb-1 mt-2">
