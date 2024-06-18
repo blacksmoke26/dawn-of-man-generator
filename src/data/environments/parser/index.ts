@@ -9,7 +9,7 @@ import {mergeAll} from '~/helpers/object';
 
 // types
 import type {Json} from '~/types/json.types';
-import type {JsonToReduxOptions} from './index.types';
+import type {JsonToReduxOptions} from '~/utils/parser/index.types';
 
 // utils
 import {jsonToRedux as j2r1} from './modules/noise-amplitudes';

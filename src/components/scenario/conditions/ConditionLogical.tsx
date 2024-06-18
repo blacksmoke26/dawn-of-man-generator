@@ -124,7 +124,7 @@ const subConditionToValues = (conditions: ConditionList): ChangedValues => {
 
 
 /** Generate xml code */
-const toTemplateText = (conditions: ConditionList): string => {
+const toTemplateText = (type: string, conditions: ConditionList): string => {
   const templates = Object.values(conditions)
     .map(({template}) => String(template || '').trim())
     .join(``);
@@ -134,7 +134,7 @@ const toTemplateText = (conditions: ConditionList): string => {
   }
 
   return xmlFormatter(
-    `<condition><sub_conditions>${templates}</sub_conditions></condition>`,
+    `<condition type="${type}"><sub_conditions>${templates}</sub_conditions></condition>`,
   );
 };
 const conditionIcon = (operator: LogicalCondition) => {
@@ -182,7 +182,7 @@ const ConditionLogical = (props: Props) => {
 
   // Reflect state changes
   React.useEffect(() => {
-    const template = enabled ? toTemplateText(subConditions) : '';
+    const template = enabled ? toTemplateText(props.operator, subConditions) : '';
     typeof newProps.onChange === 'function' && newProps.onChange(
       template, enabled ? subConditionToValues(subConditions) : {} as ChangedValues,
     );

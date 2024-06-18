@@ -15,3 +15,18 @@ export const toFloat = (value: any, decimals: number = 2, defaultValue: number =
   const casted = parseFloat(String(value));
   return isNaN(casted) ? defaultValue : +casted.toFixed(decimals);
 };
+
+/**
+ * Checks that the given value is an integer or not
+ */
+export const isInt = (value: any): boolean => {
+  return 'number' === typeof value && Number.isInteger(value);
+};
+
+/**
+ * Checks that the given value is a float or not<br>
+ * Taken from: https://stackoverflow.com/a/3885844
+ */
+export const isFloat = (value: any): boolean => {
+  return 'number' === typeof value && (value === +value && value !== (value | 0));
+};

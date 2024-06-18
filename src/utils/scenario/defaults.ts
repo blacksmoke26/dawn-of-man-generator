@@ -10,3 +10,27 @@ export const MAP_SIZE_MAX: number = 12;
 
 export const MAP_SIZE_DEFAULT: number = 4;
 
+export const MILESTONES_MIN: number = 1;
+
+export const MILESTONES_MAX: number = 20;
+
+export const LOCATION_COUNT_MIN: number = 1;
+
+export const LOCATION_COUNT_MAX: number = 12;
+
+export const LOCATION_MAP_MIN: number = 0;
+
+export const LOCATION_MAP_MAX: number = 1;
+
+export const LOCATION_LAKES_MIN: number = 0;
+
+export const LOCATION_LAKES_MAX: number = 9;
+
+export const LOCATION_POSITION_MIN: number = 1;
+
+export const LOCATION_POSITION_MAX: number = MAP_SIZE_MAX * 512;
+
+export const LOCATION_SEED_MIN: number = 0;
+
+export const LOCATION_SEED_MAX: number = 99999999;
+

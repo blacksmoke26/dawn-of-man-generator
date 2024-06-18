@@ -19,13 +19,17 @@ import EnvironmentContainer from '~/panel/environment/EnvironmentContainer';
 // scenario components
 import ScenarioContainer from '~/panel/scenario/ScenarioContainer';
 import ScenarioTemplateXMLViewer from '~/panel/scenario/TemplateXMLViewer';
+import XmlToPlainJson from '~/dev/panels/XmlToPlainJson';
 
 // icons
-import {IconEnvironment, IconScenario} from '~/components/icons/app';
+import {IconCodeXml, IconEnvironment, IconScenario} from '~/components/icons/app';
 
 // redux
 import {updateInit} from '~redux/reducers';
 import {useAppDispatch} from '~redux/hooks';
+import XmlToScenarioJson from '~/dev/panels/XmlToScenarioJson';
+
+const ENV_PROD: boolean = process.env.NODE_ENV === 'production';
 
 const App = () => {
   const dispatch = useAppDispatch();
@@ -69,6 +73,32 @@ const App = () => {
               </Col>
             </Row>
           </Tab>
+          {!ENV_PROD && (
+            <Tab as="div" eventKey="xml_to_json" title={
+              <div className="pl-4 pr-4" style={{fontSize: '0.95rem'}}>
+                <IconCodeXml width="16" height="16"/> Xml_Json
+              </div>
+            }>
+              <Row>
+                <Col sm="12">
+                  <XmlToPlainJson/>
+                </Col>
+              </Row>
+            </Tab>
+          )}
+          {!ENV_PROD && (
+            <Tab as="div" eventKey="xml_to_scenario_json" title={
+              <div className="pl-4 pr-4" style={{fontSize: '0.95rem'}}>
+                <IconCodeXml width="16" height="16"/> Xml_Scenario
+              </div>
+            }>
+              <Row>
+                <Col sm="12">
+                  <XmlToScenarioJson/>
+                </Col>
+              </Row>
+            </Tab>
+          )}
         </Tabs>
         <Footer/>
       </Container>
