@@ -149,8 +149,8 @@ export const INTERACTIONS: string[] = [
 export const CONDITIONS_ALL = ([] as string[]).concat(LOGICAL_CONDITION, GENERAL_CONDITIONS);
 
 export const CONDITIONS_OPTIONS = [
-  {label: 'Logical', options: LOGICAL_CONDITION.map(value => ({label: capitalCase(value), value}))},
-  {label: 'General', options: GENERAL_CONDITIONS.map(value => ({label: capitalCase(value), value}))},
+  {label: 'Logical', options: LOGICAL_CONDITION.map(value => ({label: capitalCase(value), value, type: 'logical'}))},
+  {label: 'General', options: GENERAL_CONDITIONS.map(value => ({label: capitalCase(value), value, type: 'general'}))},
 ];
 
 export const defaultsParams: DeepPartial<ConditionDefaultParams> = {
