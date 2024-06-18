@@ -45,7 +45,7 @@ const toTemplateText = (attributes: Attributes): string => {
     return '';
   }
 
-  const startMode = attributes.startMode.trim()
+  const startMode = attributes?.startMode?.trim()
     ? `start_mode="${attributes?.startMode}"`
     : '';
 
