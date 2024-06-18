@@ -20,6 +20,7 @@ import ConditionHeader from './../elements/ConditionHeader';
 import {capitalCase} from 'change-case';
 import {toString} from '~/helpers/string';
 import {defaultsParams, ERAS} from '~/utils/condition';
+import {toEraUnlockedTemplate} from '~/utils/parser/templates';
 
 // types
 import type {$Keys, DeepPartial} from 'utility-types';
@@ -67,18 +68,13 @@ const EraUnlocked = (props: DeepPartial<Props>) => {
     });
   };
 
-  const toTemplateText = (): string => {
-    return isDisabled || !String(attributes?.era ?? '').trim()
-      ? ''
-      : (
-        `<condition type="${CONDITION_NAME}"`
-        + ` era="${attributes?.era}"/>`
-      );
-  };
-
   // Reflect state changes
   React.useEffect(() => {
-    typeof newProps.onChange === 'function' && newProps.onChange(toTemplateText(), attributes);
+    const args: [string, Attributes] = !attributes.enabled
+      ? ['', {} as Attributes]
+      : [toEraUnlockedTemplate(attributes), attributes];
+
+    typeof newProps.onChange === 'function' && newProps.onChange.apply(null, args);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [attributes]);
 
@@ -98,14 +94,15 @@ const EraUnlocked = (props: DeepPartial<Props>) => {
 
   return (
     <div className={cn('mb-2', {'text-muted': isDisabled}, 'checkbox-align')}>
-      <ConditionHeader caption={CONDITION_NAME} showCheckbox={newProps.showCheckbox}
-                       enabled={attributes.enabled}
-                       onEnabled={(isEnabled: boolean) => setAttribute('enabled', isEnabled)}
-                       disabledCheckbox={attributes.disabledCheckbox}
-                       removeIcon={newProps.removeIcon}
-                       onRemoveClick={newProps.onRemoveClick}
-                       onExpandedClick={(state: boolean) => setAttribute('expanded', state)}
-                       expanded={attributes.expanded}/>
+      <ConditionHeader
+        caption={CONDITION_NAME} showCheckbox={newProps.showCheckbox}
+        enabled={attributes.enabled}
+        onEnabled={(isEnabled: boolean) => setAttribute('enabled', isEnabled)}
+        disabledCheckbox={attributes.disabledCheckbox}
+        removeIcon={newProps.removeIcon}
+        onRemoveClick={newProps.onRemoveClick}
+        onExpandedClick={(state: boolean) => setAttribute('expanded', state)}
+        expanded={attributes.expanded}/>
       {attributes?.expanded && (
         <>
           <Row className="mb-1 mt-2">
@@ -118,7 +115,7 @@ const EraUnlocked = (props: DeepPartial<Props>) => {
                 menuPortalTarget={document.body}
                 defaultValue={newProps?.era ? {
                   label: capitalCase(newProps.era as string),
-                  value: newProps.era
+                  value: newProps.era,
                 } : null}
                 options={ERAS.map(value => ({label: capitalCase(value), value}))}
                 placeholder="Choose..."

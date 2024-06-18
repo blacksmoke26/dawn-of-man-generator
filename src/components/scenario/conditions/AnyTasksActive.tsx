@@ -21,6 +21,7 @@ import ConditionHeader from './../elements/ConditionHeader';
 import * as random from '~/utils/random';
 import {toString} from '~/helpers/string';
 import {toPerformers} from '~/utils/units';
+import {toAnyTasksActiveTemplate} from '~/utils/parser/templates';
 import {defaultsParams, PERFORMERS_MAX, PERFORMERS_MIN} from '~/utils/condition';
 
 // types
@@ -71,19 +72,13 @@ const AnyTasksActive = (props: DeepPartial<Props>) => {
     });
   };
 
-  const toTemplateText = (): string => {
-    return !attributes.enabled || !String(attributes?.taskType || '')?.trim()
-      ? ''
-      : (
-        `<condition type="${CONDITION_NAME}"`
-        + ` task_type="${attributes?.taskType}"`
-        + ` min_performers="${attributes.minPerformers}"/>`
-      );
-  };
-
   // Reflect state changes
   React.useEffect(() => {
-    typeof props.onChange === 'function' && props.onChange(toTemplateText(), attributes);
+    const args: [string, Attributes] = !attributes.enabled
+      ? ['', {} as Attributes]
+      : [toAnyTasksActiveTemplate(attributes), attributes];
+
+    typeof newProps.onChange === 'function' && newProps.onChange.apply(null, args);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [attributes]);
 
@@ -104,14 +99,15 @@ const AnyTasksActive = (props: DeepPartial<Props>) => {
 
   return (
     <div className={cn('mb-2', {'text-muted': isDisabled}, 'checkbox-align')}>
-      <ConditionHeader caption={CONDITION_NAME} showCheckbox={newProps.showCheckbox}
-                       enabled={attributes.enabled}
-                       onEnabled={(isEnabled: boolean) => setAttribute('enabled', isEnabled)}
-                       disabledCheckbox={attributes.disabledCheckbox}
-                       removeIcon={newProps.removeIcon}
-                       onRemoveClick={newProps.onRemoveClick}
-                       onExpandedClick={(state: boolean) => setAttribute('expanded', state)}
-                       expanded={attributes.expanded}/>
+      <ConditionHeader
+        caption={CONDITION_NAME} showCheckbox={newProps.showCheckbox}
+        enabled={attributes.enabled}
+        onEnabled={(isEnabled: boolean) => setAttribute('enabled', isEnabled)}
+        disabledCheckbox={attributes.disabledCheckbox}
+        removeIcon={newProps.removeIcon}
+        onRemoveClick={newProps.onRemoveClick}
+        onExpandedClick={(state: boolean) => setAttribute('expanded', state)}
+        expanded={attributes.expanded}/>
       {attributes?.expanded && (
         <>
           <Row className="mb-1 mt-2">
@@ -130,7 +126,9 @@ const AnyTasksActive = (props: DeepPartial<Props>) => {
                 id={`condition-${nanoid(5)}`}
                 placeholder="e.g., protein_hoarding"
                 value={attributes?.taskType || ''}
-                onChange={e => setAttribute('taskType', e.target.value.replace(/['"]+/ig, ``))}
+                onChange={e => {
+                  setAttribute('taskType', e.target.value.replace(/['"]+/ig, ``));
+                }}
               />
             </Col>
           </Row>
@@ -148,10 +146,11 @@ const AnyTasksActive = (props: DeepPartial<Props>) => {
               {attributes.minPerformers}
             </code>
           </span>
-              <Button disabled={isDisabled}
-                      style={{top: -1}}
-                      className="button-reset-sm" variant="link"
-                      onClick={() => setAttribute('minPerformers', random.randomPerformers())}>
+              <Button
+                disabled={isDisabled}
+                style={{top: -1}}
+                className="button-reset-sm" variant="link"
+                onClick={() => setAttribute('minPerformers', random.randomPerformers())}>
                 Random
               </Button>
               <Slider

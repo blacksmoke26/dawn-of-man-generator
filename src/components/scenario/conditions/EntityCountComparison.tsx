@@ -24,6 +24,7 @@ import {toString} from '~/helpers/string';
 import {toInteger} from '~/helpers/number';
 import {toEntityCount} from '~/utils/units';
 import {ENTITIES, ENTITIES_OPTIONS} from '~/utils/entities';
+import {toEntityCountComparisonTemplate} from '~/utils/parser/templates';
 import {COMPARISONS, COUNTERS, defaultsParams, ENTITY_COUNT_MAX, ENTITY_COUNT_MIN} from '~/utils/condition';
 
 // types
@@ -81,21 +82,13 @@ const EntityCountComparison = (props: DeepPartial<Props>) => {
     });
   };
 
-  const toTemplateText = (): string => {
-    return !attributes.enabled || !String(attributes?.entityType ?? '').trim()
-      ? ''
-      : (
-        `<condition type="${CONDITION_NAME}"`
-        + ` counter="${attributes?.counter}"`
-        + ` entity_type="${attributes?.entityType}"`
-        + ` value="${attributes?.value}"`
-        + ` comparison="${attributes?.comparison}"/>`
-      );
-  };
-
   // Reflect state changes
   React.useEffect(() => {
-    typeof newProps.onChange === 'function' && newProps.onChange(toTemplateText(), attributes);
+    const args: [string, Attributes] = !attributes.enabled
+      ? ['', {} as Attributes]
+      : [toEntityCountComparisonTemplate(attributes), attributes];
+
+    typeof newProps.onChange === 'function' && newProps.onChange.apply(null, args);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [attributes]);
 
@@ -118,14 +111,15 @@ const EntityCountComparison = (props: DeepPartial<Props>) => {
 
   return (
     <div className={cn('mb-2', {'text-muted': isDisabled}, 'checkbox-align')}>
-      <ConditionHeader caption={CONDITION_NAME} showCheckbox={newProps.showCheckbox}
-                       enabled={attributes.enabled}
-                       onEnabled={(isEnabled: boolean) => setAttribute('enabled', isEnabled)}
-                       disabledCheckbox={attributes.disabledCheckbox}
-                       removeIcon={newProps.removeIcon}
-                       onRemoveClick={newProps.onRemoveClick}
-                       onExpandedClick={(state: boolean) => setAttribute('expanded', state)}
-                       expanded={attributes.expanded}/>
+      <ConditionHeader
+        caption={CONDITION_NAME} showCheckbox={newProps.showCheckbox}
+        enabled={attributes.enabled}
+        onEnabled={(isEnabled: boolean) => setAttribute('enabled', isEnabled)}
+        disabledCheckbox={attributes.disabledCheckbox}
+        removeIcon={newProps.removeIcon}
+        onRemoveClick={newProps.onRemoveClick}
+        onExpandedClick={(state: boolean) => setAttribute('expanded', state)}
+        expanded={attributes.expanded}/>
       {attributes?.expanded && (
         <>
           <Row className="mb-1 mt-2">
@@ -140,7 +134,7 @@ const EntityCountComparison = (props: DeepPartial<Props>) => {
                 menuPortalTarget={document.body}
                 defaultValue={newProps?.counter ? {
                   label: capitalCase(newProps.counter as string),
-                  value: newProps.counter
+                  value: newProps.counter,
                 } : null}
                 options={COUNTERS.map(value => ({label: capitalCase(value), value}))}
                 placeholder="Choose counter..."
@@ -165,7 +159,7 @@ const EntityCountComparison = (props: DeepPartial<Props>) => {
                 options={ENTITIES_OPTIONS}
                 defaultValue={newProps?.entityType ? {
                   label: capitalCase(newProps.entityType as string),
-                  value: newProps.entityType
+                  value: newProps.entityType,
                 } : null}
                 placeholder="Choose..."
                 onChange={(option: Option | any, {action}): void => {
@@ -207,12 +201,13 @@ const EntityCountComparison = (props: DeepPartial<Props>) => {
               </div>
             </Col>
             <Col xs="6">
-          <span className="text-size-xs font-family-code">
-										Value: <code className={cn({'text-muted': isDisabled})}>{attributes.value}</code>
-									</span>
-              <Button disabled={isDisabled}
-                      className="button-reset-sm" variant="link"
-                      onClick={() => setAttribute('value', random.randomEntityCount())}>
+              <span className="text-size-xs font-family-code">
+                Value: <code className={cn({'text-muted': isDisabled})}>{attributes.value}</code>
+              </span>
+              <Button
+                disabled={isDisabled}
+                className="button-reset-sm" variant="link"
+                onClick={() => setAttribute('value', random.randomEntityCount())}>
                 Random
               </Button>
               <Slider

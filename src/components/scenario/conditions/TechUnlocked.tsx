@@ -21,11 +21,12 @@ import ConditionHeader from './../elements/ConditionHeader';
 import {toString} from '~/helpers/string';
 import {techEntities} from '~/utils/entities';
 import {defaultsParams} from '~/utils/condition';
+import {toTechUnlockedTemplate} from '~/utils/parser/templates';
 
 // types
 import type {$Keys} from 'utility-types';
 import type {TechEntityType} from '~/types/entity.types';
-import type {ConditionTechUnlocked as ConditionAttributes,} from '~/types/condition.types';
+import type {ConditionTechUnlocked as ConditionAttributes} from '~/types/condition.types';
 
 interface Attributes extends ConditionAttributes {
   enabled: boolean;
@@ -71,27 +72,13 @@ const TechUnlocked = (props: Partial<Props>) => {
     });
   };
 
-  const toTemplateText = (): string => {
-    if (!attributes.enabled) {
-      return '';
-    }
-
-    const techProp = attributes?.tech?.trim()
-      ? ` tech="${attributes?.tech}"`
-      : '';
-
-    const techsProp = attributes?.techs?.length
-      ? ` techs="${attributes?.techs.join(' ')}"`
-      : '';
-
-    return !techProp.trim() && !techsProp.trim()
-      ? ''
-      : `<condition type="${CONDITION_NAME}"${techProp}${techsProp}/>`;
-  };
-
   // Reflect state changes
   React.useEffect(() => {
-    typeof newProps.onChange === 'function' && newProps.onChange(toTemplateText(), attributes);
+    const args: [string, Attributes] = !attributes.enabled
+      ? ['', {} as Attributes]
+      : [toTechUnlockedTemplate(attributes), attributes];
+
+    typeof newProps.onChange === 'function' && newProps.onChange.apply(null, args);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [attributes]);
 
@@ -112,14 +99,15 @@ const TechUnlocked = (props: Partial<Props>) => {
 
   return (
     <div className={cn('mb-2', {'text-muted': isDisabled}, 'checkbox-align')}>
-      <ConditionHeader caption={CONDITION_NAME} showCheckbox={newProps.showCheckbox}
-                       enabled={attributes.enabled}
-                       onEnabled={(isEnabled: boolean) => setAttribute('enabled', isEnabled)}
-                       disabledCheckbox={attributes.disabledCheckbox}
-                       removeIcon={newProps.removeIcon}
-                       onRemoveClick={newProps.onRemoveClick}
-                       onExpandedClick={(state: boolean) => setAttribute('expanded', state)}
-                       expanded={attributes.expanded}/>
+      <ConditionHeader
+        caption={CONDITION_NAME} showCheckbox={newProps.showCheckbox}
+        enabled={attributes.enabled}
+        onEnabled={(isEnabled: boolean) => setAttribute('enabled', isEnabled)}
+        disabledCheckbox={attributes.disabledCheckbox}
+        removeIcon={newProps.removeIcon}
+        onRemoveClick={newProps.onRemoveClick}
+        onExpandedClick={(state: boolean) => setAttribute('expanded', state)}
+        expanded={attributes.expanded}/>
       {attributes?.expanded && (
         <>
           <Row className="mb-1 mt-2">

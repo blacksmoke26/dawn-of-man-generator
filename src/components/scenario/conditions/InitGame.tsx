@@ -16,10 +16,11 @@ import ConditionHeader from './../elements/ConditionHeader';
 
 // utils
 import {defaultsParams} from '~/utils/condition';
+import {toInitGameTemplate} from '~/utils/parser/templates';
 
 // types
 import type {$Keys, DeepPartial} from 'utility-types';
-import type {ConditionInitGame as ConditionAttributes,} from '~/types/condition.types';
+import type {ConditionInitGame as ConditionAttributes} from '~/types/condition.types';
 
 interface Attributes extends ConditionAttributes {
   enabled: boolean;
@@ -64,15 +65,13 @@ const InitGame = (props: DeepPartial<Props>) => {
     });
   };
 
-  const toTemplateText = (): string => {
-    return !attributes.enabled
-      ? ''
-      : `<condition type="${CONDITION_NAME}"/>`;
-  };
-
   // Reflect state changes
   React.useEffect(() => {
-    typeof newProps.onChange === 'function' && newProps.onChange(toTemplateText(), attributes);
+    const args: [string, Attributes] = !attributes.enabled
+      ? ['', {} as Attributes]
+      : [toInitGameTemplate(attributes), attributes];
+
+    typeof newProps.onChange === 'function' && newProps.onChange.apply(null, args);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [attributes]);
 
@@ -88,14 +87,15 @@ const InitGame = (props: DeepPartial<Props>) => {
 
   return (
     <div className={cn('mb-2', {'text-muted': isDisabled}, 'checkbox-align')}>
-      <ConditionHeader caption={CONDITION_NAME} showCheckbox={newProps.showCheckbox}
-                       enabled={attributes.enabled}
-                       onEnabled={(isEnabled: boolean) => setAttribute('enabled', isEnabled)}
-                       disabledCheckbox={attributes.disabledCheckbox}
-                       removeIcon={newProps.removeIcon}
-                       onRemoveClick={newProps.onRemoveClick}
-                       onExpandedClick={(state: boolean) => setAttribute('expanded', state)}
-                       expanded={attributes.expanded}/>
+      <ConditionHeader
+        caption={CONDITION_NAME} showCheckbox={newProps.showCheckbox}
+        enabled={attributes.enabled}
+        onEnabled={(isEnabled: boolean) => setAttribute('enabled', isEnabled)}
+        disabledCheckbox={attributes.disabledCheckbox}
+        removeIcon={newProps.removeIcon}
+        onRemoveClick={newProps.onRemoveClick}
+        onExpandedClick={(state: boolean) => setAttribute('expanded', state)}
+        expanded={attributes.expanded}/>
       {attributes?.expanded && (
         <div className="pl-3 text-muted mb-3"><i>No parameters</i></div>
       )}
