@@ -18,7 +18,7 @@ import Condition, {ConditionRegistry, ConditionsState} from '~/components/scenar
 
 // icons
 import {
-  COLOR_REDDISH, IconChevronDown, IconChevronUp, IconClear, IconMilestone,
+  COLOR_REDDISH, IconChevronDown, IconChevronUp, IconClear, IconCondition, IconConditionLogical, IconMilestone,
 } from '~/components/icons/app';
 
 // utils
@@ -300,6 +300,13 @@ const Milestone = (props: Props) => {
             menuPortalTarget={document.body}
             options={CONDITIONS_OPTIONS}
             value={null}
+            formatOptionLabel={(option: Option | any) => (
+              <span>
+                {option.type === 'logical' && <IconConditionLogical width="17" height="17" color={COLOR_REDDISH}/>}
+                {option.type === 'general' && <IconCondition width="17" height="17" color={COLOR_REDDISH}/>}
+                {' '} {option?.label}
+              </span>
+            )}
             placeholder="Add milestone condition..."
             onChange={(option: Option | any, {action}): void => {
               if (action === 'select-option' && option) {

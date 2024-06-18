@@ -8,19 +8,47 @@ import React from 'react';
 import merge from 'deepmerge';
 
 import {
+  AmpersandIcon,
+  ArrowDownWideNarrowIcon,
+  ArrowUpWideNarrowIcon,
+  BlendIcon,
+  BlocksIcon,
+  BrainCircuitIcon,
+  CheckIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+  CodeXmlIcon,
+  CopyIcon,
+  DownloadIcon,
+  EqualNotIcon,
+  EraserIcon,
+  FileInputIcon,
+  Flower2Icon,
+  HammerIcon,
+  LeafIcon,
   type LucideProps,
-  WandSparklesIcon, XIcon,
-  VeganIcon, PowerOffIcon, PowerIcon,
-  AmpersandIcon, BlendIcon, BlocksIcon,
-  BrainCircuitIcon, CheckIcon, ChevronDownIcon,
-  ChevronUpIcon, CodeXmlIcon, CopyIcon, DownloadIcon,
-  EqualNotIcon, EraserIcon, FileInputIcon, Flower2Icon,
-  HammerIcon, LeafIcon, MapPinIcon, MilestoneIcon,
-  MountainIcon, PencilLineIcon, PlusIcon, RotateCcwIcon,
-  ShuffleIcon, SnowflakeIcon, SproutIcon, SquareXIcon,
-  SquareChevronDownIcon, SquareChevronUpIcon, SunIcon,
-  ArrowDownWideNarrowIcon, ArrowUpWideNarrowIcon,
-  SwordsIcon, ThermometerSnowflakeIcon, TreesIcon,
+  MapPinIcon,
+  MilestoneIcon,
+  MountainIcon,
+  PencilLineIcon,
+  PlusIcon,
+  PowerIcon,
+  PowerOffIcon,
+  RotateCcwIcon,
+  ShuffleIcon,
+  SnowflakeIcon,
+  SproutIcon,
+  SquareChevronDownIcon,
+  SquareChevronUpIcon,
+  SquareXIcon,
+  SunIcon,
+  SwordsIcon,
+  ThermometerSnowflakeIcon,
+  TreesIcon,
+  VeganIcon,
+  WandSparklesIcon,
+  WorkflowIcon,
+  XIcon,
 } from 'lucide-react';
 
 export const COLOR_DISABLED: string = 'rgba(255, 255, 255, .5';
@@ -102,6 +130,11 @@ export const IconStorm = (props: LucideProps) => (
 
 export const IconCondition = (props: LucideProps) => (
   <BrainCircuitIcon {...merge(iconDefaultProps, props)}/>
+);
+
+
+export const IconConditionLogical = (props: LucideProps) => (
+  <WorkflowIcon {...merge(iconDefaultProps, props)}/>
 );
 
 export const IconConditionAnd = (props: LucideProps) => (

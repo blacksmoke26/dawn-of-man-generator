@@ -23,7 +23,7 @@ import {
   COLOR_REDDISH,
   IconCondition,
   IconChevronSimpleUp,
-  IconChevronSimpleDown,
+  IconChevronSimpleDown, IconConditionLogical,
 } from '~/components/icons/app';
 
 // elemental components
@@ -148,8 +148,9 @@ const ConditionLogical = (props: Props) => {
               }}>
                 <span className="position-relative" style={{top: 0}}>
 
-                <IconCondition width="17" height="17"
-                               color={!enabled ? COLOR_DISABLED : COLOR_REDDISH}/>
+                <IconConditionLogical
+                  width="17" height="17"
+                  color={!enabled ? COLOR_DISABLED : COLOR_REDDISH}/>
                   {' '} <strong>Condition:</strong>
                   {' '} SubConditions
               </span>
