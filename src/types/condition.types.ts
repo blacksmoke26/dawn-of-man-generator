@@ -216,10 +216,10 @@ export interface ConditionTechUnlocked {
 export interface ConditionTimeElapsed {
   /**
    * @default 'RealTime' */
-  timer: TimeElapsed;
+  timer?: TimeElapsed;
   /** Time Value
    * @default 0 */
-  value: number;
+  value?: number;
 }
 
 export interface ConditionValueEquals {
