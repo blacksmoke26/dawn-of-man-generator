@@ -19,7 +19,7 @@ import ConditionHeader from './../elements/ConditionHeader';
 
 // utils
 import {toString} from '~/helpers/string';
-import {defaultsParams, GAME_MODES, START_MODES} from '~/utils/condition';
+import {defaultsParams, START_MODES} from '~/utils/condition';
 
 // types
 import type {$Keys, DeepPartial} from 'utility-types';
@@ -126,7 +126,7 @@ const NewGame = (props: DeepPartial<Props>) => {
                   label: capitalCase(newProps.startMode as string),
                   value: newProps.startMode,
                 } : null}
-                options={GAME_MODES.map(value => ({label: capitalCase(value), value}))}
+                options={START_MODES.map(value => ({label: capitalCase(value), value}))}
                 placeholder="Choose..."
                 onChange={(option: Option | any, {action}): void => {
                   if (action === 'select-option' && option) {
