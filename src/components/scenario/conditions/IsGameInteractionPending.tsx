@@ -115,6 +115,7 @@ const IsGameInteractionPending = (props: DeepPartial<Props>) => {
             </Col>
             <Col xs="5">
               <Select
+                isClearable
                 isSearchable={false}
                 isDisabled={isDisabled}
                 menuPortalTarget={document.body}
@@ -127,6 +128,10 @@ const IsGameInteractionPending = (props: DeepPartial<Props>) => {
                 onChange={(option: Option | any, {action}): void => {
                   if (action === 'select-option' && option) {
                     setAttribute('value', option.value);
+                  }
+
+                  if (['clear', 'remove-value'].includes(action)) {
+                    setAttribute('value', '');
                   }
                 }}
               />

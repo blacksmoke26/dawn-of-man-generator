@@ -8,11 +8,11 @@ import React from 'react';
 import * as PropTypes from 'prop-types';
 import cn from 'classname';
 import merge from 'deepmerge';
-import {nanoid} from 'nanoid';
 import {capitalCase} from 'change-case';
-import {Col, Form, Row} from 'react-bootstrap';
+import {Col, Row} from 'react-bootstrap';
 
 // elemental components
+import NumberInput from '~/components/ui/NumberInput';
 import Select, {Option} from '~/components/ui/Select';
 import ConditionHeader from './../elements/ConditionHeader';
 
@@ -24,10 +24,7 @@ import {toValueReachedTemplate} from '~/utils/parser/templates';
 
 // types
 import type {$Keys, DeepPartial} from 'utility-types';
-import type {
-  ValueReachedType,
-  ConditionValueReached as ConditionAttributes,
-} from '~/types/condition.types';
+import type {ConditionValueReached as ConditionAttributes, ValueReachedType} from '~/types/condition.types';
 
 interface Attributes extends ConditionAttributes {
   enabled: boolean;
@@ -136,26 +133,16 @@ const ValueReached = (props: DeepPartial<Props>) => {
               <div className="position-relative pl-3" style={{top: 7}}>Value</div>
             </Col>
             <Col xs="3">
-              <Form.Control
-                type="number"
-                size="sm"
+              <NumberInput
                 maxLength={4}
                 min={1}
                 max={9990}
                 disabled={isDisabled}
-                className="pull-right"
-                aria-disabled={isDisabled}
-                id={`condition-${nanoid(5)}`}
-                placeholder="e.g., 50"
-                value={toInteger(attributes?.value)}
-                onChange={e => {
-                  setAttribute('value', Number(String(e.target.value).replace(/\D+/, '')) || 0);
-                }}
-                onKeyUp={e => {
-                  // @ts-ignore
-                  e.target.value = Number(String(e.target.value).replace(/\D+/, '')) || 0;
-                }}
-              />
+                allowClear={true}
+                placeholder="e.g. 350"
+                value={attributes?.value}
+                onChange={value => setAttribute('value', value)}
+                shuffle={false}/>
             </Col>
           </Row>
         </>

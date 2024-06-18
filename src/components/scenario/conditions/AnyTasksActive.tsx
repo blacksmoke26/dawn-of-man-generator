@@ -11,10 +11,10 @@ import * as PropTypes from 'prop-types';
 import cn from 'classname';
 import merge from 'deepmerge';
 import {nanoid} from 'nanoid';
-import {Button, Col, Form, Row} from 'react-bootstrap';
+import {Col, Form, Row} from 'react-bootstrap';
 
 // elemental components
-import Slider from '~/components/ui/Slider';
+import NumberInput from '~/components/ui/NumberInput';
 import ConditionHeader from './../elements/ConditionHeader';
 
 // utils
@@ -133,32 +133,23 @@ const AnyTasksActive = (props: DeepPartial<Props>) => {
             </Col>
           </Row>
           <Row className="mb-1 mt-2">
-            <Col xs="2">
+            <Col sm="2">
               <div className="position-relative pl-3" style={{top: 7}}>
                 Min Performers
               </div>
             </Col>
-            <Col xs="6">
-          <span className="text-size-xs font-family-code">
-            Value:
-            {' '}
-            <code className={cn({'text-muted': isDisabled})}>
-              {attributes.minPerformers}
-            </code>
-          </span>
-              <Button
-                disabled={isDisabled}
-                style={{top: -1}}
-                className="button-reset-sm" variant="link"
-                onClick={() => setAttribute('minPerformers', random.randomPerformers())}>
-                Random
-              </Button>
-              <Slider
+            <Col sm="4">
+              <NumberInput
+                maxLength={3}
                 min={PERFORMERS_MIN}
                 max={PERFORMERS_MAX}
-                step={1} disabled={isDisabled}
-                value={Number(attributes.minPerformers)}
-                onChange={value => setAttribute('minPerformers', Number(value))}/>
+                disabled={isDisabled}
+                allowClear={true}
+                placeholder="e.g. 0"
+                value={attributes?.minPerformers}
+                onChange={value => setAttribute('minPerformers', value)}
+                shuffle={true}
+                onShuffle={() => setAttribute('minPerformers', random.randomPerformers())}/>
             </Col>
           </Row>
         </>
