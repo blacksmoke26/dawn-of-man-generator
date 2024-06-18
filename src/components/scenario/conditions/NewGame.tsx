@@ -23,7 +23,7 @@ import {defaultsParams, GAME_MODES, START_MODES} from '~/utils/condition';
 
 // types
 import type {$Keys, DeepPartial} from 'utility-types';
-import type {ConditionNewGame as ConditionAttributes, StartMode,} from '~/types/condition.types';
+import type {ConditionNewGame as ConditionAttributes, StartMode} from '~/types/condition.types';
 
 interface Attributes extends ConditionAttributes {
   enabled: boolean;
@@ -39,6 +39,18 @@ interface Props extends Attributes {
 
   onChange?(template: string, values: Attributes): void,
 }
+
+const toTemplateText = (attributes: Attributes): string => {
+  if (!attributes.enabled) {
+    return '';
+  }
+
+  const startMode = attributes.startMode.trim()
+    ? `start_mode="${attributes?.startMode}"`
+    : '';
+
+  return `<condition type="${CONDITION_NAME}" ${startMode}/>`;
+};
 
 const CONDITION_NAME: string = 'NewGame';
 
@@ -68,17 +80,9 @@ const NewGame = (props: DeepPartial<Props>) => {
     });
   };
 
-  const toTemplateText = (): string => {
-    return !attributes.enabled || !String(attributes?.startMode ?? '').trim()
-      ? ''
-      : (
-        `<condition type="${CONDITION_NAME}" start_mode="${attributes?.startMode}"/>`
-      );
-  };
-
   // Reflect state changes
   React.useEffect(() => {
-    typeof newProps.onChange === 'function' && newProps.onChange(toTemplateText(), attributes);
+    typeof newProps.onChange === 'function' && newProps.onChange(toTemplateText(attributes), attributes);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [attributes]);
 
@@ -115,17 +119,21 @@ const NewGame = (props: DeepPartial<Props>) => {
             <Col xs="5">
               <Select
                 isSearchable={false}
+                isClearable
                 isDisabled={isDisabled}
                 menuPortalTarget={document.body}
                 defaultValue={newProps?.startMode ? {
                   label: capitalCase(newProps.startMode as string),
-                  value: newProps.startMode
+                  value: newProps.startMode,
                 } : null}
                 options={GAME_MODES.map(value => ({label: capitalCase(value), value}))}
                 placeholder="Choose..."
                 onChange={(option: Option | any, {action}): void => {
                   if (action === 'select-option' && option) {
                     setAttribute('startMode', option.value);
+                  }
+                  if (['clear', 'remove-value'].includes(action)) {
+                    setAttribute('startMode', '');
                   }
                 }}
               />
