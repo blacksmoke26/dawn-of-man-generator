@@ -26,6 +26,9 @@ import {jsonToRedux as j2r11} from './modules/general/starting-conditions';
 import {jsonToRedux as j2r12} from './modules/general/visible';
 import {jsonToRedux as j2r13} from './modules/disasters/disasters';
 import {jsonToRedux as j2r14} from './modules/locations/locations';
+import {jsonToRedux as j2r15} from './modules/milestones/milestones';
+import {jsonToRedux as j2r16} from './modules/goals/goals';
+import {jsonToRedux as j2r17} from './modules/events/events';
 
 /**
  * @public
@@ -37,7 +40,8 @@ export function jsonToRedux(json: Json, options: JsonToReduxOptions = {}): Json 
     j2r4(json, options), j2r5(json, options), j2r6(json, options),
     j2r7(json, options), j2r8(json, options), j2r9(json, options),
     j2r10(json, options), j2r11(json, options), j2r12(json, options),
-    j2r13(json, options), j2r14(json, options),
+    j2r13(json, options), j2r14(json, options), j2r15(json, options),
+    j2r16(json, options), j2r17(json, options),
   );
 
   return {scenario};
