@@ -189,7 +189,7 @@ export interface ConditionIsGameInteractionPending {
 }
 
 export interface ConditionNewGame {
-  startMode: StartMode;
+  startMode?: StartMode;
 }
 
 export interface ConditionNot {
