@@ -11,17 +11,16 @@ import * as PropTypes from 'prop-types';
 import cn from 'classname';
 import merge from 'deepmerge';
 import {capitalCase} from 'change-case';
-import {Button, Col, Row} from 'react-bootstrap';
+import {Col, Row} from 'react-bootstrap';
 
 // elemental components
-import Slider from '~/components/ui/Slider';
+import NumberInput from '~/components/ui/NumberInput';
 import Select, {Option} from '~/components/ui/Select';
 import ConditionHeader from './../elements/ConditionHeader';
 
 // utils
 import * as random from '~/utils/random';
 import {toString} from '~/helpers/string';
-import {toInteger} from '~/helpers/number';
 import {toEntityCount} from '~/utils/units';
 import {ENTITIES, ENTITIES_OPTIONS} from '~/utils/entities';
 import {toEntityCountReachedTemplate} from '~/utils/parser/templates';
@@ -124,6 +123,7 @@ const EntityCountReached = (props: DeepPartial<Props>) => {
             </Col>
             <Col xs="4">
               <Select
+                isClearable
                 isDisabled={isDisabled}
                 menuPortalTarget={document.body}
                 defaultValue={newProps?.counter ? {
@@ -135,6 +135,10 @@ const EntityCountReached = (props: DeepPartial<Props>) => {
                 onChange={(option: Option | any, {action}): void => {
                   if (action === 'select-option' && option) {
                     setAttribute('counter', option.value);
+                  }
+
+                  if (['clear', 'remove-value'].includes(action)) {
+                    setAttribute('counter', '');
                   }
                 }}
               />
@@ -170,22 +174,17 @@ const EntityCountReached = (props: DeepPartial<Props>) => {
                 Value
               </div>
             </Col>
-            <Col xs="6">
-              <span className="text-size-xs font-family-code">
-                Value: <code className={cn({'text-muted': isDisabled})}>{attributes.value}</code>
-              </span>
-              <Button
-                disabled={isDisabled}
-                className="button-reset-sm" variant="link"
-                onClick={() => setAttribute('value', random.randomEntityCount())}>
-                Random
-              </Button>
-              <Slider
+            <Col xs="4">
+              <NumberInput
+                maxLength={3}
                 min={ENTITY_COUNT_MIN}
                 max={ENTITY_COUNT_MAX}
-                step={1} disabled={isDisabled}
-                value={toInteger(attributes.value)}
-                onChange={value => setAttribute('value', Number(value))}/>
+                disabled={isDisabled}
+                allowClear={true}
+                value={attributes?.value}
+                onChange={value => setAttribute('value', value)}
+                shuffle={true}
+                onShuffle={() => setAttribute('value', random.randomEntityCount())}/>
             </Col>
           </Row>
         </>

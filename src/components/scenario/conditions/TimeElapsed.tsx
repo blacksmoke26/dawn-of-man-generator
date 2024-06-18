@@ -11,10 +11,10 @@ import * as PropTypes from 'prop-types';
 import cn from 'classname';
 import merge from 'deepmerge';
 import {capitalCase} from 'change-case';
-import {Button, Col, Row} from 'react-bootstrap';
+import {Col, Row} from 'react-bootstrap';
 
 // elemental components
-import Slider from '~/components/ui/Slider';
+import NumberInput from '~/components/ui/NumberInput';
 import Select, {Option} from '~/components/ui/Select';
 import ConditionHeader from './../elements/ConditionHeader';
 
@@ -116,13 +116,14 @@ const TimeElapsed = (props: DeepPartial<Props>) => {
       {attributes?.expanded && (
         <>
           <Row className="mb-1 mt-2">
-            <Col xs="2">
+            <Col sm="2">
               <div className="position-relative pl-3" style={{top: 7}}>
                 Timer
               </div>
             </Col>
-            <Col xs="5">
+            <Col sm="5">
               <Select
+                isClearable
                 isDisabled={isDisabled}
                 menuPortalTarget={document.body}
                 options={TIME_ELAPSED.map(value => ({label: capitalCase(value), value}))}
@@ -132,32 +133,33 @@ const TimeElapsed = (props: DeepPartial<Props>) => {
                   if (action === 'select-option' && option) {
                     setAttribute('timer', option.value);
                   }
+
+                  if (['clear', 'remove-value'].includes(action)) {
+                    setAttribute('timer', '');
+                  }
                 }}
               />
             </Col>
           </Row>
           <Row className="mb-1 mt-3">
-            <Col xs="2">
+            <Col sm="2">
               <div className="position-relative pl-3" style={{top: 7}}>
                 Value
               </div>
             </Col>
-            <Col xs="6">
-              <span className="text-size-xs font-family-code">
-                Value: <code className={cn({'text-muted': isDisabled})}>{attributes.value}y</code>
-              </span>
-              <Button
-                disabled={isDisabled}
-                className="button-reset-sm" variant="link"
-                onClick={() => setAttribute('value', +random.randomPeriod())}>
-                Random
-              </Button>
-              <Slider
+            <Col sm="4">
+              <NumberInput
+                maxLength={3}
                 min={PERIOD_MIN}
                 max={PERIOD_MAX}
-                step={0.1} disabled={isDisabled}
-                value={toInteger(attributes.value)}
-                onChange={value => setAttribute('value', Number(value))}/>
+                decimals={1}
+                disabled={isDisabled}
+                allowClear={true}
+                placeholder="e.g. 0"
+                value={attributes?.value}
+                onChange={value => setAttribute('value', value)}
+                shuffle={true}
+                onShuffle={() => setAttribute('value', +random.randomPeriod())}/>
             </Col>
           </Row>
         </>

@@ -11,10 +11,10 @@ import * as PropTypes from 'prop-types';
 import cn from 'classname';
 import merge from 'deepmerge';
 import {nanoid} from 'nanoid';
-import {Button, Col, Form, Row} from 'react-bootstrap';
+import {Col, Form, Row} from 'react-bootstrap';
 
 // elemental components
-import Slider from '~/components/ui/Slider';
+import NumberInput from '~/components/ui/NumberInput';
 import ConditionHeader from './../elements/ConditionHeader';
 
 // utils
@@ -138,21 +138,17 @@ const AnyWorkAreasActive = (props: DeepPartial<Props>) => {
               </div>
             </Col>
             <Col xs="6">
-              <span className="text-size-xs font-family-code">
-                Value: <code className={cn({'text-muted': isDisabled})}>{attributes.maxWorkers}</code>
-              </span>
-              <Button
-                disabled={isDisabled}
-                className="button-reset-sm" variant="link"
-                onClick={() => setAttribute('maxWorkers', random.randomWorkers())}>
-                Random
-              </Button>
-              <Slider
+              <NumberInput
+                maxLength={3}
                 min={PERFORMERS_MIN}
                 max={PERFORMERS_MAX}
-                step={1} disabled={isDisabled}
-                value={Number(attributes.maxWorkers)}
-                onChange={value => setAttribute('maxWorkers', Number(value))}/>
+                disabled={isDisabled}
+                allowClear={true}
+                placeholder="e.g. 1"
+                value={attributes?.maxWorkers}
+                onChange={value => setAttribute('maxWorkers', value)}
+                shuffle={true}
+                onShuffle={() => setAttribute('maxWorkers', random.randomWorkers())}/>
             </Col>
           </Row>
         </>

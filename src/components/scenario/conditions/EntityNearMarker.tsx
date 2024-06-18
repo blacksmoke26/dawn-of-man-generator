@@ -10,10 +10,10 @@ import React from 'react';
 import * as PropTypes from 'prop-types';
 import cn from 'classname';
 import merge from 'deepmerge';
-import {Button, Col, Row} from 'react-bootstrap';
+import {Col, Row} from 'react-bootstrap';
 
 // elemental components
-import Slider from '~/components/ui/Slider';
+import NumberInput from '~/components/ui/NumberInput';
 import Select, {Option} from '~/components/ui/Select';
 import ConditionHeader from './../elements/ConditionHeader';
 
@@ -139,27 +139,24 @@ const EntityNearMarker = (props: DeepPartial<Props>) => {
             </Col>
           </Row>
           <Row className="mb-1 mt-3">
-            <Col xs="2">
+            <Col sm="2">
               <div className="position-relative pl-3" style={{top: 7}}>
                 Distance
               </div>
             </Col>
-            <Col xs="6">
-              <span className="text-size-xs font-family-code">
-                Value: <code className={cn({'text-muted': isDisabled})}>{attributes.distance}</code>
-              </span>
-              <Button
-                disabled={isDisabled}
-                className="button-reset-sm" variant="link"
-                onClick={() => setAttribute('distance', random.randomDistance())}>
-                Random
-              </Button>
-              <Slider
+            <Col sm="4">
+              <NumberInput
+                maxLength={3}
                 min={DISTANCE_MIN}
                 max={DISTANCE_MAX}
-                step={1} disabled={isDisabled}
-                value={toInteger(attributes.distance)}
-                onChange={value => setAttribute('distance', Number(value))}/>
+                decimals={1}
+                disabled={isDisabled}
+                allowClear={true}
+                placeholder="e.g. 20"
+                value={attributes?.distance}
+                onChange={value => setAttribute('distance', value)}
+                shuffle={true}
+                onShuffle={() => setAttribute('distance', random.randomDistance())}/>
             </Col>
           </Row>
         </>

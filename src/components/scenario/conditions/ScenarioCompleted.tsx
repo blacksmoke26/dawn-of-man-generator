@@ -138,6 +138,7 @@ const ScenarioCompleted = (props: DeepPartial<Props>) => {
             </Col>
             <Col xs="5">
               <Select
+                isClearable
                 isDisabled={isDisabled}
                 isSearchable={false}
                 defaultValue={newProps?.gameMode ? {
@@ -150,6 +151,10 @@ const ScenarioCompleted = (props: DeepPartial<Props>) => {
                 onChange={(option: Option | any, {action}): void => {
                   if (action === 'select-option' && option) {
                     setAttribute('gameMode', option.value);
+                  }
+
+                  if (['clear', 'remove-value'].includes(action)) {
+                    setAttribute('gameMode', '');
                   }
                 }}
               />

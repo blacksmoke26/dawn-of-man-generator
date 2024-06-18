@@ -25,6 +25,7 @@ import type {
   ConditionValueReached, LogicalCondition,
 } from '~/types/condition.types';
 import {Json} from '~/types/json.types';
+import {formatPeriod} from '~/utils/scenario/format';
 
 type Attr<T> = T;
 
@@ -33,7 +34,9 @@ const renderTemplate = (type: string, props: string[]): string => {
 };
 
 const isKeyInAtt = (key: string, attributes: Json): boolean => {
-  return key in attributes && attributes[key] !== undefined;
+  return key in attributes
+    && attributes[key] !== undefined
+    && attributes[key] !== '';
 };
 
 /** Render `AnyTasksActive` attributes template */
@@ -77,7 +80,7 @@ export const toEntityCountComparisonTemplate = (attributes: Attr<ConditionEntity
   const props: string[] = [];
 
   isKeyInAtt('counter', attributes) && props.push(`counter="${attributes.counter}"`);
-  isKeyInAtt('entity_type', attributes) && props.push(`entity_type="${attributes.entityType}"`);
+  isKeyInAtt('entityType', attributes) && props.push(`entity_type="${attributes.entityType}"`);
   isKeyInAtt('value', attributes) && props.push(`value="${attributes.value}"`);
   props.push(`comparison="${attributes.comparison}"`);
 
@@ -101,7 +104,13 @@ export const toEntityCountReachedTemplate = (attributes: Attr<ConditionEntityCou
 
 /** Render `EntityNearMarker` attributes template */
 export const toEntityNearMarkerTemplate = (attributes: Attr<ConditionEntityNearMarker>): string => {
-  const props: string[] = [];
+  if (!attributes?.entityType?.trim()) {
+    return '';
+  }
+
+  const props: string[] = [
+    `entity_type="${attributes.entityType}"`,
+  ];
 
   isKeyInAtt('distance', attributes) && props.push(`distance="${attributes.distance}"`);
 
@@ -178,7 +187,7 @@ export const toTechUnlockedTemplate = (attributes: Attr<ConditionTechUnlocked>):
 export const toTimeElapsedTemplate = (attributes: Attr<ConditionTimeElapsed>): string => {
   const props: string[] = [];
   isKeyInAtt('timer', attributes) && props.push(`timer="${attributes.timer}"`);
-  isKeyInAtt('value', attributes) && props.push(`value="${attributes.value}"`);
+  isKeyInAtt('value', attributes) && props.push(`value="${formatPeriod(attributes.value as number)}"`);
 
   return renderTemplate('TimeElapsed', props);
 };
