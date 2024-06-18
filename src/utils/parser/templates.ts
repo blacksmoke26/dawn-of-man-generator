@@ -25,6 +25,7 @@ import type {
   ConditionValueReached, LogicalCondition,
 } from '~/types/condition.types';
 import {Json} from '~/types/json.types';
+import {formatPeriod} from '~/utils/scenario/format';
 
 type Attr<T> = T;
 
@@ -178,7 +179,7 @@ export const toTechUnlockedTemplate = (attributes: Attr<ConditionTechUnlocked>):
 export const toTimeElapsedTemplate = (attributes: Attr<ConditionTimeElapsed>): string => {
   const props: string[] = [];
   isKeyInAtt('timer', attributes) && props.push(`timer="${attributes.timer}"`);
-  isKeyInAtt('value', attributes) && props.push(`value="${attributes.value}"`);
+  isKeyInAtt('value', attributes) && props.push(`value="${formatPeriod(attributes.value as number)}"`);
 
   return renderTemplate('TimeElapsed', props);
 };
