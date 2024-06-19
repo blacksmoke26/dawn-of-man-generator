@@ -179,12 +179,8 @@ const ScenarioContainer = () => {
         )}
         eventKey="milestones">
         <MilestoneContainer
-          onChange={(template: string, strings: string) => {
-            setTimeout(() => {
-              updateText('milestones', template);
-              updateLangString('milestones', strings);
-            }, 50);
-          }}/>
+          onTemplate={template => updateText('milestones', template)}
+          onStrings={text => updateLangString('milestones', text)}/>
       </Accordion>
       <Accordion
         header={<span className="text-size-sm"><IconMapPin className="d-inline-block" width="17" height="17"/> Locations</span>}
