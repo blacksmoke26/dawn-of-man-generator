@@ -36,6 +36,7 @@
     "slugify": "^1.6.6",
     "typescript": "^5.4.5",
     "unique-random-array": "^4.0.0",
+    "use-debounce": "^10.0.1",
     "web-vitals": "^2.1.4",
     "xml-formatter": "^3.6.2"
   },
