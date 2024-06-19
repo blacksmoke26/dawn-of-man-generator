@@ -6,7 +6,11 @@
  * @since 2.3
  */
 
+// utils
+import {formatPeriod} from '~/utils/scenario/format';
+
 // types
+import {Json, KVDocument} from '~/types/json.types';
 import type {
   ConditionAnyTasksActive,
   ConditionAnyWorkAreasActive,
@@ -22,10 +26,9 @@ import type {
   ConditionTechUnlocked,
   ConditionTimeElapsed,
   ConditionValueEquals,
-  ConditionValueReached, LogicalCondition,
+  ConditionValueReached, GeneralCondition,
 } from '~/types/condition.types';
-import {Json} from '~/types/json.types';
-import {formatPeriod} from '~/utils/scenario/format';
+import {ChangedValues} from '~/components/scenario/conditions/utils/condition-logical';
 
 type Attr<T> = T;
 
@@ -218,20 +221,59 @@ export const toValueReachedTemplate = (attributes: Attr<ConditionValueReached>):
 };
 
 /** Render `LogicalCondition` template */
-export const toLogicalTemplate = (type: LogicalCondition, conditions: Json[]) => {
-  const subConditions = Object.values(conditions);
-
-  if (!subConditions.length) {
+export const toLogicalTemplate = (data: ChangedValues, disabled: boolean = false): string => {
+  if (!data?.conditions?.length) {
     return '';
   }
 
-  const templates = subConditions
-    .map(({template}) => String(template || '').trim())
-    .join('');
+  const templates: string[] = [];
 
-  if (!templates.trim()) {
-    return '';
+  for (const condition of data.conditions) {
+    const {type, ...values} = condition;
+    const template = toConditionTemplate(type as unknown as GeneralCondition, values, disabled).trim();
+    template && templates.push(template);
   }
 
-  return `<condition type="${type}"><sub_conditions>${templates}</sub_conditions></conditions>`
+  return !templates.length ? '' : (
+    `<condition type="${data.type}">`
+    + `<sub_conditions>${templates.join('')}</sub_conditions>`
+    + `</conditions>`
+  );
+};
+
+export const filterEmpty = <T = Json>(values: T): T => {
+  const filtered = {} as Json;
+
+  for (const [name, value] of Object.entries(values as Json)) {
+    if (value !== '' && value !== undefined) {
+      filtered[name] = value;
+    }
+  }
+
+  return filtered as T;
+};
+
+const funcRegistry: KVDocument<Function> = {
+  And: toLogicalTemplate,
+  Not: toLogicalTemplate,
+  Or: toLogicalTemplate,
+  AnyTasksActive: toAnyTasksActiveTemplate,
+  AnyWorkAreasActive: toAnyWorkAreasActiveTemplate,
+  EntityCountComparison: toEntityCountComparisonTemplate,
+  EntityCountReached: toEntityCountReachedTemplate,
+  EntityNearMarker: toEntityNearMarkerTemplate,
+  EraUnlocked: toEraUnlockedTemplate,
+  InitGame: toInitGameTemplate,
+  IsAlive: toIsAliveTemplate,
+  IsGameInteractionPending: toIsGameInteractionPendingTemplate,
+  NewGame: toNewGameTemplate,
+  ScenarioCompleted: toScenarioCompletedTemplate,
+  TechUnlocked: toTechUnlockedTemplate,
+  TimeElapsed: toTimeElapsedTemplate,
+  ValueEquals: toValueEqualsTemplate,
+  ValueReached: toValueReachedTemplate,
+};
+
+export const toConditionTemplate = (condition: GeneralCondition, values: Json, disabled: boolean = false): string => {
+  return disabled || !(condition in funcRegistry) ? '' : funcRegistry[condition](values as any);
 };
