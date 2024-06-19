@@ -11,6 +11,9 @@ import {nanoid} from 'nanoid';
 import type {FormControlProps} from 'react-bootstrap';
 import {Button, Form, InputGroup} from 'react-bootstrap';
 
+// hooks
+import { useDebouncedCallback } from 'use-debounce';
+
 // icons
 import {COLOR_DISABLED, COLOR_REDDISH, IconEraser, IconRestore, IconShuffle} from '~/components/icons/app';
 
@@ -81,6 +84,13 @@ const NumberInput = (props: Props) => {
     },
   }, props);
 
+  const debounced = useDebouncedCallback(
+    // function
+    newProps.onChange,
+    // delay in ms
+    150, { maxWait: 250 }
+  );
+
   return (
     <InputGroup>
       <Form.Control
@@ -103,7 +113,7 @@ const NumberInput = (props: Props) => {
           if (Number(value) > newProps.max) {
             value = newProps.max.toString();
           }
-          newProps.onChange(value);
+          debounced(value);
         }}
         onKeyUp={e => {
           // @ts-ignore
