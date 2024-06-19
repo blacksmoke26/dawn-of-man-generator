@@ -8,14 +8,16 @@
 // types
 import {KVDocument} from '~/types/json.types';
 
-export type Dictionary = KVDocument<string>;
+export interface LangStrings {
+  [key: string]: string;
+}
 
 /**
  * Convert strings dictionary to language string.
  * @param strings - Strings dictionary.
  * @returns Language string.
  */
-export const toLanguageString = (strings: Dictionary): string => {
+export const toLanguageString = (strings: LangStrings): string => {
   const texts: string[] = [];
 
   for (const [name, value] of Object.entries(strings)) {
@@ -26,3 +28,21 @@ export const toLanguageString = (strings: Dictionary): string => {
 
   return texts.join('\n');
 };
+
+/**
+ * Build a list of strings from a JSON document.
+ * @param strings JSON document with strings.
+ * @returns List of strings.
+ */
+export const buildStrings = (strings: KVDocument<string>): LangStrings => {
+  const list: LangStrings = {};
+
+  for (const [key, value] of Object.entries(strings)) {
+    if (key.trim() && value.trim()) {
+      list[key.trim()] = value.trim();
+    }
+  }
+
+  return list;
+};
+
