@@ -129,6 +129,8 @@ export type InteractionType =
   | 'None'
   | 'CustomizePanels';
 
+export type ConditionName = LogicalCondition | GeneralCondition;
+
 export interface ConditionAnd {
   subConditions: SubConditions;
 }
@@ -278,4 +280,28 @@ export interface ConditionDefaultParams {
   timeElapsed: ConditionTimeElapsed,
   valueEquals: ConditionValueEquals,
   valueReached: ConditionValueReached,
+}
+
+export interface ConditionAttributesProps {
+  enabled?: boolean;
+  disabledCheckbox?: boolean;
+  expanded?: boolean;
+}
+
+export interface ConditionTemplateProps<T> {
+  values?: Partial<T>;
+
+  onValuesChange?(values: Partial<T>): void;
+
+  onTemplate?(template: string): void;
+
+  onChange?(values: ConditionAttributesProps): void;
+}
+
+export interface ConditionProps<T> extends ConditionAttributesProps, ConditionTemplateProps<T> {
+  removeIcon?: boolean;
+  showCheckbox?: boolean;
+  initialValues?: Partial<T>;
+
+  onRemoveClick?(): void;
 }
