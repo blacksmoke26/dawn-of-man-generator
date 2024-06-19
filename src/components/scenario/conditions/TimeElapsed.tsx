@@ -1,5 +1,3 @@
-// noinspection HtmlUnknownAttribute
-
 /**
  * @author Junaid Atari <mj.atari@gmail.com>
  * @see https://github.com/blacksmoke26/dawn-of-man-generator
@@ -7,7 +5,6 @@
  */
 
 import React from 'react';
-import * as PropTypes from 'prop-types';
 import cn from 'classname';
 import merge from 'deepmerge';
 import {capitalCase} from 'change-case';
@@ -18,102 +15,85 @@ import NumberInput from '~/components/ui/NumberInput';
 import Select, {Option} from '~/components/ui/Select';
 import ConditionHeader from './../elements/ConditionHeader';
 
+// hooks
+import useAttributes from '~/hooks/use-attributes';
+
 // utils
 import * as random from '~/utils/random';
-import {toString} from '~/helpers/string';
-import {toInteger} from '~/helpers/number';
 import {PERIOD_MAX, PERIOD_MIN} from '~/utils/defaults';
 import {defaultsParams, TIME_ELAPSED} from '~/utils/condition';
-import {toTimeElapsedTemplate} from '~/utils/parser/templates';
+import {subConditionDefaultProps} from './utils/condition-logical';
+import {filterEmpty, toConditionTemplate} from '~/utils/parser/templates';
 
 // types
-import type {$Keys, DeepPartial} from 'utility-types';
 import type {
-  ConditionTimeElapsed as ConditionAttributes,
-  TimeElapsed as TimeElapsedList,
+  ConditionAttributesProps, ConditionTimeElapsed, ConditionProps,
 } from '~/types/condition.types';
 
-interface Attributes extends ConditionAttributes {
-  enabled: boolean;
-  disabledCheckbox?: boolean;
-  expanded?: boolean;
-}
-
-interface Props extends Attributes {
-  removeIcon?: boolean;
-  showCheckbox?: boolean,
-
-  onRemoveClick?(): void,
-
-  onChange?(template: string, values: Attributes): void,
+interface Props extends ConditionProps<ConditionTimeElapsed> {
 }
 
 const CONDITION_NAME: string = 'TimeElapsed';
 
-const TimeElapsed = (props: DeepPartial<Props>) => {
-  const newProps = merge.all<Props>([{
-    enabled: true,
-    disabledCheckbox: false,
-    removeIcon: false,
-    showCheckbox: true,
-    expanded: true,
-    onChange: () => {
-    },
-    onRemoveClick: () => {
-    },
-  }, defaultsParams.timeElapsed as Props, props]);
+const TimeElapsed = (props: Props) => {
+  const newProps = merge<Required<Props>>(subConditionDefaultProps, props);
 
-  const [attributes, setAttributes] = React.useState<Attributes>({
+  const [attributes, setAttr, getAttr] = useAttributes<ConditionAttributesProps>({
     enabled: newProps.enabled as boolean,
     disabledCheckbox: newProps.disabledCheckbox as boolean,
-    expanded: newProps.expanded as boolean,
-    timer: toString<TimeElapsedList>(newProps?.timer),
-    value: toInteger(newProps?.value),
+    expanded: newProps.expanded as boolean || true,
   });
 
-  const setAttribute = <T = any>(name: $Keys<Attributes>, value: T) => {
-    setAttributes(current => {
-      return ({...current, [name]: value as T});
-    });
-  };
+  const [values, setValue, getValue] = useAttributes<ConditionTimeElapsed>(
+    merge(defaultsParams?.timeElapsed || {}, newProps?.initialValues || {}),
+  );
+
+  React.useEffect(() => {
+    if (attributes.enabled) {
+      setValue('timer', props?.values?.timer, true);
+      setValue('value', props?.values?.value, true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    attributes.enabled,
+    props?.values?.timer, props?.values?.value,
+  ]);
+
+  // Reflect values changes
+  React.useEffect(() => {
+    newProps?.onTemplate(toConditionTemplate('TimeElapsed', values, !attributes.enabled));
+    newProps?.onValuesChange(filterEmpty(values));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [attributes.enabled, values]);
 
   // Reflect state changes
   React.useEffect(() => {
-    const args: [string, Attributes] = !attributes.enabled
-      ? ['', {} as Attributes]
-      : [toTimeElapsedTemplate(attributes), attributes];
-
-    typeof props.onChange === 'function' && props.onChange.apply(null, args);
+    newProps.onChange(attributes);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [attributes]);
 
   // Reflect prop changes
   React.useEffect(() => {
-    props?.enabled !== undefined && setAttribute('enabled', props.enabled);
-    props?.disabledCheckbox !== undefined && setAttribute('disabledCheckbox', props.disabledCheckbox);
-    props?.expanded !== undefined && setAttribute('expanded', props.expanded);
-
-    if (props?.enabled) {
-      props?.timer !== undefined && setAttribute('timer', props.timer);
-      props?.value !== undefined && setAttribute('value', props.value);
-    }
+    setAttr('enabled', props?.enabled, true);
+    setAttr('disabledCheckbox', props?.disabledCheckbox, true);
+    setAttr('expanded', props?.expanded, true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props]);
+  }, [props?.enabled, props?.disabledCheckbox, props?.expanded]);
 
-  const isDisabled = attributes.disabledCheckbox || !attributes.enabled;
+  const isDisabled = getAttr('disabledCheckbox') || !getAttr('enabled');
 
   return (
     <div className={cn('mb-2', {'text-muted': isDisabled}, 'checkbox-align')}>
       <ConditionHeader
         caption={CONDITION_NAME} showCheckbox={newProps.showCheckbox}
-        enabled={attributes.enabled}
-        onEnabled={(isEnabled: boolean) => setAttribute('enabled', isEnabled)}
-        disabledCheckbox={attributes.disabledCheckbox}
+        enabled={getAttr('enabled')}
+        onEnabled={(isEnabled: boolean) => setAttr('enabled', isEnabled)}
+        disabledCheckbox={getAttr('disabledCheckbox')}
         removeIcon={newProps.removeIcon}
         onRemoveClick={newProps.onRemoveClick}
-        onExpandedClick={(state: boolean) => setAttribute('expanded', state)}
-        expanded={attributes.expanded}/>
-      {attributes?.expanded && (
+        onExpandedClick={(state: boolean) => setAttr('expanded', state)}
+        expanded={getAttr('expanded')}/>
+      {getAttr('expanded') && (
         <>
           <Row className="mb-1 mt-2">
             <Col sm="2">
@@ -127,15 +107,15 @@ const TimeElapsed = (props: DeepPartial<Props>) => {
                 isDisabled={isDisabled}
                 menuPortalTarget={document.body}
                 options={TIME_ELAPSED.map(value => ({label: capitalCase(value), value}))}
-                defaultValue={attributes?.timer ? {label: attributes.timer, value: attributes.timer} : null}
+                defaultValue={getValue('timer') ? {label: getValue('timer'), value: getValue('timer')} : null}
                 placeholder="Choose..."
                 onChange={(option: Option | any, {action}): void => {
                   if (action === 'select-option' && option) {
-                    setAttribute('timer', option.value);
+                    setValue('timer', option.value);
                   }
 
                   if (['clear', 'remove-value'].includes(action)) {
-                    setAttribute('timer', '');
+                    setValue('timer', '');
                   }
                 }}
               />
@@ -156,10 +136,10 @@ const TimeElapsed = (props: DeepPartial<Props>) => {
                 disabled={isDisabled}
                 allowClear={true}
                 placeholder="e.g. 0"
-                value={attributes?.value}
-                onChange={value => setAttribute('value', value)}
+                value={getValue('value')}
+                onChange={value => setValue('value', value)}
                 shuffle={true}
-                onShuffle={() => setAttribute('value', +random.randomPeriod())}/>
+                onShuffle={() => setValue('value', +random.randomPeriod())}/>
             </Col>
           </Row>
         </>
@@ -170,14 +150,14 @@ const TimeElapsed = (props: DeepPartial<Props>) => {
 
 // Properties validation
 TimeElapsed.propTypes = {
-  enabled: PropTypes.bool,
+  /*enabled: PropTypes.bool,
   disabledCheckbox: PropTypes.bool,
   removeIcon: PropTypes.bool,
   onRemoveClick: PropTypes.func,
   expanded: PropTypes.bool,
   onChange: PropTypes.func,
   time: PropTypes.oneOf(TIME_ELAPSED),
-  value: PropTypes.number,
+  value: PropTypes.number,*/
 };
 
 export default TimeElapsed;

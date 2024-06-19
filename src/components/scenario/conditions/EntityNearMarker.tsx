@@ -7,7 +7,6 @@
  */
 
 import React from 'react';
-import * as PropTypes from 'prop-types';
 import cn from 'classname';
 import merge from 'deepmerge';
 import {Col, Row} from 'react-bootstrap';
@@ -17,102 +16,84 @@ import NumberInput from '~/components/ui/NumberInput';
 import Select, {Option} from '~/components/ui/Select';
 import ConditionHeader from './../elements/ConditionHeader';
 
+// hooks
+import useAttributes from '~/hooks/use-attributes';
+
 // utils
 import * as random from '~/utils/random';
 import {capitalCase} from 'change-case';
-import {toString} from '~/helpers/string';
-import {toInteger} from '~/helpers/number';
-import {toEntityCount} from '~/utils/units';
-import {ENTITIES, ENTITIES_OPTIONS} from '~/utils/entities';
-import {toEntityNearMarkerTemplate} from '~/utils/parser/templates';
+import {ENTITIES_OPTIONS} from '~/utils/entities';
+import {subConditionDefaultProps} from './utils/condition-logical';
+import {filterEmpty, toConditionTemplate} from '~/utils/parser/templates';
 import {defaultsParams, DISTANCE_MAX, DISTANCE_MIN} from '~/utils/condition';
 
 // types
-import type {$Keys, DeepPartial} from 'utility-types';
-import type {EntityType} from '~/types/entity.types';
-import type {ConditionEntityNearMarker as ConditionAttributes} from '~/types/condition.types';
+import type {ConditionAttributesProps, ConditionEntityNearMarker, ConditionProps} from '~/types/condition.types';
 
-interface Attributes extends ConditionAttributes {
-  enabled: boolean;
-  disabledCheckbox?: boolean;
-  expanded?: boolean;
-}
-
-interface Props extends Attributes {
-  removeIcon?: boolean;
-  showCheckbox?: boolean,
-
-  onRemoveClick?(): void,
-
-  onChange?(template: string, values: Attributes): void,
+interface Props extends ConditionProps<ConditionEntityNearMarker> {
 }
 
 const CONDITION_NAME: string = 'EntityNearMarker';
 
-const EntityNearMarker = (props: DeepPartial<Props>) => {
-  const newProps = merge.all<Props>([{
-    enabled: true,
-    disabledCheckbox: false,
-    removeIcon: false,
-    showCheckbox: true,
-    expanded: true,
-    onChange: () => {
-    },
-    onRemoveClick: () => {
-    },
-  }, defaultsParams.entityNearMarker as Props, props]);
+const EntityNearMarker = (props: Props) => {
+  const newProps = merge<Required<Props>>(subConditionDefaultProps, props);
 
-  const [attributes, setAttributes] = React.useState<Attributes>({
+  const [attributes, setAttr, getAttr] = useAttributes<ConditionAttributesProps>({
     enabled: newProps.enabled as boolean,
     disabledCheckbox: newProps.disabledCheckbox as boolean,
-    expanded: newProps.expanded as boolean,
-    entityType: toString<EntityType>(newProps.entityType),
-    distance: toInteger(newProps.distance),
+    expanded: newProps.expanded as boolean || true,
   });
 
-  const setAttribute = <T = any>(name: $Keys<Attributes>, value: T) => {
-    setAttributes(current => {
-      return ({...current, [name]: value as T});
-    });
-  };
+  const [values, setValue, getValue] = useAttributes<ConditionEntityNearMarker>(
+    merge(defaultsParams?.entityNearMarker || {}, newProps?.initialValues || {}),
+  );
+
+  React.useEffect(() => {
+    if (attributes.enabled) {
+      setValue('entityType', props?.values?.entityType, true);
+      setValue('distance', props?.values?.distance, true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    attributes.enabled, props?.values?.entityType,
+    props?.values?.distance,
+  ]);
+
+  // Reflect values changes
+  React.useEffect(() => {
+    newProps?.onTemplate(toConditionTemplate('EntityNearMarker', values, !attributes.enabled));
+    newProps?.onValuesChange(filterEmpty(values));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [attributes.enabled, values]);
 
   // Reflect state changes
   React.useEffect(() => {
-    const args: [string, Attributes] = !attributes.enabled
-      ? ['', {} as Attributes]
-      : [toEntityNearMarkerTemplate(attributes), attributes];
-
-    typeof newProps.onChange === 'function' && newProps.onChange.apply(null, args);
+    newProps.onChange(attributes);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [attributes]);
 
   // Reflect prop changes
   React.useEffect(() => {
-    props?.enabled !== undefined && setAttribute('enabled', props.enabled);
-    props?.disabledCheckbox !== undefined && setAttribute('disabledCheckbox', props.disabledCheckbox);
-    props?.expanded !== undefined && setAttribute('expanded', props.expanded);
-
-    if (props?.enabled) {
-      props?.entityType !== undefined && setAttribute('entityType', props.entityType);
-      props?.distance !== undefined && setAttribute('distance', toEntityCount(props.distance));
-    }
+    setAttr('enabled', props?.enabled, true);
+    setAttr('disabledCheckbox', props?.disabledCheckbox, true);
+    setAttr('expanded', props?.expanded, true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props]);
+  }, [props?.enabled, props?.disabledCheckbox, props?.expanded]);
 
-  const isDisabled = attributes.disabledCheckbox || !attributes.enabled;
+  const isDisabled = getAttr('disabledCheckbox') || !getAttr('enabled');
 
   return (
     <div className={cn('mb-2', {'text-muted': isDisabled}, 'checkbox-align')}>
       <ConditionHeader
         caption={CONDITION_NAME} showCheckbox={newProps.showCheckbox}
-        enabled={attributes.enabled}
-        onEnabled={(isEnabled: boolean) => setAttribute('enabled', isEnabled)}
-        disabledCheckbox={attributes.disabledCheckbox}
+        enabled={getAttr('enabled')}
+        onEnabled={(isEnabled: boolean) => setAttr('enabled', isEnabled)}
+        disabledCheckbox={getAttr('disabledCheckbox')}
         removeIcon={newProps.removeIcon}
         onRemoveClick={newProps.onRemoveClick}
-        onExpandedClick={(state: boolean) => setAttribute('expanded', state)}
-        expanded={attributes.expanded}/>
-      {attributes?.expanded && (
+        onExpandedClick={(state: boolean) => setAttr('expanded', state)}
+        expanded={getAttr('expanded')}/>
+      {getAttr('expanded') && (
         <>
           <Row className="mb-1 mt-2">
             <Col xs="2">
@@ -125,14 +106,14 @@ const EntityNearMarker = (props: DeepPartial<Props>) => {
                 isDisabled={isDisabled}
                 menuPortalTarget={document.body}
                 options={ENTITIES_OPTIONS}
-                defaultValue={newProps?.entityType
-                  ? {label: capitalCase(newProps.entityType), value: newProps.entityType}
+                defaultValue={getValue('entityType')
+                  ? {label: capitalCase(getValue('entityType')), value: getValue('entityType')}
                   : null
                 }
                 placeholder="Choose..."
                 onChange={(option: Option | any, {action}): void => {
                   if (action === 'select-option' && option) {
-                    setAttribute('entityType', option.value);
+                    setValue('entityType', option.value);
                   }
                 }}
               />
@@ -153,10 +134,11 @@ const EntityNearMarker = (props: DeepPartial<Props>) => {
                 disabled={isDisabled}
                 allowClear={true}
                 placeholder="e.g. 20"
-                value={attributes?.distance}
-                onChange={value => setAttribute('distance', value)}
+                value={getValue('distance')}
+                onChange={value => setValue('distance', value)}
                 shuffle={true}
-                onShuffle={() => setAttribute('distance', random.randomDistance())}/>
+                onShuffle={() => setValue('distance', random.randomDistance())}
+              />
             </Col>
           </Row>
         </>
@@ -167,14 +149,14 @@ const EntityNearMarker = (props: DeepPartial<Props>) => {
 
 // Properties validation
 EntityNearMarker.propTypes = {
-  enabled: PropTypes.bool,
+  /*enabled: PropTypes.bool,
   disabledCheckbox: PropTypes.bool,
   removeIcon: PropTypes.bool,
   onRemoveClick: PropTypes.func,
   expanded: PropTypes.bool,
   onChange: PropTypes.func,
   entityType: PropTypes.oneOf(ENTITIES),
-  distance: PropTypes.number,
+  distance: PropTypes.number,*/
 };
 
 export default EntityNearMarker;

@@ -5,6 +5,7 @@
  */
 
 import React from 'react';
+import {nanoid} from 'nanoid';
 
 // utils
 import {onlyKeys} from '~/helpers/object';
@@ -29,12 +30,11 @@ import ValueReached from '../ValueReached';
 // types
 import type {Required} from 'utility-types';
 import type {KVDocument} from '~/types/json.types';
-import type {
-  GeneralCondition,
-  ConditionType as ConditionTypeBase,
+import {
+  GeneralCondition, ConditionProps, LogicalCondition,
 } from '~/types/condition.types';
 
-const componentsMap = {
+const componentsMap: KVDocument<React.FC<ConditionProps<any>>> = {
   AnyTasksActive,
   AnyWorkAreasActive,
   EntityCountComparison,
@@ -52,42 +52,57 @@ const componentsMap = {
   ValueReached,
 };
 
-export type ConditionType = Required<ConditionTypeBase, 'internalName'> & {
-  enabled?: boolean,
-  expanded?: boolean,
-  template?: string,
-};
-
-export type ConditionList = Record<string, ConditionType>;
-
-export type SubConditionsValues = KVDocument<KVDocument>;
-
 export interface ChangedValues {
-  subConditions: SubConditionsValues;
+  type: LogicalCondition;
+  conditions: PropValues[];
 }
-export const createConditionComponent = (condition: ConditionType): React.FC<any> => {
-  if (!(condition.internalName in componentsMap)) {
+
+export interface ConditionLogicalValues {
+  [key: string]: any;
+
+  type?: GeneralCondition;
+}
+
+
+export type PropValues = KVDocument<Required<ConditionLogicalValues, 'type'>>;
+export const createConditionComponent = (condition: ConditionLogicalValues): React.FC<ConditionProps<any>> => {
+  if (condition?.type === undefined || !(condition.type in componentsMap)) {
     throw new Error(`Unknown condition component: ${condition.internalName}`);
   }
 
-  return componentsMap[condition.internalName as GeneralCondition];
+  return componentsMap[condition.type as GeneralCondition];
 };
 
-export const subConditionToValues = (conditions: ConditionList): ChangedValues => {
-  const subConditions: SubConditionsValues = {};
-  let index = 0;
-
-  for (const [, condition] of Object.entries(conditions)) {
-    if (!condition.enabled) {
-      continue;
-    }
-    index++;
-    const attributes = onlyKeys(condition, [
-      'internalName', 'expanded', 'disabledCheckbox', 'enabled', 'template',
-    ], true) as KVDocument;
-
-    subConditions[`condition_${index}`] = {type: condition.internalName, ...attributes};
+export const arrayValuesToAttributes = (values: ConditionLogicalValues[]): PropValues => {
+  if (!Array.isArray(values) || !values.length) {
+    return {};
   }
 
-  return {subConditions};
+  const registry: KVDocument = {};
+
+  for (const item of values) {
+    if (item?.type) {
+      const key: string = `condition_${nanoid(10).toLowerCase()}`;
+      registry[key] = {...item};
+    }
+  }
+  return registry as PropValues;
+};
+
+export const subConditionDefaultProps = {
+  enabled: true,
+  disabledCheckbox: false,
+  removeIcon: false,
+  showCheckbox: true,
+  expanded: true,
+  initialValues: {},
+  values: {},
+  onChange: () => {
+  },
+  onTemplate: () => {
+  },
+  onValuesChange: () => {
+  },
+  onRemoveClick: () => {
+  },
 };

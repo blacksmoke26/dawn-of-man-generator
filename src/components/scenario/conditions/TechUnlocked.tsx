@@ -1,5 +1,3 @@
-// noinspection HtmlUnknownAttribute
-
 /**
  * @author Junaid Atari <mj.atari@gmail.com>
  * @see https://github.com/blacksmoke26/dawn-of-man-generator
@@ -7,7 +5,6 @@
  */
 
 import React from 'react';
-import * as PropTypes from 'prop-types';
 import cn from 'classname';
 import merge from 'deepmerge';
 import {capitalCase} from 'change-case';
@@ -17,98 +14,82 @@ import {Col, Row} from 'react-bootstrap';
 import Select, {Option} from '~/components/ui/Select';
 import ConditionHeader from './../elements/ConditionHeader';
 
+// hooks
+import useAttributes from '~/hooks/use-attributes';
+
 // utils
-import {toString} from '~/helpers/string';
 import {techEntities} from '~/utils/entities';
 import {defaultsParams} from '~/utils/condition';
-import {toTechUnlockedTemplate} from '~/utils/parser/templates';
+import {subConditionDefaultProps} from './utils/condition-logical';
+import {filterEmpty, toConditionTemplate} from '~/utils/parser/templates';
 
 // types
-import type {$Keys} from 'utility-types';
-import type {TechEntityType} from '~/types/entity.types';
-import type {ConditionTechUnlocked as ConditionAttributes} from '~/types/condition.types';
+import type {ConditionAttributesProps, ConditionProps, ConditionTechUnlocked} from '~/types/condition.types';
 
-interface Attributes extends ConditionAttributes {
-  enabled: boolean;
-  disabledCheckbox?: boolean;
-  expanded?: boolean;
-}
-
-interface Props extends Attributes {
-  removeIcon?: boolean;
-  showCheckbox?: boolean,
-
-  onRemoveClick?(): void,
-
-  onChange?(template: string, values: Attributes): void,
+interface Props extends ConditionProps<ConditionTechUnlocked> {
 }
 
 const CONDITION_NAME: string = 'TechUnlocked';
 
-const TechUnlocked = (props: Partial<Props>) => {
-  const newProps = merge.all<Props>([{
-    enabled: true,
-    disabledCheckbox: false,
-    removeIcon: false,
-    showCheckbox: true,
-    expanded: true,
-    onChange: () => {
-    },
-    onRemoveClick: () => {
-    },
-  }, defaultsParams.techUnlocked as Props, props]);
+const TechUnlocked = (props: Props) => {
+  const newProps = merge<Required<Props>>(subConditionDefaultProps, props);
 
-  const [attributes, setAttributes] = React.useState<Attributes>({
+  const [attributes, setAttr, getAttr] = useAttributes<ConditionAttributesProps>({
     enabled: newProps.enabled as boolean,
     disabledCheckbox: newProps.disabledCheckbox as boolean,
-    expanded: newProps.expanded as boolean,
-    tech: toString<TechEntityType>(newProps.tech),
-    techs: (newProps?.techs || []) as TechEntityType[],
+    expanded: newProps.expanded as boolean || true,
   });
 
-  const setAttribute = <T = any>(name: $Keys<Attributes>, value: T) => {
-    setAttributes(current => {
-      return ({...current, [name]: value as T});
-    });
-  };
+  const [values, setValue, getValue] = useAttributes<ConditionTechUnlocked>(
+    merge(defaultsParams?.techUnlocked || {}, newProps?.initialValues || {}),
+  );
+
+  React.useEffect(() => {
+    if (attributes.enabled) {
+      setValue('tech', props?.values?.tech, true);
+      setValue('techs', props?.values?.techs, true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    attributes.enabled,
+    props?.values?.tech, props?.values?.techs,
+  ]);
+
+  // Reflect values changes
+  React.useEffect(() => {
+    newProps?.onTemplate(toConditionTemplate('TechUnlocked', values, !attributes.enabled));
+    newProps?.onValuesChange(filterEmpty(values));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [attributes.enabled, values]);
 
   // Reflect state changes
   React.useEffect(() => {
-    const args: [string, Attributes] = !attributes.enabled
-      ? ['', {} as Attributes]
-      : [toTechUnlockedTemplate(attributes), attributes];
-
-    typeof newProps.onChange === 'function' && newProps.onChange.apply(null, args);
+    newProps.onChange(attributes);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [attributes]);
 
   // Reflect prop changes
   React.useEffect(() => {
-    props?.enabled !== undefined && setAttribute('enabled', props.enabled);
-    props?.disabledCheckbox !== undefined && setAttribute('disabledCheckbox', props.disabledCheckbox);
-    props?.expanded !== undefined && setAttribute('expanded', props.expanded);
-
-    if (props?.enabled) {
-      props?.tech?.length && setAttribute('tech', props.tech);
-      props?.techs?.length && setAttribute('techs', props.techs);
-    }
+    setAttr('enabled', props?.enabled, true);
+    setAttr('disabledCheckbox', props?.disabledCheckbox, true);
+    setAttr('expanded', props?.expanded, true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props]);
+  }, [props?.enabled, props?.disabledCheckbox, props?.expanded]);
 
-  const isDisabled = attributes.disabledCheckbox || !attributes.enabled;
+  const isDisabled = getAttr('disabledCheckbox') || !getAttr('enabled');
 
   return (
     <div className={cn('mb-2', {'text-muted': isDisabled}, 'checkbox-align')}>
       <ConditionHeader
         caption={CONDITION_NAME} showCheckbox={newProps.showCheckbox}
-        enabled={attributes.enabled}
-        onEnabled={(isEnabled: boolean) => setAttribute('enabled', isEnabled)}
-        disabledCheckbox={attributes.disabledCheckbox}
+        enabled={getAttr('enabled')}
+        onEnabled={(isEnabled: boolean) => setAttr('enabled', isEnabled)}
+        disabledCheckbox={getAttr('disabledCheckbox')}
         removeIcon={newProps.removeIcon}
         onRemoveClick={newProps.onRemoveClick}
-        onExpandedClick={(state: boolean) => setAttribute('expanded', state)}
-        expanded={attributes.expanded}/>
-      {attributes?.expanded && (
+        onExpandedClick={(state: boolean) => setAttr('expanded', state)}
+        expanded={getAttr('expanded')}/>
+      {getAttr('expanded') && (
         <>
           <Row className="mb-1 mt-2">
             <Col xs="2">
@@ -118,12 +99,12 @@ const TechUnlocked = (props: Partial<Props>) => {
               <Select
                 isDisabled={isDisabled}
                 isClearable={true}
-                defaultValue={attributes?.tech ? {label: attributes.tech, value: attributes.tech} : null}
+                defaultValue={getValue('tech') ? {label: getValue('tech'), value: getValue('tech')} : null}
                 menuPortalTarget={document.body}
                 options={techEntities.map(value => ({label: capitalCase(value), value}))}
                 placeholder="Choose..."
                 onChange={(option: Option | any, {action}): void => {
-                  setAttribute('tech', option?.value || '');
+                  setValue('tech', option?.value || '');
                 }}
               />
             </Col>
@@ -138,12 +119,12 @@ const TechUnlocked = (props: Partial<Props>) => {
                 isDisabled={isDisabled}
                 isMulti={true}
                 menuPortalTarget={document.body}
-                defaultValue={newProps?.techs?.map(value => ({label: capitalCase(value), value}) || [])}
+                defaultValue={getValue<string[]>('techs')?.map(value => ({label: capitalCase(value), value}) || [])}
                 options={techEntities.map(value => ({label: capitalCase(value), value}))}
                 placeholder="Choose..."
                 onChange={(option: Option[] | any, {action}): void => {
                   if (['select-option', 'remove-value', 'clear'].includes(action) && Array.isArray(option)) {
-                    setAttribute('techs', option?.map(({value}) => value) || []);
+                    setValue('techs', option?.map(({value}) => value) || []);
                   }
                 }}
               />
@@ -157,14 +138,14 @@ const TechUnlocked = (props: Partial<Props>) => {
 
 // Properties validation
 TechUnlocked.propTypes = {
-  enabled: PropTypes.bool,
+  /*enabled: PropTypes.bool,
   disabledCheckbox: PropTypes.bool,
   removeIcon: PropTypes.bool,
   onRemoveClick: PropTypes.func,
   expanded: PropTypes.bool,
   onChange: PropTypes.func,
   tech: PropTypes.oneOf(techEntities),
-  techs: PropTypes.arrayOf(PropTypes.oneOf(techEntities)),
+  techs: PropTypes.arrayOf(PropTypes.oneOf(techEntities)),*/
 };
 
 export default TechUnlocked;
