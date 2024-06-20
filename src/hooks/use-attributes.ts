@@ -23,10 +23,6 @@ const useAttributes = <Attr = Record<string, any>>(values: Attr = {} as Attr) =>
         const output = (value as Callback<T>)(newCurrent[name] as T);
         return {...newCurrent, [name]: output};
       });
-
-      setTimeout(() => {
-        console.log('attributes', attributes);
-      }, 150);
     } else {
       setAttributes(current => {
         return ({...current, [name]: value as T});

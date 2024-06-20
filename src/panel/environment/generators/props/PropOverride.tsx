@@ -65,7 +65,6 @@ const PropOverride = (props: Props) => {
     }
 
     if (isObject(extValue)) {
-      console.log('extValue:', extValue);
       setChecked(true);
       reflectValues(extValueToSelection(extValue as Json));
     }

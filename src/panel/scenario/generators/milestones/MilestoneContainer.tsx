@@ -82,7 +82,6 @@ const MilestoneContainer = (props: Props) => {
 
   // Reflect state changes
   React.useEffect(() => {
-    console.log('milestones:', milestones);
     //setMile((milestones: MilestonesState) => merge(milestones, newProps.milestones));
     newProps.onTemplate(!checked ? '' : toTemplateText(milestones));
     newProps.onStrings(!checked ? '' : toStringsText(milestones));

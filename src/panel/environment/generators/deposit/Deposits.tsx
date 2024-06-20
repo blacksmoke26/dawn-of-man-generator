@@ -108,7 +108,6 @@ const Deposits = (props: Props) => {
               label={v}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 const list = deposits.filter(val => val !== e.target.getAttribute('data-value'));
-                console.log({list});
                 e.target.checked && list.push(v);
                 setDeposits([...list]);
               }}
