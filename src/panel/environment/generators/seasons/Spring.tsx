@@ -17,7 +17,10 @@ import Slider from '~/components/ui/Slider';
 import Range from '~/components/ui/Range';
 
 // icons
-import {IconRestore, IconShuffle} from '~/components/icons/app';
+import {
+  IconRestore, IconShuffle,
+  COLOR_DISABLED, COLOR_REDDISH, COLOR_WHITISH,
+} from '~/components/icons/app';
 
 // utils
 import {isObject} from '~/helpers/object';
@@ -310,12 +313,16 @@ const Spring = (props: Props) => {
       <div className="mt-3">
         <ButtonGroup>
           <Button
-            disabled={!enabled} variant="secondary" size="sm"
+           disabled={!enabled} variant="link"
+           style={{color: !enabled ? COLOR_DISABLED : COLOR_WHITISH}}
+            className="text-size-sm button-reset-sm p-0 ml-0 mr-3" size="sm"
             onClick={() => setSeason(randomizeSpring())}>
             <IconShuffle width="14" height="14"/> Randomize
           </Button>
           <Button
-            disabled={!enabled} variant="secondary" size="sm"
+            disabled={!enabled} variant="link"
+            style={{color: !enabled ? COLOR_DISABLED : COLOR_REDDISH}}
+            className="text-size-sm button-reset-sm p-0 ml-0 mr-3" size="sm"
             onClick={() => setSeason(seasonsPropsDefault().spring as SpringSeasonProps)}>
             <IconRestore width="14" height="14"/> Restore
           </Button>
