@@ -4,7 +4,7 @@
  * @since 2.3
  */
 
-import React from 'react';
+import React, {PropsWithChildren} from 'react';
 import cn from 'classname';
 import {nanoid} from 'nanoid';
 import merge from 'deepmerge';
@@ -57,7 +57,7 @@ const sanitizeInput = (value: string, event: 'KEYUP' | 'CHANGE' = 'CHANGE', case
 
 type ValueCaseType = 'SNAKE_CASE' | 'DEFAULT';
 
-const TextInput = (props: Props = {}) => {
+const TextInput = (props: PropsWithChildren<Props> = {}) => {
   const newProps = merge<Required<Props>>({
     disabled: false,
     allowClear: false,
@@ -150,6 +150,7 @@ const TextInput = (props: Props = {}) => {
           <IconEraser width="19" height="19"/>
         </Button>
       )}
+      {props?.children}
     </InputGroup>
   );
 };
