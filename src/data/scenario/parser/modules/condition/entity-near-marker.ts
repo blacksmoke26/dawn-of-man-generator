@@ -4,8 +4,6 @@
  * @since 2.3
  */
 
-import op from 'object-path';
-
 // helpers
 import {isInt} from '~/helpers/number';
 import {isObject} from '~/helpers/object';

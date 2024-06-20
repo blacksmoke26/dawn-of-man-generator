@@ -77,7 +77,7 @@ const MilestoneContainer = (props: Props) => {
   }, props);
 
   const [checked, setChecked] = React.useState<boolean>(newProps.checked);
-  const [milestones, setMile, getMile, remMile, clearMile] = useAttributes<MilestonesState>({});
+  const [milestones, setMile, , remMile, clearMile] = useAttributes<MilestonesState>({});
   const [activeKey, setActiveKey] = React.useState<string>('');
 
   // Reflect state changes

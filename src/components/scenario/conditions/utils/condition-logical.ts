@@ -7,9 +7,6 @@
 import React from 'react';
 import {nanoid} from 'nanoid';
 
-// utils
-import {onlyKeys} from '~/helpers/object';
-
 // components
 import AnyTasksActive from '../AnyTasksActive';
 import AnyWorkAreasActive from '../AnyWorkAreasActive';
