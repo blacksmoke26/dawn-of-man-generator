@@ -33,7 +33,7 @@
 }
 
 .text-size-sm {
-	font-size: .89rem;
+	font-size: .89rem !important;
 }
  
 .text-size-xs {
