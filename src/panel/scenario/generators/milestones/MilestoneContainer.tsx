@@ -189,28 +189,25 @@ const MilestoneContainer = (props: Props) => {
                 </>
               }>
               <TabContentWrapper>
-                <div className="pl-2" style={{borderLeft: '2px solid rgb(133 107 99)'}}>
-                  <Milestone
-                    disabledCheckbox={!checked}
-                    onTemplate={(template: string) => {
-                      setMile(id, (value: KVDocument) => ({...value, template}));
-                    }}
-                    onStringsChange={strings => {
-                      setMile(id, (value: KVDocument) => ({...value, strings: toLanguageString(strings)}));
-                    }}
-                    onValuesChange={changedValues => {
-                      setMile(id, (value: KVDocument) => {
-                        const _name = capitalCase(changedValues?.id?.trim() || '').substring(0, 15);
-                        return {
-                          ...value,
-                          disabled: !Boolean(_name),
-                          name: _name || value.name,
-                        };
-                      });
-                    }}
-                    onRemoveClick={() => remMile(id)}/>
-                </div>
-                <div className="clearfix"></div>
+                <Milestone
+                  disabledCheckbox={!checked}
+                  onTemplate={(template: string) => {
+                    setMile(id, (value: KVDocument) => ({...value, template}));
+                  }}
+                  onStringsChange={strings => {
+                    setMile(id, (value: KVDocument) => ({...value, strings: toLanguageString(strings)}));
+                  }}
+                  onValuesChange={changedValues => {
+                    setMile(id, (value: KVDocument) => {
+                      const _name = capitalCase(changedValues?.id?.trim() || '').substring(0, 15);
+                      return {
+                        ...value,
+                        disabled: !Boolean(_name),
+                        name: _name || value.name,
+                      };
+                    });
+                  }}
+                  onRemoveClick={() => remMile(id)}/>
               </TabContentWrapper>
             </Tab>
           );
