@@ -8,10 +8,10 @@ import React from 'react';
 import * as PropTypes from 'prop-types';
 import merge from 'deepmerge';
 import {nanoid} from 'nanoid';
-import {Button, Form, ButtonGroup} from 'react-bootstrap';
-
-// elemental components
-import Accordion from '~/components/ui/Accordion';
+import {
+  Button, ButtonGroup, ButtonToolbar,
+  Form, InputGroup, Tab, Tabs,
+} from 'react-bootstrap';
 
 // components
 import Spring from './Spring';
@@ -28,11 +28,15 @@ import {useAppSelector, useAppDispatch} from '~redux/hooks';
 import {updateValuesRaw} from '~redux/slices/environment/reducers';
 
 // icons
-import {IconFall, IconRestore, IconShuffle, IconSpring, IconSummer, IconWinter} from '~/components/icons/app';
+import {
+  IconRestore, IconShuffle,
+  IconFall, IconSpring, IconSummer, IconWinter,
+  COLOR_DISABLED, COLOR_REDDISH, COLOR_WHITISH,
+} from '~/components/icons/app';
 
 // types
-import type {SeasonsProp} from '~/utils/seasons.types';
 import type {Json} from '~/types/json.types';
+import type {SeasonsProp} from '~/utils/seasons.types';
 
 export interface ExportValues {
   spring: Json;
@@ -92,69 +96,89 @@ const SeasonsPanel = (props: Props) => {
     return enabled
       ? (
         `<seasons>
-					${spring} ${summer} ${fall} ${winter}
+					${spring + summer + fall + winter}
 				</seasons>`
       ) : '';
   };
 
   return (
     <div className="checkbox-align">
-      <div className="mb-2">
-        <Form.Check
-          className="pull-right"
-          type="switch"
-          id={`seasons_override-switch-${nanoid(5)}`}
-          label="Override seasons"
-          checked={enabled}
-          onChange={e => setEnabled(e.target.checked)}
-        />
+      <div className="mb-3">
+        <ButtonToolbar
+          className="justify-content-between"
+          aria-label="Toolbar with Button groups">
+          <InputGroup>
+            <Form.Check
+              type="switch"
+              id={`seasons_override-switch-${nanoid(5)}`}
+              label="Override seasons"
+              className="positive-relative"
+              style={{top: 6}}
+              checked={enabled}
+              onChange={e => setEnabled(e.target.checked)}
+            />
+          </InputGroup>
+          <ButtonGroup>
+            <Button
+              title="Shuffle all seasons values"
+              className="button-reset-sm mr-2"
+              disabled={!enabled} variant="link" size="sm"
+              style={{color: enabled ? COLOR_WHITISH : COLOR_DISABLED}}
+              onClick={() => {
+                dispatch(updateValuesRaw({seasons: seasonsPropsRandomize()}));
+              }}>
+              <IconShuffle/> Randomize
+            </Button>
+            <Button
+              title="Reset all seasons to their default"
+              className="button-reset-sm"
+              style={{color: enabled ? COLOR_REDDISH : COLOR_DISABLED}}
+              disabled={!enabled} variant="link" size="sm"
+              onClick={() => {
+                dispatch(updateValuesRaw({seasons: seasonsPropsDefault()}));
+              }}>
+              <IconRestore/> Restore
+            </Button>
+          </ButtonGroup>
+        </ButtonToolbar>
       </div>
-      <Accordion
-        noCard={true}
-        eventKey="seasons_spring"
-        header={<span className="text-size-sm"><IconSpring width="17" height="17"/> Spring</span>}>
-        <Spring season={springConfig} onChange={v => setSpring(v)} enabled={enabled}/>
-      </Accordion>
-      <hr className="mt-2 mb-2"/>
-      <Accordion
-        noCard={true}
-        eventKey="seasons_summer"
-        header={<span className="text-size-sm"><IconSummer width="17" height="17"/> Summer</span>}>
-        <Summer season={summerConfig} onChange={v => setSummer(v)} enabled={enabled}/>
-      </Accordion>
-      <hr className="mt-2 mb-2"/>
-      <Accordion
-        noCard={true}
-        eventKey="seasons_fall"
-        header={<span className="text-size-sm"><IconFall width="17" height="17"/> Fall</span>}>
-        <Fall season={fallConfig} onChange={v => setFall(v)} enabled={enabled}/>
-      </Accordion>
-      <hr className="mt-2 mb-2"/>
-      <Accordion
-        noCard={true}
-        eventKey="seasons_winter"
-        header={<span className="text-size-sm"><IconWinter width="17" height="17"/> Winter</span>}>
-        <Winter season={winterConfig} onChange={v => setWinter(v)} enabled={enabled}/>
-      </Accordion>
-      <hr className="mt-2 mb-2"/>
-      <div>
-        <ButtonGroup>
-          <Button
-            disabled={!enabled} variant="secondary" size="sm"
-            onClick={() => {
-              dispatch(updateValuesRaw({seasons: seasonsPropsRandomize()}));
-            }}>
-            <IconShuffle/> Randomize All
-          </Button>
-          <Button
-            disabled={!enabled} variant="secondary" size="sm"
-            onClick={() => {
-              dispatch(updateValuesRaw({seasons: seasonsPropsDefault()}));
-            }}>
-            <IconRestore/> Restore All
-          </Button>
-        </ButtonGroup>
-      </div>
+      <Tabs
+        id="seasons-tab"
+        defaultActiveKey="spring"
+        className="nav-tabs-bottom text-pos-left mb-0">
+        <Tab
+          disabled={!enabled}
+          eventKey="spring"
+          key="spring"
+          title={<span className="text-size-sm"><IconSpring width="17" height="17"/> Spring</span>}
+          as="div">
+          <Spring season={springConfig} onChange={v => setSpring(v)} enabled={enabled}/>
+        </Tab>
+        <Tab
+          disabled={!enabled}
+          eventKey="summer"
+          key="summer"
+          title={<span className="text-size-sm"><IconSummer width="17" height="17"/> Summer</span>}
+          as="div">
+          <Summer season={summerConfig} onChange={v => setSummer(v)} enabled={enabled}/>
+        </Tab>
+        <Tab
+          disabled={!enabled}
+          eventKey="fall"
+          key="fall"
+          title={<span className="text-size-sm"><IconFall width="17" height="17"/> Fall</span>}
+          as="div">
+          <Fall season={fallConfig} onChange={v => setFall(v)} enabled={enabled}/>
+        </Tab>
+        <Tab
+          disabled={!enabled}
+          eventKey="winter"
+          key="winter"
+          title={<span className="text-size-sm"><IconWinter width="17" height="17"/> Winter</span>}
+          as="div">
+          <Winter season={winterConfig} onChange={v => setWinter(v)} enabled={enabled}/>
+        </Tab>
+      </Tabs>
     </div>
   );
 };

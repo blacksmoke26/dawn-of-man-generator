@@ -118,7 +118,7 @@ const Spring = (props: Props) => {
   };
 
   return (
-    <div className="panel-border ml-1">
+    <div className="ml-1 pt-3" style={{minHeight: 350}}>
       <Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled})}>
         <Form.Label column={true} sm="2">
 					<span style={{textDecoration: 'underline dotted'}}

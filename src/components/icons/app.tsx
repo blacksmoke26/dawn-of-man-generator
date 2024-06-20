@@ -53,6 +53,8 @@ import {
 
 export const COLOR_DISABLED: string = 'rgba(255, 255, 255, .5';
 
+export const COLOR_WHITISH: string = '#eaeaea';
+
 export const COLOR_REDDISH: string = '#ff8a65';
 
 export const COLOR_GRAYED: string = 'rgba(255, 255, 255, .4';
