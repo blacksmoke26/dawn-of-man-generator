@@ -17,5 +17,6 @@ export default {
   panels: {
     showXmlToJson: ENV_DEV,
     showXmlToScenario: ENV_DEV,
+    showXmlToEnvironment: ENV_DEV,
   },
 } as ConfigurationState;

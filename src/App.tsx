@@ -17,10 +17,13 @@ import TemplateXMLViewer from '~/panel/environment/TemplateXMLViewer';
 import EnvironmentContainer from '~/panel/environment/EnvironmentContainer';
 
 // scenario components
-import XmlToPlainJson from '~/dev/panels/XmlToPlainJson';
-import XmlToScenarioJson from '~/dev/panels/XmlToScenarioJson';
 import ScenarioContainer from '~/panel/scenario/ScenarioContainer';
 import ScenarioTemplateXMLViewer from '~/panel/scenario/TemplateXMLViewer';
+
+// dev panels
+import XmlToPlainJson from '~/dev/panels/XmlToPlainJson';
+import XmlToScenarioJson from '~/dev/panels/XmlToScenarioJson';
+import XmlToEnvironmentJson from '~/dev/panels/XmlToEnvironmentJson';
 
 // icons
 import {IconCodeXml, IconEnvironment, IconScenario} from '~/components/icons/app';
@@ -76,7 +79,7 @@ const App = () => {
           {panelsAttribute?.showXmlToJson && (
             <Tab as="div" eventKey="xml_to_json" title={
               <div className="pl-4 pr-4" style={{fontSize: '0.95rem'}}>
-                <IconCodeXml width="16" height="16"/> Xml_Json
+                <IconCodeXml width="16" height="16"/> Xml:Json
               </div>
             }>
               <Row>
@@ -86,10 +89,23 @@ const App = () => {
               </Row>
             </Tab>
           )}
+          {panelsAttribute?.showXmlToEnvironment && (
+            <Tab as="div" eventKey="xml_to_environment_json" title={
+              <div className="pl-4 pr-4" style={{fontSize: '0.95rem'}}>
+                <IconCodeXml width="16" height="16"/> Xml:Environment
+              </div>
+            }>
+              <Row>
+                <Col sm="12">
+                  <XmlToEnvironmentJson/>
+                </Col>
+              </Row>
+            </Tab>
+          )}
           {panelsAttribute?.showXmlToScenario && (
             <Tab as="div" eventKey="xml_to_scenario_json" title={
               <div className="pl-4 pr-4" style={{fontSize: '0.95rem'}}>
-                <IconCodeXml width="16" height="16"/> Xml_Scenario
+                <IconCodeXml width="16" height="16"/> Xml:Scenario
               </div>
             }>
               <Row>

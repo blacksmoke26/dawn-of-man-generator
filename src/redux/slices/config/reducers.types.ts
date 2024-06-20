@@ -10,6 +10,7 @@ export interface ConfigurationState {
   panels: {
     showXmlToJson?: boolean;
     showXmlToScenario?: boolean;
+    showXmlToEnvironment?: boolean;
   };
 }
 
