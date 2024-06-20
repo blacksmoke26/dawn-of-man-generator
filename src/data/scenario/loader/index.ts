@@ -1,7 +1,8 @@
 /**
  * @author Junaid Atari <mj.atari@gmail.com>
  * @see https://github.com/blacksmoke26/dawn-of-man-generator
- * @since 2020-08-29
+ * @since 2024-06-20
+ * @version 2.3.0
  */
 
 import {xmlToJson} from '~/helpers/xml';
@@ -22,18 +23,18 @@ import {Json} from '~/types/json.types';
  * @throws {Error} - Failed to parse xml
  */
 export const xmlToReduxJson = (xml: string): Json => {
-  const json = xmlToJson(xml);
+  const json: Json = xmlToJson(xml);
 
-  if (!('environment' in json)) {
-    throw new Error('Not a valid environment XML');
+  if (!('scenario' in json)) {
+    throw new Error('Not a valid scenario XML');
   }
 
   const converted: Json = jsonToRedux(json, {
     nullResolver: (key: string) => ({[key]: false}),
   });
 
-  if (allEqual(Object.values(converted?.environment || {}))) {
-    throw new Error('XML text contains no environment data');
+  if (allEqual(Object.values(converted?.scenario || {}))) {
+    throw new Error('XML text contains no scenario data');
   }
 
   return converted;

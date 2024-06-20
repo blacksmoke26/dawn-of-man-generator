@@ -4,12 +4,11 @@
  * @since 2020-08-29
  */
 
-// helpers
-import {mergeAll} from '~/helpers/object';
+import merge from 'deepmerge';
 
 // types
 import type {Json} from '~/types/json.types';
-import type {JsonToReduxOptions} from '~/utils/parser/index.types';
+import type {JsonToReduxOptions, ParserCallback} from '~/utils/parser/index.types';
 
 // utils
 import {jsonToRedux as j2r1} from './modules/noise-amplitudes';
@@ -33,14 +32,19 @@ import {jsonToRedux as j2rse} from './modules/seasons';
  * @static
  * Convert environment json into redux data */
 export function jsonToRedux(json: Json, options: JsonToReduxOptions = {}): Json {
-  const environment: Json = mergeAll<Json>(
-    j2r1(json, options), j2r2(json, options), j2r3(json, options),
-    j2r4(json, options), j2r5(json, options), j2r6(json, options),
-    j2rdo1(json, options), j2rdo2(json, options),
-    j2rde1(json, options), j2rpr1(json, options),
-    j2rtr1(json, options), j2rtr2(json, options), j2rtr3(json, options), j2rtr4(json, options),
-    j2rse(json, options),
-  );
+  const parsers: ParserCallback[] = [
+    j2r1, j2r2, j2r3, j2r4, j2r5,
+    j2r6, j2rdo1, j2rdo2, j2rde1, j2rpr1,
+    j2rtr1, j2rtr2, j2rtr3, j2rtr4, j2rse,
+  ];
 
-  return {environment};
+  const outputs: Json[] = [];
+
+  for (const parserFunc of parsers) {
+    outputs.push(parserFunc(json, options));
+  }
+
+  return {
+    environment: merge.all<Json>(outputs),
+  };
 }

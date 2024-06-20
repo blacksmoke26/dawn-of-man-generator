@@ -4,10 +4,12 @@
  * @since 2020-08-29
  */
 
+import merge from 'deepmerge';
+import {XMLValidator, XMLParser, validationOptions, X2jOptions, ValidationError} from 'fast-xml-parser';
+
 // types
 import type {Json} from '~/types/json.types';
 
-import {XMLValidator, XMLParser, validationOptions, X2jOptions, ValidationError} from 'fast-xml-parser';
 export type {ValidationError};
 
 /**
@@ -28,5 +30,26 @@ export const validate = (xml: string, options: Partial<validationOptions> = {}):
  */
 export const parse = (xml: string, options: Partial<X2jOptions> = {}): Json => {
   return (new XMLParser(options)).parse(xml, {});
+};
+
+/**
+ * @public
+ * @static
+ * Convert XML to JSON
+ * @throws {Error} - Failed to parse xml
+ */
+export const xmlToJson = (xml: string, options: Partial<X2jOptions> = {}): Json => {
+  try {
+    return parse(xml, merge({
+      attributeNamePrefix: '',
+      ignoreAttributes: false,
+      parseAttributeValue: true,
+      parseTagValue: true,
+      trimValues: true,
+      allowBooleanAttributes: true,
+    }, options));
+  } catch (e) {
+    throw e;
+  }
 };
 
