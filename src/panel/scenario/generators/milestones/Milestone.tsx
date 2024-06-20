@@ -246,7 +246,7 @@ const Milestone = (props: Props) => {
         </Row>
         <div className="mt-2 mb-3">
           <Select
-            isDisabled={getAttr<boolean>('disabled')}
+            isDisabled={isDisabled}
             menuPortalTarget={document.body}
             options={CONDITIONS_OPTIONS}
             value={null}
