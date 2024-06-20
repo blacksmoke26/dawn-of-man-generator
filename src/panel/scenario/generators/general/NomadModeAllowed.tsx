@@ -35,17 +35,17 @@ function NomadModeAllowed ( props: Props ) {
 	const [value, setValue] = React.useState<boolean>(props.value as boolean);
 	const [enabled, setEnabled] = React.useState<boolean>(props.enabled as boolean);
 
-	const scenario = useAppSelector(({scenario}) => (scenario));
+	const nomadModeAllowedAttribute = useAppSelector(({scenario}) => scenario.values?.nomadModeAllowed);
 	
 	// Reflect attributes changes
 	React.useEffect(() => {
-		const extValue = scenario?.nomadModeAllowed ?? null;
+		const extValue = nomadModeAllowedAttribute ?? null;
 		
 		if ( typeof extValue === 'boolean' ) {
 			setEnabled(extValue);
 			setValue(extValue);
 		}
-	}, [scenario]);
+	}, [nomadModeAllowedAttribute]);
 	
 	// Reflect attributes changes
 	React.useEffect(() => {

@@ -34,17 +34,17 @@ const CustomSettlementNameAllowed = (props: Props) => {
   const [value, setValue] = React.useState<boolean>(props.value as boolean);
   const [enabled, setEnabled] = React.useState<boolean>(props.enabled as boolean);
 
-  const scenario = useAppSelector(({scenario}) => (scenario));
+  const customSettlementNameAllowedAttribute = useAppSelector(({scenario}) => scenario?.values?.customSettlementNameAllowed);
 
   // Reflect attributes changes
   React.useEffect(() => {
-    const extValue = scenario?.customSettlementNameAllowed ?? null;
+    const extValue = customSettlementNameAllowedAttribute ?? null;
 
     if (typeof extValue === 'boolean') {
       setEnabled(extValue);
       setValue(extValue);
     }
-  }, [scenario]);
+  }, [customSettlementNameAllowedAttribute]);
 
   // Reflect attributes changes
   React.useEffect(() => {

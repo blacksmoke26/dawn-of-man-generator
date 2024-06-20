@@ -19,14 +19,14 @@ import XmlTextLoader from './loaders/XmlTextLoader';
 import {IconCopy, IconDownload, IconPencilLine} from '~/components/icons/app';
 
 // redux
-import {updateFilename} from '~redux/reducers';
+import {updateName} from '~redux/slices/environment/reducers';
 import {useAppDispatch, useAppSelector} from '~redux/hooks';
 
 const TemplateXMLViewer = () => {
   const dispatch = useAppDispatch();
 
-  const template = useAppSelector(({templates}) => templates.environment);
-  const fileName = useAppSelector(({fileName}) => fileName);
+  const template = useAppSelector(({environment}) => environment.template);
+  const fileName = useAppSelector(({environment}) => environment.name);
 
   return (
     <>
@@ -78,7 +78,7 @@ const TemplateXMLViewer = () => {
               value={fileName}
               onChange={e => {
                 const value = e.target.value.replace(/(['" \t]|[^a-z_\d])+/ig, `_`).toLowerCase();
-                dispatch(updateFilename(value));
+                dispatch(updateName(value));
               }}
               onKeyUp={e => {
                 // @ts-ignore

@@ -71,11 +71,11 @@ const Summer = (props: Props) => {
 
   const isWindEnabled = enabled && windEnabled;
 
-  const environment = useAppSelector(({environment}) => (environment));
+  const seasonsAttribute = useAppSelector(({environment}) => environment.values?.seasons);
 
   // Reflect attributes changes
   React.useEffect(() => {
-    const extValue = environment?.seasons ?? null;
+    const extValue = seasonsAttribute ?? null;
 
     if (typeof extValue === 'boolean') {
       setEnabled(extValue);
@@ -85,7 +85,7 @@ const Summer = (props: Props) => {
       setEnabled(true);
       setSeason(extValueToSeason(extValue as Json) as SummerSeasonProps);
     }
-  }, [environment]);
+  }, [seasonsAttribute]);
 
   // Reflect attributes changes
   React.useEffect(() => {

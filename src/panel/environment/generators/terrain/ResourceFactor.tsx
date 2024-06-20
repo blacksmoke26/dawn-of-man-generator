@@ -43,11 +43,11 @@ const ResourceFactor = (props: Props) => {
   const [enabled, setEnabled] = React.useState<boolean>(props.enabled as boolean);
   const [resource, setResource] = React.useState<number>(props.resource as number);
 
-  const environment = useAppSelector(({environment}) => (environment));
+  const resourceFactorAttribute = useAppSelector(({environment}) => environment.values?.resourceFactor);
 
   // Reflect attributes changes
   React.useEffect(() => {
-    const extValue = environment?.resourceFactor ?? null;
+    const extValue = resourceFactorAttribute ?? null;
 
     if (typeof extValue === 'boolean') {
       setEnabled(extValue);
@@ -57,7 +57,7 @@ const ResourceFactor = (props: Props) => {
       setEnabled(true);
       setResource(extValue);
     }
-  }, [environment]);
+  }, [resourceFactorAttribute]);
 
   // Reflect state changes
   React.useEffect(() => {

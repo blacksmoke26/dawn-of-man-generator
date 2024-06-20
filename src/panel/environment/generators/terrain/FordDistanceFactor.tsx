@@ -43,11 +43,11 @@ function FordDistanceFactor(props: Props) {
   const [enabled, setEnabled] = React.useState<boolean>(props.enabled as boolean);
   const [distance, setDistance] = React.useState<number>(props.distance as number);
 
-  const environment = useAppSelector(({environment}) => (environment));
+  const fordDistanceFactorAttribute = useAppSelector(({environment}) => environment.values?.fordDistanceFactor);
 
   // Reflect attributes changes
   React.useEffect(() => {
-    const extValue = environment?.fordDistanceFactor ?? null;
+    const extValue = fordDistanceFactorAttribute ?? null;
 
     if (typeof extValue === 'boolean') {
       setEnabled(extValue);
@@ -57,7 +57,7 @@ function FordDistanceFactor(props: Props) {
       setEnabled(true);
       setDistance(extValue);
     }
-  }, [environment]);
+  }, [fordDistanceFactorAttribute]);
 
   // Reflect state changes
   React.useEffect(() => {

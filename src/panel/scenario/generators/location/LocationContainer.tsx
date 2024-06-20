@@ -54,7 +54,7 @@ const LocationContainer = (props: Props) => {
     },
   }, props);
 
-  const initiated = useAppSelector(({initiated}) => initiated);
+  const initiated = useAppSelector(({config}) => config.initiated);
 
   const [enabled, setEnabled] = React.useState<boolean>(props.enabled as boolean);
   const [locations, setLocations] = React.useState<LocationProps[]>([]);

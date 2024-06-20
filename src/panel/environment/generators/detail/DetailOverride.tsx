@@ -48,7 +48,7 @@ const DetailOverride = (props: Props) => {
   const [isInit, setIsInit] = React.useState<boolean>(false);
   const [templates, setTemplates] = React.useState<KVDocument<string>>({});
 
-  const environment = useAppSelector(({environment}) => (environment));
+  const detailOverridePrototypesAttribute = useAppSelector(({environment}) => environment?.values?.detailOverridePrototypes);
 
   const reflectValues = (values: ObjectsList) => {
     setTemplates(valuesToTemplates(values));
@@ -58,7 +58,7 @@ const DetailOverride = (props: Props) => {
 
   // Reflect redux specific changes
   React.useEffect(() => {
-    const extValue = environment?.detailOverridePrototypes ?? null;
+    const extValue = detailOverridePrototypesAttribute ?? null;
 
     if (typeof extValue === 'boolean') {
       setChecked(extValue);
@@ -69,7 +69,7 @@ const DetailOverride = (props: Props) => {
       setChecked(true);
       reflectValues(extValueToSelection(extValue as Json));
     }
-  }, [environment]);
+  }, [detailOverridePrototypesAttribute]);
 
   // Reflect state changes
   React.useEffect(() => {

@@ -85,18 +85,18 @@ const DisasterContainer = (props: Props) => {
   const [enabled, setEnabled] = React.useState<boolean>(props.enabled as boolean);
   const [selection, setSelection] = React.useState<Registry>(props.attributes as Registry);
 
-  const scenario = useAppSelector(({scenario}) => (scenario));
+  const disastersAttribute = useAppSelector(({scenario}) => scenario?.values?.disasters);
 
   // Reflect attributes changes
   React.useEffect(() => {
-    const extValue = scenario?.disasters ?? null;
+    const extValue = disastersAttribute ?? null;
     if (isObject(extValue)) {
       setEnabled(true);
       setSelection(extValueToSelection(extValue as Json));
     } else {
       setEnabled(false);
     }
-  }, [scenario]);
+  }, [disastersAttribute]);
 
   // Reflect state changes
   React.useEffect(() => {

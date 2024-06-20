@@ -41,11 +41,11 @@ const MapSize = (props: Props) => {
   const [enabled, setEnabled] = React.useState<boolean>(props.enabled as boolean);
   const [value, setValue] = React.useState<number>(props.value as number);
 
-  const scenario = useAppSelector(({scenario}) => (scenario));
+  const sizeAttribute = useAppSelector(({scenario}) => scenario.values?.size);
 
   // Reflect attributes changes
   React.useEffect(() => {
-    const extValue = scenario?.size ?? null;
+    const extValue = sizeAttribute ?? null;
 
     // noinspection SuspiciousTypeOfGuard
     if (typeof extValue === 'boolean') {
@@ -56,7 +56,7 @@ const MapSize = (props: Props) => {
       setEnabled(true);
       setValue(extValue);
     }
-  }, [scenario]);
+  }, [sizeAttribute]);
 
   // Reflect state changes
   React.useEffect(() => {

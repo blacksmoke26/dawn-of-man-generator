@@ -29,7 +29,7 @@ import PropPanel from './generators/props/PropPanel';
 import SeasonsPanel from './generators/seasons/SeasonsPanel';
 
 // redux
-import {updateTemplate} from '~redux/reducers';
+import {updateTemplate} from '~redux/slices/environment/reducers';
 import {useAppDispatch, useAppSelector} from '~redux/hooks';
 
 // types
@@ -50,7 +50,7 @@ const toTemplateText = (templates: Json): string => {
 function EnvironmentContainer() {
   const dispatch = useAppDispatch();
 
-  const environmentTemplate = useAppSelector(({templates}) => (templates.environment));
+  const environmentTemplate = useAppSelector(({environment}) => environment.template);
 
   const [templates, setTemplates] = React.useState<Json>({
     noiseAmplitudes: '',
@@ -69,7 +69,7 @@ function EnvironmentContainer() {
   React.useEffect(() => {
     const text = toTemplateText(templates);
     if (text !== environmentTemplate) {
-      dispatch(updateTemplate({type: 'environment', text}));
+      dispatch(updateTemplate(text));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [templates, environmentTemplate]);

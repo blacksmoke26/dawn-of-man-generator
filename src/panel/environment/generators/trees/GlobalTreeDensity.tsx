@@ -37,11 +37,11 @@ const GlobalTreeDensity = ( props: Props ) => {
 	const [value, setValue] = React.useState<number>(random.randomDensity());
 	const [enabled, setEnabled] = React.useState<boolean>(props.enabled as boolean);
 
-	const environment = useAppSelector(({environment}) => (environment));
+	const globalTreeDensityAttribute = useAppSelector(({environment}) => environment.values?.globalTreeDensity);
 
 	// Reflect attributes changes
 	React.useEffect(() => {
-		const extValue = environment?.globalTreeDensity ?? null;
+		const extValue = globalTreeDensityAttribute ?? null;
 
 		if ( typeof extValue === 'boolean' ) {
 			setEnabled(extValue);
@@ -51,7 +51,7 @@ const GlobalTreeDensity = ( props: Props ) => {
 			setEnabled(true);
 			setValue(extValue);
 		}
-	}, [environment]);
+	}, [globalTreeDensityAttribute]);
 
 	// Reflect state changes
 	React.useEffect(() => {

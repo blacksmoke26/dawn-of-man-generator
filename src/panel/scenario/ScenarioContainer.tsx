@@ -35,7 +35,7 @@ import {nodesToLanguageStrings} from '~/utils/location';
 
 // redux
 import {useAppDispatch, useAppSelector} from '~redux/hooks';
-import {updateTemplate, updateString} from '~redux/reducers';
+import {updateTemplate, updateString} from '~redux/slices/scenario/reducers';
 
 // types
 import type {Json, KVDocument} from '~/types/json.types';
@@ -76,8 +76,8 @@ const toLanguageText = (strings: KVDocument<string | Json>): string => {
 const ScenarioContainer = () => {
   const dispatch = useAppDispatch();
 
-  const templateText = useAppSelector(({templates}) => templates.scenario);
-  const stringsText = useAppSelector(({strings}) => strings.scenario);
+  const templateText = useAppSelector(({scenario}) => scenario.template);
+  const stringsText = useAppSelector(({scenario}) => scenario.strings);
 
   const [templateTexts, setTemplateTexts] = React.useState<KVDocument<string>>({
     hardcoreModeAllowed: '',
@@ -111,7 +111,7 @@ const ScenarioContainer = () => {
   React.useEffect(() => {
     const text = toTemplateText(templateTexts);
     if (text !== templateText) {
-      dispatch(updateTemplate({type: 'scenario', text}));
+      dispatch(updateTemplate(text));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [templateTexts, templateText]);
@@ -119,7 +119,7 @@ const ScenarioContainer = () => {
   React.useEffect(() => {
     const text = toLanguageText(langStrings);
     if (text !== stringsText) {
-      dispatch(updateString({type: 'scenario', text}));
+      dispatch(updateString(text));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [langStrings, stringsText]);

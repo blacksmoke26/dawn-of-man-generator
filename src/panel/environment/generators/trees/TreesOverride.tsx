@@ -48,7 +48,7 @@ const TreesOverride = (props: Props) => {
 	const [isInit, setIsInit] = React.useState<boolean>(false);
 	const [templates, setTemplates] = React.useState<KVDocument<string>>({});
 
-	const environment = useAppSelector(({environment}) => (environment));
+	const treeOverridePrototypesAttribute = useAppSelector(({environment}) => environment.values?.treeOverridePrototypes);
 
 	const reflectValues = (values: ObjectsList) => {
 		setTemplates(valuesToTemplates(values));
@@ -58,7 +58,7 @@ const TreesOverride = (props: Props) => {
 
 	// Reflect redux specific changes
 	React.useEffect(() => {
-		const extValue = environment?.treeOverridePrototypes ?? null;
+		const extValue = treeOverridePrototypesAttribute ?? null;
 
 		if (typeof extValue === 'boolean') {
 			setChecked(extValue);
@@ -69,7 +69,7 @@ const TreesOverride = (props: Props) => {
 			setChecked(true);
 			reflectValues(extValueToSelection(extValue as Json));
 		}
-	}, [environment]);
+	}, [treeOverridePrototypesAttribute]);
 
 	// Reflect state changes
 	React.useEffect(() => {

@@ -68,11 +68,11 @@ const Fall = (props: Props) => {
   const [enabled, setEnabled] = React.useState<boolean>(props.enabled as boolean);
   const [season, setSeason] = React.useState<FallSeasonProps>(props.season as FallSeasonProps);
 
-  const environment = useAppSelector(({environment}) => (environment));
+  const seasonsAttribute = useAppSelector(({environment}) => environment?.values?.seasons);
 
   // Reflect attributes changes
   React.useEffect(() => {
-    const extValue = environment?.seasons ?? null;
+    const extValue = seasonsAttribute ?? null;
 
     if (typeof extValue === 'boolean') {
       setEnabled(extValue);
@@ -82,7 +82,7 @@ const Fall = (props: Props) => {
       setEnabled(true);
       setSeason(extValueToSeason(extValue as Json) as FallSeasonProps);
     }
-  }, [environment]);
+  }, [seasonsAttribute]);
 
   // Reflect attributes changes
   React.useEffect(() => {

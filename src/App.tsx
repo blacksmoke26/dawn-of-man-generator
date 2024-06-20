@@ -17,22 +17,22 @@ import TemplateXMLViewer from '~/panel/environment/TemplateXMLViewer';
 import EnvironmentContainer from '~/panel/environment/EnvironmentContainer';
 
 // scenario components
+import XmlToPlainJson from '~/dev/panels/XmlToPlainJson';
+import XmlToScenarioJson from '~/dev/panels/XmlToScenarioJson';
 import ScenarioContainer from '~/panel/scenario/ScenarioContainer';
 import ScenarioTemplateXMLViewer from '~/panel/scenario/TemplateXMLViewer';
-import XmlToPlainJson from '~/dev/panels/XmlToPlainJson';
 
 // icons
 import {IconCodeXml, IconEnvironment, IconScenario} from '~/components/icons/app';
 
 // redux
-import {updateInit} from '~redux/reducers';
-import {useAppDispatch} from '~redux/hooks';
-import XmlToScenarioJson from '~/dev/panels/XmlToScenarioJson';
-
-const ENV_PROD: boolean = process.env.NODE_ENV === 'production';
+import {useAppDispatch, useAppSelector} from '~redux/hooks';
+import {updateInit} from '~redux/slices/config/reducers';
 
 const App = () => {
   const dispatch = useAppDispatch();
+
+  const panelsAttribute = useAppSelector(({config}) => config?.panels);
 
   React.useEffect(() => {
     dispatch(updateInit(true));
@@ -73,7 +73,7 @@ const App = () => {
               </Col>
             </Row>
           </Tab>
-          {!ENV_PROD && (
+          {panelsAttribute?.showXmlToJson && (
             <Tab as="div" eventKey="xml_to_json" title={
               <div className="pl-4 pr-4" style={{fontSize: '0.95rem'}}>
                 <IconCodeXml width="16" height="16"/> Xml_Json
@@ -86,7 +86,7 @@ const App = () => {
               </Row>
             </Tab>
           )}
-          {!ENV_PROD && (
+          {panelsAttribute?.showXmlToScenario && (
             <Tab as="div" eventKey="xml_to_scenario_json" title={
               <div className="pl-4 pr-4" style={{fontSize: '0.95rem'}}>
                 <IconCodeXml width="16" height="16"/> Xml_Scenario

@@ -94,7 +94,7 @@ const NoiseAmplitudes = (props: Props) => {
     }));
   };
 
-  const environment = useAppSelector(({environment}) => (environment));
+  const noiseAmplitudesAttribute = useAppSelector(({environment}) => environment.values?.noiseAmplitudes);
 
   const filterEnabledFrequencies = <T = string>(list: T[]): Record<keyof ValueFrequencies, T> => {
     const values: Partial<Record<keyof ValueFrequencies, T>> = {
@@ -113,7 +113,7 @@ const NoiseAmplitudes = (props: Props) => {
 
   // Reflect attributes changes
   React.useEffect(() => {
-    const extValue = environment?.noiseAmplitudes ?? null;
+    const extValue = noiseAmplitudesAttribute ?? null;
 
     if (typeof extValue === 'boolean') {
       setEnabled(extValue);
@@ -133,7 +133,7 @@ const NoiseAmplitudes = (props: Props) => {
         freq8: true,
       });
     }
-  }, [environment]);
+  }, [noiseAmplitudesAttribute]);
 
   // Reflect state changes
   React.useEffect(() => {

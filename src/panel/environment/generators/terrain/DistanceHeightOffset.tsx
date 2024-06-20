@@ -43,11 +43,11 @@ const DistanceHeightOffset = (props: Props) => {
   const [enabled, setEnabled] = React.useState<boolean>(props.enabled as boolean);
   const [distance, setDistance] = React.useState<number>(props.distance as number);
 
-  const environment = useAppSelector(({environment}) => (environment));
+  const distanceHeightOffsetAttribute = useAppSelector(({environment}) => environment?.values?.distanceHeightOffset);
 
   // Reflect attributes changes
   React.useEffect(() => {
-    const extValue = environment?.distanceHeightOffset ?? null;
+    const extValue = distanceHeightOffsetAttribute ?? null;
 
     if (typeof extValue === 'boolean') {
       setEnabled(extValue);
@@ -57,7 +57,7 @@ const DistanceHeightOffset = (props: Props) => {
       setEnabled(true);
       setDistance(extValue);
     }
-  }, [environment]);
+  }, [distanceHeightOffsetAttribute]);
 
   // Reflect state changes
   React.useEffect(() => {

@@ -47,7 +47,7 @@ const Location = (props: Props) => {
     },
   }, props);
 
-  const fileName = useAppSelector(({fileName}) => fileName);
+  const environmentName = useAppSelector(({environment}) => environment.name);
 
   const [values, setValues] = React.useState<LocationProps>(props.values as LocationProps);
   const [enabled, setEnabled] = React.useState<boolean>(props.enabled as boolean);
@@ -96,8 +96,8 @@ const Location = (props: Props) => {
   };
 
   const environments = [...labels, {
-    label: capitalCase(fileName),
-    value: fileName,
+    label: capitalCase(environmentName),
+    value: environmentName,
     desc: 'Custom tailored environment for the free play scenario',
   }];
 
@@ -171,7 +171,7 @@ const Location = (props: Props) => {
             }}/>
             <Button disabled={!enabled} variant="secondary" size="sm" title="Randomize"
                     onClick={() => {
-                      updateValue('environment', location.randomEnvironment([fileName]));
+                      updateValue('environment', location.randomEnvironment([environmentName]));
                     }}><IconShuffle/></Button>
           </InputGroup>
           <ul className="list-unstyled list-inline mb-0 mt-1">
@@ -341,7 +341,7 @@ const Location = (props: Props) => {
         <ButtonGroup>
           <Button disabled={!enabled} variant="secondary" size="sm"
                   onClick={() => {
-                    const randLocation = location.randomizeLocation([fileName]);
+                    const randLocation = location.randomizeLocation([environmentName]);
                     randLocation._id = values._id;
                     !isLakeEnabled && (randLocation.lakes = values.lakes);
                     !isRiverEnabled && (randLocation.river = values.river);

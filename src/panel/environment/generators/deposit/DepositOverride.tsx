@@ -48,7 +48,7 @@ const DepositOverride = (props: Props) => {
   const [isInit, setIsInit] = React.useState<boolean>(false);
   const [templates, setTemplates] = React.useState<KVDocument<string>>({});
 
-  const environment = useAppSelector(({environment}) => (environment));
+  const depositOverridePrototypesAttribute = useAppSelector(({environment}) => environment?.values?.depositOverridePrototypes);
 
   const reflectValues = (values: ObjectsList) => {
     setTemplates(valuesToTemplates(values));
@@ -58,7 +58,7 @@ const DepositOverride = (props: Props) => {
 
   // Reflect redux specific changes
   React.useEffect(() => {
-    const extValue = environment?.depositOverridePrototypes ?? null;
+    const extValue = depositOverridePrototypesAttribute ?? null;
 
     if (typeof extValue === 'boolean') {
       setChecked(extValue);
@@ -69,7 +69,7 @@ const DepositOverride = (props: Props) => {
       setChecked(true);
       reflectValues(extValueToSelection(extValue as Json));
     }
-  }, [environment]);
+  }, [depositOverridePrototypesAttribute]);
 
   // Reflect state changes
   React.useEffect(() => {

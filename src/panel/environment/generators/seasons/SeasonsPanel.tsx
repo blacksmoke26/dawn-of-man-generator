@@ -25,7 +25,7 @@ import {seasonsPropsDefault, seasonsPropsRandomize} from '~/utils/seasons';
 
 // redux
 import {useAppSelector, useAppDispatch} from '~redux/hooks';
-import {updateEnvironmentRaw} from '~redux/reducers';
+import {updateValuesRaw} from '~redux/slices/environment/reducers';
 
 // icons
 import {IconFall, IconRestore, IconShuffle, IconSpring, IconSummer, IconWinter} from '~/components/icons/app';
@@ -66,11 +66,11 @@ const SeasonsPanel = (props: Props) => {
 
   const {spring: springConfig, summer: summerConfig, fall: fallConfig, winter: winterConfig} = seasonProps;
 
-  const environment = useAppSelector(({environment}) => (environment));
+  const seasonsAttribute = useAppSelector(({environment}) => environment.values?.seasons);
 
   // Reflect attributes changes
   React.useEffect(() => {
-    const extValue = environment?.seasons ?? null;
+    const extValue = seasonsAttribute ?? null;
 
     if (typeof extValue === 'boolean') {
       setEnabled(extValue);
@@ -79,7 +79,7 @@ const SeasonsPanel = (props: Props) => {
     if (isObject(extValue) && Object.keys(extValue as Json).length) {
       setEnabled(true);
     }
-  }, [environment]);
+  }, [seasonsAttribute]);
 
   // Reflect state changes
   React.useEffect(() => {
@@ -142,14 +142,14 @@ const SeasonsPanel = (props: Props) => {
           <Button
             disabled={!enabled} variant="secondary" size="sm"
             onClick={() => {
-              dispatch(updateEnvironmentRaw({seasons: seasonsPropsRandomize()}));
+              dispatch(updateValuesRaw({seasons: seasonsPropsRandomize()}));
             }}>
             <IconShuffle/> Randomize All
           </Button>
           <Button
             disabled={!enabled} variant="secondary" size="sm"
             onClick={() => {
-              dispatch(updateEnvironmentRaw({seasons: seasonsPropsDefault()}));
+              dispatch(updateValuesRaw({seasons: seasonsPropsDefault()}));
             }}>
             <IconRestore/> Restore All
           </Button>

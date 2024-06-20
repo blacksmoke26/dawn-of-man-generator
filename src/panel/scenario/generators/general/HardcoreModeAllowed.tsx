@@ -34,17 +34,17 @@ const HardcoreModeAllowed = (props: Props) => {
   const [value, setValue] = React.useState<boolean>(props.value as boolean);
   const [enabled, setEnabled] = React.useState<boolean>(props.enabled as boolean);
 
-  const scenario = useAppSelector(({scenario}) => (scenario));
+  const hardcoreModeAllowedAttribute = useAppSelector(({scenario}) => scenario?.values?.hardcoreModeAllowed);
 
   // Reflect attributes changes
   React.useEffect(() => {
-    const extValue = scenario?.hardcoreModeAllowed ?? null;
+    const extValue = hardcoreModeAllowedAttribute ?? null;
 
     if (typeof extValue === 'boolean') {
       setEnabled(extValue);
       setValue(extValue);
     }
-  }, [scenario]);
+  }, [hardcoreModeAllowedAttribute]);
 
   // Reflect attributes changes
   React.useEffect(() => {

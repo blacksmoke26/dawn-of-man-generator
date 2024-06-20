@@ -35,11 +35,11 @@ const Trees = ( props: Props ) => {
 	const [trees, setTrees] = React.useState<string[]>(random.randomTrees());
 	const [enabled, setEnabled] = React.useState<boolean>(props.enabled as boolean);
 
-	const environment = useAppSelector(({environment}) => (environment));
+	const treesAttribute = useAppSelector(({environment}) => environment.values?.trees);
 
 	// Reflect attributes changes
 	React.useEffect(() => {
-		const extValue = environment?.trees ?? null;
+		const extValue = treesAttribute ?? null;
 
 		if ( typeof extValue === 'boolean' ) {
 			setEnabled(extValue);
@@ -49,7 +49,7 @@ const Trees = ( props: Props ) => {
 			setEnabled(true);
 			setTrees(extValue);
 		}
-	}, [environment]);
+	}, [treesAttribute]);
 
 	// Reflect state changes
 	React.useEffect(() => {

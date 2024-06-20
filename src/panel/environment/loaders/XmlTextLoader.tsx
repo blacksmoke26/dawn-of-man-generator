@@ -19,7 +19,7 @@ import {xmlToReduxJson} from '~/data/environments/loader';
 
 // redux
 import {useAppDispatch} from '~redux/hooks';
-import {updateEnvironmentRaw} from '~redux/reducers';
+import {updateValuesRaw} from '~redux/slices/environment/reducers';
 
 /** XmlTextLoader functional component */
 function XmlTextLoader() {
@@ -43,7 +43,7 @@ function XmlTextLoader() {
   const onImportClick = React.useCallback(async () => {
     try {
       const json = xmlToReduxJson(value);
-      dispatch(updateEnvironmentRaw(json?.environment ?? {}));
+      dispatch(updateValuesRaw(json?.environment ?? {}));
       setShowModel(false);
     } catch (e: any) {
       setError(e.message);

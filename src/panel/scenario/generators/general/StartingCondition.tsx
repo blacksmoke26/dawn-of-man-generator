@@ -51,7 +51,7 @@ const StartingCondition = (props: Props) => {
     },
   }, props);
 
-  const scenario = useAppSelector(({scenario}) => (scenario));
+  const startingConditionAttribute = useAppSelector(({scenario}) => scenario.values?.startingCondition);
 
   const [attributes, setAttributes] = React.useState<Attributes>({
     seasonId: props.seasonId as Season,
@@ -67,14 +67,14 @@ const StartingCondition = (props: Props) => {
 
   // Reflect attributes changes
   React.useEffect(() => {
-    const extValue = scenario?.startingCondition ?? null;
+    const extValue = startingConditionAttribute ?? null;
     const isEnabled = !!extValue;
     setAttribute<boolean>('enabled', isEnabled);
 
     if (isEnabled) {
       setAttribute<Season>('seasonId', extValue?.seasonId as Season);
     }
-  }, [scenario]);
+  }, [startingConditionAttribute]);
 
   // Reflect state changes
   React.useEffect(() => {

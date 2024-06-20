@@ -35,17 +35,17 @@ const Visible = ( props: Props ) => {
 	const [value, setValue] = React.useState<boolean>(props.value as boolean);
 	const [enabled, setEnabled] = React.useState<boolean>(props.enabled as boolean);
 
-	const scenario = useAppSelector(({scenario}) => (scenario));
+	const visibleAttribute = useAppSelector(({scenario}) => scenario.values?.visible);
 	
 	// Reflect attributes changes
 	React.useEffect(() => {
-		const extValue = scenario?.nomadModeAllowed ?? null;
+		const extValue = visibleAttribute ?? null;
 		
 		if ( typeof extValue === 'boolean' ) {
 			setEnabled(extValue);
 			setValue(extValue);
 		}
-	}, [scenario]);
+	}, [visibleAttribute]);
 	
 	// Reflect attributes changes
 	React.useEffect(() => {

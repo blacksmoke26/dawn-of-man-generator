@@ -35,18 +35,18 @@ const RequiredMilestone = ( props: Props ) => {
 	const [value, setValue] = React.useState<number>(props.value as number);
 	const [enabled, setEnabled] = React.useState<boolean>(props.enabled as boolean);
 
-	const scenario = useAppSelector(({scenario}) => (scenario));
+	const requiredMilestonesAttribute = useAppSelector(({scenario}) => scenario.values?.requiredMilestones);
 	
 	// Reflect attributes changes
 	React.useEffect(() => {
-		const extValue = scenario?.requiredMilestones ?? null;
+		const extValue = requiredMilestonesAttribute ?? null;
 		
 		if ( !extValue || !parseInt(String(extValue)) ) {
 			setEnabled(!!extValue);
 		} else {
 			setValue(extValue as number);
 		}
-	}, [scenario]);
+	}, [requiredMilestonesAttribute]);
 	
 	// Reflect attributes changes
 	React.useEffect(() => {

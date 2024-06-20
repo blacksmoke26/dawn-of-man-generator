@@ -43,11 +43,11 @@ const SunAngleFactor = (props: Props) => {
   const [enabled, setEnabled] = React.useState<boolean>(props.enabled as boolean);
   const [angle, setAngle] = React.useState<number>(props.angle as number);
 
-  const environment = useAppSelector(({environment}) => (environment));
+  const sunAngleFactorAttribute = useAppSelector(({environment}) => environment.values?.sunAngleFactor);
 
   // Reflect attributes changes
   React.useEffect(() => {
-    const extValue = environment?.sunAngleFactor ?? null;
+    const extValue = sunAngleFactorAttribute ?? null;
 
     if (typeof extValue === 'boolean') {
       setEnabled(extValue);
@@ -57,7 +57,7 @@ const SunAngleFactor = (props: Props) => {
       setEnabled(true);
       setAngle(extValue);
     }
-  }, [environment]);
+  }, [sunAngleFactorAttribute]);
 
   // Reflect state changes
   React.useEffect(() => {

@@ -33,17 +33,17 @@ const ShowCompletionIcon = ( props: Props ) => {
 	const [value, setValue] = React.useState<boolean>(props.value as boolean);
 	const [enabled, setEnabled] = React.useState<boolean>(props.enabled as boolean);
 
-	const scenario = useAppSelector(({scenario}) => (scenario));
+	const showCompletionIconAttribute = useAppSelector(({scenario}) => scenario.values?.showCompletionIcon)
 
 	// Reflect attributes changes
 	React.useEffect(() => {
-		const extValue = scenario?.showCompletionIcon ?? null;
+		const extValue = showCompletionIconAttribute ?? null;
 
 		if ( typeof extValue === 'boolean' ) {
 			setEnabled(extValue);
 			setValue(extValue);
 		}
-	}, [scenario]);
+	}, [showCompletionIconAttribute]);
 
 	// Reflect attributes changes
 	React.useEffect(() => {
