@@ -16,6 +16,9 @@ import {Col, Form, Row} from 'react-bootstrap';
 // redux
 import {useAppSelector} from '~redux/hooks';
 
+// parsers
+import {toNomadModeAllowedTemplate} from '~/utils/parser/templates-general';
+
 /** NomadModeAllowed `props` type */
 interface Props {
 	enabled?: boolean,
@@ -54,16 +57,12 @@ function NomadModeAllowed ( props: Props ) {
 	
 	// Reflect state changes
 	React.useEffect(() => {
-		typeof props.onChange === 'function' && props.onChange(toTemplateText(), value);
+		typeof props.onChange === 'function' && props.onChange(
+			toNomadModeAllowedTemplate(value, enabled), value
+		);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [value, enabled]);
-	
-	const toTemplateText = (): string => {
-		return !enabled
-			? ''
-			: `<nomad_mode_allowed value="${value ? 'true' : 'false'}"/>`;
-	};
-	
+
 	return (
 		<div className={cn('mb-2', {'text-muted': !enabled}, 'checkbox-align')}>
 			<Row className="mb-1">

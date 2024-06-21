@@ -19,6 +19,9 @@ import TextInput from '~/components/ui/TextInput';
 // redux
 import {useAppSelector} from '~redux/hooks';
 
+// parsers
+import {toGroupIDTemplate} from '~/utils/parser/templates-general';
+
 /** GroupID `props` type */
 interface Props {
   enabled?: boolean,
@@ -59,15 +62,11 @@ const GroupID = (props: Props) => {
 
   // Reflect state changes
   React.useEffect(() => {
-    typeof props.onChange === 'function' && props.onChange(toTemplateText(), value);
+    typeof props.onChange === 'function' && props.onChange(
+      toGroupIDTemplate(value, enabled), value
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value, enabled]);
-
-  const toTemplateText = (): string => {
-    return !enabled
-      ? ''
-      : `<group_id value="${value}"/>`;
-  };
 
   return (
     <div className={cn('mb-2', {'text-muted': !enabled}, 'checkbox-align')}>

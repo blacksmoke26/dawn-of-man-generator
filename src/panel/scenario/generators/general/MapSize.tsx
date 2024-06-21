@@ -21,6 +21,9 @@ import * as Defaults from '~/utils/scenario/defaults';
 // redux
 import {useAppSelector} from '~redux/hooks';
 
+// parsers
+import {toSizeTemplate} from '~/utils/parser/templates-general';
+
 /** MapSize `props` type */
 interface Props {
   enabled?: boolean,
@@ -60,15 +63,10 @@ const MapSize = (props: Props) => {
 
   // Reflect state changes
   React.useEffect(() => {
-    typeof props.onChange === 'function' && props.onChange(toTemplateText(), value);
+    typeof props.onChange === 'function' && props.onChange(
+      toSizeTemplate(value, enabled), value
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value, enabled]);
-
-  /** Generate xml code */
-  const toTemplateText = React.useCallback((): string => {
-    return enabled
-      ? `<size value="${value}"/>`
-      : '';
   }, [value, enabled]);
 
   return (

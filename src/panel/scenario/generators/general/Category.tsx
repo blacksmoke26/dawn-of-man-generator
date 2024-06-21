@@ -1,5 +1,3 @@
-// @flow
-
 /**
  * @author Junaid Atari <mj.atari@gmail.com>
  * @link http://junaidatari.com Author Website
@@ -18,6 +16,9 @@ import TextInput from '~/components/ui/TextInput';
 
 // redux
 import {useAppSelector} from '~redux/hooks';
+
+// parsers
+import {toCategoryTemplate} from '~/utils/parser/templates-general';
 
 /** Category `props` type */
 interface Props {
@@ -58,16 +59,12 @@ const Category = ( props: Props ) => {
 	
 	// Reflect state changes
 	React.useEffect(() => {
-		typeof props.onChange === 'function' && props.onChange(toTemplateText(), value);
+		typeof props.onChange === 'function' && props.onChange(
+			toCategoryTemplate(value, enabled), value
+		);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [value, enabled]);
-	
-	const toTemplateText = (): string => {
-		return !enabled
-			? ''
-			: `<category value="${value}"/>`;
-	};
-	
+
 	return (
 		<div className={cn('mb-2', {'text-muted': !enabled}, 'checkbox-align')}>
 			<Row className="mb-1">
