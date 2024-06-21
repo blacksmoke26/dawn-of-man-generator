@@ -21,6 +21,7 @@ export const jsonToRedux = (json: Json, options: JsonToReduxOptions = {}): Json 
     wrapperKey: 'startingConditions',
     required: ['season_id'],
     only: ['season_id', 'visual_setup_id'],
+    camelKeys: true,
     filterRequired(name: string, value: string): boolean {
       return !(name === 'season_id' && !DEFAULT_SEASONS.includes(value));
     },

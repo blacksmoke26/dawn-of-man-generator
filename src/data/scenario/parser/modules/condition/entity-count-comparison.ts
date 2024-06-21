@@ -36,7 +36,7 @@ export const jsonToRedux = (node: Json | any): Json | null => {
     condition.counter = node?.counter;
   }
 
-  condition.entity_type = node?.entity_type;
+  condition.entityType = node?.entity_type;
 
   if (isInt(node?.value) && node?.value >= 0) {
     condition.value = node?.value;

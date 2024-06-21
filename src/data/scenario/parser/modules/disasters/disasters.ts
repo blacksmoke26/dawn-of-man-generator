@@ -28,6 +28,7 @@ export const jsonToRedux = (json: Json, options: JsonToReduxOptions = {}): Json 
     only: allAttrs,
     minItems: 1,
     maxItems: 2,
+    camelKeys: true,
     filterRequired(name: string, value: any): boolean {
       if (name === 'disaster_type' && !DEFAULT_DISASTER.includes(String(value))) {
         return false;

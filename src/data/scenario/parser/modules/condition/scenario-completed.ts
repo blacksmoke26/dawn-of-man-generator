@@ -31,7 +31,7 @@ export const jsonToRedux = (node: Json | any): Json | null => {
   };
 
   if (isString(node?.game_mode) && GAME_MODES.includes(node?.game_mode)) {
-    condition.game_mode = node?.game_mode;
+    condition.gameMode = node?.game_mode;
   }
 
   return condition;

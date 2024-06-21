@@ -73,5 +73,6 @@ export const jsonToRedux = (json: Json, options: JsonToReduxOptions = {}): Json 
     maxItems: LOCATION_COUNT_MAX,
     filterRequired,
     transform,
+    camelKeys: true,
   }, options));
 };

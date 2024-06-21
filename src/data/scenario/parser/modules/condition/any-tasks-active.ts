@@ -31,7 +31,7 @@ export const jsonToRedux = (node: Json | any): Json | null => {
   };
 
   if (isInt(node?.min_performers) && node?.min_performers >= 0) {
-    condition.min_performers = node?.min_performers;
+    condition.minPerformers = node?.min_performers;
   }
 
   return condition;

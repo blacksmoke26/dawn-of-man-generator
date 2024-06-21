@@ -27,11 +27,11 @@ export const jsonToRedux = (node: Json | any): Json | null => {
 
   const condition: Json = {
     type: CONDITION_TYPE,
-    work_area_id: node?.work_area_id.trim(),
+    workAreaId: node?.work_area_id.trim(),
   };
 
   if (node?.max_workers && isInt(node?.max_workers) && node?.max_workers >= 0) {
-    condition.max_workers = node?.max_workers;
+    condition.maxWorkers = node?.max_workers;
   }
 
   return condition;
