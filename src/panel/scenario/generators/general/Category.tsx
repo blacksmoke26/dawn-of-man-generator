@@ -13,6 +13,9 @@ import merge from 'deepmerge';
 import {nanoid} from 'nanoid';
 import {Col, Form, Row} from 'react-bootstrap';
 
+// elemental components
+import TextInput from '~/components/ui/TextInput';
+
 // redux
 import {useAppSelector} from '~redux/hooks';
 
@@ -85,23 +88,19 @@ const Category = ( props: Props ) => {
 					/>
 				</Col>
 			</Row>
-			<Form.Control
-				type="text"
+			<TextInput
+				caseType="CAPITAL_CASE"
 				disabled={!enabled}
-				className="pull-right"
-				aria-disabled={!enabled}
-				id={`category-${nanoid(5)}`}
-				aria-placeholder={props.value}
 				value={value}
-				onChange={e => setValue(e.target.value)}
-			/>
+				placeholder="e.g., Freeplay"
+				onChange={theValue => setValue(theValue as string)}/>
 		</div>
 	);
 };
 
 // Properties validation
 Category.propTypes = {
-	value: PropTypes.bool,
+	value: PropTypes.string,
 	enabled: PropTypes.bool,
 	onChange: PropTypes.func,
 };
