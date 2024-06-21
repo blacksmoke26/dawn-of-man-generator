@@ -8,10 +8,11 @@ import React, {PropsWithChildren} from 'react';
 import cn from 'classname';
 import {nanoid} from 'nanoid';
 import merge from 'deepmerge';
+import {capitalCase} from 'change-case';
 import {Button, Form, type FormControlProps, InputGroup} from 'react-bootstrap';
 
 // hooks
-import { useDebouncedCallback } from 'use-debounce';
+import {useDebouncedCallback} from 'use-debounce';
 
 // icons
 import {
@@ -40,22 +41,32 @@ export interface Props {
   onShuffle?(): void;
 
   onRestore?(): void;
-
 }
 
-const sanitizeInput = (value: string, event: 'KEYUP' | 'CHANGE' = 'CHANGE', caseType: ValueCaseType): string => {
-  if (caseType === 'SNAKE_CASE') {
-    if (event === 'KEYUP') {
-      return value.replace(/(['" \t]|[^a-z_\d])+/ig, `_`).toLowerCase();
-    }
+type ValueCaseType = 'SNAKE_CASE' | 'CAPITAL_CASE' | 'DEFAULT';
 
-    return value.replace(/(['" \t]|[^a-z_\d])+/ig, `_`);
+const REGEX = /[^a-z_\d]+/ig;
+
+const sanitizeInput = (value: string, event: 'KEYUP' | 'CHANGE' = 'CHANGE', caseType: ValueCaseType): string => {
+  let newValue = String(value || '')
+    .replace(/ {2,}|['"]+/ig, '');
+
+  if (caseType === 'SNAKE_CASE') {
+    return (event === 'KEYUP'
+      ? newValue.replace(REGEX, `_`).toLowerCase()
+      : newValue.replace(REGEX, `_`))
+      .replace(/_+/ig, '_');
   }
 
-  return String(value || '').replace(/['"]+/ig, ``);
-};
+  if (caseType === 'CAPITAL_CASE') {
+    return (event === 'KEYUP'
+      ? capitalCase(newValue.replace(REGEX, ` `))
+      : newValue.replace(REGEX, ` `))
+      .replace(/ +/ig, ' ');
+  }
 
-type ValueCaseType = 'SNAKE_CASE' | 'DEFAULT';
+  return newValue;
+};
 
 const TextInput = (props: PropsWithChildren<Props> = {}) => {
   const newProps = merge<Required<Props>>({
@@ -84,7 +95,7 @@ const TextInput = (props: PropsWithChildren<Props> = {}) => {
     // function
     newProps.onChange,
     // delay in ms
-    60, { maxWait: 250 }
+    60, {maxWait: 250},
   );
   React.useEffect(() => {
     newProps?.focusOnLoad && inputRef?.current?.focus();
