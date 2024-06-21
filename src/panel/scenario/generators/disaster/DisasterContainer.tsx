@@ -30,6 +30,8 @@ import {useAppSelector} from '~redux/hooks';
 
 // types
 import type {Json} from '~/types/json.types';
+import {DisasterNode, toDisastersTemplate} from '~/utils/parser/templates-general';
+import {Disasters} from '~/types/scenario.types';
 
 export interface Attributes {
   enabled?: boolean;
@@ -106,24 +108,22 @@ const DisasterContainer = (props: Props) => {
 
   /** Generate xml code */
   const toTemplateText = React.useCallback((): string => {
-    const templateOverride: Array<string> = [];
-
     if (!enabled) {
       return '';
     }
 
-    for (const [name, attr] of Object.entries(selection)) {
-      if (attr.enabled) {
-        templateOverride.push(
-          `<disaster disaster_type="${name}" period="${attr.period}y" variance="${attr.variance}y"/>`,
-        );
-      }
-    }
+    const disasters: DisasterNode[] = [];
 
-    return templateOverride.length
-      ? (
-        `<disasters>${templateOverride.join('')}</disasters>`
-      ) : '';
+    for (const [name, attr] of Object.entries(selection)) {
+      disasters.push({
+        name: name as unknown as Disasters,
+        period: attr?.period || '',
+        variance: attr?.variance || '',
+        allowRender: attr.enabled,
+      });
+    }
+    
+    return toDisastersTemplate(disasters);
   }, [enabled, selection]);
 
   /** Get react-select options */

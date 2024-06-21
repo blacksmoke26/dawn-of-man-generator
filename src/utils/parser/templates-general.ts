@@ -8,6 +8,8 @@
 // utils
 import {toString} from '~/helpers/string';
 import {Season} from '~/utils/seasons.types';
+import {Disasters} from '~/types/scenario.types';
+import {formatPeriod} from '~/utils/scenario/format';
 
 export const toCategoryTemplate = (value: string, allowRender: boolean = true): string => {
   return allowRender && toString(value).trim()
@@ -86,5 +88,43 @@ export const toStartingConditionTemplate = (values: {
 export const toVisualTemplate = (value: boolean = false, allowRender: boolean = true): string => {
   return allowRender
     ? `<visible value="${String(value)}"/>`
+    : '';
+};
+
+export const toDisasterTemplate = (name: Disasters, values: {
+  period: number | string;
+  variance: number | string;
+}, allowRender: boolean = true): string => {
+  return !allowRender || !String(name || '').trim()
+    ? ''
+    : `<disaster ${[
+      `disaster_type="${name}"`,
+      `period="${formatPeriod(values.period)}"`,
+      `variance="${formatPeriod(values.variance)}"`,
+    ].join(' ')}/>`;
+};
+
+export interface DisasterNode {
+  name: Disasters;
+  period: number | string;
+  variance: number | string;
+  allowRender?: boolean;
+}
+
+export const toDisastersTemplate = (disasters: DisasterNode[], allowRender: boolean = true): string => {
+  if (!allowRender || disasters.length === 0) {
+    return '';
+  }
+
+  const templates: string[] = [];
+
+  disasters.forEach(disaster => {
+    const {name, variance, period, allowRender: shouldRender = true} = disaster;
+    const template = toDisasterTemplate(name, {period, variance}, shouldRender).trim();
+    template && templates.push(template);
+  });
+
+  return templates.length
+    ? `<disasters>${templates.join('')}</disasters>`
     : '';
 };
