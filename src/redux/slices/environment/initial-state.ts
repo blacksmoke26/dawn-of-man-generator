@@ -10,7 +10,7 @@ import type {EnvironmentState} from './reducers.types';
 
 /** Redux store initial state */
 export default {
-  name: 'environment',
+  name: 'custom',
   values: {},
   template: '',
   strings: '',
