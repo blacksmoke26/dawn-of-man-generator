@@ -7,21 +7,23 @@
 import React from 'react';
 import * as PropTypes from 'prop-types';
 import cn from 'classname';
-import slugify from 'slugify';
 import merge from 'deepmerge';
 import {nanoid} from 'nanoid';
 import {capitalCase} from 'change-case';
-import {Button, ButtonGroup, Col, Form, InputGroup, Row} from 'react-bootstrap';
+import {Button, Col, Form, InputGroup, Row} from 'react-bootstrap';
 
 // components
 import Slider from '~/components/ui/Slider';
-import {labels} from '~/data/environments/builtin';
+import TextInput from '~/components/ui/TextInput';
+import LinkButton from '~/components/ui/LinkButton';
+import NumberInput from '~/components/ui/NumberInput';
 
 // icons
-import {IconRestore, IconShuffle} from '~/components/icons/app';
+import {IconShuffle} from '~/components/icons/app';
 
 // utils
 import * as location from '~/utils/location';
+import {labels} from '~/data/environments/builtin';
 import {POSITION_MAX, POSITION_MIN} from '~/utils/defaults';
 
 // redux
@@ -30,9 +32,6 @@ import {useAppSelector} from '~redux/hooks';
 // types
 import type {Json} from '~/types/json.types';
 import type {LocationProps} from '~/utils/location';
-import TextInput from '~/components/ui/TextInput';
-import LinkButton from '~/components/ui/LinkButton';
-import NumberInput from '~/components/ui/NumberInput';
 
 export interface Props {
   enabled?: boolean,
