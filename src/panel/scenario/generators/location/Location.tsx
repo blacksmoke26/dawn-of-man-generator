@@ -25,6 +25,7 @@ import {IconShuffle} from '~/components/icons/app';
 import * as location from '~/utils/location';
 import {labels} from '~/data/environments/builtin';
 import {POSITION_MAX, POSITION_MIN} from '~/utils/defaults';
+import {LOCATION_LAKES_MAX, LOCATION_LAKES_MIN} from '~/utils/scenario/defaults';
 
 // redux
 import {useAppSelector} from '~redux/hooks';
@@ -136,37 +137,44 @@ const Location = (props: Props) => {
         <Form.Label className="text-size-sm" style={{textDecoration: 'underline dotted'}}
                     title="Used to create a map" column={true} sm="2">Seed</Form.Label>
         <Col sm="10">
-          <InputGroup>
-            <Form.Control
+          <div className="float-left">
+            <NumberInput
+              maxLength={8}
+              min={1}
+              max={99999999}
               disabled={!enabled}
-              value={values.seed} size="sm" className="d-inline-block position-relative"
-              maxLength={9} style={{maxWidth: 140}} onChange={e => {
-              if (e.target.value === '' || /^[0-9\b]+$/.test(e.target.value)) {
-                updateValue('seed', e.target.value);
-              }
-            }}/>
-            {' '}
+              placeholder="e.g. 11111111"
+              value={values.seed}
+              inputProps={{style: {width: 150}, className: 'd-inline-block position-relative'}}
+              onChange={value => updateValue('seed', '' + value)}
+              shuffle={true}
+              onShuffle={() => updateValue('seed', location.randomSeed())}
+            />
+          </div>
+          <div className="float-left mt-1">
             <LinkButton
-              className="ml-2"
-              title="Randomize"
+              className="text-size-sm"
+              title="Set all as 0"
               disabled={!enabled}
-              onClick={() => updateValue('seed', location.randomSeed())}>
-              <IconShuffle width="16" height="16"/>
+              onClick={() => updateValue('seed', '00000000')}>
+              0x8
             </LinkButton>
             <LinkButton
-              className="ml-2"
+              className="mr-2 text-size-sm"
               title="Set all as 1"
               disabled={!enabled}
               onClick={() => updateValue('seed', '11111111')}>
               1x8
             </LinkButton>
             <LinkButton
-              title="Set all as 0"
+              className="mr-2 text-size-sm"
+              title="Set all as 9"
               disabled={!enabled}
-              onClick={() => updateValue('seed', '00000000')}>
-              0x8
+              onClick={() => updateValue('seed', '99999999')}>
+              9x8
             </LinkButton>
-          </InputGroup>
+          </div>
+          <div className="clearfix"></div>
         </Col>
       </Form.Group>
       <Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled})}>
@@ -344,24 +352,17 @@ const Location = (props: Props) => {
           <NumberInput
             disabled={!enabled || !lakeEnabled}
             value={values.lakes}
-            min={0} max={9} maxLength={1}
+            min={LOCATION_LAKES_MIN} max={LOCATION_LAKES_MAX} maxLength={LOCATION_LAKES_MAX.toString().length}
             inputProps={{
               className: 'd-inline-block position-relative',
               style: {maxWidth: 80},
             }}
-            placeholder="0"
+            placeholder="1"
             shuffle
-            onShuffle={() => {
-              updateValue('lakes', location.randomLakes());
-            }}
+            onShuffle={() => updateValue('lakes', location.randomLakes())}
             allowRestore
-            onRestore={() => {
-              updateValue('lakes', 0);
-            }}
-            allowClear
-            onChange={value => {
-              updateValue('lakes', value);
-            }}/>
+            onRestore={() => updateValue('lakes', 1)}
+            onChange={value => updateValue('lakes', +value)}/>
         </Col>
       </Form.Group>
       <hr/>
