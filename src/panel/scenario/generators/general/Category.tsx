@@ -35,18 +35,18 @@ const Category = ( props: Props ) => {
 	const [value, setValue] = React.useState<string>(props.value as string);
 	const [enabled, setEnabled] = React.useState<boolean>(props.enabled as boolean);
 
-	const requiredScenarioAttribute = useAppSelector(({scenario}) => scenario?.values?.requiredScenario);
+	const categoryAttribute = useAppSelector(({scenario}) => scenario?.values?.category);
 	
 	// Reflect attributes changes
 	React.useEffect(() => {
-		const extValue = requiredScenarioAttribute ?? null;
+		const extValue = categoryAttribute ?? null;
 		
 		if ( !extValue ) {
 			setEnabled(!!extValue);
 		} else {
 			setValue(extValue as string);
 		}
-	}, [requiredScenarioAttribute]);
+	}, [categoryAttribute]);
 	
 	// Reflect attributes changes
 	React.useEffect(() => {
