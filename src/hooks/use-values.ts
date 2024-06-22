@@ -21,7 +21,7 @@ const useValues = <T extends object>(initialValues: T): UseValuesHook<T> => {
     setAll(newValues: T) {
       setValues(newValues);
     },
-    setValue(name, value, checkUndefined = false) {
+    set(name, value, checkUndefined = false) {
       if (checkUndefined && value === undefined) return;
 
       if (this.hasKey(name as keyof T)) {
@@ -48,8 +48,11 @@ const useValues = <T extends object>(initialValues: T): UseValuesHook<T> => {
         return newCurrent;
       });
     },
-    getValue(name, defaultValue = undefined) {
+    get(name, defaultValue = undefined) {
       return objPath.get(values, name as Path, defaultValue);
+    },
+    is(name, compare) {
+      return this.get(name as Path) === compare;
     },
     hasKey(key) {
       return key in values;

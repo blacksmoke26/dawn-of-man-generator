@@ -23,14 +23,30 @@ export interface UseValuesHook<T extends object> {
    * @param key - The key (e.g., 'enabled')
    * @param defaultValue - Default value if the key is not found
    */
-  getValue<R = any>(key: keyof T, defaultValue?: R | undefined): R;
+  get<R = any>(key: keyof T, defaultValue?: R | undefined): R;
 
   /**
    * Get value by path
    * @param path - The Path (e.g., 'a.b.c' | ['a', 'b', 'c'] | '0.a.3.c')
    * @param defaultValue - Default value if the path is not found
    */
-  getValue<R = any>(path: Path, defaultValue?: R | undefined): R;
+  get<R = any>(path: Path, defaultValue?: R | undefined): R;
+
+  /**
+   * Compare given value with the attribute's value
+   * @param key - The key (e.g., 'enabled')
+   * @param compare - The value to compare
+   * @return True if equal or false otherwise
+   */
+  is<R = any>(key: keyof T, compare?: R): boolean;
+
+  /**
+   * Compare given value with the attribute's value
+   * @param path - The Path (e.g., 'a.b.c' | ['a', 'b', 'c'] | '0.a.3.c')
+   * @param compare - The value to compare
+   * @return True if equal or false otherwise
+   */
+  is<R = any>(path: Path, compare?: R): boolean;
 
   /**
    * Set value by key
@@ -42,7 +58,7 @@ export interface UseValuesHook<T extends object> {
    * setValue<boolean>('enabled', (state) => !state);
    * @param checkUndefined - If true, the value as undefined work by set and ignore the setting process
    */
-  setValue<V = any>(key: keyof T, value: ValueType<V>, checkUndefined?: boolean): void;
+  set<V = any>(key: keyof T, value: ValueType<V>, checkUndefined?: boolean): void;
 
   /**
    * Set value by path
@@ -54,7 +70,7 @@ export interface UseValuesHook<T extends object> {
    * setValue<number>('a.b.c', (num) => num + 1);
    * @param checkUndefined - If true, the value as undefined work by set and ignore the setting process
    */
-  setValue<V = $Values<T> | any>(path: Path, value: ValueType<V>, checkUndefined?: boolean): void;
+  set<V = $Values<T> | any>(path: Path, value: ValueType<V>, checkUndefined?: boolean): void;
 
   /**
    * Clear all values
