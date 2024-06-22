@@ -5,6 +5,7 @@
  */
 
 import merge from 'deepmerge';
+import xmlFormatter, {XMLFormatterOptions} from 'xml-formatter';
 import {XMLValidator, XMLParser, validationOptions, X2jOptions, ValidationError} from 'fast-xml-parser';
 
 // types
@@ -53,3 +54,12 @@ export const xmlToJson = (xml: string, options: Partial<X2jOptions> = {}): Json 
   }
 };
 
+/**
+ * Format the given xml string
+ * @param str - The string to format
+ * @param options - Additional formatting options
+ * @returns - The formatted string
+ */
+export const formatXml = (str: string, options: XMLFormatterOptions = {}): string => {
+  return xmlFormatter(str, {indentation: '  ', ...options});
+};
