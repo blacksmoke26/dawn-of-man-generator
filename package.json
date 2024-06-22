@@ -87,7 +87,7 @@
     ]
   },
   "resolutions": {
-    "**/@babel/runtime": "7.24.7"
+    "**/@babel/runtime": "7.5.0"
   },
   "packageManager": "yarn@1.22.18",
   "engines": {
