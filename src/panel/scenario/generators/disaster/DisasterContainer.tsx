@@ -1,3 +1,5 @@
+// noinspection HtmlUnknownAnchorTarget
+
 /**
  * @author Junaid Atari <mj.atari@gmail.com>
  * @see https://github.com/blacksmoke26/dawn-of-man-generator
@@ -7,31 +9,31 @@
 // types
 import React from 'react';
 import * as PropTypes from 'prop-types';
-import {Button, Col, Form, Row} from 'react-bootstrap';
 import cn from 'classname';
 import {nanoid} from 'nanoid';
 import merge from 'deepmerge';
+import {Button, Col, Form, Row, Tab, Tabs} from 'react-bootstrap';
 
 // components
 import Slider from '~/components/ui/Slider';
 import Select, {Option} from '~/components/ui/Select';
-import Accordion from '~/components/ui/Accordion';
 
 // utils
 import * as random from '~/utils/random';
 import * as Defaults from '~/utils/defaults';
 import {isObject} from '~/helpers/object';
+import {toDisastersTemplate} from '~/utils/parser/templates-general';
 
 // icons
-import {COLOR_DISABLED, COLOR_REDDISH, IconClear, IconShuffle, IconStorm} from '~/components/icons/app';
+import {COLOR_DISABLED, COLOR_REDDISH, IconClear, IconShuffle} from '~/components/icons/app';
 
 // redux
 import {useAppSelector} from '~redux/hooks';
 
 // types
-import type {Json} from '~/types/json.types';
-import {DisasterNode, toDisastersTemplate} from '~/utils/parser/templates-general';
-import {Disasters} from '~/types/scenario.types';
+import type {Json, KVDocument} from '~/types/json.types';
+import type {Disasters} from '~/types/scenario.types';
+import type {DisasterNode} from '~/utils/parser/templates-general';
 
 export interface Attributes {
   enabled?: boolean;
@@ -39,9 +41,7 @@ export interface Attributes {
   variance?: string;
 }
 
-export interface Registry {
-  [p: string]: Attributes;
-}
+export type Registry = KVDocument<Attributes>;
 
 /** Get randomized initial values */
 const getInitialValues = (): Attributes => {
@@ -86,6 +86,7 @@ const DisasterContainer = (props: Props) => {
 
   const [enabled, setEnabled] = React.useState<boolean>(props.enabled as boolean);
   const [selection, setSelection] = React.useState<Registry>(props.attributes as Registry);
+  const [activeKey, setActiveKey] = React.useState<string>('');
 
   const disastersAttribute = useAppSelector(({scenario}) => scenario?.values?.disasters);
 
@@ -122,7 +123,7 @@ const DisasterContainer = (props: Props) => {
         allowRender: attr.enabled,
       });
     }
-    
+
     return toDisastersTemplate(disasters);
   }, [enabled, selection]);
 
@@ -151,6 +152,21 @@ const DisasterContainer = (props: Props) => {
     });
   };
 
+  const removeTab = (tabId: string): void => {
+    let nextActiveKey: string = activeKey;
+    const tabsId: string[] = Object.keys(selection);
+    const currentIndex: number = tabsId.findIndex(name => name === nextActiveKey);
+
+    if (nextActiveKey === tabId) {
+      nextActiveKey = currentIndex !== 0
+        ? tabsId[currentIndex + 1]
+        : tabsId[currentIndex - 1];
+      setActiveKey(nextActiveKey);
+    }
+
+    removeFromSelection(tabId);
+  };
+
   /** Generate selection based nodes */
   const selectionNodes = React.useCallback((): React.ReactElement[] => {
     const nodes: React.ReactElement[] = [];
@@ -160,111 +176,123 @@ const DisasterContainer = (props: Props) => {
       const eventKey = `disaster_${name}`;
 
       nodes.push(
-        <div className="pb-2">
-          <Accordion
-            noCard={true}
-            key={eventKey}
-            defaultActiveKey={eventKey}
-            eventKey={eventKey}
-            accordion={{'aria-disabled': !isEnabled, flush: true}}
-            headerProps={{className: 'pb-1'}}
-            header={
-              <div className="float-left">
-                <IconStorm width="17" height="17"/> {name}
-              </div>
-            }
-            headerAfter={
-              <>
-                <div className="float-right text-right position-relative" style={{height: 15, top: -4}}>
-                  <Button
-                    variant="link"
-                    disabled={!isEnabled}
-                    title="Randomize all values"
-                    style={{fontSize: '1.6rem', top: -9}}
-                    className={cn('p-0 text-decoration-none position-relative', {'text-white': isEnabled})} size="sm"
-                    onClick={() => {
-                      attr.enabled && modifySelection(name, {
-                        period: random.randomPeriod(), variance: random.randomPeriod(),
-                      });
-                    }}>
-                    <IconShuffle width="14" height="14"/>
-                  </Button>
-                  <Form.Check
-                    disabled={!enabled}
-                    className="d-inline-block position-relative"
-                    style={{top: -4, marginRight: 2}}
-                    type="switch"
-                    id={`enable-disaster-${name}`}
-                    label=""
-                    checked={attr.enabled}
-                    onChange={e => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      modifySelection(name, {enabled: e.target.checked});
-                    }}
-                  />
-                  {' '}
-                  <Button
-                    variant="link" disabled={!enabled}
-                    onClick={() => removeFromSelection(name)}
-                    style={{fontSize: '1.2rem', top: -8, color: !enabled ? COLOR_DISABLED : COLOR_REDDISH}}
-                    className="p-0 text-decoration-none position-relative" size="sm">
-                    <IconClear width="18" height="18"/>
-                  </Button>
-                </div>
-                <div className="clearfix"></div>
-              </>
-            }>
-            <div className="panel-border ml-1">
-              <Form.Group as={Row} className={cn('mb-2', {'text-muted': !isEnabled})}>
-                <Form.Label column={true} sm="2">
+        <Tab
+          disabled={!isEnabled}
+          eventKey={name}
+          key={name}
+          title={
+            <>
+              <span
+                className={cn('text-size-sm font mr-1', {
+                  'text-muted text-line-through': !isEnabled,
+                  'pr-2': !attr.enabled,
+                })}>
+                {name}
+              </span>
+              <a aria-disabled={!isEnabled} href="#tab-close" hidden={!isEnabled}
+                 className="text-muted text-size-sm text-decoration-none p-0"
+                 style={{
+                   lineHeight: '10px',
+                   position: 'relative',
+                   top: 0,
+                 }}
+                 onClick={e => {
+                   e.preventDefault();
+                   e.stopPropagation();
+                   removeTab(name);
+                 }}
+              >&times;</a>
+            </>
+          }
+          as="div">
+          <div>
+            <div className="float-right text-right position-relative" style={{height: 15}}>
+              <Button
+                variant="link"
+                disabled={!isEnabled}
+                title="Randomize all values"
+                style={{fontSize: '1.6rem', top: -9}}
+                className={cn('p-0 text-decoration-none position-relative', {'text-white': isEnabled})} size="sm"
+                onClick={() => {
+                  attr.enabled && modifySelection(name, {
+                    period: random.randomPeriod(), variance: random.randomPeriod(),
+                  });
+                }}>
+                <IconShuffle width="14" height="14"/>
+              </Button>
+              <Form.Check
+                disabled={!enabled}
+                className="d-inline-block position-relative"
+                style={{top: -4, marginRight: 2}}
+                type="switch"
+                id={`enable-disaster-${name}`}
+                label=""
+                checked={attr.enabled}
+                onChange={e => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  modifySelection(name, {enabled: e.target.checked});
+                }}
+              />
+              {' '}
+              <Button
+                variant="link" disabled={!enabled}
+                onClick={() => removeTab(name)}
+                style={{fontSize: '1.2rem', top: -8, color: !enabled ? COLOR_DISABLED : COLOR_REDDISH}}
+                className="p-0 text-decoration-none position-relative" size="sm">
+                <IconClear width="18" height="18"/>
+              </Button>
+            </div>
+            <div className="clearfix"></div>
+          </div>
+
+          <Form.Group as={Row} className={cn('mb-2', {'text-muted': !isEnabled})}>
+            <Form.Label column={true} sm="2">
                 <span style={{textDecoration: 'underline dotted'}}
                       title="How long this disater lasts (year)">
                   Period
                 </span>
-                </Form.Label>
-                <Col sm="10">
+            </Form.Label>
+            <Col sm="10">
 									<span className="text-size-xs font-family-code">
 										Value: <code className={cn({'text-muted': !isEnabled})}>{attr.period}y</code>
 									</span>
-                  <Button
-                    disabled={!isEnabled}
-                    className="button-reset-sm" variant="link"
-                    onClick={() => modifySelection(name, {period: random.randomPeriod()})}>
-                    Random
-                  </Button>
-                  <Slider
-                    disabled={!isEnabled}
-                    step={0.1} min={Defaults.PERIOD_MIN} max={Defaults.PERIOD_MAX}
-                    value={parseFloat(attr?.period ?? '0')}
-                    onChange={(value: any) => modifySelection(name, {period: value})}/>
-                </Col>
-              </Form.Group>
-              <Form.Group as={Row} className={cn('mb-2', {'text-muted': !isEnabled})}>
-                <Form.Label column={true} sm="2">
+              <Button
+                disabled={!isEnabled}
+                className="button-reset-sm" variant="link"
+                onClick={() => modifySelection(name, {period: random.randomPeriod()})}>
+                Random
+              </Button>
+              <Slider
+                disabled={!isEnabled}
+                step={0.1} min={Defaults.PERIOD_MIN} max={Defaults.PERIOD_MAX}
+                value={parseFloat(attr?.period ?? '0')}
+                onChange={(value: any) => modifySelection(name, {period: value})}/>
+            </Col>
+          </Form.Group>
+          <Form.Group as={Row} className={cn('mb-2', {'text-muted': !isEnabled})}>
+            <Form.Label column={true} sm="2">
                 <span style={{textDecoration: 'underline dotted'}}
                       title="How long this variance lasts (year)">
                   Variance
                 </span>
-                </Form.Label>
-                <Col sm="10">
+            </Form.Label>
+            <Col sm="10">
 									<span className="text-size-xs font-family-code">
 										Value: <code className={cn({'text-muted': !isEnabled})}>{attr.variance}y</code>
 									</span>
-                  <Button disabled={!isEnabled}
-                          className="button-reset-sm" variant="link"
-                          onClick={() => modifySelection(name, {variance: random.randomPeriod()})}>
-                    Random
-                  </Button>
-                  <Slider disabled={!isEnabled}
-                          step={0.1} min={Defaults.PERIOD_MIN} max={Defaults.PERIOD_MAX}
-                          value={parseFloat(attr?.variance ?? '0')}
-                          onChange={(value: any) => modifySelection(name, {variance: value})}/>
-                </Col>
-              </Form.Group>
-            </div>
-          </Accordion>
-        </div>,
+              <Button disabled={!isEnabled}
+                      className="button-reset-sm" variant="link"
+                      onClick={() => modifySelection(name, {variance: random.randomPeriod()})}>
+                Random
+              </Button>
+              <Slider disabled={!isEnabled}
+                      step={0.1} min={Defaults.PERIOD_MIN} max={Defaults.PERIOD_MAX}
+                      value={parseFloat(attr?.variance ?? '0')}
+                      onChange={(value: any) => modifySelection(name, {variance: value})}/>
+            </Col>
+          </Form.Group>
+        </Tab>,
       );
     }
 
@@ -272,8 +300,11 @@ const DisasterContainer = (props: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enabled, selection]);
 
+  /** Total tabs count */
+  const total: number = Object.keys(selection).length;
+
   return (
-    <div className="mt-0 checkbox-align ">
+    <div className="mt-0 checkbox-align">
       <Form.Check
         className="pull-right"
         type="switch"
@@ -282,8 +313,9 @@ const DisasterContainer = (props: Props) => {
         checked={enabled}
         onChange={e => setEnabled(e.target.checked)}
       />
-      <div className="mt-2 mb-3">
+      <div className="mt-2">
         <Select
+          isSearchable={false}
           isDisabled={!enabled}
           value={null}
           menuPortalTarget={document.body}
@@ -292,11 +324,20 @@ const DisasterContainer = (props: Props) => {
           onChange={(option: Option | any, {action}): void => {
             if (action === 'select-option' && option) {
               modifySelection(option.value, getInitialValues());
+              setActiveKey(option.value);
             }
           }}
         />
       </div>
-      {selectionNodes()}
+      {total > 0 && (
+        <Tabs
+          id="disasters-tab"
+          activeKey={activeKey}
+          className={cn('nav-tabs-bottom mt-1', {'border-0': !total})}
+          onSelect={k => setActiveKey(k as string)}>
+          {selectionNodes()}
+        </Tabs>
+      )}
     </div>
   );
 };
