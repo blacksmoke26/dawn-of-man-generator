@@ -9,7 +9,7 @@ import * as PropTypes from 'prop-types';
 import cn from 'classname';
 import merge from 'deepmerge';
 import {nanoid} from 'nanoid';
-import {Button, ButtonGroup, Form, Tab, Tabs} from 'react-bootstrap';
+import {Button, ButtonGroup, ButtonToolbar, Form, InputGroup, Tab, Tabs} from 'react-bootstrap';
 
 // types
 import type {Json} from '~/types/json.types';
@@ -54,7 +54,7 @@ const LocationContainer = (props: Props) => {
     },
   }, props);
 
-  const initiated = useAppSelector(({initiated}) => initiated);
+  const initiated = useAppSelector(({config}) => config.initiated);
 
   const [enabled, setEnabled] = React.useState<boolean>(props.enabled as boolean);
   const [locations, setLocations] = React.useState<LocationProps[]>([]);
@@ -134,18 +134,28 @@ const LocationContainer = (props: Props) => {
           />
         </div>
         <div className="mb-3">
-          <ButtonGroup>
-            <Button variant="secondary" size="sm"
-                    disabled={!enabled || total >= LOCATIONS_MAX_COUNT} onClick={() => {
-              if (total <= LOCATIONS_MAX_COUNT) {
+          <ButtonToolbar
+            className="justify-content-between"
+            aria-label="Toolbar with Button groups">
+            <ButtonGroup>
+              <Button
+                variant="secondary" size="sm"
+                disabled={!enabled || total >= LOCATIONS_MAX_COUNT}
+                onClick={() => newLocation()}>
+                <IconNew/> New Location
+              </Button>
+              <Button variant="danger" size="sm" disabled={!enabled || total <= 1} onClick={() => {
+                setLocations([]);
                 newLocation();
-              }
-            }}><IconNew/> New Location</Button>
-            <Button variant="danger" size="sm" disabled={!enabled || total <= 1} onClick={() => {
-              setLocations([]);
-              newLocation();
-            }}><IconClear/> Remove All</Button>
-          </ButtonGroup>
+              }}><IconClear/> Remove All</Button>
+            </ButtonGroup>
+            <InputGroup>
+              <InputGroup.Text
+                className={cn('border-0 pl-2 pr-2 mr-3', {
+                  'text-muted text-line-through': !enabled || total < 1,
+                })}>Total: {total}</InputGroup.Text>
+            </InputGroup>
+          </ButtonToolbar>
         </div>
       </div>
       <Tabs activeKey={activeKey} id="locations-tab"
@@ -154,7 +164,9 @@ const LocationContainer = (props: Props) => {
           <Tab disabled={!enabled} eventKey={location._id} key={location._id} as="div" className="mb-3"
                title={
                  <>
-                   <span className={cn('text-size-sm pr-2', {'text-muted': !enabled})}>{location.name}</span>
+                   <span className={cn('text-size-sm pr-2', {
+                     'text-muted text-line-through': !enabled,
+                   })}>{location.name}</span>
                    <a aria-disabled={!enabled} hidden={i === 0}
                       href="#tab-close"
                       className="text-color-default text-decoration-none p-0"

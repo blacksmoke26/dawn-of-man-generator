@@ -16,12 +16,24 @@
 	cursor: default !important;
 }
 
+.cursor-disabled {
+	cursor: not-allowed !important;
+}
+.nav-tabs .nav-link {
+	background-color: inherit !important;
+}
+
+
+.text-line-through {
+	text-decoration: line-through !important;
+}
+
 .card-header-tabs {
 	margin-bottom: -1rem;
 }
 
 .text-size-sm {
-	font-size: .89rem;
+	font-size: .89rem !important;
 }
  
 .text-size-xs {

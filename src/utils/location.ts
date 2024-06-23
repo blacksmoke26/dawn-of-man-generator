@@ -13,6 +13,7 @@ import uniqueRandomArray from 'unique-random-array';
 
 // utils
 import {POSITION_MIN, POSITION_MAX} from '~/utils/defaults';
+import {LOCATION_LAKES_MAX, LOCATION_LAKES_MIN} from '~/utils/scenario/defaults';
 
 // Location properties
 export interface LocationProps {
@@ -82,7 +83,7 @@ export const randomEnvironment = (custom: string[] = []): string => {
  * @public
  * @static
  * Random Lakes */
-export const randomLakes = (): number => randomInt(0, 5);
+export const randomLakes = (): number => randomInt(LOCATION_LAKES_MIN, LOCATION_LAKES_MAX);
 
 /**
  * @public
@@ -92,7 +93,7 @@ export const randomRiver = (): boolean => uniqueRandomArray([true, false])();
 
 export const randomPosition = (): [number, number] => [
   randomInt(POSITION_MIN, POSITION_MAX),
-  randomInt(POSITION_MIN, POSITION_MAX)
+  randomInt(POSITION_MIN, POSITION_MAX),
 ];
 
 /**
@@ -112,7 +113,7 @@ export const randomizeLocation = (customEnvironments: string[] = []): LocationPr
     river: randomRiver(),
     environment: randomEnvironment(customEnvironments),
     lakes: randomLakes(),
-    position: randomPosition()
+    position: randomPosition(),
   };
 };
 
@@ -121,20 +122,25 @@ export const randomizeLocation = (customEnvironments: string[] = []): LocationPr
  * @static
  * Convert a location object into template */
 export const nodeToTemplate = (location: LocationProps): string => {
-  const {slug, seed, coordinates, river, environment, lakes, position} = location;
+  if (!location?.slug?.trim()
+    || !location?.seed?.trim()
+    || !location?.environment?.trim()
+    || !location?.coordinates?.length
+  ) return '';
 
-  const riverProp: string = location.riverEnabled ? ` river="${river ? 'true' : 'false'}"` : '';
-  const lakesProp: string = location.lakesEnabled ? (Number(lakes) ? ` lakes="${lakes}"` : '') : '';
-  const positionProp: string = location.positionEnabled ? `position="${position?.[0] as number},${position?.[1] as number}"` : '';
+  const attributes: string[] = [
+    `id="${location?.slug}"`,
+    `seed="${String(location?.seed).padStart(8, '0')}"`,
+    `environment="${location?.environment}"`,
+    `map_location="${location?.coordinates[0]},${location?.coordinates[1]}"`,
+  ];
+
+  location?.riverEnabled && attributes.push(`river="${'' + location?.river}"`);
+  (location?.lakesEnabled && !!location?.lakes) && attributes.push(`lakes="${location?.lakes}"`);
+  location?.positionEnabled && attributes.push(`position="${location?.position?.[0] as number},${location?.position?.[1] as number}"`);
 
   return (
-    `<location id="${slug}"
-			seed="${String(seed).padStart(8, '0')}"
-			environment="${environment}"
-			map_location="${coordinates[0]},${coordinates[1]}"
-			${positionProp}
-			${riverProp} ${lakesProp}
-		/>`
+    `<location ${attributes.join(' ')}/>`
   );
 };
 

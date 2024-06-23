@@ -17,7 +17,10 @@ import Slider from '~/components/ui/Slider';
 import Range from '~/components/ui/Range';
 
 // icons
-import {IconRestore, IconShuffle} from '~/components/icons/app';
+import {
+  IconRestore, IconShuffle,
+  COLOR_DISABLED, COLOR_REDDISH, COLOR_WHITISH,
+} from '~/components/icons/app';
 
 // utils
 import {isObject} from '~/helpers/object';
@@ -68,11 +71,11 @@ const Spring = (props: Props) => {
   const [enabled, setEnabled] = React.useState<boolean>(props.enabled as boolean);
   const [season, setSeason] = React.useState<SpringSeasonProps>(props.season as SpringSeasonProps);
 
-  const environment = useAppSelector(({environment}) => (environment));
+  const seasonsAttribute = useAppSelector(({environment}) => environment.values?.seasons);
 
   // Reflect attributes changes
   React.useEffect(() => {
-    const extValue = environment?.seasons ?? null;
+    const extValue = seasonsAttribute ?? null;
 
     if (typeof extValue === 'boolean') {
       setEnabled(extValue);
@@ -82,7 +85,7 @@ const Spring = (props: Props) => {
       setEnabled(true);
       setSeason(extValueToSeason(extValue as Json) as SpringSeasonProps);
     }
-  }, [environment]);
+  }, [seasonsAttribute]);
 
   // Reflect attributes changes
   React.useEffect(() => {
@@ -118,7 +121,7 @@ const Spring = (props: Props) => {
   };
 
   return (
-    <div className="panel-border ml-1">
+    <div className="ml-1 pt-3" style={{minHeight: 350}}>
       <Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled})}>
         <Form.Label column={true} sm="2">
 					<span style={{textDecoration: 'underline dotted'}}
@@ -310,12 +313,16 @@ const Spring = (props: Props) => {
       <div className="mt-3">
         <ButtonGroup>
           <Button
-            disabled={!enabled} variant="secondary" size="sm"
+           disabled={!enabled} variant="link"
+           style={{color: !enabled ? COLOR_DISABLED : COLOR_WHITISH}}
+            className="text-size-sm button-reset-sm p-0 ml-0 mr-3" size="sm"
             onClick={() => setSeason(randomizeSpring())}>
             <IconShuffle width="14" height="14"/> Randomize
           </Button>
           <Button
-            disabled={!enabled} variant="secondary" size="sm"
+            disabled={!enabled} variant="link"
+            style={{color: !enabled ? COLOR_DISABLED : COLOR_REDDISH}}
+            className="text-size-sm button-reset-sm p-0 ml-0 mr-3" size="sm"
             onClick={() => setSeason(seasonsPropsDefault().spring as SpringSeasonProps)}>
             <IconRestore width="14" height="14"/> Restore
           </Button>

@@ -16,6 +16,9 @@ import {Col, Form, Row} from 'react-bootstrap';
 // redux
 import {useAppSelector} from '~redux/hooks';
 
+// parsers
+import {toRequiredMilestoneTemplate} from '~/utils/parser/templates-general';
+
 /** RequiredMilestone `props` type */
 interface Props {
 	enabled?: boolean,
@@ -35,18 +38,18 @@ const RequiredMilestone = ( props: Props ) => {
 	const [value, setValue] = React.useState<number>(props.value as number);
 	const [enabled, setEnabled] = React.useState<boolean>(props.enabled as boolean);
 
-	const scenario = useAppSelector(({scenario}) => (scenario));
+	const requiredMilestonesAttribute = useAppSelector(({scenario}) => scenario.values?.requiredMilestones);
 	
 	// Reflect attributes changes
 	React.useEffect(() => {
-		const extValue = scenario?.requiredMilestones ?? null;
+		const extValue = requiredMilestonesAttribute ?? null;
 		
 		if ( !extValue || !parseInt(String(extValue)) ) {
 			setEnabled(!!extValue);
 		} else {
 			setValue(extValue as number);
 		}
-	}, [scenario]);
+	}, [requiredMilestonesAttribute]);
 	
 	// Reflect attributes changes
 	React.useEffect(() => {
@@ -55,15 +58,11 @@ const RequiredMilestone = ( props: Props ) => {
 	
 	// Reflect state changes
 	React.useEffect(() => {
-		typeof props.onChange === 'function' && props.onChange(toTemplateText(), value);
+		typeof props.onChange === 'function' && props.onChange(
+			toRequiredMilestoneTemplate(value, enabled), value
+		);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [value, enabled]);
-	
-	const toTemplateText = (): string => {
-		return !enabled
-			? ''
-			: `<required_milestones value="${value}"/>`;
-	};
 	
 	return (
 		<div className={cn('mb-2', {'text-muted': !enabled}, 'checkbox-align')}>

@@ -26,7 +26,7 @@ export const jsonToRedux = (node: Json | any): Json | null => {
   };
 
   if (isString(node?.start_mode) && START_MODES.includes(node?.start_mode)) {
-    condition.start_mode = node?.start_mode;
+    condition.startMode = node?.start_mode;
   }
 
   return condition;

@@ -14,6 +14,9 @@ import {Col, Form, Row} from 'react-bootstrap';
 // redux
 import {useAppSelector} from '~redux/hooks';
 
+// parsers
+import {toShowCompletionIconTemplate} from '~/utils/parser/templates-general';
+
 /** ShowCompletionIcon `props` type */
 interface Props {
 	enabled?: boolean,
@@ -33,17 +36,17 @@ const ShowCompletionIcon = ( props: Props ) => {
 	const [value, setValue] = React.useState<boolean>(props.value as boolean);
 	const [enabled, setEnabled] = React.useState<boolean>(props.enabled as boolean);
 
-	const scenario = useAppSelector(({scenario}) => (scenario));
+	const showCompletionIconAttribute = useAppSelector(({scenario}) => scenario.values?.showCompletionIcon)
 
 	// Reflect attributes changes
 	React.useEffect(() => {
-		const extValue = scenario?.showCompletionIcon ?? null;
+		const extValue = showCompletionIconAttribute ?? null;
 
 		if ( typeof extValue === 'boolean' ) {
 			setEnabled(extValue);
 			setValue(extValue);
 		}
-	}, [scenario]);
+	}, [showCompletionIconAttribute]);
 
 	// Reflect attributes changes
 	React.useEffect(() => {
@@ -52,15 +55,11 @@ const ShowCompletionIcon = ( props: Props ) => {
 
 	// Reflect state changes
 	React.useEffect(() => {
-		typeof props.onChange === 'function' && props.onChange(toTemplateText(), value);
+		typeof props.onChange === 'function' && props.onChange(
+			toShowCompletionIconTemplate(value, enabled), value
+		);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [value, enabled]);
-
-	const toTemplateText = (): string => {
-		return !enabled
-			? ''
-			: `<show_completion_icon value="${value ? 'true' : 'false'}"/>`;
-	};
 
 	return (
 		<div className={cn('mb-2', {'text-muted': !enabled}, 'checkbox-align')}>

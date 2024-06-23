@@ -16,15 +16,15 @@ import {anOldHope} from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import {IconCopy, IconDownload, IconPencilLine} from '~/components/icons/app';
 
 // redux
-import {updateScenarioName} from '~redux/reducers';
+import {updateName} from '~redux/slices/scenario/reducers';
 import {useAppDispatch, useAppSelector} from '~redux/hooks';
 
 const TemplateXMLViewer = () => {
   const dispatch = useAppDispatch();
 
-  const template = useAppSelector(({templates}) => templates.scenario);
-  const strings = useAppSelector(({strings}) => strings.scenario);
-  const scenarioName = useAppSelector(({scenarioName}) => scenarioName);
+  const template = useAppSelector(({scenario}) => scenario.template);
+  const strings = useAppSelector(({scenario}) => scenario.strings);
+  const scenarioName = useAppSelector(({scenario}) => scenario.name);
 
   const SCENARIO_FILENAME: string = `${scenarioName.trim() || 'scenario'}.xml`;
   const STRINGS_FILENAME: string = `${scenarioName.trim() || 'scenario'}.lng.xml`;
@@ -79,7 +79,7 @@ const TemplateXMLViewer = () => {
                 value={scenarioName}
                 onChange={e => {
                   const value = e.target.value.replace(/(['" \t]|[^a-z_\d])+/ig, `_`).toLowerCase();
-                  dispatch(updateScenarioName(value));
+                  dispatch(updateName(value));
                 }}
                 onKeyUp={e => {
                   // @ts-ignore

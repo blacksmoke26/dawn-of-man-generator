@@ -1,5 +1,3 @@
-// noinspection HtmlUnknownAttribute
-
 /**
  * @author Junaid Atari <mj.atari@gmail.com>
  * @see https://github.com/blacksmoke26/dawn-of-man-generator
@@ -7,122 +5,100 @@
  */
 
 import React from 'react';
-import * as PropTypes from 'prop-types';
 import cn from 'classname';
 import merge from 'deepmerge';
-import {nanoid} from 'nanoid';
-import {Col, Form, Row} from 'react-bootstrap';
+import {Col, Row} from 'react-bootstrap';
 
 // elemental components
+import TextInput from '~/components/ui/TextInput';
 import ConditionHeader from './../elements/ConditionHeader';
 
+// hooks
+import useAttributes from '~/hooks/use-attributes';
+
 // utils
-import {toString} from '~/helpers/string';
 import {defaultsParams} from '~/utils/condition';
-import {toIsAliveTemplate} from '~/utils/parser/templates';
+import {subConditionDefaultProps} from './utils/condition-logical';
+import {filterEmpty, toConditionTemplate} from '~/utils/parser/templates';
 
 // types
-import type {$Keys, DeepPartial} from 'utility-types';
-import type {ConditionIsAlive as ConditionAttributes} from '~/types/condition.types';
+import type {ConditionAttributesProps, ConditionIsAlive, ConditionProps} from '~/types/condition.types';
 
-interface Attributes extends ConditionAttributes {
-  enabled: boolean;
-  disabledCheckbox?: boolean;
-  expanded?: boolean;
-}
-
-interface Props extends Attributes {
-  removeIcon?: boolean;
-  showCheckbox?: boolean,
-
-  onRemoveClick?(): void,
-
-  onChange?(template: string, values: Attributes): void,
+interface Props extends ConditionProps<ConditionIsAlive> {
 }
 
 const CONDITION_NAME: string = 'IsAlive';
 
-const IsAlive = (props: DeepPartial<Props>) => {
-  const newProps = merge.all<Props>([{
-    enabled: true,
-    disabledCheckbox: false,
-    removeIcon: false,
-    showCheckbox: true,
-    expanded: true,
-    onChange: () => {
-    },
-    onRemoveClick: () => {
-    },
-  }, defaultsParams.isAlive as Props, props]);
+const IsAlive = (props: Props) => {
+  const newProps = merge<Required<Props>>(subConditionDefaultProps, props);
 
-  const [attributes, setAttributes] = React.useState<Attributes>({
+  const [attributes, setAttr, getAttr] = useAttributes<ConditionAttributesProps>({
     enabled: newProps.enabled as boolean,
     disabledCheckbox: newProps.disabledCheckbox as boolean,
-    expanded: newProps.expanded as boolean,
-    name: toString(newProps.name),
+    expanded: newProps.expanded as boolean || true,
   });
 
-  const setAttribute = <T = any>(name: $Keys<Attributes>, value: T) => {
-    setAttributes(current => {
-      return ({...current, [name]: value as T});
-    });
-  };
+  const [values, setValue, getValue] = useAttributes<ConditionIsAlive>(
+    merge(defaultsParams?.isAlive || {}, newProps?.initialValues || {}),
+  );
+
+  React.useEffect(() => {
+    if (attributes.enabled) {
+      setValue('name', props?.values?.name, true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    attributes.enabled, props?.values?.name,
+  ]);
+
+  // Reflect values changes
+  React.useEffect(() => {
+    newProps?.onTemplate(toConditionTemplate('IsAlive', values, !attributes.enabled));
+    newProps?.onValuesChange(filterEmpty(values));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [attributes.enabled, values]);
 
   // Reflect state changes
   React.useEffect(() => {
-    const args: [string, Attributes] = !attributes.enabled
-      ? ['', {} as Attributes]
-      : [toIsAliveTemplate(attributes), attributes];
-
-    typeof newProps.onChange === 'function' && newProps.onChange.apply(null, args);
+    newProps.onChange(attributes);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [attributes]);
 
   // Reflect prop changes
   React.useEffect(() => {
-    props?.enabled !== undefined && setAttribute('enabled', props.enabled);
-    props?.disabledCheckbox !== undefined && setAttribute('disabledCheckbox', props.disabledCheckbox);
-    props?.expanded !== undefined && setAttribute('expanded', props.expanded);
-
-    if (props?.enabled) {
-      props?.name !== undefined && setAttribute('name', props.name);
-    }
+    setAttr('enabled', props?.enabled, true);
+    setAttr('disabledCheckbox', props?.disabledCheckbox, true);
+    setAttr('expanded', props?.expanded, true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props]);
+  }, [props?.enabled, props?.disabledCheckbox, props?.expanded]);
 
-  const isDisabled = attributes.disabledCheckbox || !attributes.enabled;
+  const isDisabled = getAttr('disabledCheckbox') || !getAttr('enabled');
 
   return (
     <div className={cn('mb-2', {'text-muted': isDisabled}, 'checkbox-align')}>
       <ConditionHeader
         caption={CONDITION_NAME} showCheckbox={newProps.showCheckbox}
-        enabled={attributes.enabled}
-        onEnabled={(isEnabled: boolean) => setAttribute('enabled', isEnabled)}
-        disabledCheckbox={attributes.disabledCheckbox}
+        enabled={getAttr('enabled')}
+        onEnabled={(isEnabled: boolean) => setAttr('enabled', isEnabled)}
+        disabledCheckbox={getAttr('disabledCheckbox')}
         removeIcon={newProps.removeIcon}
         onRemoveClick={newProps.onRemoveClick}
-        onExpandedClick={(state: boolean) => setAttribute('expanded', state)}
-        expanded={attributes.expanded}/>
-      {attributes?.expanded && (
+        onExpandedClick={(state: boolean) => setAttr('expanded', state)}
+        expanded={getAttr('expanded')}/>
+      {getAttr('expanded') && (
         <>
           <Row className="mb-1 mt-2">
             <Col xs="2">
               <div className="position-relative pl-3" style={{top: 7}}>Name</div>
             </Col>
             <Col xs="6">
-              <Form.Control
-                type="text"
-                size="sm"
+              <TextInput
+                selectOnLoad={true}
+                focusOnLoad={true}
                 disabled={isDisabled}
-                className="pull-right"
-                aria-disabled={isDisabled}
-                id={`condition-${nanoid(5)}`}
+                value={getValue('name', '')}
                 placeholder="e.g., deer"
-                value={attributes?.name || ''}
-                onChange={e => {
-                  setAttribute('name', e.target.value.replace(/['"]+/ig, ``));
-                }}
-              />
+                onChange={value => setValue('name', value)}/>
             </Col>
           </Row>
         </>
@@ -133,10 +109,10 @@ const IsAlive = (props: DeepPartial<Props>) => {
 
 // Properties validation
 IsAlive.propTypes = {
-  enabled: PropTypes.bool,
+  /*enabled: PropTypes.bool,
   disabledCheckbox: PropTypes.bool,
   name: PropTypes.string,
-  onChange: PropTypes.func,
+  onChange: PropTypes.func,*/
 };
 
 export default IsAlive;

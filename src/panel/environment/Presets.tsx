@@ -17,7 +17,7 @@ import {labels, environments} from '~/data/environments/builtin';
 
 // redux
 import {useAppDispatch} from '~redux/hooks';
-import {updateEnvironment} from '~redux/reducers';
+import {updateValues} from '~redux/slices/environment/reducers';
 
 // types
 import type {$Keys} from 'utility-types';
@@ -55,7 +55,7 @@ const Presets = () => {
           if (action === 'select-option' && option) {
             const value = option.value as $Keys<typeof environments>;
             const {environment} = environments[value]();
-            dispatch(updateEnvironment(environment as Json));
+            dispatch(updateValues(environment as Json));
           }
         }}
       />

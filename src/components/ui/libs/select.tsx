@@ -31,9 +31,12 @@ export const theme = (theme: any) => ({
 // @ts-ignore
 export const styles = {
   menuPortal: (base: any) => ({...base, zIndex: 9999}),
-  control: (styles: any) => ({...styles, backgroundColor: 'rgb(242 242 242 / 4%)',
+  control: (styles: any) => ({
+    ...styles, backgroundColor: 'rgb(42 50 66)',
+    borderColor: '#2b3345',
     height: 35,
-    minHeight: 35}),
+    minHeight: 35,
+  }),
   option: (styles: any, {isDisabled, isSelected}: { isDisabled: boolean, isSelected: boolean }) => ({
     ...styles,
     color: isDisabled
@@ -44,5 +47,5 @@ export const styles = {
           : '#FFF'
       ),
     singleValue: (styles: any) => ({...styles, color: '#ffb74d'}),
-  })
+  }),
 };

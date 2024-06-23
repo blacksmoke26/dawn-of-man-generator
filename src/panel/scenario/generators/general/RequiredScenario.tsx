@@ -13,8 +13,14 @@ import merge from 'deepmerge';
 import {nanoid} from 'nanoid';
 import {Col, Form, Row} from 'react-bootstrap';
 
+// elemental components
+import TextInput from '~/components/ui/TextInput';
+
 // redux
 import {useAppSelector} from '~redux/hooks';
+
+// parsers
+import {toRequiredScenarioTemplate} from '~/utils/parser/templates-general';
 
 /** RequiredScenario `props` type */
 interface Props {
@@ -35,18 +41,18 @@ const RequiredScenario = ( props: Props ) => {
 	const [value, setValue] = React.useState<string>(props.value as string);
 	const [enabled, setEnabled] = React.useState<boolean>(props.enabled as boolean);
 
-	const scenario = useAppSelector(({scenario}) => (scenario));
+	const requiredScenarioAttribute = useAppSelector(({scenario}) => scenario?.values?.requiredScenario);
 	
 	// Reflect attributes changes
 	React.useEffect(() => {
-		const extValue = scenario?.requiredScenario ?? null;
+		const extValue = requiredScenarioAttribute ?? null;
 		
 		if ( !extValue ) {
 			setEnabled(!!extValue);
 		} else {
 			setValue(extValue as string);
 		}
-	}, [scenario]);
+	}, [requiredScenarioAttribute]);
 	
 	// Reflect attributes changes
 	React.useEffect(() => {
@@ -55,16 +61,12 @@ const RequiredScenario = ( props: Props ) => {
 	
 	// Reflect state changes
 	React.useEffect(() => {
-		typeof props.onChange === 'function' && props.onChange(toTemplateText(), value);
+		typeof props.onChange === 'function' && props.onChange(
+			toRequiredScenarioTemplate(value, enabled), value
+		);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [value, enabled]);
-	
-	const toTemplateText = (): string => {
-		return !enabled
-			? ''
-			: `<required_scenario value="${value}"/>`;
-	};
-	
+
 	return (
 		<div className={cn('mb-2', {'text-muted': !enabled}, 'checkbox-align')}>
 			<Row className="mb-1">
@@ -85,23 +87,19 @@ const RequiredScenario = ( props: Props ) => {
 					/>
 				</Col>
 			</Row>
-			<Form.Control
-				type="text"
+			<TextInput
+				caseType="SNAKE_CASE"
 				disabled={!enabled}
-				className="pull-right"
-				aria-disabled={!enabled}
-				id={`required_scenario-${nanoid(5)}`}
-				aria-placeholder={props.value}
 				value={value}
-				onChange={e => setValue(e.target.value.trim())}
-			/>
+				placeholder="e.g., the_long_march"
+				onChange={theValue => setValue(theValue as string)}/>
 		</div>
 	);
 };
 
 // Properties validation
 RequiredScenario.propTypes = {
-	value: PropTypes.bool,
+	value: PropTypes.string,
 	enabled: PropTypes.bool,
 	onChange: PropTypes.func,
 };

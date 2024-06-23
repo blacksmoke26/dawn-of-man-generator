@@ -20,3 +20,6 @@ export const hasKeysInArray = (list: string[], keys: string[]): boolean => {
   return true;
 };
 
+/**
+ * Check that array values are equal */
+export const allEqual = <T = any>(arr: T[]): boolean => arr.every(v => v === arr[0]);

@@ -21,6 +21,9 @@ import * as Defaults from '~/utils/scenario/defaults';
 // redux
 import {useAppSelector} from '~redux/hooks';
 
+// parsers
+import {toSizeTemplate} from '~/utils/parser/templates-general';
+
 /** MapSize `props` type */
 interface Props {
   enabled?: boolean,
@@ -41,11 +44,11 @@ const MapSize = (props: Props) => {
   const [enabled, setEnabled] = React.useState<boolean>(props.enabled as boolean);
   const [value, setValue] = React.useState<number>(props.value as number);
 
-  const scenario = useAppSelector(({scenario}) => (scenario));
+  const sizeAttribute = useAppSelector(({scenario}) => scenario.values?.size);
 
   // Reflect attributes changes
   React.useEffect(() => {
-    const extValue = scenario?.size ?? null;
+    const extValue = sizeAttribute ?? null;
 
     // noinspection SuspiciousTypeOfGuard
     if (typeof extValue === 'boolean') {
@@ -56,19 +59,14 @@ const MapSize = (props: Props) => {
       setEnabled(true);
       setValue(extValue);
     }
-  }, [scenario]);
+  }, [sizeAttribute]);
 
   // Reflect state changes
   React.useEffect(() => {
-    typeof props.onChange === 'function' && props.onChange(toTemplateText(), value);
+    typeof props.onChange === 'function' && props.onChange(
+      toSizeTemplate(value, enabled), value
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value, enabled]);
-
-  /** Generate xml code */
-  const toTemplateText = React.useCallback((): string => {
-    return enabled
-      ? `<size value="${value}"/>`
-      : '';
   }, [value, enabled]);
 
   return (

@@ -22,9 +22,9 @@ export const LOCATION_MAP_MIN: number = 0;
 
 export const LOCATION_MAP_MAX: number = 1;
 
-export const LOCATION_LAKES_MIN: number = 0;
+export const LOCATION_LAKES_MIN: number = 1;
 
-export const LOCATION_LAKES_MAX: number = 9;
+export const LOCATION_LAKES_MAX: number = 20;
 
 export const LOCATION_POSITION_MIN: number = 1;
 

@@ -1,5 +1,3 @@
-// @flow
-
 /**
  * @author Junaid Atari <mj.atari@gmail.com>
  * @link http://junaidatari.com Author Website
@@ -13,8 +11,14 @@ import merge from 'deepmerge';
 import {nanoid} from 'nanoid';
 import {Col, Form, Row} from 'react-bootstrap';
 
+// elemental components
+import TextInput from '~/components/ui/TextInput';
+
 // redux
 import {useAppSelector} from '~redux/hooks';
+
+// parsers
+import {toCategoryTemplate} from '~/utils/parser/templates-general';
 
 /** Category `props` type */
 interface Props {
@@ -35,18 +39,18 @@ const Category = ( props: Props ) => {
 	const [value, setValue] = React.useState<string>(props.value as string);
 	const [enabled, setEnabled] = React.useState<boolean>(props.enabled as boolean);
 
-	const scenario = useAppSelector(({scenario}) => (scenario));
+	const categoryAttribute = useAppSelector(({scenario}) => scenario?.values?.category);
 	
 	// Reflect attributes changes
 	React.useEffect(() => {
-		const extValue = scenario?.requiredScenario ?? null;
+		const extValue = categoryAttribute ?? null;
 		
 		if ( !extValue ) {
 			setEnabled(!!extValue);
 		} else {
 			setValue(extValue as string);
 		}
-	}, [scenario]);
+	}, [categoryAttribute]);
 	
 	// Reflect attributes changes
 	React.useEffect(() => {
@@ -55,16 +59,12 @@ const Category = ( props: Props ) => {
 	
 	// Reflect state changes
 	React.useEffect(() => {
-		typeof props.onChange === 'function' && props.onChange(toTemplateText(), value);
+		typeof props.onChange === 'function' && props.onChange(
+			toCategoryTemplate(value, enabled), value
+		);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [value, enabled]);
-	
-	const toTemplateText = (): string => {
-		return !enabled
-			? ''
-			: `<category value="${value}"/>`;
-	};
-	
+
 	return (
 		<div className={cn('mb-2', {'text-muted': !enabled}, 'checkbox-align')}>
 			<Row className="mb-1">
@@ -85,23 +85,19 @@ const Category = ( props: Props ) => {
 					/>
 				</Col>
 			</Row>
-			<Form.Control
-				type="text"
+			<TextInput
+				caseType="CAPITAL_CASE"
 				disabled={!enabled}
-				className="pull-right"
-				aria-disabled={!enabled}
-				id={`category-${nanoid(5)}`}
-				aria-placeholder={props.value}
 				value={value}
-				onChange={e => setValue(e.target.value)}
-			/>
+				placeholder="e.g., Freeplay"
+				onChange={theValue => setValue(theValue as string)}/>
 		</div>
 	);
 };
 
 // Properties validation
 Category.propTypes = {
-	value: PropTypes.bool,
+	value: PropTypes.string,
 	enabled: PropTypes.bool,
 	onChange: PropTypes.func,
 };

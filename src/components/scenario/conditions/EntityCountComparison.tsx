@@ -1,5 +1,3 @@
-// noinspection HtmlUnknownAttribute
-
 /**
  * @author Junaid Atari <mj.atari@gmail.com>
  * @see https://github.com/blacksmoke26/dawn-of-man-generator
@@ -7,7 +5,6 @@
  */
 
 import React from 'react';
-import * as PropTypes from 'prop-types';
 import cn from 'classname';
 import merge from 'deepmerge';
 import {capitalCase} from 'change-case';
@@ -18,109 +15,95 @@ import NumberInput from '~/components/ui/NumberInput';
 import Select, {Option} from '~/components/ui/Select';
 import ConditionHeader from './../elements/ConditionHeader';
 
+// hooks
+import useAttributes from '~/hooks/use-attributes';
+
 // utils
 import * as random from '~/utils/random';
-import {toString} from '~/helpers/string';
-import {toInteger} from '~/helpers/number';
-import {toEntityCount} from '~/utils/units';
-import {ENTITIES, ENTITIES_OPTIONS} from '~/utils/entities';
-import {toEntityCountComparisonTemplate} from '~/utils/parser/templates';
-import {COMPARISONS, COUNTERS, defaultsParams, ENTITY_COUNT_MAX, ENTITY_COUNT_MIN} from '~/utils/condition';
+import {ENTITIES_OPTIONS} from '~/utils/entities';
+import {subConditionDefaultProps} from './utils/condition-logical';
+import {filterEmpty, toConditionTemplate} from '~/utils/parser/templates';
+import {
+  COMPARISONS,
+  COUNTERS,
+  defaultsParams,
+  ENTITY_COUNT_DEFAULT,
+  ENTITY_COUNT_MAX,
+  ENTITY_COUNT_MIN,
+} from '~/utils/condition';
 
 // types
-import type {$Keys, DeepPartial} from 'utility-types';
-import type {EntityType} from '~/types/entity.types';
 import type {
-  CounterType,
-  ComparisonType,
-  ConditionEntityCountComparison as ConditionAttributes,
+  ConditionAttributesProps, ConditionEntityCountComparison, ConditionProps,
 } from '~/types/condition.types';
 
-interface Attributes extends ConditionAttributes {
-  enabled: boolean;
-  disabledCheckbox?: boolean;
-  expanded?: boolean;
-}
-
-interface Props extends Attributes {
-  removeIcon?: boolean;
-  showCheckbox?: boolean,
-
-  onRemoveClick?(): void,
-
-  onChange?(template: string, values: Attributes): void,
+interface Props extends ConditionProps<ConditionEntityCountComparison> {
 }
 
 const CONDITION_NAME: string = 'EntityCountComparison';
 
-const EntityCountComparison = (props: DeepPartial<Props>) => {
-  const newProps = merge.all<Props>([{
-    enabled: true,
-    disabledCheckbox: false,
-    removeIcon: false,
-    showCheckbox: true,
-    expanded: true,
-    onChange: () => {
-    },
-    onRemoveClick: () => {
-    },
-  }, defaultsParams.entityCountComparison as Props, props]);
+const EntityCountComparison = (props: Props) => {
+  const newProps = merge<Required<Props>>(subConditionDefaultProps, props);
 
-  const [attributes, setAttributes] = React.useState<Attributes>({
+  const [attributes, setAttr, getAttr] = useAttributes<ConditionAttributesProps>({
     enabled: newProps.enabled as boolean,
     disabledCheckbox: newProps.disabledCheckbox as boolean,
-    expanded: newProps.expanded as boolean,
-    counter: toString<CounterType>(newProps.counter),
-    entityType: toString<EntityType>(newProps.entityType),
-    value: toInteger(newProps.value) as number,
-    comparison: toString<ComparisonType>(newProps.comparison),
+    expanded: newProps.expanded as boolean || true,
   });
 
-  const setAttribute = <T = any>(name: $Keys<Attributes>, value: T) => {
-    setAttributes(current => {
-      return ({...current, [name]: value as T});
-    });
-  };
+  const [values, setValue, getValue] = useAttributes<ConditionEntityCountComparison>(
+    merge(defaultsParams?.entityCountComparison || {}, newProps?.initialValues || {}),
+  );
+
+  React.useEffect(() => {
+    if (attributes.enabled) {
+      setValue('counter', props?.values?.counter, true);
+      setValue('entityType', props?.values?.entityType, true);
+      setValue('value', props?.values?.value, true);
+      setValue('comparison', props?.values?.comparison, true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    attributes.enabled, props?.values?.counter,
+    props?.values?.entityType, props?.values?.value,
+    props?.values?.comparison,
+  ]);
+
+  // Reflect values changes
+  React.useEffect(() => {
+    newProps?.onTemplate(toConditionTemplate('EntityCountComparison', values, !attributes.enabled));
+    newProps?.onValuesChange(filterEmpty(values));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [attributes.enabled, values]);
 
   // Reflect state changes
   React.useEffect(() => {
-    const args: [string, Attributes] = !attributes.enabled
-      ? ['', {} as Attributes]
-      : [toEntityCountComparisonTemplate(attributes), attributes];
-
-    typeof newProps.onChange === 'function' && newProps.onChange.apply(null, args);
+    newProps.onChange(attributes);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [attributes]);
 
   // Reflect prop changes
   React.useEffect(() => {
-    props?.enabled !== undefined && setAttribute('enabled', props.enabled);
-    props?.disabledCheckbox !== undefined && setAttribute('disabledCheckbox', props.disabledCheckbox);
-    props?.expanded !== undefined && setAttribute('expanded', props.expanded);
-
-    if (props?.enabled) {
-      props?.counter !== undefined && setAttribute('counter', props.counter);
-      props?.entityType !== undefined && setAttribute('entityType', props.entityType);
-      props?.value !== undefined && setAttribute('value', toEntityCount(props.value));
-      props?.comparison !== undefined && setAttribute('comparison', props.comparison);
-    }
+    setAttr('enabled', props?.enabled, true);
+    setAttr('disabledCheckbox', props?.disabledCheckbox, true);
+    setAttr('expanded', props?.expanded, true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props]);
+  }, [props?.enabled, props?.disabledCheckbox, props?.expanded]);
 
-  const isDisabled = attributes.disabledCheckbox || !attributes.enabled;
+  const isDisabled = getAttr('disabledCheckbox') || !getAttr('enabled');
 
   return (
     <div className={cn('mb-2', {'text-muted': isDisabled}, 'checkbox-align')}>
       <ConditionHeader
         caption={CONDITION_NAME} showCheckbox={newProps.showCheckbox}
-        enabled={attributes.enabled}
-        onEnabled={(isEnabled: boolean) => setAttribute('enabled', isEnabled)}
-        disabledCheckbox={attributes.disabledCheckbox}
+        enabled={getAttr('enabled')}
+        onEnabled={(isEnabled: boolean) => setAttr('enabled', isEnabled)}
+        disabledCheckbox={getAttr('disabledCheckbox')}
         removeIcon={newProps.removeIcon}
         onRemoveClick={newProps.onRemoveClick}
-        onExpandedClick={(state: boolean) => setAttribute('expanded', state)}
-        expanded={attributes.expanded}/>
-      {attributes?.expanded && (
+        onExpandedClick={(state: boolean) => setAttr('expanded', state)}
+        expanded={getAttr('expanded')}/>
+      {getAttr('expanded') && (
         <>
           <Row className="mb-1 mt-2">
             <Col xs="2">
@@ -133,19 +116,19 @@ const EntityCountComparison = (props: DeepPartial<Props>) => {
                 isClearable
                 isDisabled={isDisabled}
                 menuPortalTarget={document.body}
-                defaultValue={newProps?.counter ? {
-                  label: capitalCase(newProps.counter as string),
-                  value: newProps.counter,
+                defaultValue={getValue('counter') ? {
+                  label: capitalCase(getValue('counter') as string),
+                  value: getValue('counter'),
                 } : null}
                 options={COUNTERS.map(value => ({label: capitalCase(value), value}))}
                 placeholder="Choose counter..."
                 onChange={(option: Option | any, {action}): void => {
                   if (action === 'select-option' && option) {
-                    setAttribute('counter', option.value);
+                    setValue('counter', option.value);
                   }
 
                   if (['clear', 'remove-value'].includes(action)) {
-                    setAttribute('counter', '');
+                    setValue('counter', '');
                   }
                 }}
               />
@@ -163,18 +146,18 @@ const EntityCountComparison = (props: DeepPartial<Props>) => {
                 isDisabled={isDisabled}
                 menuPortalTarget={document.body}
                 options={ENTITIES_OPTIONS}
-                defaultValue={newProps?.entityType ? {
-                  label: capitalCase(newProps.entityType as string),
-                  value: newProps.entityType,
+                defaultValue={getValue('entityType') ? {
+                  label: capitalCase(getValue('entityType') as string),
+                  value: getValue('entityType'),
                 } : null}
                 placeholder="Choose..."
                 onChange={(option: Option | any, {action}): void => {
                   if (action === 'select-option' && option) {
-                    setAttribute('entityType', option.value);
+                    setValue('entityType', option.value);
                   }
 
                   if (['clear', 'remove-value'].includes(action)) {
-                    setAttribute('entityType', '');
+                    setValue('entityType', '');
                   }
                 }}
               />
@@ -192,13 +175,13 @@ const EntityCountComparison = (props: DeepPartial<Props>) => {
                 menuPortalTarget={document.body}
                 options={COMPARISONS.map(value => ({label: capitalCase(value), value}))}
                 placeholder="Choose..."
-                defaultValue={newProps?.comparison
-                  ? {label: capitalCase(newProps.comparison), value: newProps.comparison}
+                defaultValue={getValue('comparison')
+                  ? {label: capitalCase(getValue('comparison')), value: getValue('comparison')}
                   : null
                 }
                 onChange={(option: Option | any, {action}): void => {
                   if (action === 'select-option' && option) {
-                    setAttribute('comparison', option.value);
+                    setValue('comparison', option.value);
                   }
                 }}
               />
@@ -217,10 +200,13 @@ const EntityCountComparison = (props: DeepPartial<Props>) => {
                 max={ENTITY_COUNT_MAX}
                 disabled={isDisabled}
                 allowClear={true}
-                value={attributes?.value}
-                onChange={value => setAttribute('value', value)}
+                value={getValue('value')}
+                onChange={value => setValue('value', value)}
                 shuffle={true}
-                onShuffle={() => setAttribute('value', random.randomPerformers())}/>
+                onShuffle={() => setValue('value', random.randomPerformers())}
+                allowRestore
+                onRestore={() => setValue('value', ENTITY_COUNT_DEFAULT)}
+              />
             </Col>
           </Row>
         </>
@@ -231,7 +217,7 @@ const EntityCountComparison = (props: DeepPartial<Props>) => {
 
 // Properties validation
 EntityCountComparison.propTypes = {
-  enabled: PropTypes.bool,
+  /*enabled: PropTypes.bool,
   disabledCheckbox: PropTypes.bool,
   removeIcon: PropTypes.bool,
   onRemoveClick: PropTypes.func,
@@ -240,7 +226,7 @@ EntityCountComparison.propTypes = {
   counter: PropTypes.oneOf(COUNTERS),
   entityType: PropTypes.oneOf(ENTITIES),
   value: PropTypes.number,
-  comparison: PropTypes.oneOf(COMPARISONS),
+  comparison: PropTypes.oneOf(COMPARISONS),*/
 };
 
 export default EntityCountComparison;

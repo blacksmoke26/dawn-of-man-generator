@@ -4,12 +4,11 @@
  * @since 2.3
  */
 
-// helpers
-import {mergeAll} from '~/helpers/object';
+import merge from 'deepmerge';
 
 // types
 import type {Json} from '~/types/json.types';
-import type {JsonToReduxOptions} from '~/utils/parser/index.types';
+import type {JsonToReduxOptions, ParserCallback} from '~/utils/parser/index.types';
 
 // utils
 import {jsonToRedux as j2r1} from './modules/general/hardcore-mode';
@@ -35,14 +34,20 @@ import {jsonToRedux as j2r17} from './modules/events/events';
  * @static
  * Convert scenario json into redux data */
 export function jsonToRedux(json: Json, options: JsonToReduxOptions = {}): Json {
-  const scenario: Json = mergeAll<Json>(
-    j2r1(json, options), j2r2(json, options), j2r3(json, options),
-    j2r4(json, options), j2r5(json, options), j2r6(json, options),
-    j2r7(json, options), j2r8(json, options), j2r9(json, options),
-    j2r10(json, options), j2r11(json, options), j2r12(json, options),
-    j2r13(json, options), j2r14(json, options), j2r15(json, options),
-    j2r16(json, options), j2r17(json, options),
-  );
+  const parsers: ParserCallback[] = [
+    j2r1, j2r2, j2r3, j2r4, j2r5,
+    j2r6, j2r7, j2r8, j2r9, j2r10,
+    j2r11, j2r12, j2r13, j2r14, j2r15,
+    j2r16, j2r17,
+  ];
 
-  return {scenario};
+  const outputs: Json[] = [];
+
+  for (const parserFunc of parsers) {
+    outputs.push(parserFunc(json, options));
+  }
+
+  return {
+    scenario: merge.all<Json>(outputs),
+  };
 }

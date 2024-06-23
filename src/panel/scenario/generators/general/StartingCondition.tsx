@@ -20,6 +20,9 @@ import {useAppSelector} from '~redux/hooks';
 // utils
 import {DEFAULT_SEASONS} from '~/utils/defaults';
 
+// parsers
+import {toStartingConditionTemplate} from '~/utils/parser/templates-general';
+
 // types
 import type {$Keys} from 'utility-types';
 import type {Season} from '~/utils/seasons.types';
@@ -51,7 +54,7 @@ const StartingCondition = (props: Props) => {
     },
   }, props);
 
-  const scenario = useAppSelector(({scenario}) => (scenario));
+  const startingConditionAttribute = useAppSelector(({scenario}) => scenario.values?.startingCondition);
 
   const [attributes, setAttributes] = React.useState<Attributes>({
     seasonId: props.seasonId as Season,
@@ -67,18 +70,21 @@ const StartingCondition = (props: Props) => {
 
   // Reflect attributes changes
   React.useEffect(() => {
-    const extValue = scenario?.startingCondition ?? null;
+    const extValue = startingConditionAttribute ?? null;
     const isEnabled = !!extValue;
     setAttribute<boolean>('enabled', isEnabled);
 
     if (isEnabled) {
       setAttribute<Season>('seasonId', extValue?.seasonId as Season);
     }
-  }, [scenario]);
+  }, [startingConditionAttribute]);
 
   // Reflect state changes
   React.useEffect(() => {
-    typeof props.onChange === 'function' && props.onChange(toTemplateText(), attributes);
+    const {enabled, ...attrs} = attributes;
+    typeof props.onChange === 'function' && props.onChange(
+      toStartingConditionTemplate(attrs, enabled), attributes
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [attributes]);
 
@@ -86,14 +92,6 @@ const StartingCondition = (props: Props) => {
     return DEFAULT_SEASONS
       .map(v => ({label: v, value: v}));
   }, []);
-
-  const toTemplateText = (): string => {
-    const visualSetupIdProp = attributes.visualSetupId?.trim()
-      ? ` visual_setup_id="${attributes.visualSetupId?.trim()}"` : ''
-    return !attributes.enabled
-      ? ''
-      : `<starting_conditions season_id="${attributes.seasonId}"${visualSetupIdProp}/>`;
-  };
 
   return (
     <div className={cn('mb-2', {'text-muted': !attributes.enabled}, 'checkbox-align')}>

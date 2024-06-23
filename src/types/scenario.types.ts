@@ -6,6 +6,7 @@
 
 import {Omit} from 'utility-types';
 import {Season} from '~/utils/seasons.types';
+import type {Json} from '~/types/json.types';
 
 export interface StartingCondition {
   seasonId: Season;
@@ -20,3 +21,20 @@ export interface Disaster {
 }
 
 export type Disasters = Record<DisasterType, Omit<Disaster, 'disasterType'>>;
+
+export interface Scenario {
+  hardcoreModeAllowed?: boolean;
+  category?: string;
+  groupId?: string;
+  visible?: boolean;
+  nomadModeAllowed?: boolean;
+  showCompletionIcon?: boolean;
+  size?: number;
+  requiredScenario?: string;
+  disasters?: Disasters;
+  requiredMilestones?: number;
+  startingCondition?: StartingCondition;
+  customSettlementNameAllowed?: boolean;
+  loadingScreen?: string;
+  locations?: Json[];
+}

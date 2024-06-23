@@ -4,37 +4,16 @@
  * @since 2020-08-29
  */
 
-import * as XML from '~/helpers/xml';
+import {xmlToJson} from '~/helpers/xml';
 
-// Utils
-import {jsonToRedux} from './../parser/index';
+// utils
+import {allEqual} from '~/helpers/array';
 
-/**
- * @private
- * @static
- * Check that array values are equal */
-const allEqual = <T = any>(arr: T[]): boolean => arr.every(v => v === arr[0]);
+// parsers
+import {jsonToRedux} from './../parser';
 
-/**
- * @public
- * @static
- * Convert XML to JSON
- * @throws {Error} - Failed to parse xml
- */
-export const xmlToJson = (xml: string): { [p: string]: any } => {
-  try {
-    return XML.parse(xml, {
-      attributeNamePrefix: '',
-      ignoreAttributes: false,
-      parseAttributeValue: true,
-      parseTagValue: true,
-      trimValues: true,
-      allowBooleanAttributes: true,
-    });
-  } catch (e) {
-    throw e;
-  }
-};
+// types
+import {Json} from '~/types/json.types';
 
 /**
  * @public
@@ -42,14 +21,14 @@ export const xmlToJson = (xml: string): { [p: string]: any } => {
  * Convert XML to Redux JSON
  * @throws {Error} - Failed to parse xml
  */
-export const xmlToReduxJson = (xml: string): { [p: string]: any } => {
-  const json: { [p: string]: any } = xmlToJson(xml);
+export const xmlToReduxJson = (xml: string): Json => {
+  const json = xmlToJson(xml);
 
   if (!('environment' in json)) {
     throw new Error('Not a valid environment XML');
   }
 
-  const converted: { [p: string]: any } = jsonToRedux(json, {
+  const converted: Json = jsonToRedux(json, {
     nullResolver: (key: string) => ({[key]: false}),
   });
 

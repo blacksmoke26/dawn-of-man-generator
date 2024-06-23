@@ -38,6 +38,13 @@ export interface ObjectAttributes {
   humidity?: Partial<HumidityObject>;
 }
 
+export interface ObjectTemplateAttributes {
+  density?: number;
+  altitude?: [number, number];
+  angle?: [number, number];
+  humidity?: [number, number];
+}
+
 export type ObjectAttributesCasual = DeepPartial<DeepOmit<ObjectAttributes, 'disabled'>>;
 
 export type ObjectType = typeof objects[number];

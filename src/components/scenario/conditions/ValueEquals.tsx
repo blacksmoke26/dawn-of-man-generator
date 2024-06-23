@@ -5,107 +5,92 @@
  */
 
 import React from 'react';
-import * as PropTypes from 'prop-types';
 import cn from 'classname';
 import merge from 'deepmerge';
-import {nanoid} from 'nanoid';
 import {capitalCase} from 'change-case';
-import {Col, Form, Row} from 'react-bootstrap';
+import {Col, Row} from 'react-bootstrap';
 
 // elemental components
+import TextInput from '~/components/ui/TextInput';
 import Select, {Option} from '~/components/ui/Select';
 import ConditionHeader from './../elements/ConditionHeader';
+
+// hooks
+import useAttributes from '~/hooks/use-attributes';
 
 // utils
 import {toString} from '~/helpers/string';
 import {defaultsParams, VALUE_EQUALS} from '~/utils/condition';
-import {toValueEqualsTemplate} from '~/utils/parser/templates';
+import {subConditionDefaultProps} from './utils/condition-logical';
+import {filterEmpty, toConditionTemplate} from '~/utils/parser/templates';
 
 // types
-import type {$Keys, DeepPartial} from 'utility-types';
-import type {
-  ValueEqualsType, ConditionValueEquals as ConditionAttributes,
-} from '~/types/condition.types';
+import type {ConditionAttributesProps, ConditionProps, ConditionValueEquals} from '~/types/condition.types';
 
-interface Attributes extends ConditionAttributes {
-  enabled: boolean;
-  disabledCheckbox?: boolean;
-  expanded?: boolean;
-}
-
-interface Props extends Attributes {
-  removeIcon?: boolean;
-  showCheckbox?: boolean,
-
-  onRemoveClick?(): void,
-
-  onChange?(template: string, values: Attributes): void,
+interface Props extends ConditionProps<ConditionValueEquals> {
 }
 
 const CONDITION_NAME: string = 'ValueEquals';
 
-const ValueEquals = (props: DeepPartial<Props>) => {
-  const newProps = merge.all<Props>([{
-    enabled: true,
-    disabledCheckbox: false,
-    removeIcon: false,
-    showCheckbox: true,
-    expanded: true,
-    onChange: () => {
-    },
-    onRemoveClick: () => {
-    },
-  }, defaultsParams.valueEquals as Props, props]);
+const ValueEquals = (props: Props) => {
+  const newProps = merge<Required<Props>>(subConditionDefaultProps, props);
 
-  const [attributes, setAttributes] = React.useState<Attributes>({
+  const [attributes, setAttr, getAttr] = useAttributes<ConditionAttributesProps>({
     enabled: newProps.enabled as boolean,
-    id: toString<ValueEqualsType>(newProps?.id),
-    value: toString(newProps.value),
+    disabledCheckbox: newProps.disabledCheckbox as boolean,
+    expanded: newProps.expanded as boolean || true,
   });
 
-  const setAttribute = <T = any>(name: $Keys<Attributes>, value: T) => {
-    setAttributes(current => {
-      return ({...current, [name]: value as T});
-    });
-  };
+  const [values, setValue, getValue] = useAttributes<ConditionValueEquals>(
+    merge(defaultsParams?.valueEquals || {}, newProps?.initialValues || {}),
+  );
+
+  React.useEffect(() => {
+    if (attributes.enabled) {
+      setValue('id', props?.values?.id, true);
+      setValue('value', props?.values?.value, true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    attributes.enabled,
+    props?.values?.id, props?.values?.value,
+  ]);
+
+  // Reflect values changes
+  React.useEffect(() => {
+    newProps?.onTemplate(toConditionTemplate('ValueEquals', values, !attributes.enabled));
+    newProps?.onValuesChange(filterEmpty(values));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [attributes.enabled, values]);
 
   // Reflect state changes
   React.useEffect(() => {
-    const args: [string, Attributes] = !attributes.enabled
-      ? ['', {} as Attributes]
-      : [toValueEqualsTemplate(attributes), attributes];
-
-    typeof newProps.onChange === 'function' && newProps.onChange.apply(null, args);
+    newProps.onChange(attributes);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [attributes]);
 
   // Reflect prop changes
   React.useEffect(() => {
-    props?.enabled !== undefined && setAttribute('enabled', props.enabled);
-    props?.disabledCheckbox !== undefined && setAttribute('disabledCheckbox', props.disabledCheckbox);
-    props?.expanded !== undefined && setAttribute('expanded', props.expanded);
-
-    if (props?.enabled) {
-      props?.id !== undefined && setAttribute('id', props.id?.toString());
-      props?.value !== undefined && setAttribute('value', props.value?.toString()?.trim());
-    }
+    setAttr('enabled', props?.enabled, true);
+    setAttr('disabledCheckbox', props?.disabledCheckbox, true);
+    setAttr('expanded', props?.expanded, true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props]);
+  }, [props?.enabled, props?.disabledCheckbox, props?.expanded]);
 
-  const isDisabled = attributes.disabledCheckbox || !attributes.enabled;
+  const isDisabled = getAttr('disabledCheckbox') || !getAttr('enabled');
 
   return (
     <div className={cn('mb-2', {'text-muted': isDisabled}, 'checkbox-align')}>
       <ConditionHeader
         caption={CONDITION_NAME} showCheckbox={newProps.showCheckbox}
-        enabled={attributes.enabled}
-        onEnabled={(isEnabled: boolean) => setAttribute('enabled', isEnabled)}
-        disabledCheckbox={attributes.disabledCheckbox}
+        enabled={getAttr('enabled')}
+        onEnabled={(isEnabled: boolean) => setAttr('enabled', isEnabled)}
+        disabledCheckbox={getAttr('disabledCheckbox')}
         removeIcon={newProps.removeIcon}
         onRemoveClick={newProps.onRemoveClick}
-        onExpandedClick={(state: boolean) => setAttribute('expanded', state)}
-        expanded={attributes.expanded}/>
-      {attributes?.expanded && (
+        onExpandedClick={(state: boolean) => setAttr('expanded', state)}
+        expanded={getAttr('expanded')}/>
+      {getAttr('expanded') && (
         <>
           <Row className="mb-1 mt-2">
             <Col xs="2">
@@ -115,8 +100,8 @@ const ValueEquals = (props: DeepPartial<Props>) => {
               <Select
                 isDisabled={isDisabled}
                 isSearchable={false}
-                defaultValue={attributes?.id
-                  ? {label: toString(attributes?.id), value: toString(attributes?.id)}
+                defaultValue={getValue('id')
+                  ? {label: toString(getValue('id')), value: toString(getValue('id'))}
                   : null
                 }
                 menuPortalTarget={document.body}
@@ -124,7 +109,7 @@ const ValueEquals = (props: DeepPartial<Props>) => {
                 placeholder="Choose..."
                 onChange={(option: Option | any, {action}): void => {
                   if (action === 'select-option' && option) {
-                    setAttribute('id', option.value);
+                    setValue('id', option.value);
                   }
                 }}
               />
@@ -135,19 +120,13 @@ const ValueEquals = (props: DeepPartial<Props>) => {
               <div className="position-relative pl-3" style={{top: 7}}>Value</div>
             </Col>
             <Col xs="6">
-              <Form.Control
-                type="text"
-                size="sm"
+              <TextInput
+                selectOnLoad={true}
+                focusOnLoad={true}
                 disabled={isDisabled}
-                className="pull-right"
-                aria-disabled={isDisabled}
-                id={`condition-${nanoid(5)}`}
+                value={getValue('value', '')}
                 placeholder="e.g., SomeValue"
-                value={toString(attributes?.value)}
-                onChange={e => {
-                  setAttribute('value', e.target.value.replace(/['"]+/ig, ``));
-                }}
-              />
+                onChange={value => setValue('value', value)}/>
             </Col>
           </Row>
         </>
@@ -158,14 +137,14 @@ const ValueEquals = (props: DeepPartial<Props>) => {
 
 // Properties validation
 ValueEquals.propTypes = {
-  enabled: PropTypes.bool,
+  /*enabled: PropTypes.bool,
   disabledCheckbox: PropTypes.bool,
   removeIcon: PropTypes.bool,
   onRemoveClick: PropTypes.func,
   expanded: PropTypes.bool,
   onChange: PropTypes.func,
   id: PropTypes.oneOf(VALUE_EQUALS),
-  value: PropTypes.string,
+  value: PropTypes.string,*/
 };
 
 export default ValueEquals;

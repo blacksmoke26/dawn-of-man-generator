@@ -11,7 +11,7 @@ import {nanoid} from 'nanoid';
 import merge from 'deepmerge';
 import {Button, Form, Row, Col} from 'react-bootstrap';
 
-// Utils
+// utils
 import * as random from '~/utils/random';
 
 // redux
@@ -37,11 +37,11 @@ const Deposits = (props: Props) => {
   const [enabled, setEnabled] = React.useState<boolean>(props.enabled as boolean);
   const [deposits, setDeposits] = React.useState<string[]>(props.deposits as string[]);
 
-  const environment = useAppSelector(({environment}) => (environment));
+  const depositsAttribute = useAppSelector(({environment}) => environment?.values?.deposits);
 
   // Reflect attributes changes
   React.useEffect(() => {
-    const extValue = environment?.deposits ?? null;
+    const extValue = depositsAttribute ?? null;
 
     if (typeof extValue === 'boolean') {
       setEnabled(extValue);
@@ -51,7 +51,7 @@ const Deposits = (props: Props) => {
       setEnabled(true);
       setDeposits(extValue);
     }
-  }, [environment]);
+  }, [depositsAttribute]);
 
   // Reflect state changes
   React.useEffect(() => {
@@ -108,7 +108,6 @@ const Deposits = (props: Props) => {
               label={v}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 const list = deposits.filter(val => val !== e.target.getAttribute('data-value'));
-                console.log({list});
                 e.target.checked && list.push(v);
                 setDeposits([...list]);
               }}

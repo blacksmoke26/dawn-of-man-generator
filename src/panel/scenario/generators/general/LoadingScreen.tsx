@@ -13,8 +13,14 @@ import merge from 'deepmerge';
 import {nanoid} from 'nanoid';
 import {Col, Form, Row} from 'react-bootstrap';
 
+// elemental components
+import TextInput from '~/components/ui/TextInput';
+
 // redux
 import {useAppSelector} from '~redux/hooks';
+
+// parsers
+import {toLoadingScreenTemplate} from '~/utils/parser/templates-general';
 
 /** LoadingScreen `props` type */
 interface Props {
@@ -35,18 +41,18 @@ const LoadingScreen = ( props: Props ) => {
 	const [value, setValue] = React.useState<string>(props.value as string);
 	const [enabled, setEnabled] = React.useState<boolean>(props.enabled as boolean);
 
-	const scenario = useAppSelector(({scenario}) => (scenario));
+	const loadingScreenAttribute = useAppSelector(({scenario}) => scenario?.values?.loadingScreen);
 	
 	// Reflect attributes changes
 	React.useEffect(() => {
-		const extValue = scenario?.loadingScreen ?? null;
+		const extValue = loadingScreenAttribute ?? null;
 		
 		if ( !extValue ) {
 			setEnabled(false);
 		} else {
 			setValue(extValue as string);
 		}
-	}, [scenario]);
+	}, [loadingScreenAttribute]);
 	
 	// Reflect attributes changes
 	React.useEffect(() => {
@@ -55,23 +61,19 @@ const LoadingScreen = ( props: Props ) => {
 	
 	// Reflect state changes
 	React.useEffect(() => {
-		typeof props.onChange === 'function' && props.onChange(toTemplateText(), value);
+		typeof props.onChange === 'function' && props.onChange(
+			toLoadingScreenTemplate(value, enabled), value
+		);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [value, enabled]);
-	
-	const toTemplateText = (): string => {
-		return !enabled
-			? ''
-			: `<loading_screens values="${value}"/>`;
-	};
 	
 	return (
 		<div className={cn('mb-2', {'text-muted': !enabled}, 'checkbox-align')}>
 			<Row className="mb-1">
 				<Col xs="10">
-					Required Scenario
+					Loading Screens
 					<div className="text-size-xxs text-muted mt-1">
-						Probably referees to a .lng file with loading screen hints
+						Referees to the loading screen images
 					</div>
 				</Col>
 				<Col xs="2" className="text-right">
@@ -85,23 +87,19 @@ const LoadingScreen = ( props: Props ) => {
 					/>
 				</Col>
 			</Row>
-			<Form.Control
-				type="text"
+			<TextInput
+				caseType="SNAKE_CASE"
 				disabled={!enabled}
-				className="pull-right"
-				aria-disabled={!enabled}
-				id={`loading_screens-${nanoid(5)}`}
-				aria-placeholder={props.value}
 				value={value}
-				onChange={e => setValue(e.target.value.replace(/['"]+/ig, ``))}
-			/>
+				placeholder="e.g., map_the_northlands"
+				onChange={theValue => setValue(theValue as string)}/>
 		</div>
 	);
 };
 
 // Properties validation
 LoadingScreen.propTypes = {
-	value: PropTypes.bool,
+	value: PropTypes.string,
 	enabled: PropTypes.bool,
 	onChange: PropTypes.func,
 };

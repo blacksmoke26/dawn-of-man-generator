@@ -11,8 +11,11 @@ import {nanoid} from 'nanoid';
 import type {FormControlProps} from 'react-bootstrap';
 import {Button, Form, InputGroup} from 'react-bootstrap';
 
+// hooks
+import { useDebouncedCallback } from 'use-debounce';
+
 // icons
-import {COLOR_DISABLED, COLOR_REDDISH, IconEraser, IconShuffle} from '~/components/icons/app';
+import {COLOR_DISABLED, COLOR_REDDISH, IconEraser, IconRestore, IconShuffle} from '~/components/icons/app';
 
 // types
 import type {Required} from 'utility-types';
@@ -21,6 +24,7 @@ export interface Props {
   disabled?: boolean;
   placeholder?: string;
   allowClear?: boolean;
+  allowRestore?: boolean;
   value?: string | number;
   decimals?: number;
   min?: number;
@@ -33,6 +37,7 @@ export interface Props {
   onChange?(value: string | number): void;
 
   onShuffle?(): void;
+  onRestore?(): void;
 }
 
 const sanitizeInput = (value: string, decimal: number = 0): string => {
@@ -63,6 +68,7 @@ const NumberInput = (props: Props) => {
     disabled: false,
     decimals: 0,
     allowClear: false,
+    allowRestore: false,
     shuffle: false,
     value: '',
     min: 0,
@@ -74,7 +80,16 @@ const NumberInput = (props: Props) => {
     },
     onShuffle() {
     },
+    onRestore() {
+    },
   }, props);
+
+  const debounced = useDebouncedCallback(
+    // function
+    newProps.onChange,
+    // delay in ms
+    150, { maxWait: 250 }
+  );
 
   return (
     <InputGroup>
@@ -98,7 +113,7 @@ const NumberInput = (props: Props) => {
           if (Number(value) > newProps.max) {
             value = newProps.max.toString();
           }
-          newProps.onChange(value);
+          debounced(value);
         }}
         onKeyUp={e => {
           // @ts-ignore
@@ -121,6 +136,16 @@ const NumberInput = (props: Props) => {
             inputRef?.current?.focus();
           }}>
           <IconShuffle width="16" height="16"/>
+        </Button>
+      )}
+      {newProps.allowRestore && (
+        <Button
+          disabled={newProps.disabled}
+          title="Restore default value"
+          className={cn('button-reset-sm ml-2', {'text-white': !newProps.disabled})}
+          variant="link"
+          onClick={() => newProps.onRestore()}>
+          <IconRestore width="19" height="19"/>
         </Button>
       )}
       {newProps.allowClear && (

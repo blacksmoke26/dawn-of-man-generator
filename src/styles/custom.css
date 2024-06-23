@@ -47,6 +47,11 @@
 	background-color: transparent;
 }
 
+.nav-tabs-bottom.text-pos-left li.nav-item > button {
+	padding-left: .3rem;
+	padding-right: 3rem;
+}
+
 .nav-tabs a.nav-item.active {
 	background: rgba(42, 50, 66, 0.62) !important;
 }
@@ -123,4 +128,8 @@
 
 .nav-tabs-bottom .nav-link {
 	background-color: #262d3c;
+}
+
+.syntax-highlighter code:first-of-type {
+	padding-left: 0;
 }

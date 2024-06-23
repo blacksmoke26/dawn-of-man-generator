@@ -14,6 +14,9 @@ import {Col, Form, Row} from 'react-bootstrap';
 // redux
 import {useAppSelector} from '~redux/hooks';
 
+// parsers
+import {toCustomSettlementNameAllowedTemplate} from '~/utils/parser/templates-general';
+
 /** CustomSettlementNameAllowed `props` type */
 interface Props {
   enabled?: boolean,
@@ -34,17 +37,17 @@ const CustomSettlementNameAllowed = (props: Props) => {
   const [value, setValue] = React.useState<boolean>(props.value as boolean);
   const [enabled, setEnabled] = React.useState<boolean>(props.enabled as boolean);
 
-  const scenario = useAppSelector(({scenario}) => (scenario));
+  const customSettlementNameAllowedAttribute = useAppSelector(({scenario}) => scenario?.values?.customSettlementNameAllowed);
 
   // Reflect attributes changes
   React.useEffect(() => {
-    const extValue = scenario?.customSettlementNameAllowed ?? null;
+    const extValue = customSettlementNameAllowedAttribute ?? null;
 
     if (typeof extValue === 'boolean') {
       setEnabled(extValue);
       setValue(extValue);
     }
-  }, [scenario]);
+  }, [customSettlementNameAllowedAttribute]);
 
   // Reflect attributes changes
   React.useEffect(() => {
@@ -53,15 +56,11 @@ const CustomSettlementNameAllowed = (props: Props) => {
 
   // Reflect state changes
   React.useEffect(() => {
-    typeof props.onChange === 'function' && props.onChange(toTemplateText(), value);
+    typeof props.onChange === 'function' && props.onChange(
+      toCustomSettlementNameAllowedTemplate(value, enabled), value
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value, enabled]);
-
-  const toTemplateText = (): string => {
-    return !enabled
-      ? ''
-      : `<custom_settlement_name_allowed value="${value ? 'true' : 'false'}"/>`;
-  };
 
   return (
     <div className={cn('mb-2', {'text-muted': !enabled}, 'checkbox-align')}>

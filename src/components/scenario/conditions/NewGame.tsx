@@ -1,5 +1,3 @@
-// noinspection HtmlUnknownAttribute
-
 /**
  * @author Junaid Atari <mj.atari@gmail.com>
  * @see https://github.com/blacksmoke26/dawn-of-man-generator
@@ -7,7 +5,6 @@
  */
 
 import React from 'react';
-import * as PropTypes from 'prop-types';
 import cn from 'classname';
 import merge from 'deepmerge';
 import {capitalCase} from 'change-case';
@@ -17,94 +14,79 @@ import {Col, Row} from 'react-bootstrap';
 import Select, {Option} from '~/components/ui/Select';
 import ConditionHeader from './../elements/ConditionHeader';
 
+// hooks
+import useAttributes from '~/hooks/use-attributes';
+
 // utils
-import {toString} from '~/helpers/string';
-import {toNewGameTemplate} from '~/utils/parser/templates';
 import {defaultsParams, START_MODES} from '~/utils/condition';
+import {subConditionDefaultProps} from './utils/condition-logical';
+import {filterEmpty, toConditionTemplate} from '~/utils/parser/templates';
 
 // types
-import type {$Keys, DeepPartial} from 'utility-types';
-import type {ConditionNewGame as ConditionAttributes, StartMode} from '~/types/condition.types';
+import type {ConditionAttributesProps, ConditionNewGame, ConditionProps} from '~/types/condition.types';
 
-interface Attributes extends ConditionAttributes {
-  enabled: boolean;
-  disabledCheckbox?: boolean;
-  expanded?: boolean;
-}
-
-interface Props extends Attributes {
-  removeIcon?: boolean;
-  showCheckbox?: boolean,
-
-  onRemoveClick?(): void,
-
-  onChange?(template: string, values: Attributes): void,
+interface Props extends ConditionProps<ConditionNewGame> {
 }
 
 const CONDITION_NAME: string = 'NewGame';
 
-const NewGame = (props: DeepPartial<Props>) => {
-  const newProps = merge.all<Props>([{
-    enabled: true,
-    disabledCheckbox: false,
-    removeIcon: false,
-    showCheckbox: true,
-    expanded: true,
-    onChange: () => {
-    },
-    onRemoveClick: () => {
-    },
-  }, defaultsParams.newGame as Props, props]);
+const NewGame = (props: Props) => {
+  const newProps = merge<Required<Props>>(subConditionDefaultProps, props);
 
-  const [attributes, setAttributes] = React.useState<Attributes>({
+  const [attributes, setAttr, getAttr] = useAttributes<ConditionAttributesProps>({
     enabled: newProps.enabled as boolean,
     disabledCheckbox: newProps.disabledCheckbox as boolean,
-    expanded: newProps.expanded as boolean,
-    startMode: toString<StartMode>(newProps.startMode),
+    expanded: newProps.expanded as boolean || true,
   });
 
-  const setAttribute = <T = any>(name: $Keys<Attributes>, value: T) => {
-    setAttributes(current => {
-      return ({...current, [name]: value as T});
-    });
-  };
+  const [values, setValue, getValue] = useAttributes<ConditionNewGame>(
+    merge(defaultsParams?.newGame || {}, newProps?.initialValues || {}),
+  );
+
+  React.useEffect(() => {
+    if (attributes.enabled) {
+      setValue('startMode', props?.values?.startMode, true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    attributes.enabled, props?.values?.startMode,
+  ]);
+
+  // Reflect values changes
+  React.useEffect(() => {
+    newProps?.onTemplate(toConditionTemplate('NewGame', values, !attributes.enabled));
+    newProps?.onValuesChange(filterEmpty(values));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [attributes.enabled, values]);
 
   // Reflect state changes
   React.useEffect(() => {
-    const args: [string, Attributes] = !attributes.enabled
-      ? ['', {} as Attributes]
-      : [toNewGameTemplate(attributes), attributes];
-
-    typeof newProps.onChange === 'function' && newProps.onChange.apply(null, args);
+    newProps.onChange(attributes);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [attributes]);
 
   // Reflect prop changes
   React.useEffect(() => {
-    props?.enabled !== undefined && setAttribute('enabled', props.enabled);
-    props?.disabledCheckbox !== undefined && setAttribute('disabledCheckbox', props.disabledCheckbox);
-    props?.expanded !== undefined && setAttribute('expanded', props.expanded);
-
-    if (props?.enabled) {
-      props?.startMode !== undefined && setAttribute('startMode', props.startMode);
-    }
+    setAttr('enabled', props?.enabled, true);
+    setAttr('disabledCheckbox', props?.disabledCheckbox, true);
+    setAttr('expanded', props?.expanded, true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props]);
+  }, [props?.enabled, props?.disabledCheckbox, props?.expanded]);
 
-  const isDisabled = attributes.disabledCheckbox || !attributes.enabled;
+  const isDisabled = getAttr('disabledCheckbox') || !getAttr('enabled');
 
   return (
     <div className={cn('mb-2', {'text-muted': isDisabled}, 'checkbox-align')}>
       <ConditionHeader
         caption={CONDITION_NAME} showCheckbox={newProps.showCheckbox}
-        enabled={attributes.enabled}
-        onEnabled={(isEnabled: boolean) => setAttribute('enabled', isEnabled)}
-        disabledCheckbox={attributes.disabledCheckbox}
+        enabled={getAttr('enabled')}
+        onEnabled={(isEnabled: boolean) => setAttr('enabled', isEnabled)}
+        disabledCheckbox={getAttr('disabledCheckbox')}
         removeIcon={newProps.removeIcon}
         onRemoveClick={newProps.onRemoveClick}
-        onExpandedClick={(state: boolean) => setAttribute('expanded', state)}
-        expanded={attributes.expanded}/>
-      {attributes?.expanded && (
+        onExpandedClick={(state: boolean) => setAttr('expanded', state)}
+        expanded={getAttr('expanded')}/>
+      {getAttr('expanded') && (
         <>
           <Row className="mb-1 mt-2">
             <Col xs="2">
@@ -116,18 +98,18 @@ const NewGame = (props: DeepPartial<Props>) => {
                 isClearable
                 isDisabled={isDisabled}
                 menuPortalTarget={document.body}
-                defaultValue={newProps?.startMode ? {
-                  label: capitalCase(newProps.startMode as string),
-                  value: newProps.startMode,
+                defaultValue={getValue('startMode') ? {
+                  label: capitalCase(getValue('startMode') as string),
+                  value: getValue('startMode'),
                 } : null}
                 options={START_MODES.map(value => ({label: capitalCase(value), value}))}
                 placeholder="Choose..."
                 onChange={(option: Option | any, {action}): void => {
                   if (action === 'select-option' && option) {
-                    setAttribute('startMode', option.value);
+                    setValue('startMode', option.value);
                   }
                   if (['clear', 'remove-value'].includes(action)) {
-                    setAttribute('startMode', '');
+                    setValue('startMode', '');
                   }
                 }}
               />
@@ -141,13 +123,13 @@ const NewGame = (props: DeepPartial<Props>) => {
 
 // Properties validation
 NewGame.propTypes = {
-  enabled: PropTypes.bool,
+  /*enabled: PropTypes.bool,
   disabledCheckbox: PropTypes.bool,
   removeIcon: PropTypes.bool,
   onRemoveClick: PropTypes.func,
   expanded: PropTypes.bool,
   onChange: PropTypes.func,
-  startMode: PropTypes.oneOf(START_MODES),
+  startMode: PropTypes.oneOf(START_MODES),*/
 };
 
 export default NewGame;

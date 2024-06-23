@@ -1,5 +1,3 @@
-// noinspection HtmlUnknownAttribute
-
 /**
  * @author Junaid Atari <mj.atari@gmail.com>
  * @see https://github.com/blacksmoke26/dawn-of-man-generator
@@ -7,7 +5,6 @@
  */
 
 import React from 'react';
-import * as PropTypes from 'prop-types';
 import cn from 'classname';
 import merge from 'deepmerge';
 import {capitalCase} from 'change-case';
@@ -17,97 +14,81 @@ import {Col, Row} from 'react-bootstrap';
 import Select, {Option} from '~/components/ui/Select';
 import ConditionHeader from './../elements/ConditionHeader';
 
+// hooks
+import useAttributes from '~/hooks/use-attributes';
+
 // utils
-import {toString} from '~/helpers/string';
 import {defaultsParams, INTERACTIONS} from '~/utils/condition';
-import {toIsGameInteractionPendingTemplate} from '~/utils/parser/templates';
+import {subConditionDefaultProps} from './utils/condition-logical';
+import {filterEmpty, toConditionTemplate} from '~/utils/parser/templates';
 
 // types
-import type {$Keys, DeepPartial} from 'utility-types';
 import type {
-  InteractionType,
-  ConditionIsGameInteractionPending as ConditionAttributes,
+  ConditionAttributesProps, ConditionIsGameInteractionPending, ConditionProps,
 } from '~/types/condition.types';
 
-interface Attributes extends ConditionAttributes {
-  enabled: boolean;
-  disabledCheckbox?: boolean;
-  expanded?: boolean;
-}
-
-interface Props extends Attributes {
-  removeIcon?: boolean;
-  showCheckbox?: boolean,
-
-  onRemoveClick?(): void,
-
-  onChange?(template: string, values: Attributes): void,
+interface Props extends ConditionProps<ConditionIsGameInteractionPending> {
 }
 
 const CONDITION_NAME: string = 'IsGameInteractionPending';
 
-const IsGameInteractionPending = (props: DeepPartial<Props>) => {
-  const newProps = merge.all<Props>([{
-    enabled: true,
-    disabledCheckbox: false,
-    removeIcon: false,
-    showCheckbox: true,
-    expanded: true,
-    onChange: () => {
-    },
-    onRemoveClick: () => {
-    },
-  }, defaultsParams.isGameInteractionPending as Props, props]);
+const IsGameInteractionPending = (props: Props) => {
+  const newProps = merge<Required<Props>>(subConditionDefaultProps, props);
 
-  const [attributes, setAttributes] = React.useState<Attributes>({
+  const [attributes, setAttr, getAttr] = useAttributes<ConditionAttributesProps>({
     enabled: newProps.enabled as boolean,
     disabledCheckbox: newProps.disabledCheckbox as boolean,
-    expanded: newProps.expanded as boolean,
-    value: toString<InteractionType>(newProps.value),
+    expanded: newProps.expanded as boolean || true,
   });
 
-  const setAttribute = <T = any>(name: $Keys<Attributes>, value: T) => {
-    setAttributes(current => {
-      return ({...current, [name]: value as T});
-    });
-  };
+  const [values, setValue, getValue] = useAttributes<ConditionIsGameInteractionPending>(
+    merge(defaultsParams?.isGameInteractionPending || {}, newProps?.initialValues || {}),
+  );
+
+  React.useEffect(() => {
+    if (attributes.enabled) {
+      setValue('value', props?.values?.value, true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    attributes.enabled, props?.values?.value,
+  ]);
+
+  // Reflect values changes
+  React.useEffect(() => {
+    newProps?.onTemplate(toConditionTemplate('IsGameInteractionPending', values, !attributes.enabled));
+    newProps?.onValuesChange(filterEmpty(values));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [attributes.enabled, values]);
 
   // Reflect state changes
   React.useEffect(() => {
-    const args: [string, Attributes] = !attributes.enabled
-      ? ['', {} as Attributes]
-      : [toIsGameInteractionPendingTemplate(attributes), attributes];
-
-    typeof newProps.onChange === 'function' && newProps.onChange.apply(null, args);
+    newProps.onChange(attributes);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [attributes]);
 
   // Reflect prop changes
   React.useEffect(() => {
-    props?.enabled !== undefined && setAttribute('enabled', props.enabled);
-    props?.disabledCheckbox !== undefined && setAttribute('disabledCheckbox', props.disabledCheckbox);
-    props?.expanded !== undefined && setAttribute('expanded', props.expanded);
-
-    if (props?.enabled) {
-      props?.value !== undefined && setAttribute('value', props.value);
-    }
+    setAttr('enabled', props?.enabled, true);
+    setAttr('disabledCheckbox', props?.disabledCheckbox, true);
+    setAttr('expanded', props?.expanded, true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props]);
+  }, [props?.enabled, props?.disabledCheckbox, props?.expanded]);
 
-  const isDisabled = attributes.disabledCheckbox || !attributes.enabled;
+  const isDisabled = getAttr('disabledCheckbox') || !getAttr('enabled');
 
   return (
     <div className={cn('mb-2', {'text-muted': isDisabled}, 'checkbox-align')}>
       <ConditionHeader
         caption={CONDITION_NAME} showCheckbox={newProps.showCheckbox}
-        enabled={attributes.enabled}
-        onEnabled={(isEnabled: boolean) => setAttribute('enabled', isEnabled)}
-        disabledCheckbox={attributes.disabledCheckbox}
+        enabled={getAttr('enabled')}
+        onEnabled={(isEnabled: boolean) => setAttr('enabled', isEnabled)}
+        disabledCheckbox={getAttr('disabledCheckbox')}
         removeIcon={newProps.removeIcon}
         onRemoveClick={newProps.onRemoveClick}
-        onExpandedClick={(state: boolean) => setAttribute('expanded', state)}
-        expanded={attributes.expanded}/>
-      {attributes?.expanded && (
+        onExpandedClick={(state: boolean) => setAttr('expanded', state)}
+        expanded={getAttr('expanded')}/>
+      {getAttr('expanded') && (
         <>
           <Row className="mb-1 mt-2">
             <Col xs="2">
@@ -119,19 +100,19 @@ const IsGameInteractionPending = (props: DeepPartial<Props>) => {
                 isSearchable={false}
                 isDisabled={isDisabled}
                 menuPortalTarget={document.body}
-                defaultValue={newProps?.value
-                  ? {label: capitalCase(newProps.value), value: newProps.value}
+                defaultValue={getValue('value')
+                  ? {label: capitalCase(getValue('value')), value: getValue('value')}
                   : null
                 }
                 options={INTERACTIONS.map(value => ({label: capitalCase(value), value}))}
                 placeholder="Choose..."
                 onChange={(option: Option | any, {action}): void => {
                   if (action === 'select-option' && option) {
-                    setAttribute('value', option.value);
+                    setValue('value', option.value);
                   }
 
                   if (['clear', 'remove-value'].includes(action)) {
-                    setAttribute('value', '');
+                    setValue('value', '');
                   }
                 }}
               />
@@ -145,13 +126,13 @@ const IsGameInteractionPending = (props: DeepPartial<Props>) => {
 
 // Properties validation
 IsGameInteractionPending.propTypes = {
-  enabled: PropTypes.bool,
+  /*enabled: PropTypes.bool,
   disabledCheckbox: PropTypes.bool,
   removeIcon: PropTypes.bool,
   onRemoveClick: PropTypes.func,
   expanded: PropTypes.bool,
   onChange: PropTypes.func,
-  value: PropTypes.oneOf(INTERACTIONS),
+  value: PropTypes.oneOf(INTERACTIONS),*/
 };
 
 export default IsGameInteractionPending;

@@ -7,22 +7,25 @@
 import React from 'react';
 import * as PropTypes from 'prop-types';
 import cn from 'classname';
-import slugify from 'slugify';
 import merge from 'deepmerge';
 import {nanoid} from 'nanoid';
 import {capitalCase} from 'change-case';
-import {Button, ButtonGroup, Col, Form, InputGroup, Row} from 'react-bootstrap';
+import {Button, Col, Form, InputGroup, Row} from 'react-bootstrap';
 
 // components
 import Slider from '~/components/ui/Slider';
-import {labels} from '~/data/environments/builtin';
+import TextInput from '~/components/ui/TextInput';
+import LinkButton from '~/components/ui/LinkButton';
+import NumberInput from '~/components/ui/NumberInput';
 
 // icons
-import {IconRestore, IconShuffle} from '~/components/icons/app';
+import {IconShuffle} from '~/components/icons/app';
 
 // utils
 import * as location from '~/utils/location';
+import {labels} from '~/data/environments/builtin';
 import {POSITION_MAX, POSITION_MIN} from '~/utils/defaults';
+import {LOCATION_LAKES_MAX, LOCATION_LAKES_MIN} from '~/utils/scenario/defaults';
 
 // redux
 import {useAppSelector} from '~redux/hooks';
@@ -47,7 +50,7 @@ const Location = (props: Props) => {
     },
   }, props);
 
-  const fileName = useAppSelector(({fileName}) => fileName);
+  const environmentName = useAppSelector(({environment}) => environment.name);
 
   const [values, setValues] = React.useState<LocationProps>(props.values as LocationProps);
   const [enabled, setEnabled] = React.useState<boolean>(props.enabled as boolean);
@@ -96,8 +99,8 @@ const Location = (props: Props) => {
   };
 
   const environments = [...labels, {
-    label: capitalCase(fileName),
-    value: fileName,
+    label: capitalCase(environmentName),
+    value: environmentName,
     desc: 'Custom tailored environment for the free play scenario',
   }];
 
@@ -107,28 +110,26 @@ const Location = (props: Props) => {
         <Form.Label className="text-size-sm" column={true} sm="2">Name</Form.Label>
         <Col sm="10">
           <InputGroup>
-            <Form.Control
+            <TextInput
+              caseType="SNAKE_CASE"
               disabled={!enabled}
-              value={values.slug} size="sm" className="d-inline-block position-relative"
-              maxLength={22} style={{maxWidth: 280}} onChange={e => {
-              const slug: string = slugify(e.target.value, {
-                replacement: '_', lower: true, strict: true,
-              });
-
-              const name: string = slug
-                .split('_')
-                .map(v => `${v.charAt(0).toUpperCase()}${v.slice(1)}`)
-                .join(' ');
-
-              updateValue('slug', slug);
-              updateValue('name', name);
-            }}/>
-            <Button disabled={!enabled} variant="secondary" className="mt-xs-1" size="sm"
-                    onClick={() => {
-                      const {name, slug} = location.randomName();
-                      updateValue('name', name);
-                      updateValue('slug', slug);
-                    }} title="Randomize"><IconShuffle/></Button>
+              value={values.slug}
+              maxLength={22}
+              inputProps={{
+                className: 'd-inline-block position-relative',
+                style: {maxWidth: 280},
+              }}
+              placeholder="e.g., chakwal"
+              allowShuffle
+              onShuffle={() => {
+                const {name, slug} = location.randomName();
+                updateValue('name', name);
+                updateValue('slug', slug);
+              }}
+              onChange={slug => {
+                updateValue('slug', slug);
+                updateValue('name', capitalCase(slug as string));
+              }}/>
           </InputGroup>
         </Col>
       </Form.Group>
@@ -136,44 +137,70 @@ const Location = (props: Props) => {
         <Form.Label className="text-size-sm" style={{textDecoration: 'underline dotted'}}
                     title="Used to create a map" column={true} sm="2">Seed</Form.Label>
         <Col sm="10">
-          <InputGroup>
-            <Form.Control
+          <div className="float-left">
+            <NumberInput
+              maxLength={8}
+              min={1}
+              max={99999999}
               disabled={!enabled}
-              value={values.seed} size="sm" className="d-inline-block position-relative"
-              maxLength={9} style={{maxWidth: 140}} onChange={e => {
-              if (e.target.value === '' || /^[0-9\b]+$/.test(e.target.value)) {
-                updateValue('seed', e.target.value);
-              }
-            }}/>
-            {' '}
-            <Button disabled={!enabled} variant="secondary" size="sm"
-                    onClick={() => updateValue('seed', location.randomSeed())} title="Randomize"><IconShuffle/></Button>
-            <Button disabled={!enabled} variant="secondary" size="sm"
-                    onClick={() => updateValue('seed', '11111111')} title="Set all as 1">1x8</Button>
-            <Button disabled={!enabled} variant="secondary" size="sm" title="Set all as 0"
-                    onClick={() => updateValue('seed', '00000000')}>0x8</Button>
-          </InputGroup>
+              placeholder="e.g. 11111111"
+              value={values.seed}
+              inputProps={{style: {width: 150}, className: 'd-inline-block position-relative'}}
+              onChange={value => updateValue('seed', '' + value)}
+              shuffle={true}
+              onShuffle={() => updateValue('seed', location.randomSeed())}
+            />
+          </div>
+          <div className="float-left mt-1">
+            <LinkButton
+              className="text-size-sm"
+              title="Set all as 0"
+              disabled={!enabled}
+              onClick={() => updateValue('seed', '00000000')}>
+              0x8
+            </LinkButton>
+            <LinkButton
+              className="mr-2 text-size-sm"
+              title="Set all as 1"
+              disabled={!enabled}
+              onClick={() => updateValue('seed', '11111111')}>
+              1x8
+            </LinkButton>
+            <LinkButton
+              className="mr-2 text-size-sm"
+              title="Set all as 9"
+              disabled={!enabled}
+              onClick={() => updateValue('seed', '99999999')}>
+              9x8
+            </LinkButton>
+          </div>
+          <div className="clearfix"></div>
         </Col>
       </Form.Group>
       <Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled})}>
-        <Form.Label className="text-size-sm" column={true} sm="2"
-                    style={{textDecoration: 'underline dotted'}}
-                    title="Reference to environment, custom environmnts must be placed in subfolder rootOtScenarioFile/Environments"
+        <Form.Label
+          className="text-size-sm" column={true} sm="2"
+          style={{textDecoration: 'underline dotted'}}
+          title="Reference to environment, custom environmnts must be placed in subfolder rootOtScenarioFile/Environments"
         >Environment</Form.Label>
         <Col sm="10">
-          <InputGroup>
-            <Form.Control
-              disabled={!enabled}
-              value={values.environment} size="sm"
-              className="d-inline-block position-relative"
-              maxLength={40} style={{maxWidth: 300}} onChange={e => {
-              updateValue('environment', slugify(e.target.value, '_'));
+          <TextInput
+            caseType="SNAKE_CASE"
+            disabled={!enabled}
+            value={values.environment}
+            maxLength={40}
+            inputProps={{
+              className: 'd-inline-block position-relative',
+              style: {maxWidth: 300},
+            }}
+            placeholder="e.g., custom_environment"
+            allowShuffle
+            onShuffle={() => {
+              updateValue('environment', location.randomEnvironment([environmentName]));
+            }}
+            onChange={value => {
+              updateValue('environment', value);
             }}/>
-            <Button disabled={!enabled} variant="secondary" size="sm" title="Randomize"
-                    onClick={() => {
-                      updateValue('environment', location.randomEnvironment([fileName]));
-                    }}><IconShuffle/></Button>
-          </InputGroup>
           <ul className="list-unstyled list-inline mb-0 mt-1">
             {environments.map((v: Json) => (
               <li className="list-inline-item text-size-xxs" key={`environment_key_${v.value}`}>
@@ -192,9 +219,10 @@ const Location = (props: Props) => {
         </Col>
       </Form.Group>
       <Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled})}>
-        <Form.Label className="text-size-sm" column={true} sm="2"
-                    style={{textDecoration: 'underline dotted'}}
-                    title="Only affects the marker position on the minimap! this is not the starting position of the settlement see position for that">
+        <Form.Label
+          className="text-size-sm" column={true} sm="2"
+          style={{textDecoration: 'underline dotted'}}
+          title="Only affects the marker position on the minimap! this is not the starting position of the settlement see position for that">
           Coordinates
         </Form.Label>
         <Col sm="10">
@@ -219,14 +247,16 @@ const Location = (props: Props) => {
                     onChange={v => updateCoordinate(null, Number(v))}/>
           </div>
           <div className="mt-2">
-            <ButtonGroup aria-label="Basic example">
-              <Button disabled={!enabled} variant="secondary" size="sm"
-                      onClick={() => updateValue('coordinates', location.randomCoordinates())}><IconShuffle/> Randomize</Button>
-            </ButtonGroup>
+            <LinkButton
+              className="p-0 m-0 mb-2"
+              disabled={!enabled}
+              onClick={() => updateValue('coordinates', location.randomCoordinates())}>
+              <IconShuffle/> Randomize
+            </LinkButton>
           </div>
         </Col>
       </Form.Group>
-      <Form.Group as={Row} className={cn('mb-2', {'text-muted': !positionEnabled}, 'checkbox-align')}>
+      <Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled || !positionEnabled}, 'checkbox-align')}>
         <Form.Label className="text-size-sm" column={true} sm="2">
           <Form.Check
             type="switch"
@@ -265,10 +295,12 @@ const Location = (props: Props) => {
                     onChange={v => updatePosition(null, Number(v))}/>
           </div>
           <div className="mt-2">
-            <ButtonGroup aria-label="Basic example">
-              <Button disabled={!isPositionEnabled} variant="secondary" size="sm"
-                      onClick={() => updateValue('position', location.randomPosition())}><IconShuffle/> Randomize</Button>
-            </ButtonGroup>
+            <LinkButton
+              className="p-0 m-0"
+              disabled={!isPositionEnabled}
+              onClick={() => updateValue('position', location.randomPosition())}>
+              <IconShuffle/> Randomize
+            </LinkButton>
           </div>
         </Col>
       </Form.Group>
@@ -290,7 +322,7 @@ const Location = (props: Props) => {
 
         <Col sm="10">
           <Form.Check
-            disabled={!riverEnabled}
+            disabled={!enabled || !riverEnabled}
             style={{top: 9}}
             className="position-relative"
             type="switch"
@@ -317,38 +349,38 @@ const Location = (props: Props) => {
           title="Number of lakes, no influence on size, lakes might intersect">Lakes</span>
         </Form.Label>
         <Col sm="10">
-          <InputGroup>
-            <Form.Control
-              disabled={!lakeEnabled}
-              value={values.lakes} size="sm" className="d-inline-block position-relative"
-              maxLength={1} style={{maxWidth: 60}} onChange={e => {
-              updateValue('lakes', Number(e.target.value));
-            }} onKeyUp={e => {
-              // @ts-ignore
-              e.target.value = Number(String(e.target.value).replace(/\D+/, '')) || 0;
-            }}/>
-            <Button disabled={!lakeEnabled} variant="secondary" size="sm" title="Randomize"
-                    onClick={() => {
-                      updateValue('lakes', location.randomLakes());
-                    }}><IconShuffle/></Button>
-            <Button disabled={!lakeEnabled} variant="secondary" size="sm" title="Clear / None"
-                    onClick={() => updateValue('lakes', 0)}><IconRestore/></Button>
-          </InputGroup>
+          <NumberInput
+            disabled={!enabled || !lakeEnabled}
+            value={values.lakes}
+            min={LOCATION_LAKES_MIN} max={LOCATION_LAKES_MAX} maxLength={LOCATION_LAKES_MAX.toString().length}
+            inputProps={{
+              className: 'd-inline-block position-relative',
+              style: {maxWidth: 80},
+            }}
+            placeholder="1"
+            shuffle
+            onShuffle={() => updateValue('lakes', location.randomLakes())}
+            allowRestore
+            onRestore={() => updateValue('lakes', 1)}
+            onChange={value => updateValue('lakes', +value)}/>
         </Col>
       </Form.Group>
       <hr/>
       <div className="mt-2">
-        <ButtonGroup>
-          <Button disabled={!enabled} variant="secondary" size="sm"
-                  onClick={() => {
-                    const randLocation = location.randomizeLocation([fileName]);
-                    randLocation._id = values._id;
-                    !isLakeEnabled && (randLocation.lakes = values.lakes);
-                    !isRiverEnabled && (randLocation.river = values.river);
-                    !isPositionEnabled && (randLocation.position = values.position);
-                    setValues(randLocation);
-                  }}><IconShuffle/> Randomize All</Button>
-        </ButtonGroup>
+        <LinkButton
+          className="ml-0"
+          title="Randomize all values except for the disabled ones"
+          disabled={!enabled}
+          onClick={() => {
+            const randLocation = location.randomizeLocation([environmentName]);
+            randLocation._id = values._id;
+            !isLakeEnabled && (randLocation.lakes = values.lakes);
+            !isRiverEnabled && (randLocation.river = values.river);
+            !isPositionEnabled && (randLocation.position = values.position);
+            setValues(randLocation);
+          }}>
+          <IconShuffle/> Randomize values
+        </LinkButton>
       </div>
     </>
   );

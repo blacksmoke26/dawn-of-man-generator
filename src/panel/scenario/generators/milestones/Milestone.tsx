@@ -5,44 +5,47 @@
  */
 
 import React from 'react';
-import * as PropTypes from 'prop-types';
+//import * as PropTypes from 'prop-types';
 import cn from 'classname';
 import merge from 'deepmerge';
 import {nanoid} from 'nanoid';
-import xmlFormatter from 'xml-formatter';
-import {Button, Col, Form, Row} from 'react-bootstrap';
+import {Col, Row} from 'react-bootstrap';
 
 // elemental components
+import TextInput from '~/components/ui/TextInput';
 import Select, {Option} from '~/components/ui/Select';
-import Condition, {ConditionRegistry, ConditionsState} from '~/components/scenario/generic/Condition';
+
+// components
+import {MilestoneCheck, MilestoneRemove, MilestoneToggle} from './utils/elements';
+import Condition from '~/components/scenario/generic/Condition';
 
 // icons
-import {
-  COLOR_REDDISH, IconChevronDown, IconChevronUp, IconClear, IconCondition, IconConditionLogical, IconMilestone,
-} from '~/components/icons/app';
+import {COLOR_REDDISH, IconCondition, IconConditionLogical, IconMilestone} from '~/components/icons/app';
 
 // utils
 import {toString} from '~/helpers/string';
-import {onlyKeys} from '~/helpers/object';
+import {buildStrings, LangStrings} from '~/utils/strings';
 import {CONDITIONS_OPTIONS, LOGICAL_CONDITION} from '~/utils/condition';
+import {
+  conditionsToChangedValues,
+  defaultValues,
+  propToConditionsAttributes,
+  toMilestoneTemplate,
+} from './utils/general';
+
+// hooks
+import useAttributes from '~/hooks/use-attributes';
 
 // types
 import type {Required} from 'utility-types';
 import type {KVDocument} from '~/types/json.types';
-import type {Milestone as MilestoneType} from '~/types/milestone.types';
-import type {GeneralCondition, LogicalCondition} from '~/types/condition.types';
-import {Dictionary, toLanguageString} from '~/utils/strings';
-
-const isEqual = require('is-equal');
-
-export interface ChangedValues {
-  [key: string]:
-    { type: GeneralCondition } & KVDocument
-    | {
-    type: LogicalCondition,
-    subConditions: { type: GeneralCondition } & KVDocument
-  } & KVDocument;
-}
+import type {
+  MilestoneChangedConditions,
+  MilestoneChangedValues,
+  MilestoneConditionsAttributes,
+  MilestonePropConditions,
+} from './types/milestone.types';
+import {onlyKeys} from '~/helpers/object';
 
 export interface Props {
   id?: string;
@@ -50,140 +53,119 @@ export interface Props {
   disabled?: boolean;
   disabledCheckbox?: boolean;
   expanded?: boolean;
-  conditions?: MilestoneType['conditions'];
+  conditions?: MilestonePropConditions;
 
-  onChange?(template: string, values: ChangedValues, strings: string): void,
+  /** A callback triggers when metadata values are updated */
+  onValuesChange?(values: MilestoneChangedValues): void;
 
+  /** A callback triggers when conditions are updated */
+  onConditionsChange?(values: MilestoneChangedConditions): void;
+
+  /** A callback triggers when language strings are updated */
+  onStringsChange?(strings: LangStrings): void;
+
+  /** A callback triggers when xml template is rendered */
+  onTemplate?(value: string): void;
+
+  /** A callback triggers when remove icon button is clicked */
   onRemoveClick?(): void,
 }
 
-const omitProps = <T extends KVDocument = KVDocument>(props: T): T => {
-  return onlyKeys(props, ['expanded'], true) as T;
-};
-
-const conditionsToValues = (conditions: KVDocument): ChangedValues => {
-  const registry: ChangedValues = {};
-  let index = 0;
-
-  for (const [, condition] of Object.entries(conditions)) {
-    index++;
-    registry[`condition_${index}`] = onlyKeys(condition, ['expanded', 'disabledCheckbox', 'enabled', 'template'], true);
-  }
-
-  return registry;
-};
-
-const toTemplateText = (milestoneId: string, attributes: KVDocument): string => {
-  return xmlFormatter(
-    `<milestone id="${milestoneId.trim() || 'untitled'}">`
-    + Object.values(attributes).map((attr => attr.template)).join('')
-    + '</milestone>',
-  );
-};
-
 /** Milestone functional component */
 const Milestone = (props: Props) => {
-  const newProps = merge<Required<Props>>({
-    id: 'untitled',
-    description: '',
-    conditions: {},
-    disabled: false,
-    disabledCheckbox: false,
-    expanded: true,
-    onChange: () => {
-    },
-    onRemoveClick: () => {
-    },
-  }, props);
+  const newProps = merge<Required<Props>>(defaultValues, props);
 
-  const [milestoneId, setMilestoneId] = React.useState<string>(toString(newProps.id));
-  const [description, setDescription] = React.useState<string>(toString(newProps.description));
-  const [conditions, setConditions] = React.useState<ConditionsState>(newProps?.conditions as any);
-  const [disabled, setDisabled] = React.useState<boolean>(newProps.disabled);
-  const [disabledCheckbox, setDisabledCheckbox] = React.useState<boolean>(newProps.disabledCheckbox);
-  const [expanded, setExpanded] = React.useState<boolean>(newProps.expanded);
-  const [attributes, setAttributes] = React.useState<KVDocument>({});
+  const [attributes, setAttr, getAttr] = useAttributes<{
+    id: string, desc: string,
+    disabled: boolean;
+    disabledCheckbox: boolean;
+    expanded: boolean;
+  }>({
+    id: toString(newProps.id),
+    desc: toString(newProps.description),
+    disabled: newProps.disabled,
+    disabledCheckbox: newProps.disabledCheckbox,
+    expanded: newProps.expanded,
+  });
 
-  const updateSubCondition = (id: string, values: Record<string, any> = {}): void => {
-    setConditions((current) => {
-      return {...current, [id]: merge(current?.[id] || {}, values as Partial<ConditionsState>)};
-    });
-  };
+  const [conditions, setCond, , remCond, clearCond, setAllCond] = useAttributes<MilestoneConditionsAttributes>(
+    propToConditionsAttributes(newProps?.conditions),
+  );
 
-  const isDisabled = disabledCheckbox || disabled;
-
-  const removeCondition = (id: string): void => {
-    setConditions(current => {
-      const _current = {...current};
-      delete _current[id];
-      return _current;
-    });
-  };
-
-  // Reflect state changes
+  //<editor-fold desc="Reflect strings(language texts) changes">
   React.useEffect(() => {
-    const langStrings: Dictionary = {
-      [milestoneId.trim() || 'untitled']: description,
-    };
+    const strings: KVDocument<string> = {};
 
-    const template = isDisabled ? '' : toTemplateText(milestoneId, attributes);
-    typeof newProps.onChange === 'function' && newProps.onChange(
-      template,
-      isDisabled ? {} : conditionsToValues(attributes),
-      isDisabled ? '' : toLanguageString(langStrings),
-    );
+    if (!attributes.disabled) {
+      strings[attributes.id] = attributes.desc;
+    }
+
+    newProps.onStringsChange(buildStrings(strings));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isDisabled, milestoneId, description, attributes]);
+  }, [attributes.id, attributes.desc, attributes.disabled]);
+  //</editor-fold>
 
-  // Reflect prop changes
+  //<editor-fold desc="Reflect values changes">
   React.useEffect(() => {
-    //props?.id && setDisabled(props.);
-    props?.id !== undefined && setMilestoneId(props.id);
-    props?.description !== undefined && setDescription(props.description);
-    props?.conditions !== undefined && setConditions(props.conditions as any);
-    props?.disabled !== undefined && setDisabled(props.disabled);
-    props?.disabledCheckbox !== undefined && setDisabledCheckbox(props.disabledCheckbox);
-    //props?.expanded !== undefined && setExpanded(props.expanded);
+    newProps.onValuesChange(attributes.disabled ? {} : {
+      id: attributes.id,
+      description: attributes.desc,
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props]);
+  }, [attributes.id, attributes.desc, attributes.disabled]);
+  //</editor-fold>
+
+  //<editor-fold desc="Reflect conditions/xml-template changes">
+  React.useEffect(() => {
+    newProps.onTemplate(attributes.disabled ? '' : toMilestoneTemplate(attributes.id, conditions));
+    newProps.onConditionsChange(attributes.disabled ? [] : conditionsToChangedValues(conditions));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [conditions, attributes.disabled, attributes.id]);
+  //</editor-fold>
+
+  //<editor-fold desc="Reflect prop changes">
+  React.useEffect(() => {
+    setAttr('id', props?.id, true);
+    setAttr('desc', props?.description, true);
+    setAttr('expanded', props?.expanded, true);
+    setAttr('disabled', props?.disabled, true);
+    setAttr('disabledCheckbox', props?.disabledCheckbox, true);
+
+    if (Array.isArray(props?.conditions)) {
+      clearCond();
+      setAllCond(propToConditionsAttributes(props?.conditions || []));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props?.id, props?.description, props?.expanded, props?.disabled, props?.disabledCheckbox, props?.conditions]);
+  //</editor-fold>
+
+  const isDisabled =
+    getAttr<boolean>('disabledCheckbox')
+    || getAttr<boolean>('disabled');
 
   /** Generate selection based nodes */
   const renderConditions = (): React.ReactElement[] => {
-    const nodes: React.ReactElement[] = [];
+    const elements: React.ReactElement[] = [];
 
     const totalCount = Object.keys(conditions).length;
     let index = 0;
 
     for (const [_id, condition] of Object.entries(conditions)) {
-      const values = {
-        ...condition,
-        enabled: !isDisabled,
-        disabledCheckbox: isDisabled,
-      } as ConditionRegistry;
+      const {type, ...initialValues} = condition;
 
-      nodes.push(
+      elements.push(
         <React.Fragment key={_id}>
-          <div className="ml-2 pl-3" style={{borderLeft: '2px solid rgb(97 137 97)'}}>
+          <div
+            className="ml-2 pl-3"
+            style={{borderLeft: '2px solid rgb(97 137 97)'}}>
             <Condition
-              id={_id} internalName={condition.internalName}
-              values={values}
+              type={type}
               disabledCheckbox={isDisabled}
-              onChange={(template: string, values) => {
-                const nextState = {...omitProps(values), template};
-                setAttributes(prevState => {
-                  if (isEqual(prevState[_id], nextState)) {
-                    return prevState as ChangedValues;
-                  }
-                  return {...prevState, [_id]: nextState} as ChangedValues;
-                });
-              }}
-              onRemoveClick={() => {
-                removeCondition(_id);
-                setAttributes(prevState => {
-                  const current = {...prevState};
-                  delete current[_id];
-                  return current;
-                });
+              enabled={!isDisabled}
+              initialValues={initialValues}
+              onRemoveClick={() => remCond(_id)}
+              onValuesChange={values => {
+                setCond(_id, {type, ...onlyKeys(values, ['type'], true)});
               }}
             />
           </div>
@@ -193,7 +175,7 @@ const Milestone = (props: Props) => {
       index++;
     }
 
-    return nodes;
+    return elements;
   };
 
   return (
@@ -206,64 +188,35 @@ const Milestone = (props: Props) => {
         </Col>
         <Col sm="10">
           <Row>
-            <Col sm="8" className="text-left">
-              <Form.Control
-                type="text"
-                size="sm"
-
+            <Col sm="7" className="text-left">
+              <TextInput
+                selectOnLoad={true}
+                focusOnLoad={true}
+                caseType="SNAKE_CASE"
                 disabled={isDisabled}
-                className="pull-left"
-                aria-disabled={isDisabled}
-                id={`condition-${nanoid(5)}`}
+                value={getAttr<string>('id')}
                 placeholder="e.g., survival_5_weeks"
-                value={milestoneId}
-                onChange={e => {
-                  setMilestoneId(e.target.value.replace(/(['" \t]|[^a-z_\d])+/ig, `_`));
-                }}
-                onKeyUp={e => {
-                  // @ts-ignore
-                  e.target.value = e.target.value.replace(/(['" \t]|[^a-z_\d])+/ig, `_`).toLowerCase();
-                }}
-              />
+                onChange={value => setAttr('id', value as string)}/>
             </Col>
-            <Col sm="4" className="text-right">
-              <div className="d-inline-block p-0">
-                <Button
-                  disabled={isDisabled}
-                  title={expanded ? 'Collapse milestone panel' : 'Expand milestone panel'}
-                  variant="link" className="p-0" style={{top: '0.19rem'}}
-                  onClick={() => setExpanded(!expanded)}>
-                  {!expanded
-                    ? <IconChevronUp width="16" height="16"/>
-                    : <IconChevronDown width="16" height="16"/>}
-                </Button>
+            <Col sm="5" className="text-right">
+              <div className="float-right">
+                <MilestoneToggle
+                  disabled={getAttr<boolean>('disabledCheckbox')}
+                  expanded={getAttr<boolean>('expanded')}
+                  onClick={() => setAttr('expanded', !getAttr<boolean>('expanded'))}/>
+                <MilestoneCheck
+                  disabled={getAttr<boolean>('disabledCheckbox')} checked={getAttr<boolean>('disabled')}
+                  onChange={isChecked => setAttr('disabled', !isChecked)}/>
+                <MilestoneRemove
+                  disabled={getAttr<boolean>('disabledCheckbox')}
+                  onClick={() => newProps.onRemoveClick()}/>
               </div>
-              <div className="d-inline-block mr-1" title="Allow milestone for a current scenerio">
-                <Form.Check
-                  type="switch"
-                  style={{top: 7}}
-                  id={`allow_milestone-switch-${nanoid(5)}`}
-                  label=""
-                  disabled={disabledCheckbox}
-                  checked={!disabled}
-                  onChange={e => setDisabled(!e.target.checked)}
-                />
-              </div>
-              <div className="d-inline-block">
-                <Button
-                  variant="link" className="p-0"
-                  style={{top: 2, color: isDisabled ? 'rgba(255, 255, 255, .4)' : COLOR_REDDISH}}
-                  title="Remove milestone"
-                  disabled={isDisabled}
-                  onClick={() => newProps.onRemoveClick()}>
-                  <IconClear width="20" height="20" style={{top: 0}}/>
-                </Button>
-              </div>
+              <div className="clearfix"></div>
             </Col>
           </Row>
         </Col>
       </Row>
-      <div className={cn({'d-none invisible': !expanded})}>
+      <div className={cn({'d-none invisible': !getAttr<boolean>('expanded')})}>
         <Row className="mb-2 mt-2">
           <Col sm="2">
             <div
@@ -279,24 +232,21 @@ const Milestone = (props: Props) => {
           <Col sm="10">
             <Row>
               <Col sm="10" className="text-left">
-                <Form.Control
-                  as="textarea"
-                  style={{height: 50}}
-                  size="sm"
+                <TextInput
+                  caseType="DEFAULT"
+                  allowClear={true}
                   disabled={isDisabled}
-                  className="pull-left"
-                  aria-disabled={isDisabled}
+                  value={getAttr<string>('desc')}
+                  inputProps={{as: 'textarea', style: {height: 50, overflow: 'auto'}, 'aria-disabled': isDisabled}}
                   placeholder="e.g., Survive the long and cold winters..."
-                  value={description}
-                  onChange={e => setDescription(e.currentTarget.value)}
-                />
+                  onChange={value => setAttr('desc', value as string)}/>
               </Col>
             </Row>
           </Col>
         </Row>
         <div className="mt-2 mb-3">
           <Select
-            isDisabled={disabled}
+            isDisabled={isDisabled}
             menuPortalTarget={document.body}
             options={CONDITIONS_OPTIONS}
             value={null}
@@ -311,24 +261,13 @@ const Milestone = (props: Props) => {
             onChange={(option: Option | any, {action}): void => {
               if (action === 'select-option' && option) {
                 const conditionId: string = nanoid(10).toLowerCase();
-                const values = {
-                  internalName: option.value as string,
-                  disabledCheckbox: false,
-                  enabled: true,
-                  expanded: true,
-                  template: '',
-                } as ConditionRegistry;
+                const params: KVDocument = {type: option.value};
 
                 if (LOGICAL_CONDITION.includes(option.value)) {
-                  values['subConditions'] = {};
-                  values['operator'] = option.value;
+                  params.conditions = [];
                 }
-                updateSubCondition(conditionId, values);
-                setAttributes(current => ({
-                  ...current, [conditionId]: {
-                    template: '',
-                  },
-                }));
+
+                setCond(conditionId, params);
               }
             }}
           />
@@ -342,11 +281,11 @@ const Milestone = (props: Props) => {
 
 // Properties validation
 Milestone.propTypes = {
-  id: PropTypes.string,
+  /*id: PropTypes.string,
   disabledCheckbox: PropTypes.bool,
   disabled: PropTypes.bool,
   conditions: PropTypes.object,
-  onRemoveClick: PropTypes.func,
+  onRemoveClick: PropTypes.func,*/
 };
 
 export default Milestone;

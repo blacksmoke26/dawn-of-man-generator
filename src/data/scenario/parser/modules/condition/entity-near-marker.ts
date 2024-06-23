@@ -4,8 +4,6 @@
  * @since 2.3
  */
 
-import op from 'object-path';
-
 // helpers
 import {isInt} from '~/helpers/number';
 import {isObject} from '~/helpers/object';
@@ -30,7 +28,7 @@ export const jsonToRedux = (node: Json | any): Json | null => {
 
   const condition: Json = {
     type: CONDITION_TYPE,
-    entity_type: node?.entity_type,
+    entityType: node?.entity_type,
   };
 
   if (isInt(node?.value) && node?.value >= 0) {
