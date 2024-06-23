@@ -23,12 +23,14 @@ import DisasterContainer from './generators/disaster/DisasterContainer';
 import LocationContainer from './generators/location/LocationContainer';
 import ShowCompletionIcon from './generators/general/ShowCompletionIcon';
 import HardcoreModeAllowed from './generators/general/HardcoreModeAllowed';
-import MilestoneContainer from './generators/milestones/MilestoneContainer';
-import CustomSettlementNameAllowed from './generators/general/CustomSettlementNameAllowed';
 import RequiredMilestone from './generators/general/RequiredMilestone';
+import CustomSettlementNameAllowed from './generators/general/CustomSettlementNameAllowed';
+
+import MilestoneContainer from './generators/milestones/MilestoneContainer';
+import GoalContainer from './generators/goals/GoalContainer';
 
 // icons
-import {IconBlock, IconMapPin, IconMilestone, IconStorm} from '~/components/icons/app';
+import {IconBlock, IconGoal, IconMapPin, IconMilestone, IconStorm} from '~/components/icons/app';
 
 // utils
 import {nodesToLanguageStrings} from '~/utils/location';
@@ -181,6 +183,19 @@ const ScenarioContainer = () => {
         <MilestoneContainer
           onTemplate={template => updateText('milestones', template)}
           onStrings={text => updateLangString('milestones', text)}/>
+      </Accordion>
+      <Accordion
+        header={(
+          <span className="text-size-sm">
+            <IconGoal
+              className="d-inline-block" width="17"
+              height="17"/> Goals
+          </span>
+        )}
+        eventKey="goals">
+        <GoalContainer
+          onTemplate={template => updateText('goals', template)}
+          onStrings={text => updateLangString('goals', text)}/>
       </Accordion>
       <Accordion
         header={<span className="text-size-sm"><IconMapPin className="d-inline-block" width="17" height="17"/> Locations</span>}
