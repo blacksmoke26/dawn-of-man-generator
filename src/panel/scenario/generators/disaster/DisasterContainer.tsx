@@ -173,7 +173,6 @@ const DisasterContainer = (props: Props) => {
 
     for (const [name, attr] of Object.entries(selection)) {
       const isEnabled = attr.enabled && enabled;
-      const eventKey = `disaster_${name}`;
 
       nodes.push(
         <Tab
