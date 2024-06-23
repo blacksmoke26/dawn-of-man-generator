@@ -49,6 +49,7 @@ import {
   WandSparklesIcon,
   WorkflowIcon,
   XIcon,
+  GoalIcon,
 } from 'lucide-react';
 
 export const COLOR_DISABLED: string = 'rgba(255, 255, 255, .5';
@@ -169,6 +170,10 @@ export const IconChevronSimpleDown = (props: LucideProps) => (
 
 export const IconMilestone = (props: LucideProps) => (
   <MilestoneIcon {...merge(iconDefaultProps, props)}/>
+);
+
+export const IconGoal = (props: LucideProps) => (
+  <GoalIcon {...merge(iconDefaultProps, props)}/>
 );
 
 export const IconCopy = (props: LucideProps) => (
