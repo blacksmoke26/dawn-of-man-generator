@@ -15,7 +15,7 @@ import merge from 'deepmerge';
 import type {Required} from 'utility-types';
 
 interface TabTitleProps {
-  title: string;
+  title: React.ReactNode;
   disabled?: boolean;
 
   onRemove?(): void;
