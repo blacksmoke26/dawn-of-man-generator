@@ -8,7 +8,7 @@
 import React from 'react';
 import cn from 'classname';
 import merge from 'deepmerge';
-import {Col} from 'react-bootstrap';
+import {Col, ColProps} from 'react-bootstrap';
 
 // components
 import Range from '../Range';
@@ -23,6 +23,7 @@ import type {Required} from 'utility-types';
 
 interface Props {
   disabled?: boolean;
+  colProps?: ColProps;
   min?: number;
   max?: number;
   allowShuffle?: boolean;
@@ -42,6 +43,7 @@ const AttributeRangeValue = (props: Props) => {
     disabled: false,
     min: 0,
     max: 0,
+    colProps: {},
     allowShuffle: true,
     allowRestore: true,
     onShuffle() {
@@ -56,7 +58,7 @@ const AttributeRangeValue = (props: Props) => {
   }, props);
 
   return (
-    <Col sm="10">
+    <Col sm="10" {...newProps.colProps}>
       <div>
         <div className="text-size-xs font-family-code float-left">
           Min: <code className={cn({'text-muted': newProps.disabled})}>
