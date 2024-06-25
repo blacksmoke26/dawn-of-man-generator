@@ -12,6 +12,7 @@ import {createConditionComponent} from './utils/condition';
 
 // types
 import type {ConditionName, ConditionProps} from '~/types/condition.types';
+import {LOGICAL_CONDITION} from '~/utils/condition';
 
 export interface Props extends ConditionProps<any> {
   type: ConditionName;
@@ -21,6 +22,10 @@ export interface Props extends ConditionProps<any> {
 const Condition = (props: Props) => {
   const ConditionComponent = createConditionComponent(props.type);
   const componentProps = onlyKeys<Props>(props, ['type'], true) as Record<string, any>;
+
+  if (LOGICAL_CONDITION.includes(props?.type)) {
+    componentProps.operator = props?.type;
+  }
 
   return (
     <ConditionComponent removeIcon={true} showCheckbox={false} {...componentProps} />
