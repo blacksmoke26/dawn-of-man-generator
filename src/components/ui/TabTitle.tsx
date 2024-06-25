@@ -40,7 +40,7 @@ const TabTitle = (props: TabTitleProps) => {
       <a href="#/close"
         aria-disabled={newProps.disabled}
         hidden={newProps.disabled}
-        className="text-decoration-none p-0"
+        className="text-decoration-none text-white-50 p-0"
         style={{
           lineHeight: '10px',
           position: 'relative',
