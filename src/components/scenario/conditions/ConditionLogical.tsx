@@ -1,3 +1,5 @@
+// noinspection HtmlUnknownAnchorTarget
+
 /**
  * @author Junaid Atari <mj.atari@gmail.com>
  * @see https://github.com/blacksmoke26/dawn-of-man-generator
@@ -193,7 +195,7 @@ const ConditionLogical = (props: Props) => {
   return (
     <div className={cn({'text-muted': !getAttr('enabled')})}>
       <Row>
-        <Col col="6" className="checkbox-align mt-1">
+        <Col col="6" className="checkbox-align">
           {!newProps.showCheckbox && (
             <ToggleCheckbox
               attr={getAttr('enabled')}
@@ -208,7 +210,7 @@ const ConditionLogical = (props: Props) => {
               type="switch"
               id={`locations_override-switch-${nanoid(5)}`}
               label={<span className="position-relative" style={{top: 0}}>
-            <span className={cn('mr-1', {'text-muted': !getAttr('enabled')})}>
+            <span className={cn({'text-muted': !getAttr('enabled')})}>
               <IconCondition
                 width="17" height="17"
                 color={!getAttr('enabled') ? COLOR_DISABLED : COLOR_REDDISH}/>
@@ -255,32 +257,30 @@ const ConditionLogical = (props: Props) => {
       </Row>
       {getAttr('expanded') && (
         <>
-          <div className="mt-2 mb-2">
+          <div className="mb-2" style={{marginTop: 7}}>
             <Row className={cn({'text-muted': false}, 'checkbox-align')}>
-              <Col xs="8">
-                <div className="d-inline-block" style={{width: '80%'}}>
-                  <Select
-                    isDisabled={!getAttr('enabled')}
-                    menuPortalTarget={document.body}
-                    value={null}
-                    formatOptionLabel={(option: Option | any) => (
-                      <span>
+              <Col sm="8">
+                <Select
+                  isDisabled={!getAttr('enabled')}
+                  menuPortalTarget={document.body}
+                  value={null}
+                  formatOptionLabel={(option: Option | any) => (
+                    <span>
                         <IconCondition width="17" height="17" color={COLOR_REDDISH}/>
-                        {' '} {option?.label}
+                      {' '} {option?.label}
                       </span>
-                    )}
-                    options={GENERAL_CONDITIONS.map(value => ({label: capitalCase(value), value}))}
-                    placeholder="Choose condition to insert..."
-                    onChange={(option: Option | any, {action}): void => {
-                      if (action === 'select-option' && option) {
-                        setValue(nanoid(10).toLowerCase(), {type: option?.value});
-                      }
-                    }}
-                  />
-                </div>
+                  )}
+                  options={GENERAL_CONDITIONS.map(value => ({label: capitalCase(value), value}))}
+                  placeholder="Choose condition to insert..."
+                  onChange={(option: Option | any, {action}): void => {
+                    if (action === 'select-option' && option) {
+                      setValue(nanoid(10).toLowerCase(), {type: option?.value});
+                    }
+                  }}
+                />
               </Col>
-              <Col xs="4" className="text-right">
-                <div className="pt-1">
+              <Col sm="4" className="text-right">
+                <div>
                   <CollapseAllButton disabled={isDisabled} onClick={() => {
                     setAttr('conditionsExpanded', false);
                     setTimeout(() => {
