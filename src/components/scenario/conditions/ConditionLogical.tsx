@@ -23,12 +23,15 @@ import useAttributes from '~/hooks/use-attributes';
 import {onlyKeys} from '~/helpers/object';
 import {GENERAL_CONDITIONS} from '~/utils/condition';
 import {
-  CollapseAllButton,
+  RemoveButton,
   conditionIcon,
   ExpandAllButton,
   RemoveAllButton,
-  RemoveButton,
+  CollapseAllButton,
 } from './elements/condition-logical';
+import {
+  arrayValuesToAttributes, createConditionComponent,
+} from './utils/condition-logical';
 
 // icons
 import {
@@ -41,16 +44,9 @@ import {
 } from '~/components/icons/app';
 
 // types
-import {KVDocument} from '~/types/json.types';
-import {
-  type PropValues,
-  type ChangedValues,
-  ConditionLogicalValues,
-  arrayValuesToAttributes,
-  createConditionComponent,
-} from './utils/condition-logical';
-import {ConditionAttributesProps, LogicalCondition} from '~/types/condition.types';
-
+import type {KVDocument} from '~/types/json.types';
+import type {PropValues, ChangedValues, ConditionLogicalValues} from './utils/condition-logical';
+import type {ConditionAttributesProps, LogicalCondition} from '~/types/condition.types';
 
 /** ConditionNot `props` type */
 interface Props extends ConditionAttributesProps {
@@ -109,10 +105,9 @@ const valuesToChangedValues = (type: LogicalCondition, values: PropValues): Chan
   return list;
 };
 
-function ToggleCheckbox(props: { attr: boolean, disabled: boolean, onClick: () => void }) {
-  return (
-    <span
-      className={cn('mr-1', {'text-muted': !props.attr})}>
+const ToggleCheckbox = (props: { attr: boolean, disabled: boolean, onClick: () => void }) => (
+  <span
+    className={cn('mr-1', {'text-muted': !props.attr})}>
       <a href="#disable"
          className={cn({'text-muted': props.disabled})}
          onClick={(e) => {
@@ -132,8 +127,7 @@ function ToggleCheckbox(props: { attr: boolean, disabled: boolean, onClick: () =
       </span>
       </a>
     </span>
-  );
-}
+);
 
 /** ConditionLogical functional component */
 const ConditionLogical = (props: Props) => {
@@ -250,7 +244,7 @@ const ConditionLogical = (props: Props) => {
           </div>
           {newProps?.removeIcon && (
             <RemoveButton
-              disabledCheckbox={getAttr('disabledCheckbox')}
+              disabled={getAttr('disabledCheckbox')}
               onClick={() => newProps?.onRemoveClick()}/>
           )}
         </Col>
