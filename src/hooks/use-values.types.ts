@@ -12,7 +12,12 @@ import {$Values} from 'utility-types';
 
 export type ValueType<V = any> = V | ((value: V) => V);
 
-export interface UseValuesHook<T extends object> {
+export interface UseValuesHook<T extends object, RT = any> {
+  /**
+   * Get immutable data values
+   */
+  readonly data: T;
+
   /**
    * Get all values
    */
@@ -23,14 +28,14 @@ export interface UseValuesHook<T extends object> {
    * @param key - The key (e.g., 'enabled')
    * @param defaultValue - Default value if the key is not found
    */
-  get<R = any>(key: keyof T, defaultValue?: R | undefined): R;
+  get<R = RT>(key: keyof T, defaultValue?: R | undefined): R;
 
   /**
    * Get value by path
    * @param path - The Path (e.g., 'a.b.c' | ['a', 'b', 'c'] | '0.a.3.c')
    * @param defaultValue - Default value if the path is not found
    */
-  get<R = any>(path: Path, defaultValue?: R | undefined): R;
+  get<R = RT>(path: Path, defaultValue?: R | undefined): R;
 
   /**
    * Compare given value with the attribute's value
@@ -38,7 +43,7 @@ export interface UseValuesHook<T extends object> {
    * @param compare - The value to compare
    * @return True if equal or false otherwise
    */
-  is<R = any>(key: keyof T, compare?: R): boolean;
+  is<R = RT>(key: keyof T, compare?: R | R[]): boolean;
 
   /**
    * Compare given value with the attribute's value
@@ -46,7 +51,7 @@ export interface UseValuesHook<T extends object> {
    * @param compare - The value to compare
    * @return True if equal or false otherwise
    */
-  is<R = any>(path: Path, compare?: R): boolean;
+  is<R = RT>(path: Path, compare?: R): boolean;
 
   /**
    * Set value by key
@@ -58,7 +63,7 @@ export interface UseValuesHook<T extends object> {
    * setValue<boolean>('enabled', (state) => !state);
    * @param checkUndefined - If true, the value as undefined work by set and ignore the setting process
    */
-  set<V = any>(key: keyof T, value: ValueType<V>, checkUndefined?: boolean): void;
+  set<V = RT>(key: keyof T, value: ValueType<V>, checkUndefined?: boolean): void;
 
   /**
    * Set value by path
@@ -70,7 +75,7 @@ export interface UseValuesHook<T extends object> {
    * setValue<number>('a.b.c', (num) => num + 1);
    * @param checkUndefined - If true, the value as undefined work by set and ignore the setting process
    */
-  set<V = $Values<T> | any>(path: Path, value: ValueType<V>, checkUndefined?: boolean): void;
+  set<V = $Values<T> | RT>(path: Path, value: ValueType<V>, checkUndefined?: boolean): void;
 
   /**
    * Overwrite value by key (unlike {@link set}, it will first {@link empty} the value if it exists and then {@link set} the value)
@@ -82,7 +87,7 @@ export interface UseValuesHook<T extends object> {
    * overwrite<number[]>('usersId', (current) => current.slice(0, 2));
    * @param checkUndefined - If true, the value as undefined work by set and ignore the setting process
    */
-  overwrite<V = any>(key: keyof T, value: ValueType<V>, checkUndefined?: boolean): void;
+  overwrite<V = RT>(key: keyof T, value: ValueType<V>, checkUndefined?: boolean): void;
 
   /**
    * Set value by path (unlike {@link set}, it will first {@link empty} the value if it exists and then {@link set} the value)

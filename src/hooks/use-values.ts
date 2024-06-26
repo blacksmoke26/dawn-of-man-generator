@@ -11,14 +11,15 @@ import objPath, {Path} from 'object-path';
 // types
 import type {ValueType, UseValuesHook} from './use-values.types';
 
-const useValues = <T extends object>(initialValues: T): UseValuesHook<T> => {
+const useValues = <T extends object, RT = any>(initialValues: T): UseValuesHook<T, RT> => {
   const [values, setValues] = useState<T>(initialValues);
 
   return {
+    data: values,
     get(name, defaultValue = undefined) {
       return objPath.get(values, name as Path, defaultValue);
     },
-    getAll(): T {
+    getAll() {
       return values;
     },
     set(name, value, checkUndefined = false) {
@@ -51,7 +52,7 @@ const useValues = <T extends object>(initialValues: T): UseValuesHook<T> => {
     setAll(newValues: T) {
       setValues(newValues);
     },
-    overwrite(name, value, checkUndefined = false){
+    overwrite(name, value, checkUndefined = false) {
       if (checkUndefined && value === undefined) return;
       this.empty(name as Path);
       this.set(name as Path, value);
@@ -64,7 +65,16 @@ const useValues = <T extends object>(initialValues: T): UseValuesHook<T> => {
       });
     },
     is(name, compare) {
-      return this.get(name as Path) === compare;
+      if (!Array.isArray(compare)) {
+        return this.get(name as Path) === compare;
+      }
+
+      // noinspection LoopStatementThatDoesntLoopJS
+      for (const comp of compare) {
+        return this.get(name as Path) === comp as unknown;
+      }
+
+      return false;
     },
     hasKey(key) {
       return key in values;
