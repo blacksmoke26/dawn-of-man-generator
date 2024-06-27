@@ -12,25 +12,27 @@ import merge from 'deepmerge';
 import * as PropTypes from 'prop-types';
 import {Button, ButtonGroup, Form} from 'react-bootstrap';
 
-// components
+// elemental components
 import Slider from '~/components/ui/Slider';
 
 // icons
 import {
   IconShuffle,
-  IconRaiseDown,
   IconRaiseUp,
+  IconRaiseDown,
   IconEnabled,
   IconDisabled,
   COLOR_DISABLED, COLOR_WHITISH, COLOR_REDDISH,
 } from '~/components/icons/app';
 
 // utils
-import * as random from '~/utils/random';
+import {randomFrequency, randomFrequencies} from '~/utils/random';
 
 // redux
 import {useAppSelector} from '~redux/hooks';
-import {$Keys} from 'utility-types';
+
+// types
+import type {$Keys} from 'utility-types';
 
 /** Frequencies type  */
 export interface ValueFrequencies {
@@ -67,7 +69,7 @@ export interface Props {
 const NoiseAmplitudes = (props: Props) => {
   props = merge({
     enabled: true,
-    frequencies: {...random.randomFrequencies()},
+    frequencies: {...randomFrequencies()},
     onChange: () => {
     },
   }, props);
@@ -127,7 +129,7 @@ const NoiseAmplitudes = (props: Props) => {
     }
     if (Array.isArray(extValue) && extValue.length === 8) {
       for (let i = 0; i <= 7; i++) {
-        setFrequency(`freq${i + 1}`, extValue[i]);
+        setFrequency(`freq${i + 1}`, extValue[i] as unknown as number);
       }
       setEnabled(true);
       setFreqEnabled({
@@ -212,7 +214,7 @@ const NoiseAmplitudes = (props: Props) => {
         </Form.Label>
 
         <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                onClick={() => setFrequency('freq1', random.randomFrequency())}>
+                onClick={() => setFrequency('freq1', randomFrequency())}>
           Random
         </Button>
         <Button disabled={!enabled} className="button-reset-sm" variant="link"
@@ -239,7 +241,7 @@ const NoiseAmplitudes = (props: Props) => {
           />
         </Form.Label>
         <Button disabled={!freq2Enabled} className="button-reset-sm" variant="link"
-                onClick={() => setFrequency('freq2', random.randomFrequency())}>
+                onClick={() => setFrequency('freq2', randomFrequency())}>
           Random
         </Button>
         <Button disabled={!freq2Enabled} className="button-reset-sm" variant="link"
@@ -266,7 +268,7 @@ const NoiseAmplitudes = (props: Props) => {
           />
         </Form.Label>
         <Button disabled={!freq3Enabled} className="button-reset-sm" variant="link"
-                onClick={() => setFrequency('freq3', random.randomFrequency())}>
+                onClick={() => setFrequency('freq3', randomFrequency())}>
           Random
         </Button>
         <Button disabled={!freq3Enabled} className="button-reset-sm" variant="link"
@@ -293,7 +295,7 @@ const NoiseAmplitudes = (props: Props) => {
           />
         </Form.Label>
         <Button disabled={!freq4Enabled} className="button-reset-sm" variant="link"
-                onClick={() => setFrequency('freq4', random.randomFrequency())}>
+                onClick={() => setFrequency('freq4', randomFrequency())}>
           Random
         </Button>
         <Button disabled={!freq4Enabled} className="button-reset-sm" variant="link"
@@ -320,7 +322,7 @@ const NoiseAmplitudes = (props: Props) => {
           />
         </Form.Label>
         <Button disabled={!freq5Enabled} className="button-reset-sm" variant="link"
-                onClick={() => setFrequency('freq5', random.randomFrequency())}>
+                onClick={() => setFrequency('freq5', randomFrequency())}>
           Random
         </Button>
         <Button disabled={!freq5Enabled} className="button-reset-sm" variant="link"
@@ -347,7 +349,7 @@ const NoiseAmplitudes = (props: Props) => {
           />
         </Form.Label>
         <Button disabled={!freq6Enabled} className="button-reset-sm" variant="link"
-                onClick={() => setFrequency('freq6', random.randomFrequency())}>
+                onClick={() => setFrequency('freq6', randomFrequency())}>
           Random
         </Button>
         <Button disabled={!freq6Enabled} className="button-reset-sm" variant="link"
@@ -374,7 +376,7 @@ const NoiseAmplitudes = (props: Props) => {
           />
         </Form.Label>
         <Button disabled={!freq7Enabled} className="button-reset-sm" variant="link"
-                onClick={() => setFrequency('freq7', random.randomFrequency())}>
+                onClick={() => setFrequency('freq7', randomFrequency())}>
           Random
         </Button>
         <Button disabled={!freq7Enabled} className="button-reset-sm" variant="link"
@@ -401,7 +403,7 @@ const NoiseAmplitudes = (props: Props) => {
           />
         </Form.Label>
         <Button disabled={!freq8Enabled} className="button-reset-sm" variant="link"
-                onClick={() => setFrequency('freq8', random.randomFrequency())}>
+                onClick={() => setFrequency('freq8', randomFrequency())}>
           Random
         </Button>
         <Button disabled={!freq8Enabled} className="button-reset-sm" variant="link"
@@ -434,7 +436,7 @@ const NoiseAmplitudes = (props: Props) => {
             style={{color: !enabled ? COLOR_DISABLED : COLOR_WHITISH}}
             className="text-size-sm button-reset-sm p-0 mr-3" size="sm"
             onClick={() => {
-              const values = filterEnabledFrequencies<number>(Object.values(random.randomFrequencies(null))) as ValueFrequencies;
+              const values = filterEnabledFrequencies<number>(Object.values(randomFrequencies(null))) as ValueFrequencies;
               setFrequencies((current) => ({...current, ...values}));
             }}><IconShuffle/> Randomize</Button>
           <Button
@@ -442,7 +444,7 @@ const NoiseAmplitudes = (props: Props) => {
             style={{color: !enabled ? COLOR_DISABLED : COLOR_WHITISH}}
             className="text-size-sm button-reset-sm p-0 mr-3" size="sm"
             onClick={() => {
-              const values = filterEnabledFrequencies<number>(Object.values(random.randomFrequencies(0))) as ValueFrequencies;
+              const values = filterEnabledFrequencies<number>(Object.values(randomFrequencies(0))) as ValueFrequencies;
               setFrequencies((current) => ({...current, ...values}));
             }}><IconRaiseDown/> Min</Button>
           <Button
@@ -450,7 +452,7 @@ const NoiseAmplitudes = (props: Props) => {
             style={{color: !enabled ? COLOR_DISABLED : COLOR_WHITISH}}
             className="text-size-sm button-reset-sm p-0 mr-3" size="sm"
             onClick={() => {
-              const values = filterEnabledFrequencies<number>(Object.values(random.randomFrequencies(1))) as ValueFrequencies;
+              const values = filterEnabledFrequencies<number>(Object.values(randomFrequencies(1))) as ValueFrequencies;
               setFrequencies((current) => ({...current, ...values}));
             }}><IconRaiseUp/> Max</Button>
           <Button
