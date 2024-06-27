@@ -282,6 +282,34 @@ export interface ConditionDefaultParams {
   valueReached: ConditionValueReached,
 }
 
+export type ConditionWithType<N = GeneralCondition, C extends object = object> = {
+  type: N;
+} & C;
+
+export type AnyLogicalCondition = {
+  type: LogicalCondition;
+  conditions: AnyGeneralCondition[];
+}
+
+export type AnyGeneralCondition =
+  | ConditionWithType<'AnyTasksActive', ConditionAnyTasksActive>
+  | ConditionWithType<'AnyWorkAreasActive', ConditionAnyWorkAreasActive>
+  | ConditionWithType<'EntityCountComparison', ConditionEntityCountComparison>
+  | ConditionWithType<'EntityCountReached', ConditionEntityCountReached>
+  | ConditionWithType<'EntityNearMarker', ConditionEntityNearMarker>
+  | ConditionWithType<'EraUnlocked', ConditionEraUnlocked>
+  | ConditionWithType<'InitGame', ConditionInitGame>
+  | ConditionWithType<'IsAlive', ConditionIsAlive>
+  | ConditionWithType<'IsGameInteractionPending', ConditionIsGameInteractionPending>
+  | ConditionWithType<'NewGame', ConditionNewGame>
+  | ConditionWithType<'ScenarioCompleted', ConditionScenarioCompleted>
+  | ConditionWithType<'TechUnlocked', ConditionTechUnlocked>
+  | ConditionWithType<'TimeElapsed', ConditionTimeElapsed>
+  | ConditionWithType<'ValueEquals', ConditionValueEquals>
+  | ConditionWithType<'ValueReached', ConditionValueReached>;
+
+export type AnyCondition = | AnyLogicalCondition | AnyGeneralCondition;
+
 export interface ConditionAttributesProps {
   enabled?: boolean;
   disabledCheckbox?: boolean;
