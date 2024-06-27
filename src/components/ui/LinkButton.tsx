@@ -12,8 +12,8 @@ import {Button} from 'react-bootstrap';
 
 // icons
 import {
-  COLOR_DISABLED, COLOR_GRAYED,
-  COLOR_REDDISH, COLOR_WHITISH,
+  COLOR_DISABLED, COLOR_GRAYED, COLOR_ORANGE, COLOR_PINK,
+  COLOR_REDDISH, COLOR_SUCCESS, COLOR_WHITISH,
 } from '~/components/icons/app';
 
 // types
@@ -23,6 +23,10 @@ const colorsMap = {
   WHITISH: COLOR_WHITISH,
   REDDISH: COLOR_REDDISH,
   GRAYED: COLOR_GRAYED,
+  PINK: COLOR_PINK,
+  SUCCESS: COLOR_SUCCESS,
+  ORANGE: COLOR_ORANGE,
+  DISABLED: COLOR_DISABLED,
 } as const;
 
 export interface LinkButtonProps {
