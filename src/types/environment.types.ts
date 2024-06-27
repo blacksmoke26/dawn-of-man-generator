@@ -10,14 +10,7 @@ import {Json} from '~/types/json.types';
 import {SeasonsProp} from '~/utils/seasons.types';
 
 export type NoiseAmplitudes =
-  | [number]
-  | [number, number]
-  | [number, number, number]
-  | [number, number, number, number]
-  | [number, number, number, number, number]
-  | [number, number, number, number, number, number]
-  | [number, number, number, number, number, number, number]
-  | [number, number, number, number, number, number, number, number];
+  [number, number?, number?, number?, number?, number?, number?, number?];
 
 export interface Environment {
   noiseAmplitudes?: NoiseAmplitudes | boolean;
