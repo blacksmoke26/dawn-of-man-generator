@@ -49,12 +49,18 @@ import {
   WandSparklesIcon,
   WorkflowIcon,
   XIcon,
-  GoalIcon,
+  GoalIcon, CalendarCogIcon, FlagIcon, ZapIcon,
 } from 'lucide-react';
 
 export const COLOR_DISABLED: string = 'rgba(255, 255, 255, .5';
 
 export const COLOR_WHITISH: string = '#eaeaea';
+
+export const COLOR_SUCCESS: string = '#66bb6a';
+
+export const COLOR_ORANGE: string = '#ffb74d';
+
+export const COLOR_PINK: string = '#ea5589';
 
 export const COLOR_REDDISH: string = '#ff8a65';
 
@@ -230,4 +236,16 @@ export const IconEnabled = (props: LucideProps) => (
 
 export const IconDisabled = (props: LucideProps) => (
   <PowerOffIcon {...merge(iconDefaultProps, props)}/>
+);
+
+export const IconEvent = (props: LucideProps) => (
+  <CalendarCogIcon {...merge(iconDefaultProps, props)}/>
+);
+
+export const IconFlag = (props: LucideProps) => (
+  <FlagIcon {...merge(iconDefaultProps, props)}/>
+);
+
+export const IconAction = (props: LucideProps) => (
+  <ZapIcon {...merge(iconDefaultProps, props)}/>
 );
