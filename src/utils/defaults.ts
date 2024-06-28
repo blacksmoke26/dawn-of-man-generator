@@ -131,3 +131,12 @@ export const ERA_FACTORS_HIGHEST: EraFactor = [
   ERA_FACTORS_MAX, ERA_FACTORS_MAX, ERA_FACTORS_MAX,
   ERA_FACTORS_MAX, ERA_FACTORS_MAX, ERA_FACTORS_MAX,
 ] as const;
+
+// Max limits
+export const EVENTS_CREATE_MAX: number = 20;
+
+export const ACTIONS_CREATE_MAX: number = 20;
+
+export const WAVES_CREATE_MAX: number = 5;
+
+export const LOCATIONS_CREATE_MAX: number = 15;
