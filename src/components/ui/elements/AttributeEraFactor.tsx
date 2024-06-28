@@ -200,7 +200,6 @@ const AttributeEraFactor = (props: Props) => {
             className="ml-2"
             title="Set all values to min"
             onClick={() => {
-              console.log('ERA_FACTORS_LOWEST:', ERA_FACTORS_LOWEST);
               newProps.onChange([...ERA_FACTORS_LOWEST]);
             }}>
             <IconRaiseDown width="14" height="14"/> Min all
@@ -210,7 +209,6 @@ const AttributeEraFactor = (props: Props) => {
             className="ml-2"
             title="Set all values to max"
             onClick={() => {
-              console.log('ERA_FACTORS_HIGHEST:', ERA_FACTORS_HIGHEST);
               newProps.onChange([...ERA_FACTORS_HIGHEST]);
             }}>
             <IconRaiseUp width="14" height="14"/> Max all

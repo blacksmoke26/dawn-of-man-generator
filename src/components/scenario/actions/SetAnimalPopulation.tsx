@@ -210,7 +210,6 @@ const SetAnimalPopulation = (props: Props) => {
                 fifth={eraFactor?.[4] || ERA_FACTORS_LOWEST[4]}
                 sixth={eraFactor?.[5] || ERA_FACTORS_LOWEST[5]}
                 onChange={values => {
-                  console.log('values:', values);
                   valuer.overwrite('eraFactors', values);
                 }}
               />
