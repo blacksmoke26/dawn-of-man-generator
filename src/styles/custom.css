@@ -137,3 +137,7 @@
 .text-muted-deep, .text-muted-deep * {
     color: rgba(255, 255, 255, .5) !important;
 }
+
+.nav-tabs-bottom .nav-link.active:before {
+    background-color: #3574F0;
+}
