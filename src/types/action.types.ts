@@ -448,7 +448,6 @@ export interface ActionTemplateProps<T> {
 export interface ActionProps<T> extends ActionAttributesProps, ActionTemplateProps<T> {
   removeIcon?: boolean;
   showHeader?: boolean;
-  showCheckbox?: boolean;
   initialValues?: Partial<T>;
 
   onRemoveClick?(): void;
