@@ -36,7 +36,7 @@ export const renderTemplate = (name: string, type: string | null, attributes: st
 
   collection.push(...attributes);
 
-  const begin = `<${collection.join(' ')}`;
+  const begin = `${collection.join(' ')}`;
 
   return !text.trim() ? `<${begin}/>` : `<${begin}>${text}</${name}>`;
 };
