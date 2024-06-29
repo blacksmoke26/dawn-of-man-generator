@@ -224,7 +224,7 @@ export const defaultsParams: DeepPartial<ActionDefaultParams> = {
   },
   setGameplayFlags: {
     flags: 'None',
-    controllableAnimal: 'ancient_bison',
+    controllableAnimal: undefined,
   },
   setGoal: {
     id: 'unnamed',
@@ -237,7 +237,7 @@ export const defaultsParams: DeepPartial<ActionDefaultParams> = {
   },
   setLocationMarker: {
     markerType: undefined,//'NearestBank',
-    entityType: undefined,//'primitive_human',
+    entityType: 'primitive_human',
     requiredGoal: undefined,//'',
     excludedGoal: undefined,//'',
     workAreaId: 'untitled',
@@ -296,8 +296,8 @@ export const defaultsParams: DeepPartial<ActionDefaultParams> = {
   },
   spawn: {
     entityType: 'primitive_human',
-    placement: undefined,
-    amount: undefined,
+    placement: 'StartLocationCircular',
+    amount: 1,
     angle: undefined,
     radius: undefined,
     age: undefined,
