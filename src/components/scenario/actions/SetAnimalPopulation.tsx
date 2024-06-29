@@ -28,7 +28,7 @@ import useValues from '~/hooks/use-values';
 // utils
 import {defaultsParams} from '~/utils/action';
 import {animalEntities} from '~/utils/entities';
-import {actionDefaultProps} from './utils/default';
+import {actionDefaultProps, optionalDefaultValueSetter} from './utils/default';
 import {randomAnimalMinMax, randomArray, randomEraFactors} from '~/utils/random';
 import {ANIMAL_POPULATION_MAX, ANIMAL_POPULATION_MIN, ERA_FACTORS_LOWEST} from '~/utils/defaults';
 
@@ -161,6 +161,9 @@ const SetAnimalPopulation = (props: Props) => {
                 caption="Population"
                 checked={state.get<boolean>('minMaxChecked', false)}
                 disabled={isDisabled}
+                undefinedSetter={[
+                  valuer, [['min', 0], ['max', 0]]
+                ]}
                 onChange={isChecked => {
                   state.set('minMaxChecked', isChecked);
                 }}
@@ -197,6 +200,9 @@ const SetAnimalPopulation = (props: Props) => {
                 caption="Era factors"
                 checked={state.get<boolean>('eraFactorsChecked', false)}
                 disabled={isDisabled}
+                undefinedSetter={[
+                  valuer, 'eraFactors', ERA_FACTORS_LOWEST
+                ]}
                 onChange={isChecked => {
                   state.set('eraFactorsChecked', isChecked);
                 }}

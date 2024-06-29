@@ -110,6 +110,7 @@ const SetTimeOfYear = (props: Props) => {
               caption="Value"
               checked={state.data.valueChecked}
               disabled={isDisabled}
+              undefinedSetter={[valuer, 'value', 0]}
               onChange={isChecked => state.set('valueChecked', isChecked)}
             />
             <Col sm="4">

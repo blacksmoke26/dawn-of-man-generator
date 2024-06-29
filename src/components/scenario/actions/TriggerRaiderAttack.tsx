@@ -110,6 +110,7 @@ const TriggerRaiderAttack = (props: Props) => {
               caption="Value"
               checked={state.data.amountChecked}
               disabled={isDisabled}
+              undefinedSetter={[valuer, 'amount', 1]}
               onChange={isChecked => {
                 state.set('amountChecked', isChecked);
               }}

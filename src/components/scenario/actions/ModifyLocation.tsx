@@ -136,6 +136,7 @@ const ModifyLocation = (props: Props) => {
                 caption="Position"
                 checked={state.get<boolean>('positionChecked', false)}
                 disabled={isDisabled}
+                undefinedSetter={[valuer, 'position', [0, 0, 0]]}
                 onChange={isChecked => {
                   state.set('positionChecked', isChecked);
                 }}
@@ -168,6 +169,7 @@ const ModifyLocation = (props: Props) => {
                 caption="Location index"
                 checked={state.get<boolean>('locationIndexChecked', false)}
                 disabled={isDisabled}
+                undefinedSetter={[valuer, 'locationIndex', -1]}
                 onChange={isChecked => {
                   state.set('locationIndexChecked', isChecked);
                 }}

@@ -108,18 +108,13 @@ const QuitGame = (props: Props) => {
               caption="Success"
               checked={state.data.successChecked}
               disabled={isDisabled}
+              undefinedSetter={[valuer, 'success', true]}
               onChange={isChecked => state.set('successChecked', isChecked)}
             />
             <AttributeCheckbox
               checked={valuer.get<boolean>('success', true)}
               caption={(
-                <>
-                  <span className={cn({'text-muted': isDisabled || !state.data.successChecked})}>Yes</span> <code
-                  className={cn('ml-2', {'text-muted text-line-through': isDisabled || !state.data.successChecked})}>
-                  {' '}
-                  {'' + valuer.get<boolean>('success', true)}
-                </code>
-                </>
+                <span className={cn({'text-muted': isDisabled || !state.data.successChecked})}>Yes</span>
               )}
               disabled={isDisabled || !state.data.successChecked}
               onChange={isChecked => {

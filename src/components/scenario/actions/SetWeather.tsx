@@ -113,6 +113,7 @@ const SetWeather = (props: Props) => {
               caption="Value"
               checked={state.data.valueChecked}
               disabled={isDisabled}
+              undefinedSetter={[valuer, 'value', 'Sunny']}
               onChange={isChecked => {
                 state.set('valueChecked', isChecked);
               }}

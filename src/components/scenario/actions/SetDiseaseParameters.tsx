@@ -131,12 +131,14 @@ const SetDiseaseParameters = (props: Props) => {
                 caption="Period"
                 checked={state.get<boolean>('periodChecked', false)}
                 disabled={isDisabled}
+                undefinedSetter={[valuer, 'period', 0.5]}
                 onChange={isChecked => {
                   state.set('periodChecked', isChecked);
                 }}
               />
               <Col sm="4">
                 <NumberInput
+                  labelAfter="y"
                   maxLength={3}
                   decimals={1}
                   min={PERIOD_MIN}
@@ -157,12 +159,14 @@ const SetDiseaseParameters = (props: Props) => {
                 caption="Variance"
                 checked={state.get<boolean>('varianceChecked', false)}
                 disabled={isDisabled}
+                undefinedSetter={[valuer, 'variance', 1.5]}
                 onChange={isChecked => {
                   state.set('varianceChecked', isChecked);
                 }}
               />
               <Col sm="4">
                 <NumberInput
+                  labelAfter="y"
                   maxLength={3}
                   decimals={1}
                   min={PERIOD_MIN}
@@ -183,6 +187,7 @@ const SetDiseaseParameters = (props: Props) => {
                 caption="Disease chance (individual)"
                 checked={state.data.individualDiseaseChanceChecked}
                 disabled={isDisabled}
+                undefinedSetter={[valuer, 'individualDiseaseChance', 0.5]}
                 onChange={isChecked => state.set('individualDiseaseChanceChecked', isChecked)}
               />
               <Col sm="4">

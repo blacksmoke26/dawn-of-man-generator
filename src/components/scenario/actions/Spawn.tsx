@@ -53,6 +53,7 @@ import {toActionTemplate} from '~/utils/parser/templates-action';
 import type {
   ActionAttributesProps, ActionName, ActionProps, ActionSpawn
 } from '~/types/action.types';
+import {toInteger} from '~/helpers/number';
 
 export interface Props extends ActionProps<ActionSpawn> {
 }
@@ -96,6 +97,7 @@ const Spawn = (props: Props) => {
   // Reflect values changes
   React.useEffect(() => {
     const changeValues = {...valuer.data};
+    changeValues.amount = toInteger(changeValues.amount);
 
     !state.data.angleChecked && (changeValues.angle = undefined);
     !state.data.radiusChecked && (changeValues.radius = undefined);
@@ -198,39 +200,42 @@ const Spawn = (props: Props) => {
               />
             </Col>
           </Row>
-          <Row className="mb-3 mt-2">
-            <PropertyLabel caption="position"/>
-            <AttributeRangeValue
-              colProps={{sm: '6'}}
-              disabled={isDisabled}
-              min={valuer.get('position.0', 0)}
-              max={valuer.get('position.1', 0)}
-              sliderProps={{
-                min: POSITION_MIN,
-                max: POSITION_MAX,
-              }}
-              allowRestore
-              onRestore={() => valuer.overwrite('position', [0, 0])}
-              allowShuffle
-              onShuffle={() => {
-                valuer.overwrite('position', randomPosition());
-              }}
-              onChange={(min, max) => {
-                valuer.set('position.0', min);
-                valuer.set('position.1', max);
-              }}
-            />
-          </Row>
           <Accordion
             noBodyPad={true}
             noCard={true}
             header="Optional parameters"
             eventKey="optional_parameters">
+            <Row className="mb-3 mt-3">
+              <PropertyCheckboxLabel
+                caption="Position"
+                checked={state.data.positionChecked}
+                disabled={isDisabled}
+                undefinedSetter={[valuer, 'position', [0, 0]]}
+                onChange={isChecked => state.set('positionChecked', isChecked)}
+              />
+              <AttributeRangeValue
+                colProps={{sm: '6'}}
+                disabled={isDisabled || !state.data.positionChecked}
+                min={valuer.get('position.0', 0)}
+                max={valuer.get('position.1', 0)}
+                sliderProps={{min: POSITION_MIN, max: POSITION_MAX}}
+                allowRestore
+                onRestore={() => valuer.overwrite('position', [0, 0])}
+                allowShuffle
+                onShuffle={() => {
+                  valuer.overwrite('position', randomPosition());
+                }}
+                onChange={(min, max) => {
+                  valuer.overwrite('position', [min, max]);
+                }}
+              />
+            </Row>
             <Row className="mb-3 mt-2">
               <PropertyCheckboxLabel
                 caption="Angle"
                 checked={state.data.angleChecked}
                 disabled={isDisabled}
+                undefinedSetter={[valuer, 'angle', 60]}
                 onChange={isChecked => state.set('angleChecked', isChecked)}
               />
               <Col sm="4">
@@ -242,7 +247,7 @@ const Spawn = (props: Props) => {
                   disabled={isDisabled || !state.data.angleChecked}
                   placeholder="e.g. 30"
                   value={valuer.get('angle', 60)}
-                  onChange={value => valuer.set('angle', value)}
+                  onChange={value => valuer.set('angle', +value)}
                   shuffle
                   onShuffle={() => valuer.set('angle', randomAngleSingle())}
                   allowRestore
@@ -255,6 +260,7 @@ const Spawn = (props: Props) => {
                 caption="Radius"
                 checked={state.get<boolean>('radiusChecked', false)}
                 disabled={isDisabled}
+                undefinedSetter={[valuer, 'radius', 30]}
                 onChange={isChecked => {
                   state.set('radiusChecked', isChecked);
                 }}
@@ -268,7 +274,7 @@ const Spawn = (props: Props) => {
                   disabled={isDisabled || !state.data.radiusChecked}
                   placeholder="e.g. 30"
                   value={valuer.get('radius', 30)}
-                  onChange={value => valuer.set('radius', value)}
+                  onChange={value => valuer.set('radius', +value)}
                   shuffle
                   onShuffle={() => valuer.set('radius', randomRadius())}
                   allowRestore
@@ -281,6 +287,7 @@ const Spawn = (props: Props) => {
                 caption="Age"
                 checked={state.data.ageChecked}
                 disabled={isDisabled}
+                undefinedSetter={[valuer, 'age', 'Young']}
                 onChange={isChecked => state.set('ageChecked', isChecked)}
               />
               <AttributeSelect
@@ -299,6 +306,7 @@ const Spawn = (props: Props) => {
                 caption="Years old"
                 checked={state.data.yearsOldChecked}
                 disabled={isDisabled}
+                undefinedSetter={[valuer, 'yearsOld', 10]}
                 onChange={isChecked => state.set('yearsOldChecked', isChecked)}
               />
               <Col sm="4">
@@ -309,7 +317,7 @@ const Spawn = (props: Props) => {
                   disabled={isDisabled || !state.data.yearsOldChecked}
                   placeholder="e.g. 10"
                   value={valuer.get('yearsOld', 10)}
-                  onChange={value => valuer.set('yearsOld', value)}
+                  onChange={value => valuer.set('yearsOld', +value)}
                   shuffle
                   onShuffle={() => valuer.set('yearsOld', randomYearsOld())}
                   allowRestore
@@ -322,6 +330,7 @@ const Spawn = (props: Props) => {
                 caption="Gender"
                 checked={state.data.genderChecked}
                 disabled={isDisabled}
+                undefinedSetter={[valuer, 'gender', 'Male']}
                 onChange={isChecked => state.set('genderChecked', isChecked)}
               />
               <AttributeSelect
@@ -340,6 +349,7 @@ const Spawn = (props: Props) => {
                 caption="Name"
                 checked={state.data.nameChecked}
                 disabled={isDisabled}
+                undefinedSetter={[valuer, 'name', '']}
                 onChange={isChecked => state.set('nameChecked', isChecked)}
               />
               <Col sm="4">
@@ -356,6 +366,7 @@ const Spawn = (props: Props) => {
                 caption="Spawn type"
                 checked={state.data.spawnTypeChecked}
                 disabled={isDisabled}
+                undefinedSetter={[valuer, 'spawnType', 'Auto']}
                 onChange={isChecked => state.set('spawnTypeChecked', isChecked)}
               />
               <AttributeSelect
@@ -376,6 +387,7 @@ const Spawn = (props: Props) => {
                 caption="Behaviour"
                 checked={state.data.behaviourChecked}
                 disabled={isDisabled}
+                undefinedSetter={[valuer, 'behaviour', 'None']}
                 onChange={isChecked => state.set('behaviourChecked', isChecked)}
               />
               <AttributeSelect
@@ -392,6 +404,7 @@ const Spawn = (props: Props) => {
               />
             </Row>
           </Accordion>
+          <div className="mt-4"></div>
         </>
       )}
     </div>

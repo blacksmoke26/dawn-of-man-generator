@@ -135,6 +135,7 @@ const ClearTrees = (props: Props) => {
                 caption="Position"
                 checked={state.get<boolean>('positionChecked', false)}
                 disabled={isDisabled}
+                undefinedSetter={[valuer, 'position', [0, 0]]}
                 onChange={isChecked => {
                   state.set('positionChecked', isChecked);
                 }}

@@ -28,7 +28,9 @@ import {filterEmpty} from '~/utils/template';
 import {toActionTemplate} from '~/utils/parser/templates-action';
 
 // types
-import {ActionAttributesProps, ActionName, ActionProps, ActionSetGoal} from '~/types/action.types';
+import type {
+  ActionAttributesProps, ActionName, ActionProps, ActionSetGoal
+} from '~/types/action.types';
 
 export interface Props extends ActionProps<ActionSetGoal> {
 }

@@ -113,6 +113,7 @@ const SetUiLocked = (props: Props) => {
               caption="Lock flags"
               checked={state.data.lockFlagsChecked}
               disabled={isDisabled}
+              undefinedSetter={[valuer, 'lockFlags', 'None']}
               onChange={isChecked => state.set('lockFlagsChecked', isChecked)}
             />
             <AttributeSelect

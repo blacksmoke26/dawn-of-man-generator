@@ -95,7 +95,7 @@ const SetRaider = (props: Props) => {
     extraRaiderPerPopulationChecked: !valuer.is('extraRaiderPerPopulation', undefined),
     gracePeriodChecked: !valuer.is('gracePeriod', undefined),
     varianceChecked: !valuer.is('variance', undefined),
-    wavesChecked: !valuer.is('waves', undefined),
+    wavesChecked: true,
     activeKey: '',
     waves: {},
   });
@@ -167,7 +167,7 @@ const SetRaider = (props: Props) => {
           title={
             <TabTitle
               className="text-size-xs"
-              title={id.replace('_', ' #')}
+              title={id.replace('_', ' ')}
               disabled={wavesDisabled}
               onRemove={() => removeWaveTab(id)}/>
           }>
@@ -176,8 +176,8 @@ const SetRaider = (props: Props) => {
               disabled={wavesDisabled}
               initialValues={initialValues}
               onValuesChange={(values: RaidWaveParameters) => {
-                state.set(`waves`, current => {
-                  const changed = {...current};
+                state.set(`waves`, (current: RaidWaveParameters) => {
+                  const changed = {...current} as SetRaiderActionAttributesProps['waves'];
                   changed[id] = values;
                   valuer.set('waves', Object.values(changed));
                   return changed;
@@ -272,10 +272,11 @@ const SetRaider = (props: Props) => {
                 }}
               />
             </Row>
-            <Row className="mb-3 mt-2">
+            <Row className="mb-3 mt-3">
               <PropertyLabel caption="Period"/>
               <Col sm="4">
                 <NumberInput
+                  labelAfter="y"
                   maxLength={3}
                   decimals={1}
                   min={PERIOD_MIN}
@@ -338,6 +339,7 @@ const SetRaider = (props: Props) => {
                   caption="Hardcore timer"
                   checked={state.data.hardcoreTimerChecked}
                   disabled={isDisabled}
+                  undefinedSetter={[valuer, 'hardcoreTimer', 10]}
                   onChange={isChecked => state.set('hardcoreTimerChecked', isChecked)}
                 />
                 <Col sm="4">
@@ -362,6 +364,7 @@ const SetRaider = (props: Props) => {
                   caption="Mins"
                   checked={state.data.minsChecked}
                   disabled={isDisabled}
+                  undefinedSetter={[valuer, 'mins', []]}
                   onChange={isChecked => state.set('minsChecked', isChecked)}
                 />
                 <Col sm="5">
@@ -388,6 +391,7 @@ const SetRaider = (props: Props) => {
                   caption="Maxes"
                   checked={state.data.maxesChecked}
                   disabled={isDisabled}
+                  undefinedSetter={[valuer, 'maxes', []]}
                   onChange={isChecked => state.set('maxesChecked', isChecked)}
                 />
                 <Col sm="5">
@@ -415,6 +419,7 @@ const SetRaider = (props: Props) => {
                   tooltip="Additional raiders per population"
                   checked={state.data.extraRaiderPerPopulationChecked}
                   disabled={isDisabled}
+                  undefinedSetter={[valuer, 'extraRaiderPerPopulation', 0]}
                   onChange={isChecked => state.set('extraRaiderPerPopulationChecked', isChecked)}
                 />
                 <Col sm="4">
@@ -438,10 +443,12 @@ const SetRaider = (props: Props) => {
                   caption="Grace period"
                   checked={state.data.gracePeriodChecked}
                   disabled={isDisabled}
+                  undefinedSetter={[valuer, 'gracePeriod', 1]}
                   onChange={isChecked => state.set('gracePeriodChecked', isChecked)}
                 />
                 <Col sm="4">
                   <NumberInput
+                    labelAfter="y"
                     maxLength={3}
                     decimals={1}
                     min={PERIOD_MIN}
@@ -462,10 +469,12 @@ const SetRaider = (props: Props) => {
                   caption="Variance"
                   checked={state.data.varianceChecked}
                   disabled={isDisabled}
+                  undefinedSetter={[valuer, 'variance', 0.5]}
                   onChange={isChecked => state.set('varianceChecked', isChecked)}
                 />
                 <Col sm="4">
                   <NumberInput
+                    labelAfter="y"
                     maxLength={3}
                     decimals={1}
                     min={PERIOD_MIN}

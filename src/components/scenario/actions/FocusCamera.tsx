@@ -151,6 +151,7 @@ const FocusCamera = (props: Props) => {
                 caption="Distance"
                 checked={state.get<boolean>('distanceChecked', false)}
                 disabled={isDisabled}
+                undefinedSetter={[valuer, 'distance', 40]}
                 onChange={isChecked => {
                   state.set('distanceChecked', isChecked);
                 }}
@@ -177,6 +178,7 @@ const FocusCamera = (props: Props) => {
                 caption="Rotation"
                 checked={state.get<boolean>('rotationChecked', false)}
                 disabled={isDisabled}
+                undefinedSetter={[valuer, 'rotation', 0]}
                 onChange={isChecked => {
                   state.set('rotationChecked', isChecked);
                 }}

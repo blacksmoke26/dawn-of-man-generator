@@ -114,7 +114,7 @@ const SetGameplayFlags = (props: Props) => {
               colProps={{sm: '6'}}
               disabled={isDisabled}
               options={GAMEPLAY_FLAGS.map(value => ({label: capitalCase(value), value}))}
-              value={valuer.get('flags', null)}
+              value={valuer.get('flags', 'None')}
               onSelect={option => valuer.set('flags', option.value)}
               allowShuffle
               onShuffle={() => {
@@ -132,6 +132,7 @@ const SetGameplayFlags = (props: Props) => {
                 caption="Controllable animal"
                 checked={state.data.controllableAnimalChecked}
                 disabled={isDisabled}
+                undefinedSetter={[valuer, 'controllableAnimal', 'ancient_bison']}
                 onChange={isChecked => state.set('controllableAnimalChecked', isChecked)}
               />
               <AttributeSelect
@@ -139,7 +140,7 @@ const SetGameplayFlags = (props: Props) => {
                 colProps={{sm: '6'}}
                 disabled={isDisabled || !state.data.controllableAnimalChecked}
                 options={animalEntities.map(value => ({label: capitalCase(value), value}))}
-                value={valuer.get('controllableAnimal', '')}
+                value={valuer.get('controllableAnimal', 'ancient_bison')}
                 onSelect={option => valuer.set('controllableAnimal', option.value)}
                 selectProps={{isSearchable: true}}
                 allowShuffle

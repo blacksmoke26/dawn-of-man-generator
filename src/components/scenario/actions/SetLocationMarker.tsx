@@ -170,6 +170,7 @@ const SetLocationMarker = (props: Props) => {
                 caption="Marker type"
                 checked={state.get<boolean>('markerTypeChecked', false)}
                 disabled={isDisabled}
+                undefinedSetter={[valuer, 'markerType', 'NearestBank']}
                 onChange={isChecked => {
                   state.set('markerTypeChecked', isChecked);
                 }}
@@ -190,6 +191,7 @@ const SetLocationMarker = (props: Props) => {
                 caption="Required goal"
                 checked={state.get<boolean>('requiredGoalChecked', false)}
                 disabled={isDisabled}
+                undefinedSetter={[valuer, 'requiredGoal', '']}
                 onChange={isChecked => {
                   state.set('requiredGoalChecked', isChecked);
                 }}
@@ -211,6 +213,7 @@ const SetLocationMarker = (props: Props) => {
                 caption="Excluded goal"
                 checked={state.get<boolean>('excludedGoalChecked', false)}
                 disabled={isDisabled}
+                undefinedSetter={[valuer, 'excludedGoal', '']}
                 onChange={isChecked => {
                   state.set('excludedGoalChecked', isChecked);
                 }}
@@ -232,6 +235,7 @@ const SetLocationMarker = (props: Props) => {
                 caption="Position"
                 checked={state.get<boolean>('positionChecked', false)}
                 disabled={isDisabled}
+                undefinedSetter={[valuer, 'position', [0, 0]]}
                 onChange={isChecked => {
                   state.set('positionChecked', isChecked);
                 }}
@@ -262,6 +266,7 @@ const SetLocationMarker = (props: Props) => {
                 caption="Scale"
                 checked={state.get<boolean>('scaleChecked', false)}
                 disabled={isDisabled}
+                undefinedSetter={[valuer, 'scale', 4]}
                 onChange={isChecked => {
                   state.set('scaleChecked', isChecked);
                 }}
@@ -288,6 +293,7 @@ const SetLocationMarker = (props: Props) => {
                 caption="Ref position"
                 checked={state.get<boolean>('refPositionChecked', false)}
                 disabled={isDisabled}
+                undefinedSetter={[valuer, 'refPosition', 'Settlement']}
                 onChange={isChecked => {
                   state.set('refPositionChecked', isChecked);
                 }}

@@ -128,14 +128,17 @@ const SetFeatureEnabled = (props: Props) => {
             eventKey="spawn_optional_parameters">
             <Row className="mb-1 mt-3">
               <PropertyCheckboxLabel
-                caption="Status"
+                caption="Value"
                 checked={state.get<boolean>('valueChecked', false)}
                 disabled={isDisabled}
-                onChange={isChecked => state.set('valueChecked', isChecked)}
+                undefinedSetter={[valuer, 'value', false]}
+                onChange={isChecked => {
+                  state.set('valueChecked', isChecked);
+                }}
               />
               <AttributeCheckbox
                 checked={valuer.get<boolean>('value', false)}
-                caption="Yes, enable this feature"
+                caption="Yes"
                 disabled={isDisabled || !state.get<boolean>('valueChecked', false)}
                 onChange={isChecked => {
                   valuer.set('value', isChecked);

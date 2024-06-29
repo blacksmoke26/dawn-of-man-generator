@@ -135,6 +135,7 @@ const RaiderWave = (props: Props = {}) => {
             caption="Disabled techs"
             checked={state.data.disabledTechsCheckbox}
             disabled={isDisabled}
+            undefinedSetter={[valuer, 'disabledTechs', []]}
             onChange={isChecked => state.set('disabledTechsCheckbox', isChecked)}
           />
           <AttributeSelect

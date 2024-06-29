@@ -5,6 +5,8 @@
  * @version 2.4
  */
 
+import type {UseValuesHook} from '~/hooks/use-values.types';
+
 export const actionDefaultProps = {
   disabled: false,
   disabledCheckbox: false,
@@ -21,4 +23,10 @@ export const actionDefaultProps = {
   },
   onRemoveClick: () => {
   },
+};
+
+export const optionalDefaultValueSetter = (valuer: UseValuesHook<any>, property: string, defaultValue: any) => {
+  if (valuer.get(property) === undefined) {
+    valuer.set(property, defaultValue);
+  }
 };

@@ -159,13 +159,14 @@ const HideUi = (props: Props) => {
               caption="Disabled UI"
               checked={state.get<boolean>('hideDisabledUiChecked', false)}
               disabled={isDisabled}
+              undefinedSetter={[valuer, 'hideDisabledUi', false]}
               onChange={isChecked => {
                 state.set('hideDisabledUiChecked', isChecked);
               }}
             />
             <AttributeCheckbox
               checked={valuer.get<boolean>('hideDisabledUi', false)}
-              caption="Yes, hide them"
+              caption="Yes"
               disabled={isDisabled || !state.get<boolean>('hideDisabledUiChecked', false)}
               onChange={isChecked => {
                 valuer.set('hideDisabledUi', isChecked);
@@ -177,13 +178,14 @@ const HideUi = (props: Props) => {
               caption="Quick panels"
               checked={state.get<boolean>('hideQuickPanelsChecked', false)}
               disabled={isDisabled}
+              undefinedSetter={[valuer, 'hideQuickPanels', false]}
               onChange={isChecked => {
                 state.set('hideQuickPanelsChecked', isChecked);
               }}
             />
             <AttributeCheckbox
               checked={valuer.get<boolean>('hideQuickPanels', false)}
-              caption="Yes, hide them"
+              caption="Hide"
               disabled={isDisabled || !state.get<boolean>('hideQuickPanelsChecked', false)}
               onChange={isChecked => {
                 valuer.set('hideQuickPanels', isChecked);

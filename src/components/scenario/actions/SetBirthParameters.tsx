@@ -127,6 +127,7 @@ const SetBirthParameters = (props: Props) => {
                 caption={<>Decrease start <i className="text-size-xxs text-muted">(population)</i></>}
                 checked={state.get<boolean>('decreaseStartPopulationChecked', false)}
                 disabled={isDisabled}
+                undefinedSetter={[valuer, 'decreaseStartPopulation', 30]}
                 onChange={isChecked => {
                   state.set('decreaseStartPopulationChecked', isChecked);
                 }}
@@ -152,6 +153,7 @@ const SetBirthParameters = (props: Props) => {
                 caption={<>Decrease halfing <i className="text-size-xxs text-muted">(population)</i></>}
                 checked={state.get<boolean>('decreaseHalfingPopulationChecked', false)}
                 disabled={isDisabled}
+                undefinedSetter={[valuer, 'decreaseHalfingPopulation', 30]}
                 onChange={isChecked => {
                   state.set('decreaseHalfingPopulationChecked', isChecked);
                 }}

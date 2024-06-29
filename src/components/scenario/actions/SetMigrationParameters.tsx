@@ -141,6 +141,7 @@ const SetMigrationParameters = (props: Props) => {
                 caption="Migrators"
                 checked={state.get<boolean>('minMaxChecked', false)}
                 disabled={isDisabled}
+                undefinedSetter={[valuer, [['min', 1], ['max', 1]]]}
                 onChange={isChecked => {
                   state.set('minMaxChecked', isChecked);
                 }}
@@ -174,12 +175,14 @@ const SetMigrationParameters = (props: Props) => {
                 caption="Period"
                 checked={state.get<boolean>('periodChecked', false)}
                 disabled={isDisabled}
+                undefinedSetter={[valuer, 'period', 0.5]}
                 onChange={isChecked => {
                   state.set('periodChecked', isChecked);
                 }}
               />
               <Col sm="4">
                 <NumberInput
+                  labelAfter="y"
                   maxLength={3}
                   min={PERIOD_MIN}
                   max={PERIOD_MAX}
@@ -200,6 +203,7 @@ const SetMigrationParameters = (props: Props) => {
                 caption={<>Decrease start <i className="text-size-xxs text-muted">(population)</i></>}
                 checked={state.get<boolean>('decreaseStartPopulationChecked', false)}
                 disabled={isDisabled}
+                undefinedSetter={[valuer, 'decreaseStartPopulation', 50]}
                 onChange={isChecked => {
                   state.set('decreaseStartPopulationChecked', isChecked);
                 }}
@@ -225,6 +229,7 @@ const SetMigrationParameters = (props: Props) => {
                 caption={<>Decrease halfing <i className="text-size-xxs text-muted">(population)</i></>}
                 checked={state.get<boolean>('decreaseHalfingPopulationChecked', false)}
                 disabled={isDisabled}
+                undefinedSetter={[valuer, 'decreaseHalfingPopulation', 50]}
                 onChange={isChecked => {
                   state.set('decreaseHalfingPopulationChecked', isChecked);
                 }}

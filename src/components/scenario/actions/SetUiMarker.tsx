@@ -175,6 +175,7 @@ const SetUiMarker = (props: Props) => {
                 caption="Marker type"
                 checked={state.data.markerTypeChecked}
                 disabled={isDisabled}
+                undefinedSetter={[valuer, 'markerType', 'Build']}
                 onChange={isChecked => state.set('markerTypeChecked', isChecked)}
               />
               <AttributeSelect
@@ -193,6 +194,7 @@ const SetUiMarker = (props: Props) => {
                 caption="Excluded goal"
                 checked={state.data.excludedGoalChecked}
                 disabled={isDisabled}
+                undefinedSetter={[valuer, 'excludedGoal', '']}
                 onChange={isChecked => {
                   state.set('excludedGoalChecked', isChecked);
                 }}
@@ -214,6 +216,7 @@ const SetUiMarker = (props: Props) => {
                 caption="Required goal"
                 checked={state.data.requiredGoalChecked}
                 disabled={isDisabled}
+                undefinedSetter={[valuer, 'requiredGoal', '']}
                 onChange={isChecked => state.set('requiredGoalChecked', isChecked)}
               />
               <Col sm="4">
@@ -233,6 +236,7 @@ const SetUiMarker = (props: Props) => {
                 caption={<>Danger level <i className="text-size-xxs text-muted">(max)</i></>}
                 checked={state.data.maxDangerLevelChecked}
                 disabled={isDisabled}
+                undefinedSetter={[valuer, 'maxDangerLevel', 'VeryHigh']}
                 onChange={isChecked => state.set('maxDangerLevelChecked', isChecked)}
               />
               <AttributeSelect

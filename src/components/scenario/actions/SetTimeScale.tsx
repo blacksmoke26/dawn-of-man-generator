@@ -105,9 +105,10 @@ const SetTimeScale = (props: Props) => {
           eventKey="optional_parameters">
           <Row className="mb-3 mt-2">
             <PropertyCheckboxLabel
-              caption="Value"
+              caption="Index"
               checked={state.data.indexChecked}
               disabled={isDisabled}
+              undefinedSetter={[valuer, 'index', 0]}
               onChange={isChecked => state.set('indexChecked', isChecked)}
             />
             <Col sm="4">
