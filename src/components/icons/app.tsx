@@ -52,7 +52,7 @@ import {
   GoalIcon, CalendarCogIcon, FlagIcon, ZapIcon,
 } from 'lucide-react';
 
-export const COLOR_DISABLED: string = 'rgba(255, 255, 255, .5';
+export const COLOR_DISABLED: string = 'rgba(255, 255, 255, .5)';
 
 export const COLOR_WHITISH: string = '#eaeaea';
 
