@@ -141,3 +141,16 @@
 .nav-tabs-bottom .nav-link.active:before {
     background-color: #3574F0;
 }
+
+.ui-input-group-text-before {
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+    padding: 0 .625rem 0 .625rem !important;
+}
+
+
+.ui-input-group-text-after {
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+    padding: 0 .625rem 0 .625rem !important;
+}
