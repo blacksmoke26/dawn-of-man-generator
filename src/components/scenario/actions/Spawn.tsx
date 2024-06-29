@@ -171,6 +171,7 @@ const Spawn = (props: Props) => {
             <Col sm="5">
               <SuggestionInput
                 disabled={isDisabled}
+                caseType="PASCAL"
                 placeholder="e.g., StartLocationCircular"
                 options={PLACEMENT_TYPES_OPTIONS}
                 value={valuer.get('placement', 'StartLocationCircular')}
