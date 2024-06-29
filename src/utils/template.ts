@@ -5,7 +5,8 @@
  * @version 2.4
  */
 
-import {Json} from '~/types/json.types';
+// types
+import type {Json} from '~/types/json.types';
 
 /**
  * Checks whether the given key exists in the given collection and cannot be empty or undefined.
@@ -13,7 +14,7 @@ import {Json} from '~/types/json.types';
  * @param attributes - The attributes to check
  * @returns true if the key exists and valid, false otherwise
  */
-export const isKeyInAtt = (key: string, attributes: Json): boolean => {
+export const isKeyInAtt = <Attr extends object = Json>(key: keyof Attr, attributes: Attr): boolean => {
   return key in attributes
     && attributes?.[key] !== undefined
     && attributes?.[key] !== '';
