@@ -154,3 +154,7 @@
     border-bottom-left-radius: 0 !important;
     padding: 0 .625rem 0 .625rem !important;
 }
+
+.ui-input-group-text-before.disabled, .ui-input-group-text-after.disabled {
+    background: rgba(255, 255, 255, .05);
+}

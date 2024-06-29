@@ -132,11 +132,11 @@ const NumberInput = (props: Props) => {
   );
 
   return (
-    <>
+    <div className={cn({'text-muted-deep': newProps.disabled})}>
       <InputGroup>
         {newProps?.labelBefore && (
           <InputGroup.Text
-            className="ui-input-group-text-before">
+            className={cn('ui-input-group-text-before', {'disabled': newProps?.disabled})}>
             {newProps?.labelBefore}
           </InputGroup.Text>
         )}
@@ -180,7 +180,7 @@ const NumberInput = (props: Props) => {
 
         {newProps?.labelAfter && (
           <InputGroup.Text
-            className="ui-input-group-text-after">
+            className={cn('ui-input-group-text-after', {'disabled': newProps?.disabled})}>
             {newProps?.labelAfter}
           </InputGroup.Text>
         )}
@@ -231,7 +231,7 @@ const NumberInput = (props: Props) => {
           {newProps?.hints}
         </Form.Text>
       )}
-    </>
+    </div>
   );
 };
 
