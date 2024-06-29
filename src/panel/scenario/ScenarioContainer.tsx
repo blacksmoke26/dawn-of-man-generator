@@ -28,9 +28,10 @@ import CustomSettlementNameAllowed from './generators/general/CustomSettlementNa
 
 import MilestoneContainer from './generators/milestones/MilestoneContainer';
 import GoalContainer from './generators/goals/GoalContainer';
+import EventContainer from './generators/events/EventContainer';
 
 // icons
-import {IconBlock, IconGoal, IconMapPin, IconMilestone, IconStorm} from '~/components/icons/app';
+import {IconBlock, IconEvent, IconGoal, IconMapPin, IconMilestone, IconStorm} from '~/components/icons/app';
 
 // utils
 import {nodesToLanguageStrings} from '~/utils/location';
@@ -97,10 +98,14 @@ const ScenarioContainer = () => {
     locations: '',
     disasters: '',
     milestones: '',
+    goals: '',
+    events: '',
   });
   const [langStrings, setLangStrings] = React.useState<KVDocument<string>>({
-    milestones: '',
     locations: '',
+    milestones: '',
+    goals: '',
+    events: '',
   });
 
   /** Update templates raw texts */
@@ -196,6 +201,19 @@ const ScenarioContainer = () => {
         <GoalContainer
           onTemplate={template => updateText('goals', template)}
           onStrings={text => updateLangString('goals', text)}/>
+      </Accordion>
+      <Accordion
+        header={(
+          <span className="text-size-sm">
+            <IconEvent
+              className="d-inline-block" width="17"
+              height="17"/> Events
+          </span>
+        )}
+        eventKey="events" noBodyPad={true}>
+        <EventContainer
+          onTemplate={template => updateText('events', template)}
+        />
       </Accordion>
       <Accordion
         header={<span className="text-size-sm"><IconMapPin className="d-inline-block" width="17" height="17"/> Locations</span>}
