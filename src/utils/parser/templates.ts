@@ -7,11 +7,14 @@
  */
 
 // utils
+import {isObject} from '~/helpers/object';
 import {formatPeriod} from '~/utils/scenario/format';
+import {LOGICAL_CONDITION} from '~/utils/condition';
 
 // types
 import {Json, KVDocument} from '~/types/json.types';
 import type {
+  AnyCondition,
   ConditionAnyTasksActive,
   ConditionAnyWorkAreasActive,
   ConditionEntityCountComparison,
@@ -28,7 +31,7 @@ import type {
   ConditionValueEquals,
   ConditionValueReached, GeneralCondition,
 } from '~/types/condition.types';
-import {ChangedValues} from '~/components/scenario/conditions/utils/condition-logical';
+import type {ChangedValues} from '~/components/scenario/conditions/utils/condition-logical';
 
 type Attr<T> = T;
 
@@ -276,4 +279,16 @@ const funcRegistry: KVDocument<Function> = {
 
 export const toConditionTemplate = (condition: GeneralCondition, values: Json, disabled: boolean = false): string => {
   return disabled || !(condition in funcRegistry) ? '' : funcRegistry[condition](values as any);
+};
+
+export const toAnyConditionTemplate = (condition: AnyCondition): string => {
+  if (!isObject(condition)) {
+    return '';
+  }
+
+  const {type, ...values} = condition;
+
+  return LOGICAL_CONDITION.includes(type)
+    ? toLogicalTemplate(condition as unknown as ChangedValues)
+    : toConditionTemplate(type as GeneralCondition, values);
 };
