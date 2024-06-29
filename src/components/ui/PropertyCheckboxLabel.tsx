@@ -9,18 +9,25 @@ import React from 'react';
 import {Form} from 'react-bootstrap';
 import cn from 'classname';
 import {nanoid} from 'nanoid';
+import {UseValuesHook} from '~/hooks/use-values.types';
+import {optionalDefaultValueSetter} from '~/components/scenario/actions/utils/default';
+
+type UndefinedSetterType =
+  | [UseValuesHook<any>, string, any]
+  | [UseValuesHook<any>, [string, any][]];
 
 export interface Props {
-  caption: React.ReactNode;
+  caption?: React.ReactNode;
   tooltip?: string,
-  disabled: boolean,
+  disabled?: boolean,
   checked?: boolean
+  undefinedSetter?: UndefinedSetterType;
 
   onChange?(state: boolean): void
 }
 
 /** PropertyCheckboxLabel functional component */
-const PropertyCheckboxLabel = (props: Props) => {
+const PropertyCheckboxLabel = (props: Props = {}) => {
   return (
     <Form.Label className="text-size-sm" column={true} sm="2">
       <Form.Check
@@ -32,12 +39,20 @@ const PropertyCheckboxLabel = (props: Props) => {
           <span
             style={{textDecoration: props?.tooltip ? 'underline dotted' : ''}}
             title={props?.tooltip || ''}>
-            {props?.caption}
+            {props?.caption || 'Untitled'}
         </span>
         )}
         checked={props?.checked}
         onChange={(e) => {
           'function' === typeof props?.onChange && props?.onChange(e.currentTarget.checked);
+
+          if (Array.isArray(props?.undefinedSetter)) {
+            const [setter, property, value] = props.undefinedSetter;
+            const list = Array.isArray(property) ? property : [[property, value]];
+            list.forEach(([prop, val]) => {
+              optionalDefaultValueSetter(setter, prop, val);
+            });
+          }
         }}
       />
     </Form.Label>
