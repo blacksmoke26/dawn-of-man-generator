@@ -122,16 +122,16 @@ const Event = (props: Props) => {
   const actionTypesCountMap = actionTypesCounter(valuer.get<EventState['actions']>('actions', {}));
 
   /** Generate selection based nodes */
-  const renderActions = (): React.ReactElement[] => {
-    const elements: React.ReactElement[] = [];
-    const actions = Object.entries(valuer?.data?.actions || {});
+  const renderActions = (): React.ReactNode[] => {
+    const elements: React.ReactNode[] = [];
+    const actions = Object.entries(valuer.get('actions', {})) as [string, AnyAction][];
 
     let index = 0;
 
     for (const [id, action] of actions) {
       ++index;
 
-      const {type, ...initialValues} = action || {};
+      const {type, ...initialValues} = action;
 
       elements.push(
         <Tab
@@ -146,7 +146,7 @@ const Event = (props: Props) => {
               title={(
                 <>
                   {action?.type ?? ''}
-                  {' '} <i className="text-grey">[{index}]</i>
+                  {' '} <i className="text-grey">{index}</i>
                 </>
               )} disabled={isDisabled}
               onRemove={() => removeTab(id)}/>
@@ -162,13 +162,14 @@ const Event = (props: Props) => {
                 valuer.remove(`actions.${id}`);
               }}
               onValuesChange={values => {
-                const changedValues = {
-                  type: valuer.get(`actions.${id}.type`),
-                  ...values,
-                } as AnyAction;
+                valuer.set<EventState['actions']>(`actions`, (state) => {
+                  const currentActions = {...state} as EventState['actions'];
+                  const actionPrev = state[id] as AnyAction;
+                  currentActions[id] = {type: actionPrev.type, ...values} as AnyAction;
 
-                valuer.overwrite(`actions.${id}`, changedValues);
-                newProps.onActionChange(changedValues);
+                  newProps.onActionChange(currentActions[id]);
+                  return currentActions;
+                });
               }}
             />
           </div>
