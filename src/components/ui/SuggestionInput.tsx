@@ -6,17 +6,24 @@
  */
 
 import React, {PropsWithChildren} from 'react';
+import cn from 'classname';
 import merge from 'deepmerge';
-import {Typeahead, TypeaheadComponentProps, TypeaheadRef} from 'react-bootstrap-typeahead';
+import {nanoid} from 'nanoid';
 import {Button, InputGroup} from 'react-bootstrap';
+import {Typeahead} from 'react-bootstrap-typeahead';
+
+// utils
+import {CaseType, toTextCase} from '~/utils/strings';
+import {
+  COLOR_DISABLED, COLOR_REDDISH, IconEraser, IconRestore, IconShuffle,
+} from '~/components/icons/app';
+
+// hooks
+import {useDebouncedCallback} from 'use-debounce';
 
 // types
 import type {Required} from 'utility-types';
-import {capitalCase} from 'change-case';
-import {useDebouncedCallback} from 'use-debounce';
-import {nanoid} from 'nanoid';
-import cn from 'classname';
-import {COLOR_DISABLED, COLOR_REDDISH, IconEraser, IconRestore, IconShuffle} from '~/components/icons/app';
+import type {TypeaheadComponentProps, TypeaheadRef} from 'react-bootstrap-typeahead';
 
 export interface Option {
   readonly [key: string]: string;
@@ -47,32 +54,6 @@ export interface Props {
   onRestore?(): void;
 }
 
-
-type CaseType = 'SNAKE_CASE' | 'CAPITAL_CASE' | 'DEFAULT';
-
-const REGEX = /[^a-z_\d]+/ig;
-
-const sanitizeInput = (value: string, event: 'KEYUP' | 'CHANGE' = 'CHANGE', caseType: CaseType): string => {
-  let newValue = String(value || '')
-    .replace(/ {2,}|['"]+/ig, '');
-
-  if (caseType === 'SNAKE_CASE') {
-    return (event === 'KEYUP'
-      ? newValue.replace(REGEX, `_`).toLowerCase()
-      : newValue.replace(REGEX, `_`))
-      .replace(/_+/ig, '_');
-  }
-
-  if (caseType === 'CAPITAL_CASE') {
-    return (event === 'KEYUP'
-      ? capitalCase(newValue.replace(REGEX, ` `))
-      : newValue.replace(REGEX, ` `))
-      .replace(/ +/ig, ' ');
-  }
-
-  return newValue;
-};
-
 const TypeheadInput = React.forwardRef<TypeaheadRef, TypeaheadComponentProps>((props: Partial<TypeaheadComponentProps> = {}, ref) => {
   return (
     <Typeahead
@@ -82,41 +63,43 @@ const TypeheadInput = React.forwardRef<TypeaheadRef, TypeaheadComponentProps>((p
       emptyLabel=""
       labelKey="value"
       id={`suggestion_input-${nanoid(5)}`}
-      options={[]} {...props} ref={ref} />
-  )
+      options={[]} {...props} ref={ref}/>
+  );
 });
+
+const PROPS_DEFAULT: Props = {
+  options: [],
+  allowClear: false,
+  focusOnLoad: false,
+  selectOnLoad: false,
+  disabled: false,
+  allowRestore: false,
+  caseType: 'DEFAULT',
+  allowShuffle: false,
+  placeholder: '',
+  value: '',
+  defaultValue: '',
+  typeheadProps: {},
+  className: '',
+  onChange() {
+  },
+  onShuffle() {
+  },
+  onRestore() {
+  },
+}
 
 /** SuggestionInput functional component */
 const SuggestionInput = (props: PropsWithChildren<Props> = {}) => {
   const inputRef = React.createRef<TypeaheadRef>();
 
-  const newProps = merge<Required<Props>>({
-    options: [],
-    allowClear: false,
-    focusOnLoad: false,
-    selectOnLoad: false,
-    disabled: false,
-    allowRestore: false,
-    caseType: 'DEFAULT',
-    allowShuffle: false,
-    placeholder: '',
-    value: '',
-    defaultValue: '',
-    typeheadProps: {},
-    className: '',
-    onChange() {
-    },
-    onShuffle() {
-    },
-    onRestore() {
-    },
-  }, props || {});
+  const newProps = merge<Required<Props>>(PROPS_DEFAULT, props || {});
 
   const debounced = useDebouncedCallback(
     // function
     newProps.onChange,
     // delay in ms
-    60, {maxWait: 250},
+    20, {maxWait: 250},
   );
 
   React.useEffect(() => {
@@ -132,7 +115,7 @@ const SuggestionInput = (props: PropsWithChildren<Props> = {}) => {
     if (props?.value) {
       setTimeout(() => {
         inputRef.current?.forceUpdate();
-      }, 150);
+      }, 120);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props?.value]);
@@ -156,12 +139,12 @@ const SuggestionInput = (props: PropsWithChildren<Props> = {}) => {
         placeholder={newProps.placeholder}
         onInputChange={value => {
           triggerOpenMenu(value);
-          debounced(sanitizeInput(value, 'CHANGE', newProps.caseType));
+          debounced(toTextCase(value, newProps.caseType, 'CHANGE'));
         }}
         onKeyDown={(e) => {
           triggerOpenMenu(e.currentTarget.value);
           // @ts-ignore
-          e.currentTarget.value = sanitizeInput(e.currentTarget.value, 'KEYUP', newProps.caseType);
+          e.currentTarget.value = toTextCase(e.currentTarget.value, newProps.caseType, 'KEYUP');
         }}
         className={newProps.className}
         disabled={newProps.disabled}
@@ -169,7 +152,7 @@ const SuggestionInput = (props: PropsWithChildren<Props> = {}) => {
         minLength={0}
         onChange={selected => {
           const option = selected?.[0] as Option;
-          if ( option?.value ) {
+          if (option?.value) {
             debounced(option.value);
             setOpenMenu(false);
           }
