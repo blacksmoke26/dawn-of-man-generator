@@ -5,10 +5,12 @@
  * @version 2.4
  */
 
+// utils
+import {onlyKeys} from '~/helpers/object';
 import {isKeyInAtt, renderTemplate} from '~/utils/template';
 
 // types
-import type {KVDocument} from '~/types/json.types';
+import {KVDocument, MapDocument} from '~/types/json.types';
 import {
   ActionClearGoals,
   ActionClearLocationMarkers,
@@ -40,6 +42,7 @@ import {
   ActionTriggerRaiderAttack,
   ActionUnlock,
   ActionName, RaidWaveParameters,
+  AnyAction,
 } from '~/types/action.types';
 
 /** Render `ClearGoals` attributes template */
@@ -297,7 +300,7 @@ export const toSetRaiderTemplate = (attributes: ActionSetRaider): string => {
   isKeyInAtt('extraRaiderPerPopulation', attributes)
   && props.push(`extra_raider_per_population="${attributes?.extraRaiderPerPopulation}"`);
 
-  isKeyInAtt('gracePeriod', attributes) && props.push(`grace_period="${attributes?.gracePeriod}"`);
+  isKeyInAtt('gracePeriod', attributes) && props.push(`grace_period="${attributes?.gracePeriod}y"`);
   isKeyInAtt('period', attributes) && props.push(`period="${attributes?.period}y"`);
   isKeyInAtt('variance', attributes) && props.push(`variance="${attributes?.variance}y"`);
 
@@ -413,9 +416,7 @@ export const toShowMessageTemplate = (attributes: ActionShowMessage): string => 
 
 /** Render `Spawn` attributes template */
 export const toSpawnTemplate = (attributes: ActionSpawn): string => {
-  if (!attributes.entityType?.trim()
-    || !attributes.placement?.trim()
-    || !attributes.position?.length) {
+  if (!attributes.entityType?.trim() || !attributes.placement?.trim()) {
     return '';
   }
 
@@ -432,7 +433,7 @@ export const toSpawnTemplate = (attributes: ActionSpawn): string => {
   isKeyInAtt('gender', attributes) && props.push(`gender="${attributes?.gender}"`);
   isKeyInAtt('name', attributes) && props.push(`name="${attributes?.name}"`);
 
-  props.push(`position="${attributes?.position.join(',')}"`);
+  Array.isArray(attributes?.position) && props.push(`position="${attributes.position.join(',')}"`);
 
   isKeyInAtt('spawnType', attributes) && props.push(`spawn_type="${attributes?.spawnType}"`);
   isKeyInAtt('behaviour', attributes) && props.push(`behaviour="${attributes?.behaviour}"`);
@@ -493,4 +494,59 @@ const funcRegistry: KVDocument<Function> = {
 
 export const toActionTemplate = (condition: ActionName, values: KVDocument, disabled: boolean = false): string => {
   return disabled || !(condition in funcRegistry) ? '' : funcRegistry[condition](values as any);
+};
+
+const templatesMap: MapDocument<ActionName, Function> = {
+  ClearGoals: toClearGoalsTemplate,
+  ClearLocationMarkers: toClearLocationMarkersTemplate,
+  ClearTrees: toClearTreesTemplate,
+  ClearUiMarkers: toClearUiMarkersTemplate,
+  FocusCamera: toFocusCameraTemplate,
+  HideUi: toHideUiTemplate,
+  ModifyLocation: toModifyLocationTemplate,
+  QuitGame: toQuitGameTemplate,
+  SetAnimalPopulation: toSetAnimalPopulationTemplate,
+  SetBirthParameters: toSetBirthParametersTemplate,
+  SetDiseaseParameters: toSetDiseaseParametersTemplate,
+  SetFeatureEnabled: toSetFeatureEnabledTemplate,
+  SetGameplayFlags: toSetGameplayFlagsTemplate,
+  SetGoal: toSetGoalTemplate,
+  SetGoalsHint: toSetGoalsHintTemplate,
+  SetKnowledgeParameters: toSetKnowledgeParametersTemplate,
+  SetLocationMarker: toSetLocationMarkerTemplate,
+  SetMigrationParameters: toSetMigrationParametersTemplate,
+  SetRaider: toSetRaiderTemplate,
+  SetTimeOfYear: toSetTimeOfYearTemplate,
+  SetTimeScale: toSetTimeScaleTemplate,
+  SetTraderPeriod: toSetTraderPeriodTemplate,
+  SetUiLocked: toSetUiLockedTemplate,
+  SetUiMarker: toSetUiMarkerTemplate,
+  SetWeather: toSetWeatherTemplate,
+  ShowMessage: toShowMessageTemplate,
+  Spawn: toSpawnTemplate,
+  TriggerRaiderAttack: toTriggerRaiderAttackTemplate,
+  Unlock: toUnlockTemplate,
+};
+export const toActionsTemplate = (actions: AnyAction[]): string => {
+  if (!actions.length) {
+    return '';
+  }
+
+  const templates = [];
+
+  for (const action of actions) {
+    if (!(action.type in templatesMap)) {
+      continue;
+    }
+
+    const template = (templatesMap[action.type] as Function)(onlyKeys(action, ['type'], true)) as string;
+
+    if (template.trim()) {
+      templates.push(template);
+    }
+  }
+
+  return !templates.length
+    ? ''
+    : renderTemplate('actions', null, [], templates.join(''));
 };
