@@ -195,6 +195,7 @@ const NoiseAmplitudes = (props: Props) => {
       </div>
       <FrequencyAttribute
         disabled={!enabled}
+        disabledCheckbox={!enabled}
         checked={true}
         checkboxProps={{readOnly: true}}
         label="Frequency 1"
