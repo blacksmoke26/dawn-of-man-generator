@@ -168,6 +168,10 @@
     background: rgba(255, 255, 255, .05);
 }
 
+.ui-popover-dropdown.has-heading > .list-group-item:first-of-type {
+    margin-top: .32rem;
+}
+
 .ui-popover-dropdown > .list-group-item:first-of-type {
     margin-top: .7rem;
 }
