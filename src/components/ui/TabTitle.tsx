@@ -15,9 +15,9 @@ import merge from 'deepmerge';
 import type {Required} from 'utility-types';
 
 interface TabTitleProps {
-  title: string;
+  title: React.ReactNode;
   disabled?: boolean;
-
+  className?: string;
   onRemove?(): void;
 }
 
@@ -25,6 +25,7 @@ interface TabTitleProps {
 const TabTitle = (props: TabTitleProps) => {
   const newProps = merge<Required<TabTitleProps>>({
     disabled: false,
+    className: 'text-size-sm',
     onRemove() {
     },
   }, props);
@@ -32,15 +33,15 @@ const TabTitle = (props: TabTitleProps) => {
   return (
     <>
       <span
-        className={cn('text-size-sm font mr-1', {
+        className={cn('mr-1', {
           'text-muted text-line-through': newProps.disabled,
-        })}>
+        }, newProps.className)}>
         {newProps.title}
       </span>
       <a href="#/close"
         aria-disabled={newProps.disabled}
         hidden={newProps.disabled}
-        className="text-decoration-none p-0"
+        className="text-decoration-none text-white-50 p-0"
         style={{
           lineHeight: '10px',
           position: 'relative',

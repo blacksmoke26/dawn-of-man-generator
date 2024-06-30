@@ -16,6 +16,10 @@
 	cursor: default !important;
 }
 
+.cursor-pointer {
+	cursor: pointer !important;
+}
+
 .cursor-disabled {
 	cursor: not-allowed !important;
 }

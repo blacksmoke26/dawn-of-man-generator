@@ -6,31 +6,32 @@
  */
 
 import React from 'react';
-import cn from 'classname';
+import * as PropTypes from 'prop-types';
 import {nanoid} from 'nanoid';
 import merge from 'deepmerge';
-import * as PropTypes from 'prop-types';
 import {Button, ButtonGroup, Form} from 'react-bootstrap';
-
-// components
-import Slider from '~/components/ui/Slider';
 
 // icons
 import {
   IconShuffle,
-  IconRaiseDown,
   IconRaiseUp,
+  IconRaiseDown,
   IconEnabled,
   IconDisabled,
   COLOR_DISABLED, COLOR_WHITISH, COLOR_REDDISH,
 } from '~/components/icons/app';
 
+// components
+import FrequencyAttribute from './elements/FrequencyAttribute';
+
 // utils
-import * as random from '~/utils/random';
+import {randomFrequencies} from '~/utils/random';
 
 // redux
 import {useAppSelector} from '~redux/hooks';
-import {$Keys} from 'utility-types';
+
+// types
+import type {$Keys} from 'utility-types';
 
 /** Frequencies type  */
 export interface ValueFrequencies {
@@ -67,7 +68,7 @@ export interface Props {
 const NoiseAmplitudes = (props: Props) => {
   props = merge({
     enabled: true,
-    frequencies: {...random.randomFrequencies()},
+    frequencies: {...randomFrequencies()},
     onChange: () => {
     },
   }, props);
@@ -127,7 +128,7 @@ const NoiseAmplitudes = (props: Props) => {
     }
     if (Array.isArray(extValue) && extValue.length === 8) {
       for (let i = 0; i <= 7; i++) {
-        setFrequency(`freq${i + 1}`, extValue[i]);
+        setFrequency(`freq${i + 1}`, extValue[i] as unknown as number);
       }
       setEnabled(true);
       setFreqEnabled({
@@ -154,9 +155,8 @@ const NoiseAmplitudes = (props: Props) => {
       return '';
     }
 
-    const list: string[] = Object.values(frequencies)
-      .map(c => Number(c).toFixed(3));
-    const values = filterEnabledFrequencies<string>(list);
+    const list: number[] = Object.values(frequencies).map(Number);
+    const values = filterEnabledFrequencies<number>(list);
     return `<noise_amplitudes values="${Object.values(values).join(' ')}"/>`;
   }, [frequencies, enabled, freqEnabled]);
 
@@ -193,224 +193,85 @@ const NoiseAmplitudes = (props: Props) => {
           </Form>
         </div>
       </div>
+      <FrequencyAttribute
+        disabled={!enabled}
+        disabledCheckbox={!enabled}
+        checked={true}
+        checkboxProps={{readOnly: true}}
+        label="Frequency 1"
+        value={frequencies.freq1}
+        onChange={(value: number) => setFrequency('freq1', value)}
+      />
 
+      <FrequencyAttribute
+        disabled={!freq2Enabled}
+        disabledCheckbox={!enabled}
+        checked={freqEnabled.freq2}
+        label="Frequency 2"
+        value={frequencies.freq2}
+        onChange={(value: number) => setFrequency('freq2', value)}
+        onCheckboxChange={isChecked => toggleFrequency('freq2', isChecked)}
+      />
 
-      <div className={(cn('mb-2', 'checkbox-align'))}>
-        <Form.Label className="text-size-sm mb-0" column={false}>
-          <Form.Check
-            disabled={!enabled}
-            readOnly={true}
-            checked={true}
-            className="text-size-xs"
-            type="switch"
-            id={`switch-${nanoid(5)}`}
-            label={<>
-              Frequency 1: <code
-              className={(cn('pl-2 text-size-xs', {'text-muted': !enabled}))}>{frequencies.freq1}</code>
-            </>}
-          />
-        </Form.Label>
+      <FrequencyAttribute
+        disabled={!freq3Enabled}
+        disabledCheckbox={!enabled}
+        checked={freqEnabled.freq3}
+        label="Frequency 3"
+        value={frequencies.freq3}
+        onChange={(value: number) => setFrequency('freq3', value)}
+        onCheckboxChange={isChecked => toggleFrequency('freq3', isChecked)}
+      />
 
-        <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                onClick={() => setFrequency('freq1', random.randomFrequency())}>
-          Random
-        </Button>
-        <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                onClick={() => setFrequency('freq1', 0)}>Min</Button>
-        <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                onClick={() => setFrequency('freq1', 1)}>Max</Button>
-        <Slider disabled={!enabled} step={0.001} value={frequencies.freq1}
-                onChange={v => setFrequency('freq1', v as number)}/>
-      </div>
+      <FrequencyAttribute
+        disabled={!freq4Enabled}
+        disabledCheckbox={!enabled}
+        checked={freqEnabled.freq4}
+        label="Frequency 4"
+        value={frequencies.freq4}
+        onChange={(value: number) => setFrequency('freq4', value)}
+        onCheckboxChange={isChecked => toggleFrequency('freq4', isChecked)}
+      />
 
-      <div className={cn('mb-2', {'text-muted': !freq2Enabled}, 'checkbox-align')}>
-        <Form.Label className="text-size-sm mb-0" column={false}>
-          <Form.Check
-            disabled={!enabled}
-            className="text-size-xs"
-            type="switch"
-            id={`switch-${nanoid(5)}`}
-            label={<>
-              Frequency 2: <code
-              className={(cn('pl-2 text-size-xs', {'text-muted': !freq2Enabled}))}>{frequencies.freq2}</code>
-            </>}
-            checked={freqEnabled.freq2}
-            onChange={e => toggleFrequency('freq2', e.target.checked)}
-          />
-        </Form.Label>
-        <Button disabled={!freq2Enabled} className="button-reset-sm" variant="link"
-                onClick={() => setFrequency('freq2', random.randomFrequency())}>
-          Random
-        </Button>
-        <Button disabled={!freq2Enabled} className="button-reset-sm" variant="link"
-                onClick={() => setFrequency('freq2', 0)}>Min</Button>
-        <Button disabled={!freq2Enabled} className="button-reset-sm" variant="link"
-                onClick={() => setFrequency('freq2', 1)}>Max</Button>
-        <Slider disabled={!freq2Enabled} step={0.001} value={frequencies.freq2}
-                onChange={v => setFrequency('freq2', v as number)}/>
-      </div>
+      <FrequencyAttribute
+        disabled={!freq5Enabled}
+        disabledCheckbox={!enabled}
+        checked={freqEnabled.freq5}
+        label="Frequency 5"
+        value={frequencies.freq5}
+        onChange={(value: number) => setFrequency('freq5', value)}
+        onCheckboxChange={isChecked => toggleFrequency('freq5', isChecked)}
+      />
 
-      <div className={cn('mb-2', {'text-muted': !freq3Enabled}, 'checkbox-align')}>
-        <Form.Label className="text-size-sm mb-0" column={false}>
-          <Form.Check
-            disabled={!enabled}
-            className="text-size-xs"
-            type="switch"
-            id={`switch-${nanoid(5)}`}
-            label={<>
-              Frequency 3: <code
-              className={(cn('pl-2 text-size-xs', {'text-muted': !freq3Enabled}))}>{frequencies.freq3}</code>
-            </>}
-            checked={freqEnabled.freq3}
-            onChange={e => toggleFrequency('freq3', e.target.checked)}
-          />
-        </Form.Label>
-        <Button disabled={!freq3Enabled} className="button-reset-sm" variant="link"
-                onClick={() => setFrequency('freq3', random.randomFrequency())}>
-          Random
-        </Button>
-        <Button disabled={!freq3Enabled} className="button-reset-sm" variant="link"
-                onClick={() => setFrequency('freq3', 0)}>Min</Button>
-        <Button disabled={!freq3Enabled} className="button-reset-sm" variant="link"
-                onClick={() => setFrequency('freq3', 1)}>Max</Button>
-        <Slider disabled={!freq3Enabled} step={0.001} value={frequencies.freq3}
-                onChange={v => setFrequency('freq3', v as number)}/>
-      </div>
+      <FrequencyAttribute
+        disabled={!freq6Enabled}
+        disabledCheckbox={!enabled}
+        checked={freqEnabled.freq6}
+        label="Frequency 6"
+        value={frequencies.freq6}
+        onChange={(value: number) => setFrequency('freq6', value)}
+        onCheckboxChange={isChecked => toggleFrequency('freq6', isChecked)}
+      />
 
-      <div className={cn('mb-2', {'text-muted': !freq4Enabled}, 'checkbox-align')}>
-        <Form.Label className="text-size-sm mb-0" column={false}>
-          <Form.Check
-            disabled={!enabled}
-            className="text-size-xs"
-            type="switch"
-            id={`switch-${nanoid(5)}`}
-            label={<>
-              Frequency 4: <code
-              className={(cn('pl-2 text-size-xs', {'text-muted': !freq4Enabled}))}>{frequencies.freq4}</code>
-            </>}
-            checked={freqEnabled.freq4}
-            onChange={e => toggleFrequency('freq4', e.target.checked)}
-          />
-        </Form.Label>
-        <Button disabled={!freq4Enabled} className="button-reset-sm" variant="link"
-                onClick={() => setFrequency('freq4', random.randomFrequency())}>
-          Random
-        </Button>
-        <Button disabled={!freq4Enabled} className="button-reset-sm" variant="link"
-                onClick={() => setFrequency('freq4', 0)}>Min</Button>
-        <Button disabled={!freq4Enabled} className="button-reset-sm" variant="link"
-                onClick={() => setFrequency('freq4', 1)}>Max</Button>
-        <Slider disabled={!freq4Enabled} step={0.001} value={frequencies.freq4}
-                onChange={v => setFrequency('freq4', v as number)}/>
-      </div>
+      <FrequencyAttribute
+        disabled={!freq7Enabled}
+        disabledCheckbox={!enabled}
+        checked={freqEnabled.freq7}
+        label="Frequency 7"
+        value={frequencies.freq7}
+        onChange={(value: number) => setFrequency('freq7', value)}
+        onCheckboxChange={isChecked => toggleFrequency('freq7', isChecked)}
+      />
 
-      <div className={cn('mb-2', {'text-muted': !freq5Enabled}, 'checkbox-align')}>
-        <Form.Label className="text-size-sm mb-0" column={false}>
-          <Form.Check
-            disabled={!enabled}
-            className="text-size-xs"
-            type="switch"
-            id={`switch-${nanoid(5)}`}
-            label={<>
-              Frequency 5: <code
-              className={(cn('pl-2 text-size-xs', {'text-muted': !freq5Enabled}))}>{frequencies.freq5}</code>
-            </>}
-            checked={freqEnabled.freq5}
-            onChange={e => toggleFrequency('freq5', e.target.checked)}
-          />
-        </Form.Label>
-        <Button disabled={!freq5Enabled} className="button-reset-sm" variant="link"
-                onClick={() => setFrequency('freq5', random.randomFrequency())}>
-          Random
-        </Button>
-        <Button disabled={!freq5Enabled} className="button-reset-sm" variant="link"
-                onClick={() => setFrequency('freq5', 0)}>Min</Button>
-        <Button disabled={!freq5Enabled} className="button-reset-sm" variant="link"
-                onClick={() => setFrequency('freq5', 1)}>Max</Button>
-        <Slider disabled={!freq5Enabled} step={0.001} value={frequencies.freq5}
-                onChange={v => setFrequency('freq5', v as number)}/>
-      </div>
-
-      <div className={cn('mb-2', {'text-muted': !freq6Enabled}, 'checkbox-align')}>
-        <Form.Label className="text-size-sm mb-0" column={false}>
-          <Form.Check
-            disabled={!enabled}
-            className="text-size-xs"
-            type="switch"
-            id={`switch-${nanoid(5)}`}
-            label={<>
-              Frequency 6: <code
-              className={(cn('pl-2 text-size-xs', {'text-muted': !freq6Enabled}))}>{frequencies.freq6}</code>
-            </>}
-            checked={freqEnabled.freq6}
-            onChange={e => toggleFrequency('freq6', e.target.checked)}
-          />
-        </Form.Label>
-        <Button disabled={!freq6Enabled} className="button-reset-sm" variant="link"
-                onClick={() => setFrequency('freq6', random.randomFrequency())}>
-          Random
-        </Button>
-        <Button disabled={!freq6Enabled} className="button-reset-sm" variant="link"
-                onClick={() => setFrequency('freq6', 0)}>Min</Button>
-        <Button disabled={!freq6Enabled} className="button-reset-sm" variant="link"
-                onClick={() => setFrequency('freq6', 1)}>Max</Button>
-        <Slider disabled={!freq6Enabled} step={0.001} value={frequencies.freq6}
-                onChange={v => setFrequency('freq6', v as number)}/>
-      </div>
-
-      <div className={cn('mb-2', {'text-muted': !freq7Enabled}, 'checkbox-align')}>
-        <Form.Label className="text-size-sm mb-0" column={false}>
-          <Form.Check
-            disabled={!enabled}
-            className="text-size-xs"
-            type="switch"
-            id={`switch-${nanoid(5)}`}
-            label={<>
-              Frequency 7: <code
-              className={(cn('pl-2 text-size-xs', {'text-muted': !freq7Enabled}))}>{frequencies.freq7}</code>
-            </>}
-            checked={freqEnabled.freq7}
-            onChange={e => toggleFrequency('freq7', e.target.checked)}
-          />
-        </Form.Label>
-        <Button disabled={!freq7Enabled} className="button-reset-sm" variant="link"
-                onClick={() => setFrequency('freq7', random.randomFrequency())}>
-          Random
-        </Button>
-        <Button disabled={!freq7Enabled} className="button-reset-sm" variant="link"
-                onClick={() => setFrequency('freq7', 0)}>Min</Button>
-        <Button disabled={!freq7Enabled} className="button-reset-sm" variant="link"
-                onClick={() => setFrequency('freq7', 1)}>Max</Button>
-        <Slider disabled={!freq7Enabled} step={0.001} value={frequencies.freq7}
-                onChange={v => setFrequency('freq7', v as number)}/>
-      </div>
-
-      <div className={cn('mb-2', {'text-muted': !freq8Enabled}, 'checkbox-align')}>
-        <Form.Label className="text-size-sm mb-0" column={false}>
-          <Form.Check
-            disabled={!enabled}
-            className="text-size-xs"
-            type="switch"
-            id={`switch-${nanoid(5)}`}
-            label={<>
-              Frequency 8: <code
-              className={(cn('pl-2 text-size-xs', {'text-muted': !freq8Enabled}))}>{frequencies.freq8}</code>
-            </>}
-            checked={freqEnabled.freq8}
-            onChange={e => toggleFrequency('freq8', e.target.checked)}
-          />
-        </Form.Label>
-        <Button disabled={!freq8Enabled} className="button-reset-sm" variant="link"
-                onClick={() => setFrequency('freq8', random.randomFrequency())}>
-          Random
-        </Button>
-        <Button disabled={!freq8Enabled} className="button-reset-sm" variant="link"
-                onClick={() => setFrequency('freq8', 0)}>Min</Button>
-        <Button disabled={!freq8Enabled} className="button-reset-sm" variant="link"
-                onClick={() => setFrequency('freq8', 1)}>Max</Button>
-        <Slider disabled={!freq8Enabled} step={0.001} value={frequencies.freq8}
-                onChange={v => setFrequency('freq8', v as number)}/>
-      </div>
+      <FrequencyAttribute
+        disabled={!freq8Enabled}
+        disabledCheckbox={!enabled}
+        checked={freqEnabled.freq8}
+        label="Frequency 8"
+        value={frequencies.freq8}
+        onChange={(value: number) => setFrequency('freq8', value)}
+        onCheckboxChange={isChecked => toggleFrequency('freq8', isChecked)}
+      />
 
       <div className="mt-2">
         <ButtonGroup size="sm">
@@ -434,7 +295,7 @@ const NoiseAmplitudes = (props: Props) => {
             style={{color: !enabled ? COLOR_DISABLED : COLOR_WHITISH}}
             className="text-size-sm button-reset-sm p-0 mr-3" size="sm"
             onClick={() => {
-              const values = filterEnabledFrequencies<number>(Object.values(random.randomFrequencies(null))) as ValueFrequencies;
+              const values = filterEnabledFrequencies<number>(Object.values(randomFrequencies(null))) as ValueFrequencies;
               setFrequencies((current) => ({...current, ...values}));
             }}><IconShuffle/> Randomize</Button>
           <Button
@@ -442,7 +303,7 @@ const NoiseAmplitudes = (props: Props) => {
             style={{color: !enabled ? COLOR_DISABLED : COLOR_WHITISH}}
             className="text-size-sm button-reset-sm p-0 mr-3" size="sm"
             onClick={() => {
-              const values = filterEnabledFrequencies<number>(Object.values(random.randomFrequencies(0))) as ValueFrequencies;
+              const values = filterEnabledFrequencies<number>(Object.values(randomFrequencies(0))) as ValueFrequencies;
               setFrequencies((current) => ({...current, ...values}));
             }}><IconRaiseDown/> Min</Button>
           <Button
@@ -450,7 +311,7 @@ const NoiseAmplitudes = (props: Props) => {
             style={{color: !enabled ? COLOR_DISABLED : COLOR_WHITISH}}
             className="text-size-sm button-reset-sm p-0 mr-3" size="sm"
             onClick={() => {
-              const values = filterEnabledFrequencies<number>(Object.values(random.randomFrequencies(1))) as ValueFrequencies;
+              const values = filterEnabledFrequencies<number>(Object.values(randomFrequencies(1))) as ValueFrequencies;
               setFrequencies((current) => ({...current, ...values}));
             }}><IconRaiseUp/> Max</Button>
           <Button

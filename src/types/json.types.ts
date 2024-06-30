@@ -7,3 +7,15 @@
 export type Json = { [p: string]: any };
 
 export type KVDocument<T = any> = { [p: string]: T };
+
+/**
+ * An extended version of Record, instead of accepting key as a
+ * plain string, it accepts a list of values.
+ *
+ * @example
+ * const FRUITS = ['Mango'] as const;
+ *
+ * type Fruit = typeof FRUITS[number];
+ * const list = {'Mango': value} as MapDocument<Fruit>;
+ */
+export type MapDocument<Key extends string = string, Value extends any = any> = Partial<Record<Key, Value>>;

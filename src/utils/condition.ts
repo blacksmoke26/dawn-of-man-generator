@@ -7,8 +7,8 @@
 import {capitalCase} from 'change-case';
 
 // types
-import {DeepPartial} from 'utility-types';
-import {ConditionDefaultParams,} from '~/types/condition.types';
+import type {DeepPartial} from 'utility-types';
+import type {ConditionDefaultParams} from '~/types/condition.types';
 
 export const ENTITY_COUNT_MIN: number = 0;
 
@@ -160,7 +160,7 @@ export const defaultsParams: DeepPartial<ConditionDefaultParams> = {
   },
   anyWorkAreasActive: {
     workAreaId: 'untitled',
-    maxWorkers: undefined
+    maxWorkers: undefined,
   },
   entityCountComparison: {
     counter: undefined,

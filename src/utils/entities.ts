@@ -255,7 +255,8 @@ export const techEntities: string[] = [
   'underground_mining',
   'weaving',
   'well_digging',
-  'wheel',];
+  'wheel'
+];
 
 export const recipeEntities: string[] = [
   'recipe_beer',
@@ -324,25 +325,41 @@ export const recipeEntities: string[] = [
   'recipe_wool_outfit',
 ];
 
-export const ENTITIES = ([] as string[]).concat(
-  humanEntities,
-  animalEntities,
-  structureEntities,
-  transportEntities,
-  resourceEntities,
-  techEntities,
-  recipeEntities,
-);
+export const ENTITIES = [
+  ...humanEntities,
+  ...animalEntities,
+  ...structureEntities,
+  ...transportEntities,
+  ...resourceEntities,
+  ...techEntities,
+  ...recipeEntities,
+] as string[];
+
+export const ENTITIES_LIVING = [...humanEntities, ...animalEntities] as const;
+
+export const ENTITIES_LIVING_OPTIONS = [
+  {label: 'Human', options: humanEntities.map(value => ({label: capitalCase(value), value, type: 'human'}))},
+  {label: 'Animal', options: animalEntities.map(value => ({label: capitalCase(value), value, type: 'animal'}))},
+] as const;
 
 export const ENTITIES_OPTIONS = [
-  {label: 'Human', options: humanEntities.map(value => ({label: capitalCase(value), value}))},
-  {label: 'Animal', options: animalEntities.map(value => ({label: capitalCase(value), value}))},
-  {label: 'Structure', options: structureEntities.map(value => ({label: capitalCase(value), value}))},
-  {label: 'Transport', options: transportEntities.map(value => ({label: capitalCase(value), value}))},
-  {label: 'Resource', options: resourceEntities.map(value => ({label: capitalCase(value), value}))},
-  {label: 'Tech', options: techEntities.map(value => ({label: capitalCase(value), value}))},
+  ...ENTITIES_LIVING_OPTIONS,
+  {
+    label: 'Structure',
+    options: structureEntities.map(value => ({label: capitalCase(value), value, type: 'structure'})),
+  },
+  {
+    label: 'Transport',
+    options: transportEntities.map(value => ({label: capitalCase(value), value, type: 'transport'})),
+  },
+  {label: 'Resource', options: resourceEntities.map(value => ({label: capitalCase(value), value, type: 'resource'}))},
+  {label: 'Tech', options: techEntities.map(value => ({label: capitalCase(value), value, type: 'tech'}))},
   {
     label: 'Recipe',
-    options: recipeEntities.map(value => ({label: capitalCase(value.replace('recipe_', '')) + ' (recipe)', value}))
+    options: recipeEntities.map(value => ({
+      label: capitalCase(value.replace('recipe_', '')) + ' (recipe)',
+      value,
+      type: 'recipe',
+    })),
   },
-];
+] as const;

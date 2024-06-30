@@ -11,6 +11,9 @@ import merge from 'deepmerge';
 import {nanoid} from 'nanoid';
 import {Button, ButtonGroup, ButtonToolbar, Form, InputGroup, Tab, Tabs} from 'react-bootstrap';
 
+// utils
+import {LOCATIONS_CREATE_MAX} from '~/utils/defaults';
+
 // types
 import type {Json} from '~/types/json.types';
 import type {LocationProps} from '~/utils/location';
@@ -26,9 +29,6 @@ import {useAppSelector} from '~redux/hooks';
 
 // icons
 import {IconClear, IconNew} from '~/components/icons/app';
-
-/** Maximum limit of location tabs */
-const LOCATIONS_MAX_COUNT: number = 15;
 
 /** Tab contents wrapper */
 const TabContentWrapper = (props: Json) => {
@@ -140,7 +140,7 @@ const LocationContainer = (props: Props) => {
             <ButtonGroup>
               <Button
                 variant="secondary" size="sm"
-                disabled={!enabled || total >= LOCATIONS_MAX_COUNT}
+                disabled={!enabled || total >= LOCATIONS_CREATE_MAX}
                 onClick={() => newLocation()}>
                 <IconNew/> New Location
               </Button>
@@ -151,9 +151,11 @@ const LocationContainer = (props: Props) => {
             </ButtonGroup>
             <InputGroup>
               <InputGroup.Text
-                className={cn('border-0 pl-2 pr-2 mr-3', {
-                  'text-muted text-line-through': !enabled || total < 1,
-                })}>Total: {total}</InputGroup.Text>
+                as="span"
+                className={cn('text-size-sm border-0 pl-2 pr-4 pt-0 pb-0 bg-transparent', {
+                  'text-muted text-line-through': !enabled,
+                })}>{!total ? <>&nbsp;</> : <>{total} / {LOCATIONS_CREATE_MAX}</>}
+              </InputGroup.Text>
             </InputGroup>
           </ButtonToolbar>
         </div>

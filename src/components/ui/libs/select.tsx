@@ -40,7 +40,7 @@ export const styles = {
   option: (styles: any, {isDisabled, isSelected}: { isDisabled: boolean, isSelected: boolean }) => ({
     ...styles,
     color: isDisabled
-      ? '#2e2e32'
+      ? '#30394b'
       : (
         isSelected
           ? '#ffb74d'

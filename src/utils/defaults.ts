@@ -4,6 +4,9 @@
  * @since 2020-08-29
  */
 
+// types
+import {EraFactor} from '~/types/action.types';
+
 export const HUMIDITY_MIN: number = 0;
 export const HUMIDITY_MAX: number = 1;
 export const HUMIDITY_MIN_DEFAULT: number = 0;
@@ -49,7 +52,63 @@ export const SUN_ANGLE_FACTOR_MAX: number = 20;
 export const SUN_ANGLE_FACTOR_DEFAULT: number = 1;
 
 export const PERIOD_MIN: number = 0;
-export const PERIOD_MAX: number = 20;
+export const PERIOD_MAX: number = 35;
+
+export const RADIUS_MIN: number = 1;
+export const RADIUS_MAX: number = 300;
+
+export const ROTATION_MIN: number = 1;
+export const ROTATION_MAX: number = 360;
+
+export const LOCATION_INDEX_MIN: number = -1;
+export const LOCATION_INDEX_MAX: number = 150;
+
+export const POSITION_VECTOR_MIN: number = 0;
+export const POSITION_VECTOR_MAX: number = 100;
+
+export const ERA_FACTORS_MIN: number = 0;
+
+export const ERA_FACTORS_MAX: number = 1;
+
+export const ANIMAL_POPULATION_MIN: number = 0;
+
+export const ANIMAL_POPULATION_MAX: number = 500;
+
+export const DECREASE_START_POPULATION_MIN: number = 1;
+export const DECREASE_START_POPULATION_MAX: number = 500;
+
+export const DECREASE_HALFING_POPULATION_MIN: number = 1;
+export const DECREASE_HALFING_POPULATION_MAX: number = 500;
+
+export const INDIVIDUAL_DISEASE_CHANCE_MIN: number = 1;
+export const INDIVIDUAL_DISEASE_CHANCE_MAX: number = 50;
+
+export const TECH_COST_MULTIPLIER_MIN: number = 1;
+export const TECH_COST_MULTIPLIER_MAX: number = 3;
+
+export const SCALE_MIN: number = 1;
+export const SCALE_MAX: number = 20;
+
+export const MIGRATION_MIN: number = 1;
+export const MIGRATION_MAX: number = 50;
+
+export const TIME_OF_YEAR_MIN: number = 1;
+export const TIME_OF_YEAR_MAX: number = 10;
+
+export const TIME_SCALE_INDEX_MIN: number = 1;
+export const TIME_SCALE_INDEX_MAX: number = 10;
+
+export const RAIDER_ATTACK_AMOUNT_MIN: number = 1;
+export const RAIDER_ATTACK_AMOUNT_MAX: number = 50;
+
+export const YEARS_OLD_MIN: number = 1;
+export const YEARS_OLD_MAX: number = 60;
+
+export const SHIELD_RATIO_MIN: number = 0;
+export const SHIELD_RATIO_MAX: number = 1;
+
+export const ARMOR_RATIO_MIN: number = 0;
+export const ARMOR_RATIO_MAX: number = 1;
 
 export const DEFAULT_SEASONS: string[] = [
   'Spring',
@@ -62,3 +121,22 @@ export const DEFAULT_DISASTER: string[] = [
   'Storm',
   'Blizzard',
 ];
+
+export const ERA_FACTORS_LOWEST: EraFactor = [
+  ERA_FACTORS_MIN, ERA_FACTORS_MIN, ERA_FACTORS_MIN,
+  ERA_FACTORS_MIN, ERA_FACTORS_MIN, ERA_FACTORS_MIN,
+] as const;
+
+export const ERA_FACTORS_HIGHEST: EraFactor = [
+  ERA_FACTORS_MAX, ERA_FACTORS_MAX, ERA_FACTORS_MAX,
+  ERA_FACTORS_MAX, ERA_FACTORS_MAX, ERA_FACTORS_MAX,
+] as const;
+
+// Max limits
+export const EVENTS_CREATE_MAX: number = 20;
+
+export const ACTIONS_CREATE_MAX: number = 20;
+
+export const WAVES_CREATE_MAX: number = 5;
+
+export const LOCATIONS_CREATE_MAX: number = 15;

@@ -1,3 +1,5 @@
+// noinspection HtmlUnknownAnchorTarget
+
 /**
  * @author Junaid Atari <mj.atari@gmail.com>
  * @see https://github.com/blacksmoke26/dawn-of-man-generator
@@ -21,12 +23,15 @@ import useAttributes from '~/hooks/use-attributes';
 import {onlyKeys} from '~/helpers/object';
 import {GENERAL_CONDITIONS} from '~/utils/condition';
 import {
-  CollapseAllButton,
+  RemoveButton,
   conditionIcon,
   ExpandAllButton,
   RemoveAllButton,
-  RemoveButton,
+  CollapseAllButton,
 } from './elements/condition-logical';
+import {
+  arrayValuesToAttributes, createConditionComponent,
+} from './utils/condition-logical';
 
 // icons
 import {
@@ -39,16 +44,9 @@ import {
 } from '~/components/icons/app';
 
 // types
-import {KVDocument} from '~/types/json.types';
-import {
-  type PropValues,
-  type ChangedValues,
-  ConditionLogicalValues,
-  arrayValuesToAttributes,
-  createConditionComponent,
-} from './utils/condition-logical';
-import {ConditionAttributesProps, LogicalCondition} from '~/types/condition.types';
-
+import type {KVDocument} from '~/types/json.types';
+import type {PropValues, ChangedValues, ConditionLogicalValues} from './utils/condition-logical';
+import type {ConditionAttributesProps, LogicalCondition} from '~/types/condition.types';
 
 /** ConditionNot `props` type */
 interface Props extends ConditionAttributesProps {
@@ -107,10 +105,9 @@ const valuesToChangedValues = (type: LogicalCondition, values: PropValues): Chan
   return list;
 };
 
-function ToggleCheckbox(props: { attr: boolean, disabled: boolean, onClick: () => void }) {
-  return (
-    <span
-      className={cn('mr-1', {'text-muted': !props.attr})}>
+const ToggleCheckbox = (props: { attr: boolean, disabled: boolean, onClick: () => void }) => (
+  <span
+    className={cn('mr-1', {'text-muted': !props.attr})}>
       <a href="#disable"
          className={cn({'text-muted': props.disabled})}
          onClick={(e) => {
@@ -130,8 +127,7 @@ function ToggleCheckbox(props: { attr: boolean, disabled: boolean, onClick: () =
       </span>
       </a>
     </span>
-  );
-}
+);
 
 /** ConditionLogical functional component */
 const ConditionLogical = (props: Props) => {
@@ -193,7 +189,7 @@ const ConditionLogical = (props: Props) => {
   return (
     <div className={cn({'text-muted': !getAttr('enabled')})}>
       <Row>
-        <Col col="6" className="checkbox-align mt-1">
+        <Col col="6" className="checkbox-align">
           {!newProps.showCheckbox && (
             <ToggleCheckbox
               attr={getAttr('enabled')}
@@ -208,7 +204,7 @@ const ConditionLogical = (props: Props) => {
               type="switch"
               id={`locations_override-switch-${nanoid(5)}`}
               label={<span className="position-relative" style={{top: 0}}>
-            <span className={cn('mr-1', {'text-muted': !getAttr('enabled')})}>
+            <span className={cn({'text-muted': !getAttr('enabled')})}>
               <IconCondition
                 width="17" height="17"
                 color={!getAttr('enabled') ? COLOR_DISABLED : COLOR_REDDISH}/>
@@ -248,39 +244,37 @@ const ConditionLogical = (props: Props) => {
           </div>
           {newProps?.removeIcon && (
             <RemoveButton
-              disabledCheckbox={getAttr('disabledCheckbox')}
+              disabled={getAttr('disabledCheckbox')}
               onClick={() => newProps?.onRemoveClick()}/>
           )}
         </Col>
       </Row>
       {getAttr('expanded') && (
         <>
-          <div className="mt-2 mb-2">
+          <div className="mb-2" style={{marginTop: 7}}>
             <Row className={cn({'text-muted': false}, 'checkbox-align')}>
-              <Col xs="8">
-                <div className="d-inline-block" style={{width: '80%'}}>
-                  <Select
-                    isDisabled={!getAttr('enabled')}
-                    menuPortalTarget={document.body}
-                    value={null}
-                    formatOptionLabel={(option: Option | any) => (
-                      <span>
+              <Col sm="8">
+                <Select
+                  isDisabled={!getAttr('enabled')}
+                  menuPortalTarget={document.body}
+                  value={null}
+                  formatOptionLabel={(option: Option | any) => (
+                    <span>
                         <IconCondition width="17" height="17" color={COLOR_REDDISH}/>
-                        {' '} {option?.label}
+                      {' '} {option?.label}
                       </span>
-                    )}
-                    options={GENERAL_CONDITIONS.map(value => ({label: capitalCase(value), value}))}
-                    placeholder="Choose condition to insert..."
-                    onChange={(option: Option | any, {action}): void => {
-                      if (action === 'select-option' && option) {
-                        setValue(nanoid(10).toLowerCase(), {type: option?.value});
-                      }
-                    }}
-                  />
-                </div>
+                  )}
+                  options={GENERAL_CONDITIONS.map(value => ({label: capitalCase(value), value}))}
+                  placeholder="Choose condition to insert..."
+                  onChange={(option: Option | any, {action}): void => {
+                    if (action === 'select-option' && option) {
+                      setValue(nanoid(10).toLowerCase(), {type: option?.value});
+                    }
+                  }}
+                />
               </Col>
-              <Col xs="4" className="text-right">
-                <div className="pt-1">
+              <Col sm="4" className="text-right">
+                <div>
                   <CollapseAllButton disabled={isDisabled} onClick={() => {
                     setAttr('conditionsExpanded', false);
                     setTimeout(() => {
