@@ -8,7 +8,7 @@
 import * as React from 'react';
 import {nanoid} from 'nanoid';
 import cn from 'classname';
-import {OverlayTrigger, OverlayTriggerProps, Popover, PopoverBodyProps} from 'react-bootstrap';
+import {OverlayTrigger, OverlayTriggerProps, Popover, PopoverBodyProps, PopoverHeaderProps} from 'react-bootstrap';
 
 // elemental components
 import LinkButton, {LinkButtonProps} from '~/components/ui/LinkButton';
@@ -21,15 +21,27 @@ interface PopoverBodyArgs {
   hide: (() => void);
 }
 
-export interface PopoverButtonProps extends React.PropsWithChildren {
+export interface CommonProps {
+  /** Input should be disabled or not
+   * @default false */
+  disabled?: boolean;
+
+  /** Hide the arrow icon right after display value
+   * @default false */
+  hideArrow?: boolean;
+
+  /** Popover should place over the value or not
+   * @default false */
+  isCovered?: boolean;
+}
+
+export interface PopoverButtonProps extends CommonProps, React.PropsWithChildren {
   buttonProps?: LinkButtonProps;
   popoverHeader?: React.ReactNode;
+  popoverHeaderProps?: PopoverHeaderProps;
   popoverBody: React.ReactNode | ((args: PopoverBodyArgs) => React.ReactNode);
   popoverBodyProps?: PopoverBodyProps;
-  isCovered?: boolean;
-  overlayProps?: OverlayTriggerProps;
-  disabled?: boolean;
-  hideArrow?: boolean;
+  overlayProps?: Omit<OverlayTriggerProps, 'children' | 'overlay'>;
 }
 
 /** PopoverButton functional component */
@@ -56,7 +68,7 @@ const PopoverButton = (props: PopoverButtonProps) => {
       className={cn({'text-muted-deep': newProps?.disabled})}
       style={{marginTop: props?.isCovered ? -27 : -8}}>
       {props?.popoverHeader && (
-        <Popover.Header as="h3">
+        <Popover.Header as="h3" {...(props?.popoverHeaderProps || {})}>
           {props?.popoverHeader}
         </Popover.Header>
       )}
