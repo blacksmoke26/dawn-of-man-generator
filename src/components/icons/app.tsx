@@ -66,6 +66,18 @@ export const COLOR_REDDISH: string = '#ff8a65';
 
 export const COLOR_GRAYED: string = 'rgba(255, 255, 255, .4';
 
+export const COLORS_MAP = {
+  WHITISH: COLOR_WHITISH,
+  REDDISH: COLOR_REDDISH,
+  GRAYED: COLOR_GRAYED,
+  PINK: COLOR_PINK,
+  SUCCESS: COLOR_SUCCESS,
+  ORANGE: COLOR_ORANGE,
+  DISABLED: COLOR_DISABLED,
+} as const;
+
+export type ColorType = keyof typeof COLORS_MAP;
+
 export const iconDefaultProps: Partial<LucideProps> = {
   className: 'd-inline position-relative',
   height: 14,

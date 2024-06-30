@@ -158,3 +158,42 @@
 .ui-input-group-text-before.disabled, .ui-input-group-text-after.disabled {
     background: rgba(255, 255, 255, .05);
 }
+
+.ui-popover-dropdown > .list-group-item:first-of-type {
+    margin-top: .7rem;
+}
+
+.ui-popover-dropdown > .list-group-item:last-of-type {
+    margin-bottom: .7rem;
+}
+
+.ui-popover-dropdown > .list-group-item:hover {
+    background-color: rgba(53, 63, 83, 0.60);
+}
+
+.ui-popover-dropdown > .list-group-item:active {
+    background-color: #353f535c;
+}
+
+.ui-popover-dropdown > .list-group-item {
+    margin-right: 2rem;
+    font-size: .75rem;
+    color: #e4e4e4;
+    padding-left: .8rem;
+    position: relative;
+}
+
+.ui-popover-dropdown > .list-group-item.icon-padding {
+    padding-left: 1.5rem;
+}
+
+.ui-popover-dropdown > .list-group-item .icon {
+    position: absolute;
+    left: .4rem;
+}
+
+.ui-popover-dropdown > .list-group-item.active {
+    border: none;
+    background-color: #373f4c;
+    color: #d9d9d9;
+}
