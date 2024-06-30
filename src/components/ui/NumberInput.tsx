@@ -61,6 +61,8 @@ export interface Props {
   allowClear?: boolean;
   /** Display restore icon button */
   allowRestore?: boolean;
+  /** Allow focus input on mount */
+  allowFocus?: boolean;
 
   /** A callback fire when input has been changed */
   onChange?(value: string | number): void;
@@ -123,6 +125,10 @@ const NumberInput = (props: Props) => {
     },
     onClear: undefined,
   }, props);
+
+  React.useEffect(() => {
+    props?.allowFocus && inputRef.current?.focus();
+  }, [props?.allowFocus])
 
   const debounced = useDebouncedCallback(
     // function
