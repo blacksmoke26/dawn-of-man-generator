@@ -28,7 +28,7 @@ import useValues from '~/hooks/use-values';
 // utils
 import {defaultsParams} from '~/utils/action';
 import {animalEntities} from '~/utils/entities';
-import {actionDefaultProps, optionalDefaultValueSetter} from './utils/default';
+import {actionDefaultProps} from './utils/default';
 import {randomAnimalMinMax, randomArray, randomEraFactors} from '~/utils/random';
 import {ANIMAL_POPULATION_MAX, ANIMAL_POPULATION_MIN, ERA_FACTORS_LOWEST} from '~/utils/defaults';
 

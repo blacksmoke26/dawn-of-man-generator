@@ -9,7 +9,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import cn from 'classname';
 import {nanoid} from 'nanoid';
-import {Button, Col, Form, FormCheckProps, Row} from 'react-bootstrap';
+import {Col, Form, FormCheckProps, Row} from 'react-bootstrap';
 
 // elemental components
 import Slider from '~/components/ui/Slider';
