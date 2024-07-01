@@ -40,12 +40,12 @@ const safeKeys: string[] = [
 /**
  * Checks whether the `eventKey` is allowed as numeric as well as safe keys
  * @param eventKey - The event key
- * @param enterKey - Additional key to check
+ * @param [enterKey] - Additional key to check
  * @returns Whatever event key is allowed or not
  */
-export const isNumericKey = (eventKey: string, enterKey: string): boolean => {
+export const isNumericKey = (eventKey: string, enterKey?: string): boolean => {
   // Allow numeric keys, backspace, delete, and decimal point and suppoerted enter key
-  return (new RegExp(`[0-9]|\\.|${safeKeys.join('|')}|${enterKey}`)).test(eventKey);
+  return (new RegExp(`[0-9]|\\.|${safeKeys.join('|')}${enterKey ? `|${enterKey}` : ''}`)).test(eventKey);
 };
 
 /**
@@ -116,6 +116,38 @@ export const handleKeyDownHandler = (args: HandleKeyDownArgs) => {
       setInputValue('');
       event.preventDefault();
   }
+};
+
+/**
+ * An event handler the check the pressed keys and update values based on the pressed keys
+ * @see NumberInput
+ */
+export const handleKeyDownEvent = (event: React.KeyboardEvent<HTMLInputElement>, args: NormalizeNumberArgs) => {
+  const current = event.currentTarget.value;
+
+  if (!isNumericKey(event.key)) {
+    event.currentTarget.value = !isNaN(parseFloat(current))
+      ? current
+      : '';
+    return event.preventDefault();
+  }
+
+  if (event.key === '.') {
+    //event.currentTarget.value = current.replace('.', '');
+    return event.preventDefault();
+  }
+
+  if (event.key === 'ArrowUp') {
+    event.currentTarget.value = '' + normalizeNumber(+current, {...args, shouldAdd: true});
+    return event.preventDefault();
+  }
+
+  if (event.key === 'ArrowDown') {
+    event.currentTarget.value = '' + normalizeNumber(+current, {...args, shouldAdd: false});
+    return event.preventDefault();
+  }
+
+  event.currentTarget.value = '' + normalizeNumber(+current, args);
 };
 
 
