@@ -21,6 +21,7 @@ export interface Props {
   tooltip?: string,
   disabled?: boolean,
   checked?: boolean
+  style?: React.CSSProperties;
   undefinedSetter?: UndefinedSetterType;
 
   onChange?(state: boolean): void
@@ -35,6 +36,7 @@ const PropertyCheckboxLabel = (props: Props = {}) => {
         className={cn('text-size-xs', {'text-white': !props?.disabled})}
         type="switch"
         id={`checkbox-label-${nanoid(5)}`}
+        style={props?.style}
         label={(
           <span
             style={{textDecoration: props?.tooltip ? 'underline dotted' : ''}}
