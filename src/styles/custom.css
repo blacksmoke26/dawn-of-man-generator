@@ -210,3 +210,5 @@
     background-color: #373f4c;
     color: #d9d9d9;
 }
+
+.text-underline-dotted { text-decoration: underline dotted; }
