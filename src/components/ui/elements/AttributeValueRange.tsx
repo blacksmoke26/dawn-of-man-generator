@@ -15,12 +15,16 @@ import Range from '../Range';
 import LinkButton from '../LinkButton';
 
 // icons
-import {IconRestore, IconShuffle} from '../../icons/app';
+import {COLOR_DISABLED, COLOR_ORANGE, COLOR_WHITISH, IconRestore, IconShuffle} from '../../icons/app';
 
 // types
 import type {SliderProps} from 'rc-slider';
 import type {Required} from 'utility-types';
 import {nanoid} from 'nanoid';
+import PopoverNumberInput from '~/components/ui/PopoverNumberInput';
+import {temperatureNumberInputProps} from '~/panel/environment/generators/seasons/utils/params';
+import * as Defaults from '~/utils/defaults';
+import {stepToDecimal} from '~/helpers/number';
 
 interface Props {
   disabled?: boolean;
@@ -66,23 +70,36 @@ const AttributeRangeValue = (props: Props) => {
   const minValue = minChecked ? 0 : newProps.min;
   const maxValue = maxChecked ? 0 : newProps.max;
 
+  const decimals = stepToDecimal(newProps.sliderProps?.step ?? 0);
+
   return (
     <Col sm="10" {...newProps.colProps}>
-      <div className={cn({'text-muted': newProps.disabled})}>
-        <div className="text-size-xs font-family-code float-left">
-          <span className={cn({'text-muted': minChecked})}>
-            Min: <code
-            className={cn({'text-muted text-line-through': newProps.disabled || minChecked})}>{minChecked ? '-' : minValue}</code>
-          </span>
-          {' / '}
-          <span className={cn({'text-muted': maxChecked})}>
-            Max: <code
-            className={cn({'text-muted text-line-through': newProps.disabled || maxChecked})}>{maxChecked ? '-' : maxValue}</code>
-          </span>
-        </div>
+      <div className={cn({'text-muted-deep': newProps.disabled})}>
         <div className="float-right">
+          <PopoverNumberInput
+            {...temperatureNumberInputProps(!newProps.disabled)}
+            min={newProps.sliderProps?.min}
+            max={newProps.sliderProps?.max}
+            decimals={decimals}
+            value={minValue}
+            onSave={value => {
+              const theValue = value > maxValue ? maxValue : value;
+              newProps.onChange(minChecked ? undefined : theValue, maxChecked ? undefined : maxValue)
+            }}/>
+          <strong style={{marginRight: 5, marginLeft: 3, color: COLOR_WHITISH}}>,</strong>
+          <PopoverNumberInput
+            {...temperatureNumberInputProps(!newProps.disabled)}
+            min={newProps.sliderProps?.min}
+            max={newProps.sliderProps?.max}
+            decimals={decimals}
+            value={maxValue}
+            onSave={value => {
+              const theValue = value < minValue ? minValue : value;
+              newProps.onChange(minChecked ? undefined : minValue, maxChecked ? undefined : theValue)
+            }}/>
           {newProps.allowShuffle && (
             <LinkButton
+              className="ml-2"
               disabled={newProps.disabled}
               onClick={() => newProps.onShuffle(minChecked, maxChecked)}>
               <IconShuffle/>
@@ -90,9 +107,10 @@ const AttributeRangeValue = (props: Props) => {
           )}
           {newProps.allowRestore && (
             <LinkButton
+              className="ml-2"
               disabled={newProps.disabled}
               onClick={() => newProps.onRestore(minChecked, maxChecked)}>
-              <IconRestore/>
+              <IconRestore color={props?.disabled ? COLOR_DISABLED : COLOR_ORANGE}/>
             </LinkButton>
           )}
         </div>
@@ -121,7 +139,7 @@ const AttributeRangeValue = (props: Props) => {
                 onChange={e => {
                   setMinChecked(e.target.checked);
                   setTimeout(() => {
-                    newProps.onChange(e.target.checked ? undefined : newProps.min, maxChecked ? undefined : newProps.max)
+                    newProps.onChange(e.target.checked ? undefined : newProps.min, maxChecked ? undefined : newProps.max);
                   }, 20);
                 }}
               />
@@ -145,7 +163,7 @@ const AttributeRangeValue = (props: Props) => {
                 checked={maxChecked}
                 onChange={e => {
                   setMaxChecked(e.target.checked);
-                  newProps.onChange(minChecked ? undefined : newProps.min, e.target.checked ? undefined : newProps.max)
+                  newProps.onChange(minChecked ? undefined : newProps.min, e.target.checked ? undefined : newProps.max);
                 }}
               />
               <span
