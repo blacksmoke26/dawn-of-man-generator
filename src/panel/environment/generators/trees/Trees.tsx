@@ -8,32 +8,35 @@ import React from 'react';
 import * as PropTypes from 'prop-types';
 import cn from 'classname';
 import merge from 'deepmerge';
-import {nanoid} from 'nanoid';
-import {Button, Col, Form, Row} from 'react-bootstrap';
+import {Form} from 'react-bootstrap';
 
-// Utils
+// elemental components
+import PanelToolbar from '~/components/environment/PanelToolbar';
+
+// utils
 import * as random from '~/utils/random';
+
+// redux
+import {useAppSelector} from '~redux/hooks';
+import {COLOR_WHITISH} from '~/components/icons/app';
 
 // types
 import {Json} from '~/types/json.types';
 
-// redux
-import {useAppSelector} from '~redux/hooks';
-
 export interface Props {
-	enabled?: boolean,
+	checked?: boolean,
 	onChange(template: string, values?: Json): void,
 }
 
 /** Trees functional component */
 const Trees = ( props: Props ) => {
 	props = merge({
-		enabled: false,
+		checked: false,
 		onChange: () => {},
 	}, props);
 
+	const [checked, setChecked] = React.useState<boolean>(props.checked as boolean);
 	const [trees, setTrees] = React.useState<string[]>(random.randomTrees());
-	const [enabled, setEnabled] = React.useState<boolean>(props.enabled as boolean);
 
 	const treesAttribute = useAppSelector(({environment}) => environment.values?.trees);
 
@@ -42,11 +45,9 @@ const Trees = ( props: Props ) => {
 		const extValue = treesAttribute ?? null;
 
 		if ( typeof extValue === 'boolean' ) {
-			setEnabled(extValue);
-		}
-
-		if ( Array.isArray(extValue) ) {
-			setEnabled(true);
+			setChecked(extValue);
+		} else if ( Array.isArray(extValue) ) {
+			setChecked(true);
 			setTrees(extValue);
 		}
 	}, [treesAttribute]);
@@ -55,50 +56,43 @@ const Trees = ( props: Props ) => {
 	React.useEffect(() => {
 		typeof props.onChange === 'function' && props.onChange(toTemplateText(), trees);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [trees, enabled]);
+	}, [trees, checked]);
 
 	const toTemplateText = (): string => {
-		return !trees.length || !enabled
+		return !trees.length || !checked
 			? ''
 			: `<trees values="${trees.join(' ')}"/>`;
 	}
 
 	return (
-		<div className={cn('mb-2', {'text-muted': !enabled})}>
-			<Row className="mb-1">
-				<Col xs="10">
-					Present Trees {' '}
-					<code className={cn('pl-2 text-size-xs', {'text-muted': !enabled})}>
-						{!trees.length ? '<None>' : trees.join(' ').trim()}
-					</code>
-					<Button disabled={!enabled} className="button-reset-sm" variant="link"
-									onClick={() => setTrees(random.randomTrees())}>
-						Random
-					</Button>
-					<Button disabled={!enabled} className="button-reset-sm" variant="link"
-									onClick={() => setTrees([...random.trees])}>All</Button>
-					<Button disabled={!enabled} className="button-reset-sm" variant="link"
-									onClick={() => setTrees([])}>None</Button>
-					<div className="text-size-xxs text-muted mt-1">
-						What trees are present in the level.
-					</div>
-				</Col>
-				<Col xs="2" className="text-right">
-					<Form.Check
-						className="pull-right"
-						type="switch"
-						id={`trees-present-switch-${nanoid(5)}`}
-						label=""
-						checked={enabled}
-						onChange={e => setEnabled(e.target.checked)}
-					/>
-				</Col>
-			</Row>
+		<div className={cn('mb-2', {'text-muted': !checked})}>
+
+			<PanelToolbar
+        checked={checked}
+        heading="Present Trees"
+        description="What trees are present in the level."
+        onCheckboxChange={state => setChecked(state)}
+        value={(
+          <>
+            {!!trees.length && <>{trees.length}
+              <strong style={{marginLeft: 3, marginRight: 3, color: COLOR_WHITISH}}>/</strong>
+              <span style={{color: COLOR_WHITISH}}>{random.trees.length}</span>
+            </>}
+          </>
+        )}
+        allowShuffle
+        onShuffle={() => setTrees(random.randomTrees())}
+        allowClear
+        onClear={() => setTrees([])}
+        allowAll
+        onAll={() => setTrees([...random.trees])}
+        disabled={!checked}/>
+
 			<ul className="list-unstyled list-inline fixed-width mb-0 checkbox-align">
 				{random.trees.map(v => (
 					<li key={v} className="list-inline-item mb-1">
 						<Form.Check
-							disabled={!enabled}
+							disabled={!checked}
 							type="switch"
 							data-value={v}
 							checked={trees.findIndex(val => v === val) !== -1}
@@ -119,7 +113,7 @@ const Trees = ( props: Props ) => {
 
 // Properties validation
 Trees.propTypes = {
-	enabled: PropTypes.bool,
+	checked: PropTypes.bool,
 	onChange: PropTypes.func,
 };
 

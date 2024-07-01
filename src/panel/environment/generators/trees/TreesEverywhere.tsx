@@ -9,7 +9,10 @@ import * as PropTypes from 'prop-types';
 import cn from 'classname';
 import merge from 'deepmerge';
 import {nanoid} from 'nanoid';
-import {Button, Col, Form, Row} from 'react-bootstrap';
+import {Form} from 'react-bootstrap';
+
+// elemental components
+import PanelToolbar from '~/components/environment/PanelToolbar';
 
 // utils
 import * as random from '~/utils/random';
@@ -17,20 +20,20 @@ import * as random from '~/utils/random';
 // redux
 import {useAppSelector} from '~redux/hooks';
 
-export interface Props {
-	enabled?: boolean,
+export interface TreesEverywhereProps {
+	checked?: boolean,
 	onChange?(template: string, value: boolean): void,
 }
 
 /** TreesEverywhere functional component */
-const TreesEverywhere = ( props: Props ) => {
+const TreesEverywhere = ( props: TreesEverywhereProps ) => {
 	props = merge({
 		enabled: false,
 		onChange: () => {},
 	}, props);
 
 	const [value, setValue] = React.useState<boolean>(random.randomTreesEverywhere());
-	const [enabled, setEnabled] = React.useState<boolean>(props.enabled as boolean);
+	const [checked, setChecked] = React.useState<boolean>(props.checked as boolean);
 
 	const treesEverywhereAttribute = useAppSelector(({environment}) => environment.values?.treesEverywhere);
 
@@ -39,59 +42,46 @@ const TreesEverywhere = ( props: Props ) => {
 		const extValue = treesEverywhereAttribute ?? null;
 
 		if ( typeof extValue === 'boolean' ) {
-			setEnabled(extValue);
+			setChecked(extValue);
 			setValue(extValue);
 		}
 	}, [treesEverywhereAttribute]);
 
 	// Reflect attributes changes
 	React.useEffect(() => {
-		setEnabled(props.enabled as boolean);
-	}, [props.enabled]);
+		setChecked(props.checked as boolean);
+	}, [props.checked]);
 
 	// Reflect state changes
 	React.useEffect(() => {
 		typeof props.onChange === 'function' && props.onChange(toTemplateText(), value);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [value, enabled]);
+	}, [value, checked]);
 
 	const toTemplateText = (): string => {
-		return !enabled
+		return !checked
 			? ''
 			: `<trees_everywhere value="${value ? 'true' : 'false'}"/>`;
 	};
 
 	return (
-		<div className={cn('mb-2 checkbox-align', {'text-muted': !enabled})}>
-			<Row className="mb-1">
-				<Col xs="10">
-					Trees Everywhere <code className={cn('ml-1 text-size-xs', {'text-muted': !enabled})}>
-					{value ? '<true>' : '<false>'}
-				</code>
-					<Button disabled={!enabled} className="button-reset-sm" variant="link"
-									onClick={() => setValue(random.randomTreesEverywhere())}>
-						Random
-					</Button>
-					<Button disabled={!enabled} className="button-reset-sm" variant="link"
-									onClick={() => setValue(false)}>None</Button>
-				</Col>
-				<Col xs="2" className="text-right">
-					<Form.Check
-						className="pull-right"
-						type="switch"
-						id={`trees_everywhere-switch-${nanoid(5)}`}
-						label=""
-						checked={enabled}
-						onChange={e => setEnabled(e.target.checked)}
-					/>
-				</Col>
-			</Row>
+		<div className={cn('mb-2 checkbox-align', {'text-muted': !checked})}>
+			<PanelToolbar
+        checked={checked}
+        heading="Trees Everywhere"
+        description="Show trees on rivers, lakes, stones etc..."
+        onCheckboxChange={state => setChecked(state)}
+        value={value ? 'Yes' : 'No'}
+        allowShuffle
+        onShuffle={() => setValue(random.randomTreesEverywhere())}
+        disabled={!checked}/>
+
 			<Form.Check
 				type="switch"
 				className="pull-right"
-				disabled={!enabled}
+				disabled={!checked}
 				id={`trees_everywhere-${nanoid(5)}`}
-				label="Show everywhere?"
+				label="Yes, everywhere!"
 				checked={value}
 				onChange={e => setValue(e.target.checked)}
 			/>
@@ -101,7 +91,7 @@ const TreesEverywhere = ( props: Props ) => {
 
 // Properties validation
 TreesEverywhere.propTypes = {
-	enabled: PropTypes.bool,
+	checked: PropTypes.bool,
 	onChange: PropTypes.func,
 };
 
