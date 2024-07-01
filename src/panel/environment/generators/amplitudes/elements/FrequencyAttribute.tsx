@@ -14,6 +14,7 @@ import {Col, Form, FormCheckProps, Row} from 'react-bootstrap';
 // elemental components
 import Slider from '~/components/ui/Slider';
 import LinkButton from '~/components/ui/LinkButton';
+import PopoverNumberInput from '~/components/ui/PopoverNumberInput';
 
 // utils
 import {randomFrequency} from '~/utils/random';
@@ -48,6 +49,17 @@ const FrequencyAttribute = (props: Props = {}) => {
 
   const isDisabled = props?.disabledCheckbox || props?.disabled;
 
+  const numberInputProps = {
+    min: 0,
+    max: 1,
+    decimals: 3,
+    hideArrow: true,
+    disabled: isDisabled,
+    title: 'Edit/Change value',
+    className: cn('mr-1', {'text-underline-dotted': !isDisabled}),
+    style: {color: COLOR_REDDISH, top: 0},
+  };
+
   return (
     <div className={(cn('mb-2', 'checkbox-align', {
       'text-muted-deep': isDisabled,
@@ -72,10 +84,10 @@ const FrequencyAttribute = (props: Props = {}) => {
           </Form.Label>
         </Col>
         <Col sm="6" className="text-right">
-          <span
-            className="pl-2 pr-2 text-size-xs position-relative"
-            style={{top: 1, color: COLOR_REDDISH}}>{props?.value ?? 0}</span>
-
+          <PopoverNumberInput
+            {...numberInputProps}
+            value={props?.value as number}
+            onSave={value => onChange(value as number)}/>
           <LinkButton
             disabled={isDisabled}
             className="m-0"
