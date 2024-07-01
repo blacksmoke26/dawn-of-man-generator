@@ -7,12 +7,11 @@
 import React from 'react';
 import * as PropTypes from 'prop-types';
 import cn from 'classname';
-import {nanoid} from 'nanoid';
 import merge from 'deepmerge';
-import {Button, Col, Form, Row} from 'react-bootstrap';
 
-// components
+// elemental components
 import Slider from '~/components/ui/Slider';
+import PanelToolbar from '~/components/environment/PanelToolbar';
 
 // utils
 import * as random from '~/utils/random';
@@ -24,23 +23,23 @@ import {useAppSelector} from '~redux/hooks';
 /**
  * DistanceHeightOffset `props` type
  */
-export interface Props {
-  enabled?: boolean;
+export interface DistanceHeightOffsetProps {
+  checked?: boolean;
   distance?: number;
 
   onChange?(template: string, value: number): void;
 }
 
 /** DistanceHeightOffset functional component */
-const DistanceHeightOffset = (props: Props) => {
+const DistanceHeightOffset = (props: DistanceHeightOffsetProps) => {
   props = merge({
-    enabled: false,
+    checked: false,
     distance: random.randomFloat(),
     onChange: () => {
     },
   }, props);
 
-  const [enabled, setEnabled] = React.useState<boolean>(props.enabled as boolean);
+  const [checked, setChecked] = React.useState<boolean>(props.checked as boolean);
   const [distance, setDistance] = React.useState<number>(props.distance as number);
 
   const distanceHeightOffsetAttribute = useAppSelector(({environment}) => environment?.values?.distanceHeightOffset);
@@ -50,11 +49,9 @@ const DistanceHeightOffset = (props: Props) => {
     const extValue = distanceHeightOffsetAttribute ?? null;
 
     if (typeof extValue === 'boolean') {
-      setEnabled(extValue);
-    }
-
-    if (typeof extValue === 'number') {
-      setEnabled(true);
+      setChecked(extValue);
+    } else if (typeof extValue === 'number') {
+      setChecked(true);
       setDistance(extValue);
     }
   }, [distanceHeightOffsetAttribute]);
@@ -63,51 +60,43 @@ const DistanceHeightOffset = (props: Props) => {
   React.useEffect(() => {
     typeof props.onChange === 'function' && props.onChange(toTemplateText(), distance);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [distance, enabled]);
+  }, [distance, checked]);
 
   /** Generate xml code */
   const toTemplateText = React.useCallback((): string => {
-    return enabled
+    return checked
       ? `<distance_height_offset value="${distance}"/>`
       : '';
-  }, [distance, enabled]);
+  }, [distance, checked]);
 
   return (
-    <div className={cn('mb-2', {'text-muted': !enabled})}>
-      <Row className="mb-1">
-        <Col xs="10">
-          Distance Height Offset <code className={cn('pl-2 text-size-xs', {'text-muted': !enabled})}>
-          {distance}
-        </code>
-          <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                  onClick={() => setDistance(random.randomFloat())}>
-            Random
-          </Button>
-          <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                  onClick={() => setDistance(Defaults.DISTANCE_HEIGHT_OFFSET_MIN)}>Min</Button>
-          <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                  onClick={() => setDistance(Defaults.DISTANCE_HEIGHT_OFFSET_MAX)}>Max</Button>
-          <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                  onClick={() => setDistance(Defaults.DISTANCE_HEIGHT_OFFSET_DEFAULT)}>Reset</Button>
-          <div className="text-size-xxs text-muted mt-1">
-            How much bigger are mountains at the edge of map.
-          </div>
-        </Col>
-        <Col xs="2" className="text-right">
-          <Form.Check
-            className="pull-right"
-            type="switch"
-            id={`river-switch-${nanoid(5)}`}
-            label=""
-            checked={enabled}
-            onChange={e => setEnabled(e.target.checked)}
-          />
-        </Col>
-      </Row>
+    <div className={cn('mb-2', {'text-muted': !checked})}>
+      <PanelToolbar
+        value={distance}
+        checked={checked}
+        heading="Distance Height Offset"
+        description="How much bigger are mountains at the edge of map."
+        allowNumberInput
+        numberInputProps={{
+          min: Defaults.DISTANCE_HEIGHT_OFFSET_MIN,
+          max: Defaults.DISTANCE_HEIGHT_OFFSET_MAX,
+          decimals: 2,
+        }}
+        onCheckboxChange={state => setChecked(state)}
+        onChange={(val: number) => setDistance(+val)}
+        allowShuffle
+        onShuffle={() => setDistance(random.randomDistanceHeightOffset(true))}
+        allowMin
+        onMin={() => setDistance(Defaults.DISTANCE_HEIGHT_OFFSET_MIN)}
+        allowMax
+        onMax={() => setDistance(Defaults.DISTANCE_HEIGHT_OFFSET_MAX)}
+        allowRestore
+        onRestore={() => setDistance(Defaults.DISTANCE_HEIGHT_OFFSET_DEFAULT)}
+        disabled={!checked}/>
       <Slider
         min={Defaults.DISTANCE_HEIGHT_OFFSET_MIN}
         max={Defaults.DISTANCE_HEIGHT_OFFSET_MAX}
-        step={0.01} disabled={!enabled}
+        step={0.01} disabled={!checked}
         value={Number(distance)} onChange={v => setDistance(v as number)}/>
     </div>
   );
@@ -115,7 +104,7 @@ const DistanceHeightOffset = (props: Props) => {
 
 // Default properties
 DistanceHeightOffset.propTypes = {
-  enabled: PropTypes.bool,
+  checked: PropTypes.bool,
   distance: PropTypes.number,
   onChange: PropTypes.func,
 };

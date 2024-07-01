@@ -7,12 +7,11 @@
 import React from 'react';
 import * as PropTypes from 'prop-types';
 import cn from 'classname';
-import {nanoid} from 'nanoid';
 import merge from 'deepmerge';
-import {Button, Col, Form, Row} from 'react-bootstrap';
 
-// components
+// elemental components
 import Slider from '~/components/ui/Slider';
+import PanelToolbar from '~/components/environment/PanelToolbar';
 
 // utils
 import * as random from '~/utils/random';
@@ -24,23 +23,23 @@ import {useAppSelector} from '~redux/hooks';
 /**
  * ResourceFactor `props` type
  */
-export interface Props {
-  enabled?: boolean;
+export interface ResourceFactorProps {
+  checked?: boolean;
   resource?: number;
 
   onChange?(template: string, value: number): void;
-};
+}
 
 /** ResourceFactor functional component */
-const ResourceFactor = (props: Props) => {
+const ResourceFactor = (props: ResourceFactorProps) => {
   props = merge({
-    enabled: false,
+    checked: false,
     resource: random.randomResource(),
     onChange: () => {
     },
   }, props);
 
-  const [enabled, setEnabled] = React.useState<boolean>(props.enabled as boolean);
+  const [checked, setChecked] = React.useState<boolean>(props.checked as boolean);
   const [resource, setResource] = React.useState<number>(props.resource as number);
 
   const resourceFactorAttribute = useAppSelector(({environment}) => environment.values?.resourceFactor);
@@ -50,11 +49,9 @@ const ResourceFactor = (props: Props) => {
     const extValue = resourceFactorAttribute ?? null;
 
     if (typeof extValue === 'boolean') {
-      setEnabled(extValue);
-    }
-
-    if (typeof extValue === 'number') {
-      setEnabled(true);
+      setChecked(extValue);
+    } else if (typeof extValue === 'number') {
+      setChecked(true);
       setResource(extValue);
     }
   }, [resourceFactorAttribute]);
@@ -63,59 +60,52 @@ const ResourceFactor = (props: Props) => {
   React.useEffect(() => {
     typeof props.onChange === 'function' && props.onChange(toTemplateText(), resource);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [resource, enabled]);
+  }, [resource, checked]);
 
   /** Generate xml code */
   const toTemplateText = React.useCallback((): string => {
-    return enabled
+    return checked
       ? `<resource_factor value="${resource}"/>`
       : '';
-  }, [resource, enabled]);
+  }, [resource, checked]);
 
   return (
-    <div className={cn('mb-2', {'text-muted': !enabled})}>
-      <Row className="mb-1">
-        <Col xs="10">
-          Resource Factor <code className={cn('pl-2 text-size-xs', {'text-muted': !enabled})}>
-          {resource}
-        </code>
-          <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                  onClick={() => setResource(random.randomResource())}>
-            Random
-          </Button>
-          <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                  onClick={() => setResource(Defaults.RESOURCE_FACTOR_DEFAULT)}>Default</Button>
-          <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                  onClick={() => setResource(Defaults.RESOURCE_FACTOR_MAX)}>Max</Button>
-          <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                  onClick={() => setResource(Defaults.RESOURCE_FACTOR_MIN)}>None</Button>
-          <div className="text-size-xxs text-muted mt-1">
-            The amount of resources in the map. 1 is the default.
-          </div>
-        </Col>
-        <Col xs="2" className="text-right">
-          <Form.Check
-            className="pull-right"
-            type="switch"
-            id={`river-switch-${nanoid(5)}`}
-            label=""
-            checked={enabled}
-            onChange={e => setEnabled(e.target.checked)}
-          />
-        </Col>
-      </Row>
-      <Slider step={0.01}
-              min={0}
-              max={100}
-              disabled={!enabled} value={Number(resource)}
-              onChange={v => setResource(v as number)}/>
+    <div className={cn('mb-2', {'text-muted': !checked})}>
+      <PanelToolbar
+        value={resource}
+        checked={checked}
+        heading="Resource Factor"
+        description="The amount of resources in the map."
+        allowNumberInput
+        numberInputProps={{
+          min: Defaults.RESOURCE_FACTOR_MIN,
+          max: Defaults.RESOURCE_FACTOR_MAX,
+          decimals: 2,
+        }}
+        onCheckboxChange={state => setChecked(state)}
+        onChange={(val: number) => setResource(+val)}
+        allowShuffle
+        onShuffle={() => setResource(random.randomResource(true))}
+        allowMin
+        onMin={() => setResource(Defaults.RESOURCE_FACTOR_MIN)}
+        allowMax
+        onMax={() => setResource(Defaults.RESOURCE_FACTOR_MAX)}
+        allowRestore
+        onRestore={() => setResource(Defaults.RESOURCE_FACTOR_DEFAULT)}
+        disabled={!checked}/>
+      <Slider
+        step={0.01}
+        min={Defaults.RESOURCE_FACTOR_MIN}
+        max={Defaults.RESOURCE_FACTOR_MAX}
+        disabled={!checked} value={Number(resource)}
+        onChange={v => setResource(v as number)}/>
     </div>
   );
 };
 
 // Properties validation
 ResourceFactor.propTypes = {
-  enabled: PropTypes.bool,
+  checked: PropTypes.bool,
   resource: PropTypes.number,
   onChange: PropTypes.func,
 };
