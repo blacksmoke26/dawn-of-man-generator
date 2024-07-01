@@ -94,7 +94,7 @@ const ObjectOverridePrototype = (props: Props) => {
 
   const randomizeAll = (restore: boolean = false): void => {
     if (valuer.is('density.disabled', false)) {
-      valuer.set('density.value', restore ? Defaults.DENSITY_DEFAULT : random.randomDensity());
+      valuer.set('density.value', restore ? Defaults.DENSITY_DEFAULT : random.randomDensity(true));
     }
 
     if (valuer.is('angle.disabled', false)) {
@@ -191,6 +191,7 @@ const ObjectOverridePrototype = (props: Props) => {
           as={Row}
           className={cn('mb-2 checkbox-align', {'text-muted': !isDensityEnabled})}>
           <PropertyCheckboxLabel
+            style={{top: 5}}
             caption="Density:"
             checked={valuer.is<boolean>('density.disabled', false)}
             disabled={!isEnabled}
@@ -203,7 +204,7 @@ const ObjectOverridePrototype = (props: Props) => {
             value={valuer.get('density.value')}
             disabled={!isDensityEnabled}
             onShuffle={() => {
-              valuer.set('density.value', random.randomDensity());
+              valuer.set('density.value', random.randomDensity(true));
             }}
             onRestore={() => {
               valuer.set('density.value', Defaults.DENSITY_DEFAULT);
@@ -223,6 +224,7 @@ const ObjectOverridePrototype = (props: Props) => {
           as={Row}
           className={cn('mb-2 checkbox-align', {'text-muted': !isAltitudeEnabled})}>
           <PropertyCheckboxLabel
+            style={{top: 5}}
             caption="Altitude:"
             checked={valuer.is<boolean>('altitude.disabled', false)}
             disabled={!isEnabled}
@@ -264,6 +266,7 @@ const ObjectOverridePrototype = (props: Props) => {
           as={Row}
           className={cn('mb-2 checkbox-align', {'text-muted': !isAngleEnabled})}>
           <PropertyCheckboxLabel
+            style={{top: 5}}
             caption="Angle:"
             checked={valuer.is<boolean>('angle.disabled', false)}
             disabled={!isEnabled}
@@ -305,6 +308,7 @@ const ObjectOverridePrototype = (props: Props) => {
           as={Row}
           className={cn('mb-2 checkbox-align', {'text-muted': !isHumidityEnabled})}>
           <PropertyCheckboxLabel
+            style={{top: 5}}
             caption="Humidity:"
             checked={valuer.is<boolean>('humidity.disabled', false)}
             disabled={!isEnabled}
