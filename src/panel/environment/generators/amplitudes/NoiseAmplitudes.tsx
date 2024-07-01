@@ -23,15 +23,19 @@ import {
 
 // components
 import FrequencyAttribute from './elements/FrequencyAttribute';
+import PopoverDropdown from '~/components/ui/PopoverDropdown';
 
 // utils
 import {randomFrequencies} from '~/utils/random';
+import presets, {valuesToValueFrequencies} from './utils/presets';
 
 // redux
 import {useAppSelector} from '~redux/hooks';
 
 // types
 import type {$Keys} from 'utility-types';
+import type {NoiseAmplitudes as NoiseAmplitudesType} from '~/types/environment.types';
+import {Scroll} from 'lucide-react';
 
 /** Frequencies type  */
 export interface ValueFrequencies {
@@ -330,6 +334,25 @@ const NoiseAmplitudes = (props: Props) => {
               });
             }}><IconDisabled/> Disable</Button>
         </ButtonGroup>
+        <div className="d-inline-block ml-3">
+          <PopoverDropdown
+            disabled={!enabled}
+            className="text-size-sm"
+            placeholder="Presets"
+            heading="Schwifty Presets"
+            formatLabel={option => (
+              <><Scroll color={COLOR_WHITISH} className="mr-1" width="16"/>{option.label}</>
+            )}
+            onSelect={option => {
+              const params = (presets.find(item => item.id === option.value)?.values || []) as number[];
+              const values = filterEnabledFrequencies<number>(params);
+              setFrequencies((current) => ({...current, ...values}));
+            }}
+            options={presets.map(item =>({
+              label: item.caption,
+              value: item.id,
+            }))}/>
+        </div>
       </div>
     </>
   );

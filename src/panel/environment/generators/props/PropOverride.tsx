@@ -148,7 +148,7 @@ const DetailOverride = (props: Props) => {
           <Tabs
             id="detail-override-tab"
             activeKey={activeKey}
-            className={cn('nav-tabs-bottom mt-1', {'border-0': !total})}
+            className={cn('nav-tabs-bottom mt-1 mb-0', {'border-0': !total})}
             onSelect={k => setActiveKey(k as string)}>
             {Object.keys(templates).map(id => (
               <Tab

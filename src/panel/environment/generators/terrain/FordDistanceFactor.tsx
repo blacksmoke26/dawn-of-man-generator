@@ -33,7 +33,7 @@ export interface FordDistanceFactorProps {
 /** FordDistanceFactor functional component */
 function FordDistanceFactor(props: FordDistanceFactorProps) {
   props = merge({
-    enabled: false,
+    checked: false,
     distance: random.randomFloat(),
     onChange: () => {
     },

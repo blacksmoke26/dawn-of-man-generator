@@ -52,7 +52,7 @@ const FrequencyAttribute = (props: Props = {}) => {
   const numberInputProps = {
     min: 0,
     max: 1,
-    decimals: 3,
+    decimals: 4,
     hideArrow: true,
     disabled: isDisabled,
     title: 'Edit/Change value',
