@@ -52,8 +52,14 @@ export interface Props extends CommonProps {
   /** Use a different component than `span` for display value container */
   as?: string;
 
+  /** Display value element title */
+  title?: string;
+
   /** Display value element classname */
   className?: string;
+
+  /** Display value element styles */
+  style?: React.CSSProperties;
 
   /** A callback fire when input has been changed */
   onChange?(value: number): void;
@@ -111,7 +117,7 @@ const PopoverNumberInput = (props: Props) => {
         <div
           className="pt-1 pb-2 pl-2 pr-2 w-auto d-flex align-items-start"
           style={{minWidth: 250, maxWidth: 250, overflow: 'hidden'}}>
-          <div className="d-inline-block" style={{width: '87.6%'}}>
+          <div className="d-inline-block pt-1" style={{width: '87.6%'}}>
             <NumberInput
               {...props?.inputProps}
               inputProps={{
@@ -130,7 +136,7 @@ const PopoverNumberInput = (props: Props) => {
           </div>
           <LinkButton
             size="sm" variant="secondary"
-            className="radius-left-0 position-relative mt-1"
+            className="radius-left-0 position-relative mt-2"
             style={{marginLeft: '.5rem'}}
             onClick={() => onSaveHandler(hide)}>
             <CircleCheckBig
@@ -141,8 +147,9 @@ const PopoverNumberInput = (props: Props) => {
       )}
       popoverBodyProps={{className: 'p-0 m-0'}}>
       <As
+        title={props?.title}
         className={cn('position-relative', obPath.get(props, 'className', ''))}
-        style={{minHeight: 18}}>
+        style={{minHeight: 18, ...(props?.style || {})}}>
         {formattedValue === undefined ? (props?.placeholder || 0) : formattedValue}
       </As>
     </PopoverButton>
