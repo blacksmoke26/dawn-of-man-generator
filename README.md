@@ -19,13 +19,14 @@ Yeah, it was a hassle 🥴, but here we go again.
 | Version                                              | Status  | EOL | Release    |
 |------------------------------------------------------|---------|-----|------------|
 | [2.x](https://dev--dawn-of-man-mod-gen.netlify.app/) | Nightly | No  | Next       |
-| [2.4](https://dawn-of-man-mod-gen.netlify.app/)      | Current | No  | 2024-06-30 |
-| [2.3](https://2-3--dawn-of-man-mod-gen.netlify.app/) | Beta    | No  | 2024-06-23 |
+| [2.5](https://dawn-of-man-mod-gen.netlify.app/)      | Alpha   | No  | OnGoing    |
+| [2.4](https://2-4--dawn-of-man-mod-gen.netlify.app/) | Beta    | No  | 2024-06-30 |
 
 ### Stalled Versions
 
 | Version                                                       | Status | EOL | Release    |
 |---------------------------------------------------------------|--------|-----|------------|
+| [2.3](https://2-3--dawn-of-man-mod-gen.netlify.app/)          | Beta   | No  | 2024-06-23 |
 | [2.2](https://2-2--dawn-of-man-mod-gen.netlify.app/)          | Beta   | Yes | 2024-06-16 |
 | [2.1](https://2-1--dawn-of-man-mod-gen.netlify.app/)          | Beta   | Yes | 2024-06-13 |
 | [2.0](https://2-0-1-hotfix--dawn-of-man-mod-gen.netlify.app/) | Beta   | Yes | 2024-06-07 |
