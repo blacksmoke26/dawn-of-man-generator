@@ -17,6 +17,7 @@ import {useDebouncedCallback} from 'use-debounce';
 import {COLOR_DISABLED, COLOR_REDDISH, IconEraser, IconRestore, IconShuffle} from '~/components/icons/app';
 
 // utils
+import {decimalToStep} from '~/helpers/number';
 import {handleKeyDownEvent, normalizeNumber} from '~/components/ui/libs/tag-input';
 
 // types
@@ -80,9 +81,6 @@ export interface Props {
   onClear?(): void;
 }
 
-const decimalToStep = (decimal: number): string => {
-  return decimal === 0 ? '1' : `.${''.padStart(decimal - 1, '0')}1`;
-};
 
 /** NumberInput functional component */
 const NumberInput = (props: Props) => {
@@ -114,7 +112,7 @@ const NumberInput = (props: Props) => {
   }, props);
 
   const numberProps = {
-    step: +decimalToStep(newProps.decimals),
+    step: decimalToStep(newProps.decimals),
     min: newProps.min,
     max: newProps.max,
   };

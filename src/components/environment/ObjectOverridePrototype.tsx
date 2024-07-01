@@ -22,7 +22,7 @@ import AttributeValueSlider from '~/components/ui/elements/AttributeValueSlider'
 import useValues from '~/hooks/use-values';
 
 // icons
-import {IconClear, IconRestore, IconShuffle} from '~/components/icons/app';
+import {COLOR_DISABLED, COLOR_ORANGE, IconClear, IconRestore, IconShuffle} from '~/components/icons/app';
 
 // utils
 import * as random from '~/utils/random';
@@ -94,7 +94,7 @@ const ObjectOverridePrototype = (props: Props) => {
 
   const randomizeAll = (restore: boolean = false): void => {
     if (valuer.is('density.disabled', false)) {
-      valuer.set('density.value', restore ? Defaults.DENSITY_DEFAULT : random.randomDensity());
+      valuer.set('density.value', restore ? Defaults.DENSITY_DEFAULT : random.randomDensity(true));
     }
 
     if (valuer.is('angle.disabled', false)) {
@@ -159,7 +159,9 @@ const ObjectOverridePrototype = (props: Props) => {
             title="Restore all values to their defaults"
             onClick={() => randomizeAll(true)}
             style={{top: -7, marginRight: '.85rem'}}>
-            <IconRestore width="14" height="14"/>
+            <IconRestore
+              width="14" height="14"
+              color={newProps.disabled ? COLOR_DISABLED : COLOR_ORANGE}/>
           </LinkButton>
           {' '}
           <Form.Check
@@ -191,6 +193,7 @@ const ObjectOverridePrototype = (props: Props) => {
           as={Row}
           className={cn('mb-2 checkbox-align', {'text-muted': !isDensityEnabled})}>
           <PropertyCheckboxLabel
+            style={{top: 5}}
             caption="Density:"
             checked={valuer.is<boolean>('density.disabled', false)}
             disabled={!isEnabled}
@@ -203,7 +206,7 @@ const ObjectOverridePrototype = (props: Props) => {
             value={valuer.get('density.value')}
             disabled={!isDensityEnabled}
             onShuffle={() => {
-              valuer.set('density.value', random.randomDensity());
+              valuer.set('density.value', random.randomDensity(true));
             }}
             onRestore={() => {
               valuer.set('density.value', Defaults.DENSITY_DEFAULT);
@@ -223,6 +226,7 @@ const ObjectOverridePrototype = (props: Props) => {
           as={Row}
           className={cn('mb-2 checkbox-align', {'text-muted': !isAltitudeEnabled})}>
           <PropertyCheckboxLabel
+            style={{top: 5}}
             caption="Altitude:"
             checked={valuer.is<boolean>('altitude.disabled', false)}
             disabled={!isEnabled}
@@ -264,6 +268,7 @@ const ObjectOverridePrototype = (props: Props) => {
           as={Row}
           className={cn('mb-2 checkbox-align', {'text-muted': !isAngleEnabled})}>
           <PropertyCheckboxLabel
+            style={{top: 5}}
             caption="Angle:"
             checked={valuer.is<boolean>('angle.disabled', false)}
             disabled={!isEnabled}
@@ -279,14 +284,16 @@ const ObjectOverridePrototype = (props: Props) => {
             min={valuer.get('angle.min')}
             max={valuer.get('angle.max')}
             disabled={!isAngleEnabled}
+            allowShuffle
+            allowRestore
             onShuffle={() => {
               const [min, max] = random.randomAngle();
-              valuer.set('angle.disabled', min);
-              valuer.set('angle.disabled', max);
+              valuer.set('angle.min', min);
+              valuer.set('angle.max', max);
             }}
             onRestore={() => {
-              valuer.set('angle.disabled', Defaults.ANGLE_MIN_DEFAULT);
-              valuer.set('angle.disabled', Defaults.ANGLE_MAX_DEFAULT);
+              valuer.set('angle.min', Defaults.ANGLE_MIN_DEFAULT);
+              valuer.set('angle.max', Defaults.ANGLE_MAX_DEFAULT);
             }}
             sliderProps={{
               min: Defaults.ANGLE_MIN,
@@ -305,6 +312,7 @@ const ObjectOverridePrototype = (props: Props) => {
           as={Row}
           className={cn('mb-2 checkbox-align', {'text-muted': !isHumidityEnabled})}>
           <PropertyCheckboxLabel
+            style={{top: 5}}
             caption="Humidity:"
             checked={valuer.is<boolean>('humidity.disabled', false)}
             disabled={!isEnabled}

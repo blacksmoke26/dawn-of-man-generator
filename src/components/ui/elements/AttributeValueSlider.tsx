@@ -13,9 +13,14 @@ import {Col} from 'react-bootstrap';
 // components
 import Slider from '../Slider';
 import LinkButton from '../LinkButton';
+import PopoverNumberInput from '../PopoverNumberInput';
 
 // icons
-import {IconRestore, IconShuffle} from '../../icons/app';
+import {COLOR_DISABLED, COLOR_ORANGE, COLOR_REDDISH, IconRestore, IconShuffle} from '../../icons/app';
+
+// utils
+import {stepToDecimal} from '~/helpers/number';
+import {invokeHandler} from '../../environment/PanelToolbar';
 
 // types
 import type {SliderProps} from 'rc-slider';
@@ -46,6 +51,8 @@ const AttributeValueSlider = (props: Props) => {
     },
     onRestore() {
     },
+    onChange(){
+    },
     sliderProps: {
       min: 1,
       max: 100,
@@ -55,29 +62,37 @@ const AttributeValueSlider = (props: Props) => {
 
   return (
     <Col sm="10">
-      <div>
-        <div className="float-left text-size-xs font-family-code">
-          Value: <code className={cn({'text-muted': newProps.disabled})}>{newProps.value}</code>
-        </div>
-        {(newProps.allowShuffle || newProps.allowRestore) && (
-          <div className="float-right">
-            {newProps.allowShuffle && (
-              <LinkButton
-                disabled={newProps.disabled}
-                onClick={() => newProps.onShuffle()}>
-                <IconShuffle/>
-              </LinkButton>
-            )}
-            {newProps.allowRestore && (
-              <LinkButton
-                disabled={newProps.disabled}
-                onClick={() => newProps.onRestore()}>
-                <IconRestore/>
-              </LinkButton>
-            )}
-          </div>
+      <div className="text-right">
+        <PopoverNumberInput
+          className={cn('text-size-xs position-relative d-inline-block', {'text-underline-dotted': !props?.disabled})}
+          hideArrow
+          disabled={newProps.disabled}
+          title="Edit/Change value"
+          min={newProps?.sliderProps?.min}
+          max={newProps?.sliderProps?.max}
+          decimals={stepToDecimal(newProps?.sliderProps?.step ?? 0)}
+          style={{top: 0, color: COLOR_REDDISH}}
+          value={props?.value ?? 0}
+          onSave={changedValue => invokeHandler(props, 'onChange', changedValue)}
+        />
+        {newProps.allowShuffle && (
+          <LinkButton
+            className="ml-2"
+            disabled={newProps.disabled}
+            onClick={() => newProps.onShuffle()}>
+            <IconShuffle width="13" height="13"/>
+          </LinkButton>
         )}
-        <div className="clearfix"></div>
+        {newProps.allowRestore && (
+          <LinkButton
+            className="ml-2"
+            disabled={newProps.disabled}
+            onClick={() => newProps.onRestore()}>
+            <IconRestore
+              width="13" height="13"
+              color={newProps.disabled ? COLOR_DISABLED : COLOR_ORANGE}/>
+          </LinkButton>
+        )}
       </div>
       <Slider
         disabled={newProps.disabled}
