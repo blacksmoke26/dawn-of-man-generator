@@ -94,8 +94,25 @@ export const randomIntMinMax = (min: number, max: number): number => {
 export const randomFrequency = (): number => Number(randomFloatMod(0, 1).toFixed(3));
 
 /** Random Resource */
-export const randomResource = (): number => {
-  return randomInt(Defaults.RESOURCE_FACTOR_MIN, Defaults.RESOURCE_FACTOR_MAX);
+export const randomResource = (float: boolean = false): number => {
+  return float
+    ? randomFloat(2, Defaults.RESOURCE_FACTOR_MIN, Defaults.RESOURCE_FACTOR_MAX)
+    : randomInt(Defaults.RESOURCE_FACTOR_MIN, Defaults.RESOURCE_FACTOR_MAX);
+};
+export const randomDistanceHeightOffset = (float: boolean = false): number => {
+  return float
+    ? randomFloat(2, Defaults.DISTANCE_HEIGHT_OFFSET_MIN, Defaults.DISTANCE_HEIGHT_OFFSET_MAX)
+    : randomInt(Defaults.DISTANCE_HEIGHT_OFFSET_MIN, Defaults.DISTANCE_HEIGHT_OFFSET_MAX);
+};
+export const randomSunAngleFactor = (float: boolean = false): number => {
+  return float
+    ? randomFloat(2, Defaults.SUN_ANGLE_FACTOR_MIN, Defaults.SUN_ANGLE_FACTOR_MAX)
+    : randomInt(Defaults.SUN_ANGLE_FACTOR_MIN, Defaults.SUN_ANGLE_FACTOR_MAX);
+};
+export const randomFordDistanceFactor = (float: boolean = false): number => {
+  return float
+    ? randomFloat(2, Defaults.FORD_DISTANCE_FACTOR_MIN, Defaults.FORD_DISTANCE_FACTOR_MAX)
+    : randomInt(Defaults.FORD_DISTANCE_FACTOR_MIN, Defaults.FORD_DISTANCE_FACTOR_MAX);
 };
 
 /** Random Density */
