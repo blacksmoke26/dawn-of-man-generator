@@ -10,7 +10,7 @@ import cn from 'classname';
 import {ListGroup} from 'react-bootstrap';
 
 // elemental components
-import PopoverButton from '~/components/ui/PopoverButton';
+import PopoverButton, {CommonProps} from '~/components/ui/PopoverButton';
 
 // icons
 import {CheckIcon} from 'lucide-react';
@@ -19,40 +19,48 @@ export interface Option {
   readonly label: string;
   readonly value: string;
   readonly disabled?: boolean;
+
+  readonly [p: string]: any;
 }
 
-export interface DropdownProps {
+export interface DropdownCommonProps {
   options: Option[];
 
   onSelect?(option: Option): void;
 
   value?: string;
 
+  onHide?(): void;
+
+  formatLabel?(option: Option, action: { selected: boolean }): React.ReactNode;
+}
+
+export interface DropdownProps extends DropdownCommonProps {
+  hasHeading?: boolean;
   onHide(): void;
-
-  formatLabel?(option: Option, action: { selected: boolean }): React.ReactNode;
 }
 
-export interface PopoverDropdownProps {
-  value?: string;
-  options: Option[];
-
-  onSelect?(option: Option): void;
-
-  formatLabel?(option: Option, action: { selected: boolean }): React.ReactNode;
-
-  hideArrow?: boolean;
-  disabled?: boolean;
+export interface PopoverDropdownProps extends DropdownCommonProps, CommonProps {
   heading?: React.ReactNode;
   placeholder?: string;
-  isCovered?: boolean;
+
+  /** Use a different component than `span` for display value container */
+  as?: string;
+
+  /** Display value element classname */
+  className?: string;
+
+  formatText?(label: string): React.ReactNode;
 }
 
 export const Dropdown = (props: DropdownProps) => {
   const hasActiveItem = props?.options?.findIndex(opt => opt.value === props?.value);
 
   return (
-    <ListGroup className="p-0 m-0 ui-popover-dropdown">
+    <ListGroup className={cn(
+      'p-0 m-0 ui-popover-dropdown border-0',
+      {'has-heading': props?.hasHeading},
+    )}>
       {props?.options.map(option => {
         const isSelected = props?.value === option.value;
 
@@ -61,7 +69,12 @@ export const Dropdown = (props: DropdownProps) => {
             active={isSelected}
             key={option.value}
             action href="#"
-            className={cn('pt-1 pb-1', {'icon-padding': hasActiveItem !== -1})}
+            disabled={option?.disabled}
+            className={cn(
+              'pt-1 pb-1',
+              {'icon-padding': hasActiveItem !== -1},
+              {'text-muted-deep': option?.disabled},
+            )}
             onClick={e => {
               e.preventDefault();
               e.stopPropagation();
@@ -86,30 +99,40 @@ export const Dropdown = (props: DropdownProps) => {
 const PopoverDropdown = (props: PopoverDropdownProps) => {
   const selected = props?.options?.find(opt => opt.value === props?.value) || null;
 
+  const As = (props?.as ?? 'span') as unknown as React.FC<any>;
+
+  const formatTextHandler = 'function' === typeof props?.formatText
+    ? props?.formatText
+    : ((value: string): React.ReactNode => value)
+
   return (
     <>
       <PopoverButton
-        disabled={props?.disabled}
-        isCovered={props?.isCovered}
-        hideArrow={props?.hideArrow}
+        disabled={props?.disabled ?? false}
+        isCovered={props?.isCovered ?? false}
+        hideArrow={props?.hideArrow ?? false}
         popoverHeader={props?.heading}
+        popoverHeaderProps={{
+          as: 'h6',
+          className: 'text-size-xxs pt-2 pl-2 pr-2',
+        }}
         popoverBody={({hide}) => (
           <Dropdown
+            hasHeading={!!props?.heading}
             onSelect={props?.onSelect}
             formatLabel={props?.formatLabel}
             value={props?.value}
             onHide={() => hide()}
             options={props?.options}/>
         )}
-        popoverBodyProps={{className: 'p-0 m-0'}}
-      >
-        <span
-          className="position-relative"
+        popoverBodyProps={{className: 'p-0 m-0'}}>
+        <As
+          className={cn('position-relative', props?.className)}
           style={{minHeight: 18}}>
           {selected === null
-            ? (props?.placeholder ?? 'None')
-            : selected?.label}
-        </span>
+            ? formatTextHandler(props?.placeholder ?? 'None')
+            : formatTextHandler(selected?.label)}
+        </As>
       </PopoverButton>
     </>
   );

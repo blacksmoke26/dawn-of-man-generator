@@ -7,12 +7,11 @@
 import React from 'react';
 import * as PropTypes from 'prop-types';
 import cn from 'classname';
-import {nanoid} from 'nanoid';
 import merge from 'deepmerge';
-import {Button, Col, Form, Row} from 'react-bootstrap';
 
-// Components
+// elemental components
 import Slider from '~/components/ui/Slider';
+import PanelToolbar from '~/components/environment/PanelToolbar';
 
 // Utils
 import * as random from '~/utils/random';
@@ -24,15 +23,15 @@ import {useAppSelector} from '~redux/hooks';
 /**
  * FordDistanceFactor `props` type
  */
-export interface Props {
-  enabled?: boolean;
+export interface FordDistanceFactorProps {
+  checked?: boolean;
   distance?: number;
 
   onChange?(template: string, value: number): void;
 }
 
 /** FordDistanceFactor functional component */
-function FordDistanceFactor(props: Props) {
+function FordDistanceFactor(props: FordDistanceFactorProps) {
   props = merge({
     enabled: false,
     distance: random.randomFloat(),
@@ -40,7 +39,7 @@ function FordDistanceFactor(props: Props) {
     },
   }, props);
 
-  const [enabled, setEnabled] = React.useState<boolean>(props.enabled as boolean);
+  const [checked, setChecked] = React.useState<boolean>(props.checked as boolean);
   const [distance, setDistance] = React.useState<number>(props.distance as number);
 
   const fordDistanceFactorAttribute = useAppSelector(({environment}) => environment.values?.fordDistanceFactor);
@@ -50,11 +49,11 @@ function FordDistanceFactor(props: Props) {
     const extValue = fordDistanceFactorAttribute ?? null;
 
     if (typeof extValue === 'boolean') {
-      setEnabled(extValue);
+      setChecked(extValue);
     }
 
     if (typeof extValue === 'number') {
-      setEnabled(true);
+      setChecked(true);
       setDistance(extValue);
     }
   }, [fordDistanceFactorAttribute]);
@@ -63,51 +62,43 @@ function FordDistanceFactor(props: Props) {
   React.useEffect(() => {
     typeof props.onChange === 'function' && props.onChange(toTemplateText(), distance);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [distance, enabled]);
+  }, [distance, checked]);
 
   /** Generate xml code */
   const toTemplateText = React.useCallback((): string => {
-    return enabled
+    return checked
       ? `<ford_distance_factor value="${distance}"/>`
       : '';
-  }, [distance, enabled]);
+  }, [distance, checked]);
 
   return (
-    <div className={cn('mb-2', {'text-muted': !enabled})}>
-      <Row className="mb-1">
-        <Col xs="10">
-          Ford Distance Factor <code className={cn('pl-2 text-size-xs', {'text-muted': !enabled})}>
-          {distance}
-        </code>
-          <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                  onClick={() => setDistance(random.randomFloat())}>
-            Random
-          </Button>
-          <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                  onClick={() => setDistance(Defaults.FORD_DISTANCE_FACTOR_MIN)}>Max</Button>
-          <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                  onClick={() => setDistance(Defaults.FORD_DISTANCE_FACTOR_MAX)}>Max</Button>
-          <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                  onClick={() => setDistance(Defaults.FORD_DISTANCE_FACTOR_DEFAULT)}>Reset</Button>
-          <div className="text-size-xxs text-muted mt-1">
-            The average distance between river fords, 1.0 is the default.
-          </div>
-        </Col>
-        <Col xs="2" className="text-right">
-          <Form.Check
-            className="pull-right"
-            type="switch"
-            id={`river-switch-${nanoid(5)}`}
-            label=""
-            checked={enabled}
-            onChange={e => setEnabled(e.target.checked)}
-          />
-        </Col>
-      </Row>
+    <div className={cn('mb-2', {'text-muted': !checked})}>
+      <PanelToolbar
+        value={distance}
+        checked={checked}
+        heading="Ford Distance Factor"
+        description="The average distance between river fords"
+        allowNumberInput
+        numberInputProps={{
+          min: Defaults.FORD_DISTANCE_FACTOR_MIN,
+          max: Defaults.FORD_DISTANCE_FACTOR_MAX,
+          decimals: 2,
+        }}
+        onCheckboxChange={state => setChecked(state)}
+        onChange={(val: number) => setDistance(+val)}
+        allowShuffle
+        onShuffle={() => setDistance(random.randomFordDistanceFactor(true))}
+        allowMin
+        onMin={() => setDistance(Defaults.FORD_DISTANCE_FACTOR_MIN)}
+        allowMax
+        onMax={() => setDistance(Defaults.FORD_DISTANCE_FACTOR_MAX)}
+        allowRestore
+        onRestore={() => setDistance(Defaults.FORD_DISTANCE_FACTOR_DEFAULT)}
+        disabled={!checked}/>
       <Slider
         min={Defaults.FORD_DISTANCE_FACTOR_MIN}
         max={Defaults.FORD_DISTANCE_FACTOR_MAX}
-        step={0.01} disabled={!enabled} value={distance}
+        step={0.01} disabled={!checked} value={distance}
         onChange={v => setDistance(v as number)}/>
     </div>
   );
@@ -115,8 +106,8 @@ function FordDistanceFactor(props: Props) {
 
 // Default properties
 FordDistanceFactor.propTypes = {
+  checked: PropTypes.bool,
   distance: PropTypes.number,
-  enabled: PropTypes.bool,
   onChange: PropTypes.func,
 };
 

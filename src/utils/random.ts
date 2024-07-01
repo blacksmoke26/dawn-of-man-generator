@@ -94,13 +94,32 @@ export const randomIntMinMax = (min: number, max: number): number => {
 export const randomFrequency = (): number => Number(randomFloatMod(0, 1).toFixed(3));
 
 /** Random Resource */
-export const randomResource = (): number => {
-  return randomInt(Defaults.RESOURCE_FACTOR_MIN, Defaults.RESOURCE_FACTOR_MAX);
+export const randomResource = (float: boolean = false): number => {
+  return float
+    ? randomFloat(2, Defaults.RESOURCE_FACTOR_MIN, Defaults.RESOURCE_FACTOR_MAX)
+    : randomInt(Defaults.RESOURCE_FACTOR_MIN, Defaults.RESOURCE_FACTOR_MAX);
+};
+export const randomDistanceHeightOffset = (float: boolean = false): number => {
+  return float
+    ? randomFloat(2, Defaults.DISTANCE_HEIGHT_OFFSET_MIN, Defaults.DISTANCE_HEIGHT_OFFSET_MAX)
+    : randomInt(Defaults.DISTANCE_HEIGHT_OFFSET_MIN, Defaults.DISTANCE_HEIGHT_OFFSET_MAX);
+};
+export const randomSunAngleFactor = (float: boolean = false): number => {
+  return float
+    ? randomFloat(2, Defaults.SUN_ANGLE_FACTOR_MIN, Defaults.SUN_ANGLE_FACTOR_MAX)
+    : randomInt(Defaults.SUN_ANGLE_FACTOR_MIN, Defaults.SUN_ANGLE_FACTOR_MAX);
+};
+export const randomFordDistanceFactor = (float: boolean = false): number => {
+  return float
+    ? randomFloat(2, Defaults.FORD_DISTANCE_FACTOR_MIN, Defaults.FORD_DISTANCE_FACTOR_MAX)
+    : randomInt(Defaults.FORD_DISTANCE_FACTOR_MIN, Defaults.FORD_DISTANCE_FACTOR_MAX);
 };
 
 /** Random Density */
-export const randomDensity = (fraction: number = 2): number => {
-  return +Number(randomFloatMod(Defaults.DENSITY_MIN, Defaults.DENSITY_MAX)).toFixed(fraction);
+export const randomDensity = (float: boolean = false): number => {
+  return float
+    ? randomFloat(2, Defaults.DENSITY_MIN, Defaults.DENSITY_MAX)
+    : randomInt(Defaults.DENSITY_MIN, Defaults.DENSITY_MAX);
 };
 
 /** Random Angle */
@@ -169,9 +188,11 @@ export const randomFrequencies = (value: number | null | undefined = undefined):
 };
 
 /** Random Deposits */
-export const randomDeposits = <T = string>(counts: number = 2): T[] => {
+export const randomDeposits = <T = string>(counts: number = 0): T[] => {
   const rand: Function = uniqueRandomArray(deposits);
   const list: T[] = [];
+
+  counts = !counts ? randomInt(1, deposits.length) : counts;
 
   for (let i = 1; i <= counts; i++) {
     list.push(rand());
@@ -181,9 +202,11 @@ export const randomDeposits = <T = string>(counts: number = 2): T[] => {
 };
 
 /** Random Trees */
-export const randomTrees = <T = string>(counts: number = 5): T[] => {
+export const randomTrees = <T = string>(counts: number = 0): T[] => {
   const rand: Function = uniqueRandomArray(trees) as RandomArrayFunc<T>;
   const list: T[] = [];
+
+  counts = !counts ? randomInt(1, trees.length) : counts;
 
   for (let i = 1; i <= counts; i++) {
     list.push(rand());

@@ -16,6 +16,9 @@ import {useDebouncedCallback} from 'use-debounce';
 // icons
 import {COLOR_DISABLED, COLOR_REDDISH, IconEraser, IconRestore, IconShuffle} from '~/components/icons/app';
 
+// utils
+import {handleKeyDownEvent, normalizeNumber} from '~/components/ui/libs/tag-input';
+
 // types
 import type {Required} from 'utility-types';
 import type {FormControlProps} from 'react-bootstrap';
@@ -61,6 +64,8 @@ export interface Props {
   allowClear?: boolean;
   /** Display restore icon button */
   allowRestore?: boolean;
+  /** Allow focus input on mount */
+  allowFocus?: boolean;
 
   /** A callback fire when input has been changed */
   onChange?(value: string | number): void;
@@ -74,22 +79,6 @@ export interface Props {
   /** A callback fire when clicked on `clear` icon button */
   onClear?(): void;
 }
-
-const sanitizeInput = (value: string, decimal: number = 0): string => {
-  if (value === '') {
-    return value;
-  }
-
-  if (decimal === 0) {
-    return String(value).replace(/\D+/, '');
-  }
-
-  if (value.replace(/^\d+,/, '').length > decimal) {
-    value = Number(value).toFixed(decimal);
-  }
-
-  return value.replace('.0', '');
-};
 
 const decimalToStep = (decimal: number): string => {
   return decimal === 0 ? '1' : `.${''.padStart(decimal - 1, '0')}1`;
@@ -113,7 +102,7 @@ const NumberInput = (props: Props) => {
     min: 0,
     max: 100,
     maxLength: 3,
-    placeholder: 'e.g., 150',
+    placeholder: '',
     inputProps: {},
     onChange() {
     },
@@ -123,6 +112,16 @@ const NumberInput = (props: Props) => {
     },
     onClear: undefined,
   }, props);
+
+  const numberProps = {
+    step: +decimalToStep(newProps.decimals),
+    min: newProps.min,
+    max: newProps.max,
+  };
+
+  React.useEffect(() => {
+    props?.allowFocus && inputRef.current?.focus();
+  }, [props?.allowFocus])
 
   const debounced = useDebouncedCallback(
     // function
@@ -149,31 +148,14 @@ const NumberInput = (props: Props) => {
           maxLength={newProps.maxLength}
           title={newProps?.tooltip}
           disabled={newProps.disabled}
-          max={newProps.max}
           aria-disabled={newProps.disabled}
           id={`number-${nanoid(5)}`}
           placeholder={newProps.placeholder}
           value={newProps.value}
           ref={inputRef}
           step={decimalToStep(newProps.decimals)}
-          onChange={e => {
-            let value = sanitizeInput(e.currentTarget.value, newProps.decimals)
-              || (newProps.allowClear ? '' : newProps.min);
-
-            if (Number(value) > newProps.max) {
-              value = newProps.max.toString();
-            }
-            debounced(value);
-          }}
-          onKeyUp={e => {
-            // @ts-ignore
-            e.currentTarget.value = sanitizeInput(e.currentTarget.value, newProps.decimals)
-              || (newProps.allowClear ? '' : newProps.min);
-
-            if (Number(e.currentTarget.value) > newProps.max) {
-              e.currentTarget.value = newProps.max.toString();
-            }
-          }}
+          onChange={e => debounced(normalizeNumber(e.currentTarget.value, numberProps))}
+          onKeyUp={e => handleKeyDownEvent(e as unknown as any, numberProps)}
           {...newProps.inputProps}
         />
         {/*</editor-fold>*/}

@@ -148,6 +148,15 @@
     padding: 0 .625rem 0 .625rem !important;
 }
 
+.radius-left-0 {
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+}
+
+.radius-right-0 {
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+}
 
 .ui-input-group-text-after {
     border-top-left-radius: 0 !important;
@@ -157,6 +166,10 @@
 
 .ui-input-group-text-before.disabled, .ui-input-group-text-after.disabled {
     background: rgba(255, 255, 255, .05);
+}
+
+.ui-popover-dropdown.has-heading > .list-group-item:first-of-type {
+    margin-top: .32rem;
 }
 
 .ui-popover-dropdown > .list-group-item:first-of-type {
@@ -197,3 +210,5 @@
     background-color: #373f4c;
     color: #d9d9d9;
 }
+
+.text-underline-dotted { text-decoration: underline dotted; }

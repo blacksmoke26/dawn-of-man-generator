@@ -7,11 +7,11 @@
 import React from 'react';
 import * as PropTypes from 'prop-types';
 import cn from 'classname';
-import {nanoid} from 'nanoid';
-import {Button, Col, Form, Row} from 'react-bootstrap';
+import merge from 'deepmerge';
 
-// components
+// elemental components
 import Slider from '~/components/ui/Slider';
+import PanelToolbar from '~/components/environment/PanelToolbar';
 
 // utils
 import * as random from '~/utils/random';
@@ -19,23 +19,22 @@ import * as Defaults from '~/utils/defaults';
 
 // redux
 import {useAppSelector} from '~redux/hooks';
-import merge from 'deepmerge';
 
-export interface Props {
-	enabled?: boolean,
+export interface GlobalTreeDensityProps {
+	checked?: boolean,
 
 	onChange(template: string, value: number): void,
 }
 
 /** GlobalTreeDensity functional component */
-const GlobalTreeDensity = ( props: Props ) => {
+const GlobalTreeDensity = ( props: GlobalTreeDensityProps ) => {
 	props = merge({
 		enabled: false,
 		onChange: () => {},
 	}, props);
 
 	const [value, setValue] = React.useState<number>(random.randomDensity());
-	const [enabled, setEnabled] = React.useState<boolean>(props.enabled as boolean);
+	const [checked, setChecked] = React.useState<boolean>(props.checked as boolean);
 
 	const globalTreeDensityAttribute = useAppSelector(({environment}) => environment.values?.globalTreeDensity);
 
@@ -44,11 +43,9 @@ const GlobalTreeDensity = ( props: Props ) => {
 		const extValue = globalTreeDensityAttribute ?? null;
 
 		if ( typeof extValue === 'boolean' ) {
-			setEnabled(extValue);
-		}
-
-		if ( typeof extValue === 'number' ) {
-			setEnabled(true);
+			setChecked(extValue);
+		} else if ( typeof extValue === 'number' ) {
+			setChecked(true);
 			setValue(extValue);
 		}
 	}, [globalTreeDensityAttribute]);
@@ -57,52 +54,42 @@ const GlobalTreeDensity = ( props: Props ) => {
 	React.useEffect(() => {
 		typeof props.onChange === 'function' && props.onChange(toTemplateText(), value);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [value, enabled]);
+	}, [value, checked]);
 
 	/** Generate xml code */
 	const toTemplateText = (): string => {
-		return enabled
+		return checked
 			? `<global_tree_density value="${value}"/>`
 			: '';
 	}
 
 	return (
-    <div className={cn('mb-2', {'text-muted': !enabled})}>
-      <Row style={{marginBottom: 7}}>
-        <Col xs="6">
-          <span
-            style={{textDecoration: 'underline dotted'}}
-            title="The global tree density in the environment.">
-            Global Tree Density
-          </span>
-        </Col>
-        <Col xs="6" className="text-right">
-          <Form.Check
-            type="switch"
-            id={`global_tree_density-switch-${nanoid(5)}`}
-            label=""
-            onChange={e => setEnabled(Boolean(e.target.checked))}
-          />
-        </Col>
-      </Row>
-      <span className="text-size-xs font-family-code">Value: <code className={cn({'text-muted': !enabled})}>{value}</code></span>
-      <Button
-        disabled={!enabled} className="button-reset-sm" variant="link"
-        onClick={() => setValue(random.randomDensity())}>
-        Random
-      </Button>
-      <Button
-        disabled={!enabled} className="button-reset-sm" variant="link"
-        onClick={() => setValue(Defaults.DENSITY_DEFAULT)}>
-        Default
-      </Button>
-      <Button
-        disabled={!enabled} className="button-reset-sm" variant="link"
-        onClick={() => setValue(Defaults.DENSITY_MIN)}>
-        None
-      </Button>
+    <div className={cn('mb-2', {'text-muted': !checked})}>
+			<PanelToolbar
+        value={+value}
+        checked={checked}
+        heading="Global Tree Density"
+        description="The global tree density in the environment."
+        allowNumberInput
+        numberInputProps={{
+          min: Defaults.DENSITY_MIN,
+          max: Defaults.DENSITY_MAX,
+          decimals: 2,
+        }}
+        onCheckboxChange={state => setChecked(state)}
+        onChange={(val: number) => setValue(+val)}
+        allowShuffle
+        onShuffle={() => setValue(random.randomDensity(true))}
+        allowMin
+        onMin={() => setValue(Defaults.DENSITY_MIN)}
+        allowMax
+        onMax={() => setValue(Defaults.DENSITY_MAX)}
+        allowRestore
+        onRestore={() => setValue(Defaults.DENSITY_DEFAULT)}
+        disabled={!checked}/>
+
       <Slider
-        step={0.01} disabled={!enabled} min={Defaults.DENSITY_MIN} max={Defaults.DENSITY_MAX}
+        step={0.01} disabled={!checked} min={Defaults.DENSITY_MIN} max={Defaults.DENSITY_MAX}
         value={Number(value)} onChange={v => setValue(v as number)}/>
     </div>
   );
@@ -110,7 +97,7 @@ const GlobalTreeDensity = ( props: Props ) => {
 
 // Properties validation
 GlobalTreeDensity.propTypes = {
-  enabled: PropTypes.bool,
+  checked: PropTypes.bool,
   onChange: PropTypes.func,
 };
 

@@ -6,13 +6,12 @@
 
 import React from 'react';
 import * as PropTypes from 'prop-types';
-import {Button, Col, Form, Row} from 'react-bootstrap';
-import {nanoid} from 'nanoid';
 import cn from 'classname';
 import merge from 'deepmerge';
 
-// Components
+// elemental components
 import Slider from '~/components/ui/Slider';
+import PanelToolbar from '~/components/environment/PanelToolbar';
 
 // Utils
 import * as random from '~/utils/random';
@@ -24,23 +23,23 @@ import {useAppSelector} from '~redux/hooks';
 /**
  * SunAngleFactor `props` type
  */
-export interface Props {
-  enabled?: boolean;
+export interface SunAngleFactorProps {
+  checked?: boolean;
   angle?: number;
 
   onChange?(template: string, value: number): void;
-};
+}
 
 /** SunAngleFactor functional component */
-const SunAngleFactor = (props: Props) => {
+const SunAngleFactor = (props: SunAngleFactorProps) => {
   props = merge({
-    enabled: false,
-    angle: random.randomFloat(),
+    checked: false,
+    angle: random.randomSunAngleFactor(),
     onChange: () => {
     },
   }, props);
 
-  const [enabled, setEnabled] = React.useState<boolean>(props.enabled as boolean);
+  const [checked, setChecked] = React.useState<boolean>(props.checked as boolean);
   const [angle, setAngle] = React.useState<number>(props.angle as number);
 
   const sunAngleFactorAttribute = useAppSelector(({environment}) => environment.values?.sunAngleFactor);
@@ -50,11 +49,9 @@ const SunAngleFactor = (props: Props) => {
     const extValue = sunAngleFactorAttribute ?? null;
 
     if (typeof extValue === 'boolean') {
-      setEnabled(extValue);
-    }
-
-    if (typeof extValue === 'number') {
-      setEnabled(true);
+      setChecked(extValue);
+    } else if (typeof extValue === 'number') {
+      setChecked(true);
       setAngle(extValue);
     }
   }, [sunAngleFactorAttribute]);
@@ -63,57 +60,52 @@ const SunAngleFactor = (props: Props) => {
   React.useEffect(() => {
     typeof props.onChange === 'function' && props.onChange(toTemplateText(), angle);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [angle, enabled]);
+  }, [angle, checked]);
 
   /** Generate xml code */
   const toTemplateText = React.useCallback((): string => {
-    return enabled
+    return checked
       ? `<sun_angle_factor value="${angle}"/>`
       : '';
-  }, [angle, enabled]);
+  }, [angle, checked]);
 
   return (
-    <div className={cn('mb-2', {'text-muted': !enabled})}>
-      <Row className="mb-1">
-        <Col xs="10">
-          Sun Angle Factor <code className={cn('pl-2 text-size-xs', {'text-muted': !enabled})}>
-          {angle}
-        </code>
-          <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                  onClick={() => setAngle(random.randomFloat())}>Random</Button>
-          <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                  onClick={() => setAngle(Defaults.SUN_ANGLE_FACTOR_MIN)}>Min</Button>
-          <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                  onClick={() => setAngle(Defaults.SUN_ANGLE_FACTOR_MAX)}>Max</Button>
-          <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                  onClick={() => setAngle(Defaults.SUN_ANGLE_FACTOR_DEFAULT)}>Reset</Button>
-          <div className="text-size-xxs text-muted mt-1">
-            How high is the sun in the sky, 1.0 is the default.
-          </div>
-        </Col>
-        <Col xs="2" className="text-right">
-          <Form.Check
-            className="pull-right"
-            type="switch"
-            id={`river-switch-${nanoid(5)}`}
-            label=""
-            checked={enabled}
-            onChange={e => setEnabled(e.target.checked)}
-          />
-        </Col>
-      </Row>
+    <div className={cn('mb-2', {'text-muted': !checked})}>
+      <PanelToolbar
+        value={angle}
+        checked={checked}
+        heading="Sun Angle Factor"
+        description="How high is the sun in the sky"
+        allowNumberInput
+        numberInputProps={{
+          min: Defaults.SUN_ANGLE_FACTOR_MIN,
+          max: Defaults.SUN_ANGLE_FACTOR_MAX,
+          decimals: 2,
+        }}
+        onCheckboxChange={state => setChecked(state)}
+        onChange={(val: number) => setAngle(+val)}
+        allowShuffle
+        onShuffle={() => setAngle(random.randomSunAngleFactor(true))}
+        allowMin
+        onMin={() => setAngle(Defaults.SUN_ANGLE_FACTOR_MIN)}
+        allowMax
+        onMax={() => setAngle(Defaults.SUN_ANGLE_FACTOR_MAX)}
+        allowRestore
+        onRestore={() => setAngle(Defaults.SUN_ANGLE_FACTOR_DEFAULT)}
+        disabled={!checked}/>
       <Slider
         min={Defaults.SUN_ANGLE_FACTOR_MIN}
         max={Defaults.SUN_ANGLE_FACTOR_MAX}
-        step={0.1} disabled={!enabled}
-        value={Number(angle)} onChange={v => setAngle(v as number)}/>
+        step={0.1} disabled={!checked}
+        value={+angle}
+        onChange={v => setAngle(v as number)}/>
     </div>
   );
 };
 
 // Default properties
 SunAngleFactor.propTypes = {
-  enabled: PropTypes.bool,
+  checked: PropTypes.bool,
   angle: PropTypes.number,
   onChange: PropTypes.func,
 };
