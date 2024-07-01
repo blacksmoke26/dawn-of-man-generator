@@ -8,7 +8,6 @@
 
 import React from 'react';
 import * as PropTypes from 'prop-types';
-import cn from 'classname';
 import merge from 'deepmerge';
 import {ButtonGroup} from 'react-bootstrap';
 

@@ -31,7 +31,7 @@ import {updateValuesRaw} from '~redux/slices/environment/reducers';
 import {
   IconRestore, IconShuffle,
   IconFall, IconSpring, IconSummer, IconWinter,
-  COLOR_DISABLED, COLOR_REDDISH, COLOR_WHITISH, COLOR_ORANGE,
+  COLOR_DISABLED, COLOR_WHITISH, COLOR_ORANGE,
 } from '~/components/icons/app';
 
 // types

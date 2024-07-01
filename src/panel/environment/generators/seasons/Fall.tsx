@@ -8,9 +8,8 @@
 
 import React from 'react';
 import * as PropTypes from 'prop-types';
-import cn from 'classname';
 import merge from 'deepmerge';
-import {Button, ButtonGroup, Col, Form, Row} from 'react-bootstrap';
+import {ButtonGroup} from 'react-bootstrap';
 
 // elemental components
 import Range from '~/components/ui/Range';
