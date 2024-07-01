@@ -186,9 +186,11 @@ export const randomFrequencies = (value: number | null | undefined = undefined):
 };
 
 /** Random Deposits */
-export const randomDeposits = <T = string>(counts: number = 2): T[] => {
+export const randomDeposits = <T = string>(counts: number = 0): T[] => {
   const rand: Function = uniqueRandomArray(deposits);
   const list: T[] = [];
+
+  counts = !counts ? randomInt(1, deposits.length) : counts;
 
   for (let i = 1; i <= counts; i++) {
     list.push(rand());
@@ -198,9 +200,11 @@ export const randomDeposits = <T = string>(counts: number = 2): T[] => {
 };
 
 /** Random Trees */
-export const randomTrees = <T = string>(counts: number = 5): T[] => {
+export const randomTrees = <T = string>(counts: number = 0): T[] => {
   const rand: Function = uniqueRandomArray(trees) as RandomArrayFunc<T>;
   const list: T[] = [];
+
+  counts = !counts ? randomInt(1, trees.length) : counts;
 
   for (let i = 1; i <= counts; i++) {
     list.push(rand());
