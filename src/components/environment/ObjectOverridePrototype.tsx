@@ -22,7 +22,7 @@ import AttributeValueSlider from '~/components/ui/elements/AttributeValueSlider'
 import useValues from '~/hooks/use-values';
 
 // icons
-import {IconClear, IconRestore, IconShuffle} from '~/components/icons/app';
+import {COLOR_DISABLED, COLOR_ORANGE, IconClear, IconRestore, IconShuffle} from '~/components/icons/app';
 
 // utils
 import * as random from '~/utils/random';
@@ -159,7 +159,9 @@ const ObjectOverridePrototype = (props: Props) => {
             title="Restore all values to their defaults"
             onClick={() => randomizeAll(true)}
             style={{top: -7, marginRight: '.85rem'}}>
-            <IconRestore width="14" height="14"/>
+            <IconRestore
+              width="14" height="14"
+              color={newProps.disabled ? COLOR_DISABLED : COLOR_ORANGE}/>
           </LinkButton>
           {' '}
           <Form.Check

@@ -16,7 +16,7 @@ import LinkButton from '../LinkButton';
 import PopoverNumberInput from '../PopoverNumberInput';
 
 // icons
-import {COLOR_REDDISH, IconRestore, IconShuffle} from '../../icons/app';
+import {COLOR_DISABLED, COLOR_ORANGE, COLOR_REDDISH, IconRestore, IconShuffle} from '../../icons/app';
 
 // utils
 import {stepToDecimal} from '~/helpers/number';
@@ -88,7 +88,9 @@ const AttributeValueSlider = (props: Props) => {
             className="ml-2"
             disabled={newProps.disabled}
             onClick={() => newProps.onRestore()}>
-            <IconRestore width="13" height="13"/>
+            <IconRestore
+              width="13" height="13"
+              color={newProps.disabled ? COLOR_DISABLED : COLOR_ORANGE}/>
           </LinkButton>
         )}
       </div>
