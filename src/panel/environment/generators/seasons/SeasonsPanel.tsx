@@ -31,7 +31,7 @@ import {updateValuesRaw} from '~redux/slices/environment/reducers';
 import {
   IconRestore, IconShuffle,
   IconFall, IconSpring, IconSummer, IconWinter,
-  COLOR_DISABLED, COLOR_REDDISH, COLOR_WHITISH,
+  COLOR_DISABLED, COLOR_REDDISH, COLOR_WHITISH, COLOR_ORANGE,
 } from '~/components/icons/app';
 
 // types
@@ -127,17 +127,17 @@ const SeasonsPanel = (props: Props) => {
               onClick={() => {
                 dispatch(updateValuesRaw({seasons: seasonsPropsRandomize()}));
               }}>
-              <IconShuffle/> Randomize
+              <IconShuffle/> Randomize All
             </Button>
             <Button
               title="Reset all seasons to their default"
               className="button-reset-sm"
-              style={{color: enabled ? COLOR_REDDISH : COLOR_DISABLED}}
+              style={{color: enabled ? COLOR_WHITISH : COLOR_DISABLED}}
               disabled={!enabled} variant="link" size="sm"
               onClick={() => {
                 dispatch(updateValuesRaw({seasons: seasonsPropsDefault()}));
               }}>
-              <IconRestore/> Restore
+              <IconRestore color={enabled ? COLOR_ORANGE : COLOR_DISABLED}/> Restore All
             </Button>
           </ButtonGroup>
         </ButtonToolbar>

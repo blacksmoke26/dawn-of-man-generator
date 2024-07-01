@@ -116,8 +116,10 @@ export const randomFordDistanceFactor = (float: boolean = false): number => {
 };
 
 /** Random Density */
-export const randomDensity = (fraction: number = 2): number => {
-  return +Number(randomFloatMod(Defaults.DENSITY_MIN, Defaults.DENSITY_MAX)).toFixed(fraction);
+export const randomDensity = (float: boolean = false): number => {
+  return float
+    ? randomFloat(2, Defaults.DENSITY_MIN, Defaults.DENSITY_MAX)
+    : randomInt(Defaults.DENSITY_MIN, Defaults.DENSITY_MAX);
 };
 
 /** Random Angle */

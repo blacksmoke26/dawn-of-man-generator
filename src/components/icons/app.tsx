@@ -67,7 +67,7 @@ export const COLOR_PINK: string = '#ea5589';
 
 export const COLOR_REDDISH: string = '#ff8a65';
 
-export const COLOR_GRAYED: string = 'rgba(255, 255, 255, .4';
+export const COLOR_GRAYED: string = 'rgba(255, 255, 255, .4)';
 
 export const COLORS_MAP = {
   WHITISH: COLOR_WHITISH,

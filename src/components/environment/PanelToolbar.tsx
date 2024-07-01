@@ -66,7 +66,7 @@ interface Props {
 
 export type {Props as PanelToolbarProps};
 
-const invokeHandler = <T extends object = Props>(props: T, func: keyof T, value: unknown | unknown[] = undefined) => {
+export const invokeHandler = <T extends object = Props>(props: T, func: keyof T, value: unknown | unknown[] = undefined) => {
   if (func in props && 'function' === typeof props[func]) {
     const args = value !== undefined ? [].concat(value as any) as any : [];
     (props[func] as Function)(...args);

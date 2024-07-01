@@ -10,22 +10,32 @@ import React from 'react';
 import * as PropTypes from 'prop-types';
 import cn from 'classname';
 import merge from 'deepmerge';
-import {Button, ButtonGroup, Col, Form, Row} from 'react-bootstrap';
+import {ButtonGroup, Form} from 'react-bootstrap';
 
 // elemental components
-import Slider from '~/components/ui/Slider';
 import Range from '~/components/ui/Range';
+import Slider from '~/components/ui/Slider';
+import LinkButton from '~/components/ui/LinkButton';
+import PopoverNumberInput from '~/components/ui/PopoverNumberInput';
+
+// components
+import SeasonAttributeSlider from './elements/SeasonAttributeSlider';
 
 // icons
 import {
-  IconRestore, IconShuffle,
-  COLOR_DISABLED, COLOR_REDDISH, COLOR_WHITISH,
+  COLOR_DISABLED,
+  COLOR_ORANGE,
+  COLOR_REDDISH,
+  COLOR_WHITISH,
+  IconRestore,
+  IconShuffle,
 } from '~/components/icons/app';
 
 // utils
 import * as random from '~/utils/random';
 import * as Defaults from '~/utils/defaults';
 import {isObject} from '~/helpers/object';
+import {temperatureNumberInputProps} from './utils/params';
 import {normalizeSummer, randomizeSummer, seasonsPropsDefault, SummerConfig} from '~/utils/seasons';
 
 // redux
@@ -125,196 +135,185 @@ const Summer = (props: Props) => {
   };
 
   return (
-    <div className="ml-1 pt-3" style={{minHeight: 350}}>
-      <Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled})}>
-        <Form.Label column={true} sm="2">
-					<span style={{textDecoration: 'underline dotted'}}
-                title="How long this season is, in terms of a fraction of a
-						year, all season durations have to add up to 1.">
-						Duration
-					</span>
-        </Form.Label>
-        <Col sm="10">
-          <code className={cn('text-size-xs', {'text-muted': !enabled})}>{season.duration}</code>
-          <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                  onClick={() => updateValue('duration', random.randomFloat())}>Random</Button>
-          <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                  onClick={() => updateValue('duration', SummerConfig.duration)}>Default</Button>
-          <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                  onClick={() => updateValue('duration', 0)}>%</Button>
-          <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                  onClick={() => updateValue('duration', 0.25)}>25%</Button>
-          <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                  onClick={() => updateValue('duration', 0.50)}>50%</Button>
-          <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                  onClick={() => updateValue('duration', 0.75)}>75%</Button>
-          <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                  onClick={() => updateValue('duration', 1)}>100%</Button>
-          <Slider
-            disabled={!enabled}
-            min={0} max={1} step={0.01}
-            value={season.duration}
-            onChange={v => updateValue('duration', v)}/>
-        </Col>
-      </Form.Group>
-      <Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled})}>
-        <Form.Label column={true} sm="2">
-					<span style={{textDecoration: 'underline dotted'}}
-                title="How likely it is to rain/snow in this season.">
-						Precipitation Chance
-					</span>
-        </Form.Label>
-        <Col sm="10">
-          <code className={cn('text-size-xs', {'text-muted': !enabled})}>{season.precipitationChance}</code>
-          <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                  onClick={() => updateValue('precipitationChance', random.randomFloat())}>Random</Button>
-          <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                  onClick={() => updateValue('precipitationChance', SummerConfig.precipitation_chance)}>Default</Button>
-          <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                  onClick={() => updateValue('precipitationChance', 0)}>0%</Button>
-          <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                  onClick={() => updateValue('precipitationChance', 0.25)}>25%</Button>
-          <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                  onClick={() => updateValue('precipitationChance', 0.50)}>50%</Button>
-          <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                  onClick={() => updateValue('precipitationChance', 0.75)}>75%</Button>
-          <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                  onClick={() => updateValue('precipitationChance', 1)}>100%</Button>
-          <Slider
-            disabled={!enabled}
-            min={0} max={1} step={0.01}
-            value={season.precipitationChance}
-            onChange={v => updateValue('precipitationChance', v)}/>
-        </Col>
-      </Form.Group>
-      <Form.Group as={Row} className={cn('mb-2', {'text-muted': !isWindEnabled})}>
-        <Form.Label column={true} sm="2">
+    <div className="ml-1 pt-3" style={{minHeight: 351}}>
+      <SeasonAttributeSlider
+        disabled={!enabled}
+        value={season.duration}
+        onChange={val => updateValue('duration', val)}
+        allowNumberInput
+        caption="Duration"
+        title="How long this season is, in terms of a fraction of a
+						year, all season durations have to add up to 1."
+        allowRestore allowShuffle allowMin allowMax
+        onShuffle={() => updateValue('duration', random.randomFloat())}
+        onRestore={() => updateValue('duration', SummerConfig.duration)}>
+        <Slider
+          disabled={!enabled}
+          min={0} max={1} step={0.01}
+          value={season.duration}
+          onChange={v => updateValue('duration', v)}/>
+      </SeasonAttributeSlider>
+
+      <SeasonAttributeSlider
+        disabled={!enabled}
+        value={season.precipitationChance}
+        onChange={val => updateValue('precipitationChance', val)}
+        allowNumberInput
+        caption="Precipitation Chance"
+        title="How likely it is to rain/snow in this season."
+        allowRestore allowShuffle allowMin allowMax
+        onShuffle={() => updateValue('precipitationChance', random.randomFloat())}
+        onRestore={() => updateValue('precipitationChance', SummerConfig.precipitation_chance)}>
+        <Slider
+          disabled={!enabled}
+          min={0} max={1} step={0.01}
+          value={season.precipitationChance}
+          onChange={v => updateValue('precipitationChance', v)}/>
+      </SeasonAttributeSlider>
+
+      <SeasonAttributeSlider
+        disabled={!isWindEnabled}
+        displayValue={() => (
+          <>
+            <PopoverNumberInput
+              {...temperatureNumberInputProps(enabled)}
+              min={Defaults.SEASON_WIND_MIN}
+              max={25}
+              value={season.minWind as number}
+              onSave={value => updateValue('minWind', value)}/>
+            <strong style={{marginRight: 5, marginLeft: 3, color: COLOR_WHITISH}}>,</strong>
+            <PopoverNumberInput
+              {...temperatureNumberInputProps(enabled)}
+              min={26}
+              max={Defaults.SEASON_TEMPERATURE_MAX}
+              value={season.maxWind as number}
+              onSave={value => updateValue('maxWind', value)}/>
+          </>
+        )}
+        caption={(
           <Form.Check
             disabled={!enabled}
             className="text-size-xs"
             type="switch"
             id={`switch-seasons-wind-enabled`}
-            label={<span style={{textDecoration: 'underline dotted'}}
-                         title="The speed of wind between a range">
-              Wind:
-            </span>}
+            label="Wind Speed"
             checked={windEnabled}
             onChange={e => setWindEnabled(e.target.checked)}
           />
-        </Form.Label>
-        <Col sm="10">
-					<span className="text-size-xs font-family-code">
-						Min: <code className={cn({'text-muted': !isWindEnabled})}>{season.minWind}</code>
-            {' / '}
-            Max: <code className={cn({'text-muted': !isWindEnabled})}>{season.maxWind}</code>
-					</span>
-          <Button disabled={!isWindEnabled} className="button-reset-sm" variant="link"
-                  onClick={() => {
-                    const [min, max] = random.randomSeasonWind();
-                    updateValue('minWind', min);
-                    updateValue('maxWind', max);
-                  }}>Random</Button>
-          <Button disabled={!isWindEnabled} className="button-reset-sm" variant="link"
-                  onClick={() => {
-                    updateValue('minWind', SummerConfig.min_wind);
-                    updateValue('maxWind', SummerConfig.max_wind);
-                  }}>Default</Button>
-          <Range
-            min={Defaults.SEASON_WIND_MIN}
-            max={Defaults.SEASON_WIND_MAX}
-            step={0}
-            disabled={!isWindEnabled}
-            value={[season.minWind as number, season.maxWind as number]}
-            onChange={value => {
-              const [min, max] = value as number[];
-              updateValue('minWind', min);
-              updateValue('maxWind', max);
-            }}/>
-        </Col>
-      </Form.Group>
-      <Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled})}>
-        <Form.Label column={true} sm="2">
-					<span style={{textDecoration: 'underline dotted'}}
-                title="How likely it is for it to be windy in this season.">
-						Windy Chance
-					</span>
-        </Form.Label>
-        <Col sm="10">
-          <code className={cn('text-size-xs', {'text-muted': !enabled})}>{season.windyChance}</code>
-          <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                  onClick={() => updateValue('windyChance', random.randomFloat())}>Random</Button>
-          <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                  onClick={() => updateValue('windyChance', SummerConfig.windy_chance)}>Default</Button>
-          <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                  onClick={() => updateValue('windyChance', 0.0)}>0%</Button>
-          <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                  onClick={() => updateValue('windyChance', 0.25)}>25%</Button>
-          <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                  onClick={() => updateValue('windyChance', 0.50)}>50%</Button>
-          <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                  onClick={() => updateValue('windyChance', 0.75)}>75%</Button>
-          <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                  onClick={() => updateValue('windyChance', 1.0)}>100%</Button>
-          <Slider
-            disabled={!enabled}
-            min={0} max={1} step={0.01}
-            value={season.windyChance}
-            onChange={v => updateValue('windyChance', v)}/>
-        </Col>
-      </Form.Group>
-      <Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled})}>
-        <Form.Label column={true} sm="2">
-					<span style={{textDecoration: 'underline dotted'}}
-                title="Temperature will randomly oscillate between these 2 values (in Celsius)">
-						Temperature
-					</span>
-        </Form.Label>
-        <Col sm="10">
-					<span className="text-size-xs font-family-code">
-						Min: <code className={cn({'text-muted': !enabled})}>{season.minTemperatureValue}°</code>
-            {' / '}
-            Max: <code className={cn({'text-muted': !enabled})}>{season.maxTemperatureValue}°</code>
-					</span>
-          <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                  onClick={() => {
-                    const [min, max] = random.randomSeasonTemperature();
-                    updateValue('minTemperatureValue', min);
-                    updateValue('maxTemperatureValue', max);
-                  }}>Random</Button>
-          <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                  onClick={() => {
-                    updateValue('minTemperatureValue', SummerConfig.min_temperature.value);
-                    updateValue('maxTemperatureValue', SummerConfig.max_temperature.value);
-                  }}>Default</Button>
-          <Range
-            min={Defaults.SEASON_TEMPERATURE_MIN}
-            max={Defaults.SEASON_TEMPERATURE_MAX}
-            disabled={!enabled}
-            step={0}
-            value={[season.minTemperatureValue as number, season.maxTemperatureValue as number]}
-            onChange={value => {
-              const [min, max] = value as number[];
-              updateValue('minTemperatureValue', min);
-              updateValue('maxTemperatureValue', max);
-            }}/>
-        </Col>
-      </Form.Group>
-      <div className="mt-3">
+        )}
+        title="The speed of wind between a range"
+        allowRestore allowShuffle
+        onShuffle={() => {
+          const [min, max] = random.randomSeasonWind();
+          updateValue('minWind', min);
+          updateValue('maxWind', max);
+        }}
+        onRestore={() => {
+          updateValue('minWind', SummerConfig.min_wind);
+          updateValue('maxWind', SummerConfig.max_wind);
+        }}>
+        <Range
+          min={Defaults.SEASON_WIND_MIN}
+          max={Defaults.SEASON_WIND_MAX}
+          step={0}
+          disabled={!isWindEnabled}
+          value={[season.minWind as number, season.maxWind as number]}
+          onChange={value => {
+            const [min, max] = value as number[];
+            updateValue('minWind', min);
+            updateValue('maxWind', max);
+          }}/>
+      </SeasonAttributeSlider>
+
+      <SeasonAttributeSlider
+        disabled={!enabled}
+        value={season.windyChance}
+        onChange={val => updateValue('windyChance', val)}
+        allowNumberInput
+        caption="Windy Chance"
+        title="How likely it is for it to be windy in this season."
+        allowRestore allowShuffle allowMin allowMax
+        onShuffle={() => updateValue('windyChance', random.randomFloat())}
+        onRestore={() => updateValue('windyChance', SummerConfig.windy_chance)}>
+        <Slider
+          disabled={!enabled}
+          min={0} max={1} step={0.01}
+          value={season.windyChance}
+          onChange={v => updateValue('windyChance', v)}/>
+      </SeasonAttributeSlider>
+
+      <SeasonAttributeSlider
+        disabled={!enabled}
+        displayValue={() => (
+          <>
+            <PopoverNumberInput
+              {...temperatureNumberInputProps(enabled)}
+              min={Defaults.SEASON_TEMPERATURE_MIN}
+              max={0}
+              formatValue={value => <>{value}°</>}
+              value={season.minTemperatureValue as number}
+              onSave={value => updateValue('minTemperatureValue', value)}/>
+            <strong style={{marginRight: 5, marginLeft: 3, color: COLOR_WHITISH}}>,</strong>
+            <PopoverNumberInput
+              {...temperatureNumberInputProps(enabled)}
+              min={1}
+              max={Defaults.SEASON_TEMPERATURE_MAX}
+              formatValue={value => <>{value}°</>}
+              value={season.maxTemperatureValue as number}
+              onSave={value => updateValue('maxTemperatureValue', value)}/>
+          </>
+        )}
+        caption="Temperature"
+        title="Temperature will randomly oscillate between these 2 values (in Celsius)"
+        allowRestore allowShuffle
+        onShuffle={() => {
+          const [min, max] = random.randomSeasonTemperature();
+          updateValue('minTemperatureValue', min);
+          updateValue('maxTemperatureValue', max);
+        }}
+        onRestore={() => {
+          updateValue('minTemperatureValue', SummerConfig.min_temperature.value);
+          updateValue('maxTemperatureValue', SummerConfig.max_temperature.value);
+        }}>
+        <Range
+          min={Defaults.SEASON_TEMPERATURE_MIN}
+          max={Defaults.SEASON_TEMPERATURE_MAX}
+          disabled={!enabled}
+          step={0}
+          value={[season.minTemperatureValue as number, season.maxTemperatureValue as number]}
+          onChange={value => {
+            const [min, max] = value as number[];
+            updateValue('minTemperatureValue', min);
+            updateValue('maxTemperatureValue', max);
+          }}/>
+      </SeasonAttributeSlider>
+
+      <div className="mt-3 text-right">
         <ButtonGroup>
-          <Button
-            disabled={!enabled} variant="link"
-            style={{color: !enabled ? COLOR_DISABLED : COLOR_WHITISH}}
-            className="text-size-sm button-reset-sm p-0 ml-0 mr-3" size="sm"
-            onClick={() => setSeason(randomizeSummer())}>
+          <LinkButton
+            title="Randomize season parameters"
+            disabled={!enabled}
+            style={{color: !enabled ? COLOR_DISABLED : COLOR_WHITISH, fontSize: '.716rem'}}
+            className="p-0 ml-0 mr-2"
+            onClick={() => {
+              const values = randomizeSummer();
+              if ( !windEnabled ) {
+                values.minWind = season.minWind;
+                values.maxWind = season.maxWind;
+              }
+
+              setSeason(values);
+            }}>
             <IconShuffle width="14" height="14"/> Randomize
-          </Button>
-          <Button
-            disabled={!enabled} variant="link"
-            style={{color: !enabled ? COLOR_DISABLED : COLOR_REDDISH}}
-            className="text-size-sm button-reset-sm p-0 ml-0 mr-3" size="sm"
+          </LinkButton>
+          <LinkButton
+            title="Restore season parameters to their default"
+            disabled={!enabled}
+            style={{color: !enabled ? COLOR_DISABLED : COLOR_REDDISH, fontSize: '.718rem'}}
+            className="p-0 ml-0"
             onClick={() => setSeason(seasonsPropsDefault().summer as SummerSeasonProps)}>
-            <IconRestore width="14" height="14"/> Restore
-          </Button>
+            <IconRestore width="14" height="14" color={!props?.enabled ? COLOR_DISABLED : COLOR_ORANGE}/> Restore
+          </LinkButton>
         </ButtonGroup>
       </div>
     </div>
