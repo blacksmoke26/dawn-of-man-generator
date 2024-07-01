@@ -30,3 +30,25 @@ export const isInt = (value: any): boolean => {
 export const isFloat = (value: any): boolean => {
   return 'number' === typeof value && (value === +value && value !== (value | 0));
 };
+
+/**
+ * Converts slider steps into decimals count
+ * @param decimal - The decimal number
+ * @returns The slider steps
+ * @see stepToDecimal
+ */
+export const decimalToStep = (decimal: number): number => {
+  return decimal === 0 ? 1 : +`.${''.padStart(decimal - 1, '0')}1`;
+};
+
+/**
+ * Converts decimals count into slider steps
+ * @param step - Step float value
+ * @return The decimals count
+ * @see decimalToStep
+ */
+export const stepToDecimal = (step: number): number => {
+  return !String(step).includes('.')
+    ? step
+    : String(step).replace(/^.+\./g, '').length;
+};
