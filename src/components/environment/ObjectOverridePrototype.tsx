@@ -282,14 +282,16 @@ const ObjectOverridePrototype = (props: Props) => {
             min={valuer.get('angle.min')}
             max={valuer.get('angle.max')}
             disabled={!isAngleEnabled}
+            allowShuffle
+            allowRestore
             onShuffle={() => {
               const [min, max] = random.randomAngle();
-              valuer.set('angle.disabled', min);
-              valuer.set('angle.disabled', max);
+              valuer.set('angle.min', min);
+              valuer.set('angle.max', max);
             }}
             onRestore={() => {
-              valuer.set('angle.disabled', Defaults.ANGLE_MIN_DEFAULT);
-              valuer.set('angle.disabled', Defaults.ANGLE_MAX_DEFAULT);
+              valuer.set('angle.min', Defaults.ANGLE_MIN_DEFAULT);
+              valuer.set('angle.max', Defaults.ANGLE_MAX_DEFAULT);
             }}
             sliderProps={{
               min: Defaults.ANGLE_MIN,
