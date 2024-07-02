@@ -23,7 +23,6 @@ import type {Required} from 'utility-types';
 import {nanoid} from 'nanoid';
 import PopoverNumberInput from '~/components/ui/PopoverNumberInput';
 import {temperatureNumberInputProps} from '~/panel/environment/generators/seasons/utils/params';
-import * as Defaults from '~/utils/defaults';
 import {stepToDecimal} from '~/helpers/number';
 
 interface Props {

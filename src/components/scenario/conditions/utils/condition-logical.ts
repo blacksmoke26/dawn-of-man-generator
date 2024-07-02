@@ -31,6 +31,23 @@ import {
   GeneralCondition, ConditionProps, LogicalCondition,
 } from '~/types/condition.types';
 
+export interface ChangedValues {
+  type: LogicalCondition;
+  conditions: PropValues[];
+}
+
+export interface ConditionLogicalValues {
+  type: GeneralCondition;
+  [key: string]: any;
+}
+
+export interface SubConditionAttributes {
+  [p: string]: {
+    type: GeneralCondition;
+    [p: string]: unknown;
+  };
+}
+
 const componentsMap: KVDocument<React.FC<ConditionProps<any>>> = {
   AnyTasksActive,
   AnyWorkAreasActive,
@@ -49,19 +66,8 @@ const componentsMap: KVDocument<React.FC<ConditionProps<any>>> = {
   ValueReached,
 };
 
-export interface ChangedValues {
-  type: LogicalCondition;
-  conditions: PropValues[];
-}
-
-export interface ConditionLogicalValues {
-  [key: string]: any;
-
-  type?: GeneralCondition;
-}
-
-
 export type PropValues = KVDocument<Required<ConditionLogicalValues, 'type'>>;
+
 export const createConditionComponent = (condition: ConditionLogicalValues): React.FC<ConditionProps<any>> => {
   if (condition?.type === undefined || !(condition.type in componentsMap)) {
     throw new Error(`Unknown condition component: ${condition.internalName}`);
@@ -70,20 +76,20 @@ export const createConditionComponent = (condition: ConditionLogicalValues): Rea
   return componentsMap[condition.type as GeneralCondition];
 };
 
-export const arrayValuesToAttributes = (values: ConditionLogicalValues[]): PropValues => {
+export const arrayValuesToAttributes = (values: ConditionLogicalValues[]): SubConditionAttributes => {
   if (!Array.isArray(values) || !values.length) {
     return {};
   }
 
-  const registry: KVDocument = {};
+  const registry = {} as KVDocument;
 
   for (const item of values) {
     if (item?.type) {
-      const key: string = `condition_${nanoid(10).toLowerCase()}`;
+      const key: string = nanoid(10).toLowerCase();
       registry[key] = {...item};
     }
   }
-  return registry as PropValues;
+  return registry as SubConditionAttributes;
 };
 
 export const subConditionDefaultProps = {
@@ -103,3 +109,13 @@ export const subConditionDefaultProps = {
   onRemoveClick: () => {
   },
 };
+
+export const conditionDefaultProps = {
+  enabled: true,
+  expanded: true,
+  showCheckbox: true,
+  subConditions: {},
+  removeIcon: false,
+  onValuesChange() {
+  },
+}

@@ -10,12 +10,15 @@ import merge from 'deepmerge';
 import {Col, Row} from 'react-bootstrap';
 
 // elemental components
+import Accordion from '~/components/ui/Accordion';
 import TextInput from '~/components/ui/TextInput';
 import NumberInput from '~/components/ui/NumberInput';
+import PropertyLabel from '~/components/ui/PropertyLabel';
 import ConditionHeader from './../elements/ConditionHeader';
+import PropertyCheckboxLabel from '~/components/ui/PropertyCheckboxLabel';
 
 // hooks
-import useAttributes from '~/hooks/use-attributes';
+import useValues from '~/hooks/use-values';
 
 // utils
 import * as random from '~/utils/random';
@@ -29,103 +32,112 @@ import type {ConditionAnyWorkAreasActive, ConditionAttributesProps, ConditionPro
 interface Props extends ConditionProps<ConditionAnyWorkAreasActive> {
 }
 
+export interface AnyWorkAreasActiveAttributes extends ConditionAttributesProps {
+  maxWorkersChecked: boolean;
+}
+
 const CONDITION_NAME: string = 'AnyWorkAreasActive';
 
 const AnyWorkAreasActive = (props: Props) => {
   const newProps = merge<Required<Props>>(subConditionDefaultProps, props);
 
-  const [attributes, setAttr, getAttr] = useAttributes<ConditionAttributesProps>({
+  const valuer = useValues<Partial<ConditionAnyWorkAreasActive>>(
+    merge(defaultsParams?.anyWorkAreasActive || {}, props?.initialValues || {}),
+  );
+
+  const state = useValues<AnyWorkAreasActiveAttributes>({
     enabled: newProps.enabled as boolean,
     disabledCheckbox: newProps.disabledCheckbox as boolean,
     expanded: newProps.expanded as boolean || true,
+    maxWorkersChecked: !valuer.is('maxWorkers', undefined),
   });
-
-  const [values, setValue, getValue] = useAttributes<ConditionAnyWorkAreasActive>(
-    merge(defaultsParams?.anyWorkAreasActive || {}, newProps?.initialValues || {}),
-  );
-  React.useEffect(() => {
-    if (attributes.enabled) {
-      setValue('workAreaId', props?.values?.workAreaId, true);
-      setValue('maxWorkers', props?.values?.maxWorkers, true);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [attributes.enabled, props?.values?.workAreaId, props?.values?.maxWorkers]);
 
   // Reflect values changes
   React.useEffect(() => {
-    newProps?.onTemplate(toConditionTemplate('AnyWorkAreasActive', values, !attributes.enabled));
-    newProps?.onValuesChange(filterEmpty(values));
+    const changeValues = {...valuer.data};
+
+    if (!state.data.maxWorkersChecked) {
+      changeValues.maxWorkers = undefined;
+    }
+
+    newProps?.onTemplate(toConditionTemplate('AnyWorkAreasActive', changeValues, !state.data.enabled));
+    newProps?.onValuesChange(filterEmpty(changeValues));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [attributes.enabled, values]);
+  }, [state.data.enabled, valuer.data, state.data.maxWorkersChecked]);
 
   // Reflect state changes
   React.useEffect(() => {
-    newProps.onChange(attributes);
+    newProps.onChange(state.data);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [attributes]);
+  }, [state.data]);
 
   // Reflect prop changes
   React.useEffect(() => {
-    setAttr('enabled', props?.enabled, true);
-    setAttr('disabledCheckbox', props?.disabledCheckbox, true);
-    setAttr('expanded', props?.expanded, true);
+    state.set('enabled', props?.enabled, true);
+    state.set('disabledCheckbox', props?.disabledCheckbox, true);
+    state.set('expanded', props?.expanded, true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props?.enabled, props?.disabledCheckbox, props?.expanded]);
 
-  const isDisabled = getAttr('disabledCheckbox') || !getAttr('enabled');
+  const isDisabled = state.data.disabledCheckbox || !state.data.enabled;
 
   return (
     <div className={cn('mb-2', {'text-muted': isDisabled}, 'checkbox-align')}>
       <ConditionHeader
         caption={CONDITION_NAME} showCheckbox={newProps.showCheckbox}
-        enabled={getAttr('enabled')}
-        onEnabled={(isEnabled: boolean) => setAttr('enabled', isEnabled)}
-        disabledCheckbox={getAttr('disabledCheckbox')}
+        enabled={state.data.enabled}
+        onEnabled={(isEnabled: boolean) => state.set('enabled', isEnabled)}
+        disabledCheckbox={state.data.disabledCheckbox}
         removeIcon={newProps.removeIcon}
         onRemoveClick={newProps.onRemoveClick}
-        onExpandedClick={(state: boolean) => setAttr('expanded', state)}
-        expanded={getAttr('expanded')}/>
-      {getAttr('expanded') && (
+        onExpandedClick={(isExpended: boolean) => state.set('expanded', isExpended)}
+        expanded={state.data.expanded}/>
+      {state.data.expanded && (
         <>
-          <Row className="mb-1 mt-2">
-            <Col xs="2">
-              <div className="position-relative pl-3" style={{top: 7}}>
-                Work Area ID
-              </div>
-            </Col>
+          <Row className="mb-2 mt-2">
+            <PropertyLabel caption="Work Area ID"/>
             <Col xs="6">
               <TextInput
                 selectOnLoad={true}
                 focusOnLoad={true}
                 disabled={isDisabled}
-                value={getValue('workAreaId', '')}
+                caseType="SNAKE_CASE"
+                maxLength={100}
+                value={valuer.data.workAreaId}
                 placeholder="e.g., mountain_side"
-                onChange={value => setValue('workAreaId', value)}/>
+                onChange={value => valuer.set('workAreaId', value)}/>
             </Col>
           </Row>
-          <Row className="mb-1 mt-3">
-            <Col sm="2">
-              <div className="position-relative pl-3" style={{top: 7}}>
-                Max Workers
-              </div>
-            </Col>
-            <Col sm="4">
-              <NumberInput
-                maxLength={3}
-                min={PERFORMERS_MIN}
-                max={PERFORMERS_MAX}
+          <Accordion
+            noBodyPad={true}
+            noCard={true}
+            header="Optional parameters"
+            eventKey="optional_parameters">
+            <Row className="mb-1 mt-2">
+              <PropertyCheckboxLabel
+                caption="Max Workers"
+                checked={state.get<boolean>('maxWorkersChecked', false)}
                 disabled={isDisabled}
-                allowClear={true}
-                placeholder="e.g. 26"
-                value={getValue('maxWorkers', '')}
-                onChange={value => setValue('maxWorkers', value)}
-                shuffle={true}
-                onShuffle={() => setValue('maxWorkers', random.randomWorkers())}
-                allowRestore
-                onRestore={() => setValue('maxWorkers', PERFORMERS_MAX)}
+                undefinedSetter={[valuer, 'maxWorkers', 10]}
+                onChange={isChecked => state.set('maxWorkersChecked', isChecked)}
               />
-            </Col>
-          </Row>
+              <Col sm="4">
+                <NumberInput
+                  maxLength={3}
+                  min={PERFORMERS_MIN}
+                  max={PERFORMERS_MAX}
+                  disabled={isDisabled || !state.data.maxWorkersChecked}
+                  placeholder="e.g. 26"
+                  value={valuer.get('maxWorkers', 10)}
+                  onChange={value => valuer.set('maxWorkers', value)}
+                  shuffle={true}
+                  onShuffle={() => valuer.set('maxWorkers', random.randomPerformers())}
+                  allowRestore
+                  onRestore={() => valuer.set('maxWorkers', PERFORMERS_MAX)}
+                />
+              </Col>
+            </Row>
+          </Accordion>
         </>
       )}
     </div>
@@ -133,7 +145,6 @@ const AnyWorkAreasActive = (props: Props) => {
 };
 
 // Properties validation
-AnyWorkAreasActive.propTypes = {
-};
+AnyWorkAreasActive.propTypes = {};
 
 export default AnyWorkAreasActive;

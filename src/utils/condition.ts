@@ -18,7 +18,7 @@ export const ENTITY_COUNT_MAX: number = 500;
 
 export const PERFORMERS_MIN: number = 0;
 
-export const PERFORMERS_MAX: number = 250;
+export const PERFORMERS_MAX: number = 150;
 
 export const WORKERS_MIN: number = 1;
 

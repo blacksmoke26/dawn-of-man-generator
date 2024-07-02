@@ -11,42 +11,41 @@ import cn from 'classname';
 import merge from 'deepmerge';
 import {nanoid} from 'nanoid';
 import {capitalCase} from 'change-case';
-import {Button, Col, Form, Row} from 'react-bootstrap';
+import {Col, Row} from 'react-bootstrap';
 
 // elemental components
 import Select, {Option} from '~/components/ui/Select';
 
 // hooks
-import useAttributes from '~/hooks/use-attributes';
+import useValues from '~/hooks/use-values';
 
 // utils
 import {onlyKeys} from '~/helpers/object';
 import {GENERAL_CONDITIONS} from '~/utils/condition';
 import {
-  RemoveButton,
-  conditionIcon,
-  ExpandAllButton,
-  RemoveAllButton,
   CollapseAllButton,
+  ExpandAllButton,
+  OperatorIcon,
+  RemoveAllButton,
+  RemoveButton,
+  ToggleCheckbox,
+  ToggleExpand,
+  ToggleIcon,
 } from './elements/condition-logical';
 import {
-  arrayValuesToAttributes, createConditionComponent,
+  arrayValuesToAttributes,
+  conditionDefaultProps,
+  createConditionComponent,
+  SubConditionAttributes,
 } from './utils/condition-logical';
 
 // icons
-import {
-  COLOR_DISABLED,
-  COLOR_REDDISH,
-  IconChevronSimpleDown,
-  IconChevronSimpleUp,
-  IconCondition,
-  IconConditionLogical,
-} from '~/components/icons/app';
+import {COLOR_REDDISH, IconCondition} from '~/components/icons/app';
 
 // types
 import type {KVDocument} from '~/types/json.types';
-import type {PropValues, ChangedValues, ConditionLogicalValues} from './utils/condition-logical';
 import type {ConditionAttributesProps, LogicalCondition} from '~/types/condition.types';
+import type {ChangedValues, ConditionLogicalValues, PropValues} from './utils/condition-logical';
 
 /** ConditionNot `props` type */
 interface Props extends ConditionAttributesProps {
@@ -80,6 +79,13 @@ interface Props extends ConditionAttributesProps {
   onRemoveClick?(): void,
 }
 
+export interface ConditionAttributes {
+  enabled: boolean,
+  expanded: boolean,
+  disabledCheckbox: boolean,
+  conditionsExpanded: boolean,
+}
+
 const valuesToChangedValues = (type: LogicalCondition, values: PropValues): ChangedValues => {
   const list: ChangedValues = {
     type,
@@ -105,170 +111,117 @@ const valuesToChangedValues = (type: LogicalCondition, values: PropValues): Chan
   return list;
 };
 
-const ToggleCheckbox = (props: { attr: boolean, disabled: boolean, onClick: () => void }) => (
-  <span
-    className={cn('mr-1', {'text-muted': !props.attr})}>
-      <a href="#disable"
-         className={cn({'text-muted': props.disabled})}
-         onClick={(e) => {
-           e.preventDefault();
-           props.onClick();
-         }} style={{
-        cursor: !props.disabled ? 'pointer' : 'default',
-        color: '#FFF',
-      }}>
-        <span className="position-relative" style={{top: 0}}>
-
-        <IconConditionLogical
-          width="17" height="17"
-          color={!props.attr ? COLOR_DISABLED : COLOR_REDDISH}/>
-          {' '} <strong>Condition:</strong>
-          {' '} SubConditions
-      </span>
-      </a>
-    </span>
-);
-
 /** ConditionLogical functional component */
 const ConditionLogical = (props: Props) => {
-  const newProps = merge({
-    enabled: true,
-    expanded: true,
-    showCheckbox: true,
-    subConditions: {},
-    removeIcon: false,
-    onValuesChange() {
-    },
-  }, props);
+  const newProps = merge(conditionDefaultProps, props);
 
-  const [values, setValue, getValue, remValue, clearValues, setAllValues] = useAttributes<PropValues>(arrayValuesToAttributes(props?.values || []));
-  const [attributes, setAttr, getAttr] = useAttributes<{
-    enabled: boolean;
-    disabledCheckbox: boolean;
-    expanded: boolean;
-    conditionsExpanded?: boolean;
-  }>({
+  const state = useValues<ConditionAttributes>({
     enabled: true,
     expanded: true,
     disabledCheckbox: false,
-    conditionsExpanded: undefined,
+    conditionsExpanded: true,
   });
+
+  const subCondition = useValues<SubConditionAttributes>(arrayValuesToAttributes(props?.values || []));
 
   // Reflect state changes
   React.useEffect(() => {
     if (Array.isArray(props?.values)) {
-      clearValues();
-      setAllValues(arrayValuesToAttributes(props?.values || []));
+      subCondition.clear();
+      subCondition.setAll(arrayValuesToAttributes(props?.values || []));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props?.values]);
 
   // Reflect values changes
   React.useEffect(() => {
-    newProps.onValuesChange(attributes.enabled
-      ? valuesToChangedValues(props.operator, values)
+    newProps.onValuesChange(state.data.enabled
+      ? valuesToChangedValues(props.operator, subCondition.data)
       : {} as ChangedValues);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [values, attributes.enabled]);
+  }, [state.data.enabled, subCondition.data]);
 
   // Reflect prop changes
   React.useEffect(() => {
-    setAttr('enabled', props?.enabled, true);
-    setAttr('disabledCheckbox', props?.disabledCheckbox, true);
-    setAttr('expanded', props?.expanded, true);
+    state.set('enabled', props?.enabled, true);
+    state.set('disabledCheckbox', props?.disabledCheckbox, true);
+    state.set('expanded', props?.expanded, true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props?.enabled, props?.disabledCheckbox, props?.expanded]);
 
-  const subConditionsList = Object.entries(values);
+  const subConditionsList = Object.entries(subCondition.data);
   const totalCount = subConditionsList.length;
 
-  const isDisabled = getAttr('disabledCheckbox')
-    || !getAttr('enabled')
-    || !Object.keys(values).length;
+  const isDisabled = state.data.disabledCheckbox
+    || !state.data.enabled
+    || !Object.keys(subCondition.data).length;
 
   return (
-    <div className={cn({'text-muted': !getAttr('enabled')})}>
+    <div className={cn({'text-muted': !state.data.enabled})}>
       <Row>
         <Col col="6" className="checkbox-align">
           {!newProps.showCheckbox && (
             <ToggleCheckbox
-              attr={getAttr('enabled')}
+              attr={state.data.enabled}
               disabled={isDisabled} onClick={() => {
               if (!isDisabled) {
-                setAttr('expanded', !getAttr('expanded'));
+                state.set('expanded', current => !current);
               }
             }}/>
           )}
           {newProps.showCheckbox && (
-            <Form.Check
-              type="switch"
-              id={`locations_override-switch-${nanoid(5)}`}
-              label={<span className="position-relative" style={{top: 0}}>
-            <span className={cn({'text-muted': !getAttr('enabled')})}>
-              <IconCondition
-                width="17" height="17"
-                color={!getAttr('enabled') ? COLOR_DISABLED : COLOR_REDDISH}/>
-              {' '} <strong>Condition:</strong>
-              {' '} SubConditions
-            </span>
-            </span>}
-              checked={getAttr('enabled')}
-              disabled={getAttr('disabledCheckbox')}
-              onChange={e => {
-                setAttr('enabled', e.target.checked);
+            <ToggleExpand
+              disabled={!state.data.enabled}
+              disabledCheckbox={state.data.disabledCheckbox}
+              onChange={isEnabled => {
+                state.set('enabled', isEnabled);
               }}
             />
           )}
         </Col>
-        <Col col="6" className="text-right" style={{top: 3}}>
-          <div className="d-inline-block">
-            <strong
-              style={{color: '#ebeaea'}}
-              className={cn('text-size-sm', {'text-muted': !getAttr('enabled')})}>
-              {conditionIcon(newProps.operator)}
-              {' '}
-              <span className="position-relative" style={{top: '0.01rem'}}>
-                {newProps.operator?.toUpperCase()}
-              </span>
-            </strong>
-          </div>
-          <div className="d-inline-block ml-2">
-            <Button
-              variant="link" className="p-0" style={{top: '-0.080rem'}}
-              disabled={getAttr('disabledCheckbox')}
-              onClick={() => setAttr('expanded', !getAttr('expanded'))}>
-              {!getAttr('expanded')
-                ? <IconChevronSimpleUp width="16" height="16"/>
-                : <IconChevronSimpleDown width="16" height="16"/>}
-            </Button>
-          </div>
+        <Col col="6" className="text-right" style={{top: 1}}>
+          <OperatorIcon
+            operator={newProps.operator}
+            disabled={!state.data.enabled || !totalCount}/>
+
+          <ToggleIcon
+            disabled={!state.data.enabled}
+            disabledCheckbox={state.data.disabledCheckbox}
+            expanded={state.data.expanded}
+            onClick={() => state.set('expanded', current => !current)}/>
+
           {newProps?.removeIcon && (
             <RemoveButton
-              disabled={getAttr('disabledCheckbox')}
-              onClick={() => newProps?.onRemoveClick()}/>
+              disabled={state.data.disabledCheckbox}
+              onClick={() => newProps?.onRemoveClick()}
+            />
           )}
         </Col>
       </Row>
-      {getAttr('expanded') && (
+
+      {state.data.expanded && (
         <>
           <div className="mb-2" style={{marginTop: 7}}>
             <Row className={cn({'text-muted': false}, 'checkbox-align')}>
               <Col sm="8">
                 <Select
-                  isDisabled={!getAttr('enabled')}
+                  isDisabled={!state.data.enabled}
                   menuPortalTarget={document.body}
                   value={null}
                   formatOptionLabel={(option: Option | any) => (
-                    <span>
-                        <IconCondition width="17" height="17" color={COLOR_REDDISH}/>
-                      {' '} {option?.label}
-                      </span>
+                    <>
+                      <IconCondition
+                        width="17" height="17"
+                        className="d-inline-block mr-1"
+                        color={COLOR_REDDISH}/>
+                      {option?.label}
+                    </>
                   )}
                   options={GENERAL_CONDITIONS.map(value => ({label: capitalCase(value), value}))}
                   placeholder="Choose condition to insert..."
                   onChange={(option: Option | any, {action}): void => {
                     if (action === 'select-option' && option) {
-                      setValue(nanoid(10).toLowerCase(), {type: option?.value});
+                      subCondition.set(nanoid(10).toLowerCase(), {type: option?.value});
                     }
                   }}
                 />
@@ -276,18 +229,18 @@ const ConditionLogical = (props: Props) => {
               <Col sm="4" className="text-right">
                 <div>
                   <CollapseAllButton disabled={isDisabled} onClick={() => {
-                    setAttr('conditionsExpanded', false);
+                    state.set('conditionsExpanded', false);
                     setTimeout(() => {
-                      setAttr('conditionsExpanded', undefined);
+                      state.set('conditionsExpanded', undefined);
                     }, 250);
                   }}/>
                   <ExpandAllButton disabled={isDisabled} onClick={() => {
-                    setAttr('conditionsExpanded', true);
+                    state.set('conditionsExpanded', true);
                     setTimeout(() => {
-                      setAttr('conditionsExpanded', undefined);
+                      state.set('conditionsExpanded', undefined);
                     }, 250);
                   }}/>
-                  <RemoveAllButton disabled={isDisabled} onClick={() => clearValues()}/>
+                  <RemoveAllButton disabled={isDisabled} onClick={() => subCondition.clear()}/>
                 </div>
               </Col>
             </Row>
@@ -295,7 +248,7 @@ const ConditionLogical = (props: Props) => {
           <div className="mt-3">
             {subConditionsList.map(([_id, condition], index) => {
               const ConditionComponent = createConditionComponent(condition);
-              const initialValues = onlyKeys(getValue(_id), [
+              const initialValues = onlyKeys(subCondition.get(_id), [
                 'type',
               ], true);
 
@@ -304,14 +257,14 @@ const ConditionLogical = (props: Props) => {
                   <div style={{borderLeft: '2px solid #616978', paddingLeft: '1rem'}}>
                     <ConditionComponent
                       initialValues={initialValues}
-                      removeIcon={true}
-                      onRemoveClick={() => remValue(_id)}
-                      enabled={getAttr('enabled')}
-                      expanded={getAttr('conditionsExpanded', undefined)}
+                      removeIcon
+                      onRemoveClick={() => subCondition.remove(_id)}
+                      enabled={state.data.enabled}
+                      expanded={state.data.conditionsExpanded}
                       showCheckbox={false}
-                      disabledCheckbox={!getAttr('enabled')}
+                      disabledCheckbox={!state.data.enabled}
                       onValuesChange={(changedValues: KVDocument): void => {
-                        setValue(_id, {type: condition.type, ...changedValues});
+                        subCondition.overwrite(_id, {type: condition.type, ...changedValues})
                       }}
                     />
                   </div>
