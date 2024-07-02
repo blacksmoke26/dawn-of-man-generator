@@ -46,6 +46,7 @@ interface Props {
   allowMax?: boolean;
   allowAll?: boolean;
   allowRestore?: boolean;
+  checkboxPosition?: 'left' | 'right';
 
   onChange?(value: unknown): void;
 
@@ -76,28 +77,39 @@ export const invokeHandler = <T extends object = Props>(props: T, func: keyof T,
 const PanelToolbar = (props: React.PropsWithChildren<Props>) => {
   const isDisabled = props?.disabledCheckbox || props?.disabled;
 
-  const iconTop = !props?.allowNumberInput ? 1 : 0;
+  const checkboxPosition = props?.checkboxPosition ?? 'left';
+
+  const iconTop = 1 //;!props?.allowNumberInput ? 1 : 0;
 
   return (
     <div>
       <Row className={cn({'d-flex text-muted-deep': isDisabled})}>
         <Col sm="6" className="checkbox-align" style={{paddingTop: 3}}>
-          <Form.Label className="text-size-sm mb-0" column={false}>
-            <Form.Check
-              disabled={props?.disabledCheckbox}
-              checked={props?.checked}
-              className="text-size-xs"
-              type="switch"
-              id={`switch-${nanoid(5)}`}
-              onChange={e => {
-                invokeHandler(props, 'onCheckboxChange', e.currentTarget.checked);
-              }}
-              label={props?.heading || 'Panel'}
-            />
-          </Form.Label>
+          {checkboxPosition === 'left' && (
+            <Form.Label className="text-size-xs mb-0" column={false}>
+              <Form.Check
+                disabled={props?.disabledCheckbox}
+                checked={props?.checked}
+                className="text-size-xs"
+                type="switch"
+                id={`switch-${nanoid(5)}`}
+                onChange={e => {
+                  invokeHandler(props, 'onCheckboxChange', e.currentTarget.checked);
+                }}
+                label={props?.heading || 'Panel'}
+              />
+            </Form.Label>
+          )}
 
+          {checkboxPosition === 'right' && (
+            <div
+              className="position-relative"
+              style={{paddingBottom: '.16rem', top: -1}}>
+              {props?.heading || 'Panel'}
+            </div>
+          )}
         </Col>
-        <Col sm="6" className="text-right pr-2">
+        <Col sm="6" className="checkbox-align text-right pr-2">
           {!props?.allowNumberInput && (
             <span
               style={{top: 2, color: COLOR_REDDISH, marginRight: 1}}
@@ -111,7 +123,7 @@ const PanelToolbar = (props: React.PropsWithChildren<Props>) => {
               hideArrow
               disabled={isDisabled}
               title="Edit/Change value"
-              style={{top: 0, color: COLOR_REDDISH}}
+              style={{top: 0, color: COLOR_REDDISH, fontSize: '.788rem'}}
               value={props?.value ?? 0}
               onSave={changedValue => invokeHandler(props, 'onChange', changedValue)}
               {...props?.numberInputProps}
@@ -171,12 +183,28 @@ const PanelToolbar = (props: React.PropsWithChildren<Props>) => {
               <IconEraser color={isDisabled ? COLOR_DISABLED : COLOR_DANGER}/>
             </LinkButton>
           )}
+          {checkboxPosition === 'right' && (
+            <Form.Label className="m-0 ml-3 positive-relative d-inline-block">
+              <Form.Check
+                disabled={props?.disabledCheckbox}
+                checked={props?.checked}
+                className="pl-1 pt-0 positive-relative"
+                type="switch"
+                label=" "
+                style={{top: 5, marginRight: -3}}
+                id={`switch-${nanoid(5)}`}
+                onChange={e => {
+                  invokeHandler(props, 'onCheckboxChange', e.currentTarget.checked);
+                }}
+              />
+            </Form.Label>
+          )}
         </Col>
       </Row>
 
       {props?.description && (
         <div className="text-size-xxs text-muted mt-0 mb-1 position-relative"
-        style={{top: -2}}>
+             style={{top: -2}}>
           {props?.description}
         </div>
       )}
