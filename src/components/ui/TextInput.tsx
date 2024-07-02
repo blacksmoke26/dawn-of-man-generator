@@ -8,17 +8,19 @@ import React, {PropsWithChildren} from 'react';
 import cn from 'classname';
 import {nanoid} from 'nanoid';
 import merge from 'deepmerge';
-import {capitalCase} from 'change-case';
 import {Button, Form, type FormControlProps, InputGroup} from 'react-bootstrap';
+
+// icons
+import {
+  COLOR_DISABLED, COLOR_REDDISH,
+  IconEraser, IconRestore, IconShuffle
+} from '~/components/icons/app';
 
 // hooks
 import {useDebouncedCallback} from 'use-debounce';
 
-// icons
-import {
-  IconEraser, IconRestore, IconShuffle,
-  COLOR_DISABLED, COLOR_REDDISH,
-} from '~/components/icons/app';
+// utils
+import {type CaseTypeFull, toTextCase} from '~/utils/strings';
 
 // types
 import type {Required} from 'utility-types';
@@ -27,7 +29,7 @@ export interface Props {
   disabled?: boolean;
   placeholder?: string;
   allowShuffle?: boolean;
-  caseType?: ValueCaseType;
+  caseType?: CaseTypeFull;
   allowClear?: boolean;
   allowRestore?: boolean;
   focusOnLoad?: boolean;
@@ -42,31 +44,6 @@ export interface Props {
 
   onRestore?(): void;
 }
-
-type ValueCaseType = 'SNAKE_CASE' | 'CAPITAL_CASE' | 'DEFAULT';
-
-const REGEX = /[^a-z_\d]+/ig;
-
-const sanitizeInput = (value: string, event: 'KEYUP' | 'CHANGE' = 'CHANGE', caseType: ValueCaseType): string => {
-  let newValue = String(value || '')
-    .replace(/ {2,}|['"]+/ig, '');
-
-  if (caseType === 'SNAKE_CASE') {
-    return (event === 'KEYUP'
-      ? newValue.replace(REGEX, `_`).toLowerCase()
-      : newValue.replace(REGEX, `_`))
-      .replace(/_+/ig, '_');
-  }
-
-  if (caseType === 'CAPITAL_CASE') {
-    return (event === 'KEYUP'
-      ? capitalCase(newValue.replace(REGEX, ` `))
-      : newValue.replace(REGEX, ` `))
-      .replace(/ +/ig, ' ');
-  }
-
-  return newValue;
-};
 
 const TextInput = (props: PropsWithChildren<Props> = {}) => {
   const newProps = merge<Required<Props>>({
@@ -114,12 +91,12 @@ const TextInput = (props: PropsWithChildren<Props> = {}) => {
         id={`text_input-${nanoid(5)}`}
         value={newProps?.value || ''}
         onChange={e => {
-          debounced(sanitizeInput(e.currentTarget.value, 'CHANGE', newProps.caseType));
+          debounced(toTextCase(e.currentTarget.value, newProps.caseType, 'CHANGE'));
           //newProps.onChange(value);
         }}
         onKeyUp={e => {
           // @ts-ignore
-          e.currentTarget.value = sanitizeInput(e.currentTarget.value, 'KEYUP', newProps.caseType);
+          e.currentTarget.value = toTextCase(e.currentTarget.value, newProps.caseType, 'KEYUP');
         }}
         placeholder={newProps.placeholder}
         {...newProps.inputProps}

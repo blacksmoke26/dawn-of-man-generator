@@ -8,11 +8,10 @@ import React from 'react';
 import * as PropTypes from 'prop-types';
 import cn from 'classname';
 import merge from 'deepmerge';
-import {nanoid} from 'nanoid';
-import {Button, Col, Form, Row} from 'react-bootstrap';
 
 // Components
 import Slider from '~/components/ui/Slider';
+import PanelToolbar from '~/components/environment/PanelToolbar';
 
 // Utils
 import * as random from '~/utils/scenario/random';
@@ -71,32 +70,25 @@ const MapSize = (props: Props) => {
 
   return (
     <div className={cn('mb-2', {'text-muted': !enabled})}>
-      <Row className="mb-1">
-        <Col xs="10">
-          Map size <code className={cn('text-size-xs', {'text-muted': !enabled})}>
-          {value}
-        </code>
-          <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                  onClick={() => setValue(random.randomMapSize())}>
-            Random
-          </Button>
-          <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                  onClick={() => setValue(Defaults.MAP_SIZE_DEFAULT)}>Default</Button>
-          <div className="text-size-xxs text-muted mt-1">
-            Defines the size of the map, beware that big maps can drain performance.
-          </div>
-        </Col>
-        <Col xs="2" className="text-right">
-          <Form.Check
-            className="pull-right"
-            type="switch"
-            id={`size-switch-${nanoid(5)}`}
-            label=""
-            checked={enabled}
-            onChange={e => setEnabled(e.target.checked)}
-          />
-        </Col>
-      </Row>
+      <PanelToolbar
+        value={value}
+        checked={enabled}
+        checkboxPosition="right"
+        heading="Map size"
+        description="Defines the size of the map, beware that big maps can drain performance."
+        allowNumberInput
+        numberInputProps={{
+          min: Defaults.MAP_SIZE_MIN,
+          max: Defaults.MAP_SIZE_MAX,
+          decimals: 0,
+        }}
+        onCheckboxChange={state => setEnabled(state)}
+        onChange={(val: number) => setValue(+val)}
+        allowShuffle
+        onShuffle={() => setValue(random.randomMapSize())}
+        allowRestore
+        onRestore={() => setValue(Defaults.MAP_SIZE_DEFAULT)}
+        disabled={!enabled}/>
       <Slider
         min={Defaults.MAP_SIZE_MIN}
         max={Defaults.MAP_SIZE_MAX}

@@ -10,14 +10,17 @@ import React from 'react';
 import * as PropTypes from 'prop-types';
 import cn from 'classname';
 import merge from 'deepmerge';
-import {nanoid} from 'nanoid';
-import {Col, Form, Row} from 'react-bootstrap';
+
+// elemental components
+import PanelToolbar from '~/components/environment/PanelToolbar';
 
 // redux
 import {useAppSelector} from '~redux/hooks';
 
 // parsers
 import {toRequiredMilestoneTemplate} from '~/utils/parser/templates-general';
+import NumberInput from '~/components/ui/NumberInput';
+import {randomIntMinMax} from '~/utils/random';
 
 /** RequiredMilestone `props` type */
 interface Props {
@@ -66,40 +69,32 @@ const RequiredMilestone = ( props: Props ) => {
 	
 	return (
 		<div className={cn('mb-2', {'text-muted': !enabled}, 'checkbox-align')}>
-			<Row className="mb-1">
-				<Col xs="10">
-					Required Milestones
-					<div className="text-size-xxs text-muted mt-1">
-						Milestones needed for the scenario to count as completed, so that depending scenarios can be started.
-					</div>
-				</Col>
-				<Col xs="2" className="text-right">
-					<Form.Check
-						className="pull-right"
-						type="switch"
-						id={`required_milestones-switch-${nanoid(5)}`}
-						label=""
-						checked={enabled}
-						onChange={e => setEnabled(e.target.checked)}
-					/>
-				</Col>
-			</Row>
-			<Form.Control
-				type="number"
-				disabled={!enabled}
-				className="pull-right"
-				aria-disabled={!enabled}
-				id={`required_milestones-${nanoid(5)}`}
-				value={value}
-				pattern="^[0-9]+$"
-				min="1"
-				max="20"
-				maxLength={2}
-				onChange={e => {
-					const num = parseInt(e.target.value.trim());
-					setValue(!num ? 0 : (num > 20 ? 20 : num));
-				}}
-			/>
+			<PanelToolbar
+        checked={enabled}
+        heading="Required Milestones"
+				checkboxPosition="right"
+        description="Milestones needed for the scenario to count as
+        completed, so that depending scenarios can be started."
+        onCheckboxChange={state => setEnabled(state)}
+				value=""
+        disabled={!enabled}/>
+
+			<div className="w-50">
+				<NumberInput
+					disabled={!enabled}
+					value={value}
+					min={1}
+					max={20}
+					maxLength={2}
+					placeholder="0"
+					shuffle
+					onShuffle={() => setValue(randomIntMinMax(1,20))}
+					onChange={num => {
+						num = +num;
+						setValue(!num ? 0 : (num > 20 ? 20 : num))
+					}}
+				/>
+			</div>
 		</div>
 	);
 };

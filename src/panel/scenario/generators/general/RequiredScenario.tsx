@@ -10,11 +10,10 @@ import React from 'react';
 import * as PropTypes from 'prop-types';
 import cn from 'classname';
 import merge from 'deepmerge';
-import {nanoid} from 'nanoid';
-import {Col, Form, Row} from 'react-bootstrap';
 
 // elemental components
 import TextInput from '~/components/ui/TextInput';
+import PanelToolbar from '~/components/environment/PanelToolbar';
 
 // redux
 import {useAppSelector} from '~redux/hooks';
@@ -69,30 +68,23 @@ const RequiredScenario = ( props: Props ) => {
 
 	return (
 		<div className={cn('mb-2', {'text-muted': !enabled}, 'checkbox-align')}>
-			<Row className="mb-1">
-				<Col xs="10">
-					Required Scenario
-					<div className="text-size-xxs text-muted mt-1">
-						Specifies another scenario the user has to complete before playing this one.
-					</div>
-				</Col>
-				<Col xs="2" className="text-right">
-					<Form.Check
-						className="pull-right"
-						type="switch"
-						id={`required_scenario-switch-${nanoid(5)}`}
-						label=""
-						checked={enabled}
-						onChange={e => setEnabled(e.target.checked)}
-					/>
-				</Col>
-			</Row>
-			<TextInput
-				caseType="SNAKE_CASE"
-				disabled={!enabled}
-				value={value}
-				placeholder="e.g., the_long_march"
-				onChange={theValue => setValue(theValue as string)}/>
+			<PanelToolbar
+        checked={enabled}
+        heading="Required Scenario"
+				checkboxPosition="right"
+        description="Specifies another scenario the user has to complete before playing this one."
+        onCheckboxChange={state => setEnabled(state)}
+				value=""
+        disabled={!enabled}/>
+			<div className="w-75">
+        <TextInput
+          caseType="SNAKE_CASE"
+          disabled={!enabled}
+          value={value}
+          maxLength={80}
+          placeholder="e.g., the_long_march"
+          onChange={theValue => setValue(theValue as string)}/>
+      </div>
 		</div>
 	);
 };

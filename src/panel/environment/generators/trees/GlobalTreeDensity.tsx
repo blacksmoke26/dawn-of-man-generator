@@ -34,7 +34,7 @@ const GlobalTreeDensity = ( props: GlobalTreeDensityProps ) => {
 	}, props);
 
 	const [value, setValue] = React.useState<number>(random.randomDensity());
-	const [checked, setChecked] = React.useState<boolean>(props.checked as boolean);
+	const [checked, setChecked] = React.useState<boolean>(props.checked || false);
 
 	const globalTreeDensityAttribute = useAppSelector(({environment}) => environment.values?.globalTreeDensity);
 

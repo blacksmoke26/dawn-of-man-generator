@@ -9,7 +9,10 @@ import * as PropTypes from 'prop-types';
 import cn from 'classname';
 import merge from 'deepmerge';
 import {nanoid} from 'nanoid';
-import {Col, Form, Row} from 'react-bootstrap';
+import {Form} from 'react-bootstrap';
+
+// elemental components
+import PanelToolbar from '~/components/environment/PanelToolbar';
 
 // redux
 import {useAppSelector} from '~redux/hooks';
@@ -64,32 +67,20 @@ const CustomSettlementNameAllowed = (props: Props) => {
 
   return (
     <div className={cn('mb-2', {'text-muted': !enabled}, 'checkbox-align')}>
-      <Row className="mb-1">
-        <Col xs="10">
-          Custom Settlement Name <code className={cn('text-size-xs', {'text-muted': !enabled})}>
-          {value ? '<True>' : '<False>'}
-        </code>
-          <div className="text-size-xxs text-muted mt-1">
-            Determines if naming the settlement is an option on game start - unknown default name, where to set the name
-          </div>
-        </Col>
-        <Col xs="2" className="text-right">
-          <Form.Check
-            className="pull-right"
-            type="switch"
-            id={`custom_settlement_name_allowed-switch-${nanoid(5)}`}
-            label=""
-            checked={enabled}
-            onChange={e => setEnabled(e.target.checked)}
-          />
-        </Col>
-      </Row>
+      <PanelToolbar
+        checked={enabled}
+        heading="Custom Settlement Name"
+				checkboxPosition="right"
+        description="Determines if naming the settlement is an option on game start - unknown default name, where to set the name"
+        onCheckboxChange={state => setEnabled(state)}
+				value={<span className={cn({'text-line-through': !enabled})}>{value ? 'Yes' : 'No'}</span>}
+        disabled={!enabled}/>
       <Form.Check
         type="switch"
         className="pull-right"
         disabled={!enabled}
         id={`custom_settlement_name_allowed-${nanoid(5)}`}
-        label="Allow Custom Settlement Name?"
+        label="Allowed?"
         checked={value}
         onChange={e => setValue(e.target.checked)}
       />

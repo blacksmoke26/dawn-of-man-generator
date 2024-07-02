@@ -11,7 +11,10 @@ import * as PropTypes from 'prop-types';
 import cn from 'classname';
 import merge from 'deepmerge';
 import {nanoid} from 'nanoid';
-import {Col, Form, Row} from 'react-bootstrap';
+import {Form} from 'react-bootstrap';
+
+// elemental components
+import PanelToolbar from '~/components/environment/PanelToolbar';
 
 // redux
 import {useAppSelector} from '~redux/hooks';
@@ -65,32 +68,20 @@ function NomadModeAllowed ( props: Props ) {
 
 	return (
 		<div className={cn('mb-2', {'text-muted': !enabled}, 'checkbox-align')}>
-			<Row className="mb-1">
-				<Col xs="10">
-					Nomad Mode <code className={cn('text-size-xs', {'text-muted': !enabled})}>
-					{value ? '<True>' : '<False>'}
-				</code>
-					<div className="text-size-xxs text-muted mt-1">
-						Player whether this scenario can be played in nomad mode or not.
-					</div>
-				</Col>
-				<Col xs="2" className="text-right">
-					<Form.Check
-						className="pull-right"
-						type="switch"
-						id={`nomad_mode_allowed-switch-${nanoid(5)}`}
-						label=""
-						checked={enabled}
-						onChange={e => setEnabled(e.target.checked)}
-					/>
-				</Col>
-			</Row>
+			<PanelToolbar
+        checked={enabled}
+        heading="Nomad Mode"
+				checkboxPosition="right"
+        description="Player whether this scenario can be played in nomad mode or not."
+        onCheckboxChange={state => setEnabled(state)}
+				value={<span className={cn({'text-line-through': !enabled})}>{value ? 'Yes' : 'No'}</span>}
+        disabled={!enabled}/>
 			<Form.Check
 				type="switch"
 				className="pull-right"
 				disabled={!enabled}
 				id={`nomad_mode_allowed-${nanoid(5)}`}
-				label="Allow Nomad Mode?"
+				label="Allowed?"
 				checked={value}
 				onChange={e => setValue(e.target.checked)}
 			/>
