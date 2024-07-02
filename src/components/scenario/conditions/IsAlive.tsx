@@ -11,10 +11,11 @@ import {Col, Row} from 'react-bootstrap';
 
 // elemental components
 import TextInput from '~/components/ui/TextInput';
+import PropertyLabel from '~/components/ui/PropertyLabel';
 import ConditionHeader from './../elements/ConditionHeader';
 
 // hooks
-import useAttributes from '~/hooks/use-attributes';
+import useValues from '~/hooks/use-values';
 
 // utils
 import {defaultsParams} from '~/utils/condition';
@@ -27,78 +28,74 @@ import type {ConditionAttributesProps, ConditionIsAlive, ConditionProps} from '~
 interface Props extends ConditionProps<ConditionIsAlive> {
 }
 
+export interface IsAliveAttributes extends ConditionAttributesProps {
+}
+
 const CONDITION_NAME: string = 'IsAlive';
 
 const IsAlive = (props: Props) => {
   const newProps = merge<Required<Props>>(subConditionDefaultProps, props);
 
-  const [attributes, setAttr, getAttr] = useAttributes<ConditionAttributesProps>({
+  const valuer = useValues<Partial<ConditionIsAlive>>(
+    merge(defaultsParams?.anyTasksActive || {}, props?.initialValues || {}),
+  );
+
+  const state = useValues<IsAliveAttributes>({
     enabled: newProps.enabled as boolean,
     disabledCheckbox: newProps.disabledCheckbox as boolean,
     expanded: newProps.expanded as boolean || true,
   });
 
-  const [values, setValue, getValue] = useAttributes<ConditionIsAlive>(
-    merge(defaultsParams?.isAlive || {}, newProps?.initialValues || {}),
-  );
-
-  React.useEffect(() => {
-    if (attributes.enabled) {
-      setValue('name', props?.values?.name, true);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    attributes.enabled, props?.values?.name,
-  ]);
-
   // Reflect values changes
   React.useEffect(() => {
-    newProps?.onTemplate(toConditionTemplate('IsAlive', values, !attributes.enabled));
-    newProps?.onValuesChange(filterEmpty(values));
+    const changeValues = {...valuer.data};
+
+    newProps?.onTemplate(toConditionTemplate('IsAlive', changeValues, !state.data.enabled));
+    newProps?.onValuesChange(filterEmpty(changeValues));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [attributes.enabled, values]);
+  }, [state.data.enabled, valuer.data]);
 
   // Reflect state changes
   React.useEffect(() => {
-    newProps.onChange(attributes);
+    newProps.onChange(state.data);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [attributes]);
+  }, [state.data]);
 
   // Reflect prop changes
   React.useEffect(() => {
-    setAttr('enabled', props?.enabled, true);
-    setAttr('disabledCheckbox', props?.disabledCheckbox, true);
-    setAttr('expanded', props?.expanded, true);
+    state.set('enabled', props?.enabled, true);
+    state.set('disabledCheckbox', props?.disabledCheckbox, true);
+    state.set('expanded', props?.expanded, true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props?.enabled, props?.disabledCheckbox, props?.expanded]);
 
-  const isDisabled = getAttr('disabledCheckbox') || !getAttr('enabled');
+  const isDisabled = state.data.disabledCheckbox || !state.data.enabled;
 
   return (
     <div className={cn('mb-2', {'text-muted': isDisabled}, 'checkbox-align')}>
       <ConditionHeader
         caption={CONDITION_NAME} showCheckbox={newProps.showCheckbox}
-        enabled={getAttr('enabled')}
-        onEnabled={(isEnabled: boolean) => setAttr('enabled', isEnabled)}
-        disabledCheckbox={getAttr('disabledCheckbox')}
+        enabled={state.data.enabled}
+        onEnabled={(isEnabled: boolean) => state.set('enabled', isEnabled)}
+        disabledCheckbox={state.data.disabledCheckbox}
         removeIcon={newProps.removeIcon}
         onRemoveClick={newProps.onRemoveClick}
-        onExpandedClick={(state: boolean) => setAttr('expanded', state)}
-        expanded={getAttr('expanded')}/>
-      {getAttr('expanded') && (
+        onExpandedClick={(isExpended: boolean) => state.set('expanded', isExpended)}
+        expanded={state.data.expanded}/>
+      {state.data.expanded && (
         <>
-          <Row className="mb-1 mt-2">
-            <Col xs="2">
-              <div className="position-relative pl-3" style={{top: 7}}>Name</div>
-            </Col>
+          <Row className="mb-2 mt-1">
+            <PropertyLabel caption="Name"/>
             <Col xs="6">
               <TextInput
                 selectOnLoad={true}
                 focusOnLoad={true}
+                caseType="SNAKE_CASE"
+                maxLength={80}
                 disabled={isDisabled}
-                value={getValue('name', '')}
+                value={valuer.data.name}
                 placeholder="e.g., deer"
-                onChange={value => setValue('name', value)}/>
+                onChange={value => valuer.set('name', value)}/>
             </Col>
           </Row>
         </>

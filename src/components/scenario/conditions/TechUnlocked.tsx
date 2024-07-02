@@ -1,32 +1,39 @@
+// noinspection HtmlUnknownAttribute
+
 /**
  * @author Junaid Atari <mj.atari@gmail.com>
- * @see https://github.com/blacksmoke26/dawn-of-man-generator
+ * @see https://github.com/blacksmoke26/dawn-of-man-gentechstor
  * @since 2020-08-29
  */
 
 import React from 'react';
 import cn from 'classname';
 import merge from 'deepmerge';
+import {Row} from 'react-bootstrap';
 import {capitalCase} from 'change-case';
-import {Col, Row} from 'react-bootstrap';
 
 // elemental components
-import Select, {Option} from '~/components/ui/Select';
+import PropertyLabel from '~/components/ui/PropertyLabel';
 import ConditionHeader from './../elements/ConditionHeader';
+import AttributeSelect from '~/components/ui/elements/AttributeSelect';
 
 // hooks
-import useAttributes from '~/hooks/use-attributes';
+import useValues from '~/hooks/use-values';
 
 // utils
+import {randomArray, randomIntMinMax} from '~/utils/random';
 import {techEntities} from '~/utils/entities';
 import {defaultsParams} from '~/utils/condition';
 import {subConditionDefaultProps} from './utils/condition-logical';
 import {filterEmpty, toConditionTemplate} from '~/utils/parser/templates';
 
 // types
-import type {ConditionAttributesProps, ConditionProps, ConditionTechUnlocked} from '~/types/condition.types';
+import type {ConditionAttributesProps, ConditionTechUnlocked, ConditionProps} from '~/types/condition.types';
 
 interface Props extends ConditionProps<ConditionTechUnlocked> {
+}
+
+export interface TechUnlockedAttributes extends ConditionAttributesProps {
 }
 
 const CONDITION_NAME: string = 'TechUnlocked';
@@ -34,101 +41,81 @@ const CONDITION_NAME: string = 'TechUnlocked';
 const TechUnlocked = (props: Props) => {
   const newProps = merge<Required<Props>>(subConditionDefaultProps, props);
 
-  const [attributes, setAttr, getAttr] = useAttributes<ConditionAttributesProps>({
+  const valuer = useValues<Partial<ConditionTechUnlocked>>(
+    merge(defaultsParams?.techUnlocked || {}, props?.initialValues || {}),
+  );
+
+  const state = useValues<TechUnlockedAttributes>({
     enabled: newProps.enabled as boolean,
     disabledCheckbox: newProps.disabledCheckbox as boolean,
     expanded: newProps.expanded as boolean || true,
   });
 
-  const [values, setValue, getValue] = useAttributes<ConditionTechUnlocked>(
-    merge(defaultsParams?.techUnlocked || {}, newProps?.initialValues || {}),
-  );
-
   React.useEffect(() => {
-    if (attributes.enabled) {
-      setValue('tech', props?.values?.tech, true);
-      setValue('techs', props?.values?.techs, true);
+    const changeValues = {...valuer.data};
+
+    if (changeValues.techs?.length === 1 ) {
+      changeValues.tech = changeValues.techs[0];
+      changeValues.techs = undefined;
+    } else {
+      changeValues.tech = undefined;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    attributes.enabled,
-    props?.values?.tech, props?.values?.techs,
-  ]);
 
-  // Reflect values changes
-  React.useEffect(() => {
-    newProps?.onTemplate(toConditionTemplate('TechUnlocked', values, !attributes.enabled));
-    newProps?.onValuesChange(filterEmpty(values));
+    newProps?.onTemplate(toConditionTemplate('TechUnlocked', changeValues, !state.data.enabled));
+    newProps?.onValuesChange(filterEmpty(changeValues));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [attributes.enabled, values]);
+  }, [state.data.enabled, valuer.data]);
 
   // Reflect state changes
   React.useEffect(() => {
-    newProps.onChange(attributes);
+    newProps.onChange(state.data);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [attributes]);
+  }, [state.data]);
 
   // Reflect prop changes
   React.useEffect(() => {
-    setAttr('enabled', props?.enabled, true);
-    setAttr('disabledCheckbox', props?.disabledCheckbox, true);
-    setAttr('expanded', props?.expanded, true);
+    state.set('enabled', props?.enabled, true);
+    state.set('disabledCheckbox', props?.disabledCheckbox, true);
+    state.set('expanded', props?.expanded, true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props?.enabled, props?.disabledCheckbox, props?.expanded]);
 
-  const isDisabled = getAttr('disabledCheckbox') || !getAttr('enabled');
+  const isDisabled = state.data.disabledCheckbox || !state.data.enabled;
 
   return (
     <div className={cn('mb-2', {'text-muted': isDisabled}, 'checkbox-align')}>
       <ConditionHeader
         caption={CONDITION_NAME} showCheckbox={newProps.showCheckbox}
-        enabled={getAttr('enabled')}
-        onEnabled={(isEnabled: boolean) => setAttr('enabled', isEnabled)}
-        disabledCheckbox={getAttr('disabledCheckbox')}
+        enabled={state.data.enabled}
+        onEnabled={(isEnabled: boolean) => state.set('enabled', isEnabled)}
+        disabledCheckbox={state.data.disabledCheckbox}
         removeIcon={newProps.removeIcon}
         onRemoveClick={newProps.onRemoveClick}
-        onExpandedClick={(state: boolean) => setAttr('expanded', state)}
-        expanded={getAttr('expanded')}/>
-      {getAttr('expanded') && (
+        onExpandedClick={(isExpended: boolean) => state.set('expanded', isExpended)}
+        expanded={state.data.expanded}/>
+      {state.data.expanded && (
         <>
-          <Row className="mb-1 mt-2">
-            <Col xs="2">
-              <div className="position-relative pl-3" style={{top: 7}}>Tech</div>
-            </Col>
-            <Col xs="6">
-              <Select
-                isDisabled={isDisabled}
-                isClearable={true}
-                defaultValue={getValue('tech') ? {label: getValue('tech'), value: getValue('tech')} : null}
-                menuPortalTarget={document.body}
-                options={techEntities.map(value => ({label: capitalCase(value), value}))}
-                placeholder="Choose..."
-                onChange={(option: Option | any, {action}): void => {
-                  setValue('tech', option?.value || '');
-                }}
-              />
-            </Col>
-          </Row>
-          <Row className="mb-1 mt-2">
-            <Col xs="2">
-              <div className="position-relative pl-3" style={{top: 7}}>Techs</div>
-            </Col>
-            <Col xs="8">
-              <Select
-                isClearable={true}
-                isDisabled={isDisabled}
-                isMulti={true}
-                menuPortalTarget={document.body}
-                defaultValue={getValue<string[]>('techs')?.map(value => ({label: capitalCase(value), value}) || [])}
-                options={techEntities.map(value => ({label: capitalCase(value), value}))}
-                placeholder="Choose..."
-                onChange={(option: Option[] | any, {action}): void => {
-                  if (['select-option', 'remove-value', 'clear'].includes(action) && Array.isArray(option)) {
-                    setValue('techs', option?.map(({value}) => value) || []);
-                  }
-                }}
-              />
-            </Col>
+          <Row className="mb-2 mt-2">
+            <PropertyLabel caption="Tech(s)"/>
+            <AttributeSelect
+              className="w-75"
+              colProps={{sm: 10}}
+              disabled={isDisabled}
+              options={techEntities.map(value => ({label: capitalCase(value), value}))}
+              value={valuer.get<string[]>('techs', [])?.map(value => ({label: capitalCase(value), value})) || []}
+              selectProps={{isSearchable: true, isMulti: true, isClearable: false}}
+              onChange={(option, {action}) => {
+                if (['select-option', 'remove-value', 'clear'].includes(action) && Array.isArray(option)) {
+                  valuer.overwrite('techs', option?.map(({value}) => value) || []);
+                }
+              }}
+              allowClear
+              onClear={() => valuer.overwrite('techs', [])}
+              allowShuffle
+              onShuffle={() => {
+                valuer.set('techs', [...(new Set<string>(randomArray(techEntities, randomIntMinMax(1, 5)) as string[]) as unknown as string[])]);
+              }}
+            />
           </Row>
         </>
       )}
@@ -144,8 +131,7 @@ TechUnlocked.propTypes = {
   onRemoveClick: PropTypes.func,
   expanded: PropTypes.bool,
   onChange: PropTypes.func,
-  tech: PropTypes.oneOf(techEntities),
-  techs: PropTypes.arrayOf(PropTypes.oneOf(techEntities)),*/
+  techs: PropTypes.oneOf(ERAS),*/
 };
 
 export default TechUnlocked;

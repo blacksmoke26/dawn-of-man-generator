@@ -10,6 +10,7 @@
 import {isObject} from '~/helpers/object';
 import {formatPeriod} from '~/utils/scenario/format';
 import {LOGICAL_CONDITION} from '~/utils/condition';
+import {isKeyInAtt, renderTemplate} from '~/utils/template';
 
 // types
 import {Json, KVDocument} from '~/types/json.types';
@@ -35,16 +36,6 @@ import type {ChangedValues} from '~/components/scenario/conditions/utils/conditi
 
 type Attr<T> = T;
 
-const renderTemplate = (type: string, props: string[]): string => {
-  return `<condition type="${type}" ${props.join(' ')}/>`;
-};
-
-const isKeyInAtt = (key: string, attributes: Json): boolean => {
-  return key in attributes
-    && attributes[key] !== undefined
-    && attributes[key] !== '';
-};
-
 /** Render `AnyTasksActive` attributes template */
 export const toAnyTasksActiveTemplate = (attributes: Attr<ConditionAnyTasksActive>): string => {
   if (!attributes?.taskType?.trim()) {
@@ -58,7 +49,7 @@ export const toAnyTasksActiveTemplate = (attributes: Attr<ConditionAnyTasksActiv
   isKeyInAtt('minPerformers', attributes)
   && props.push(`min_performers="${attributes.minPerformers}"`);
 
-  return renderTemplate('AnyTasksActive', props);
+  return renderTemplate('condition', 'AnyTasksActive', props);
 };
 
 /** Render `AnyWorkAreasActive` attributes template */
@@ -74,7 +65,7 @@ export const toAnyWorkAreasActiveTemplate = (attributes: Attr<ConditionAnyWorkAr
   isKeyInAtt('maxWorkers', attributes)
   && props.push(`max_workers="${attributes.maxWorkers}"`);
 
-  return renderTemplate('AnyWorkAreasActive', props);
+  return renderTemplate('condition', 'AnyWorkAreasActive', props);
 };
 
 /** Render `EntityCountComparison` attributes template */
@@ -90,7 +81,7 @@ export const toEntityCountComparisonTemplate = (attributes: Attr<ConditionEntity
   isKeyInAtt('value', attributes) && props.push(`value="${attributes.value}"`);
   props.push(`comparison="${attributes.comparison}"`);
 
-  return renderTemplate('EntityCountComparison', props);
+  return renderTemplate('condition', 'EntityCountComparison', props);
 };
 
 /** Render `EntityCountReached` attributes template */
@@ -105,7 +96,7 @@ export const toEntityCountReachedTemplate = (attributes: Attr<ConditionEntityCou
   props.push(`entity_type="${attributes.entityType}"`);
   isKeyInAtt('value', attributes) && props.push(`value="${attributes.value}"`);
 
-  return renderTemplate('EntityCountReached', props);
+  return renderTemplate('condition', 'EntityCountReached', props);
 };
 
 /** Render `EntityNearMarker` attributes template */
@@ -120,24 +111,24 @@ export const toEntityNearMarkerTemplate = (attributes: Attr<ConditionEntityNearM
 
   isKeyInAtt('distance', attributes) && props.push(`distance="${attributes.distance}"`);
 
-  return renderTemplate('EntityNearMarker', props);
+  return renderTemplate('condition', 'EntityNearMarker', props);
 };
 
 /** Render `EraUnlocked` attributes template */
 export const toEraUnlockedTemplate = (attributes: Attr<ConditionEraUnlocked>): string => {
-  return !attributes?.era?.trim() ? '' : renderTemplate('EraUnlocked', [
+  return !attributes?.era?.trim() ? '' : renderTemplate('condition', 'EraUnlocked', [
     `era="${attributes.era}"`,
   ]);
 };
 
 /** Render `InitGame` attributes template */
 export const toInitGameTemplate = (attributes: Attr<ConditionInitGame>): string => {
-  return renderTemplate('InitGame', []);
+  return renderTemplate('condition', 'InitGame', []);
 };
 
 /** Render `IsAlive` attributes template */
 export const toIsAliveTemplate = (attributes: Attr<ConditionIsAlive>): string => {
-  return !attributes?.name?.trim() ? '' : renderTemplate('IsAlive', [
+  return !attributes?.name?.trim() ? '' : renderTemplate('condition', 'IsAlive', [
     `name="${attributes.name}"`,
   ]);
 };
@@ -148,7 +139,7 @@ export const toIsGameInteractionPendingTemplate = (attributes: Attr<ConditionIsG
 
   isKeyInAtt('value', attributes) && props.push(`value="${attributes.value}"`);
 
-  return renderTemplate('IsGameInteractionPending', props);
+  return renderTemplate('condition', 'IsGameInteractionPending', props);
 };
 
 /** Render `NewGame` attributes template */
@@ -157,7 +148,7 @@ export const toNewGameTemplate = (attributes: Attr<ConditionNewGame>): string =>
 
   isKeyInAtt('startMode', attributes) && props.push(`start_mode="${attributes.startMode}"`);
 
-  return renderTemplate('NewGame', props);
+  return renderTemplate('condition', 'NewGame', props);
 };
 
 /** Render `ScenarioCompleted` attributes template */
@@ -172,7 +163,7 @@ export const toScenarioCompletedTemplate = (attributes: Attr<ConditionScenarioCo
 
   isKeyInAtt('gameMode', attributes) && props.push(`game_mode="${attributes.gameMode}"`);
 
-  return renderTemplate('ScenarioCompleted', props);
+  return renderTemplate('condition', 'ScenarioCompleted', props);
 };
 
 /** Render `TechUnlocked` attributes template */
@@ -186,7 +177,7 @@ export const toTechUnlockedTemplate = (attributes: Attr<ConditionTechUnlocked>):
   isKeyInAtt('tech', attributes) && props.push(`tech="${attributes.tech}"`);
   isKeyInAtt('techs', attributes) && props.push(`techs="${attributes.techs.join(' ')}"`);
 
-  return renderTemplate('TechUnlocked', props);
+  return renderTemplate('condition', 'TechUnlocked', props);
 };
 
 /** Render `TimeElapsed` attributes template */
@@ -195,13 +186,13 @@ export const toTimeElapsedTemplate = (attributes: Attr<ConditionTimeElapsed>): s
   isKeyInAtt('timer', attributes) && props.push(`timer="${attributes.timer}"`);
   isKeyInAtt('value', attributes) && props.push(`value="${formatPeriod(attributes.value as number)}"`);
 
-  return renderTemplate('TimeElapsed', props);
+  return renderTemplate('condition', 'TimeElapsed', props);
 };
 
 /** Render `ValueEquals` attributes template */
 export const toValueEqualsTemplate = (attributes: Attr<ConditionValueEquals>): string => {
   return attributes?.id?.trim() && isKeyInAtt('value', attributes)
-    ? renderTemplate('ValueEquals', [
+    ? renderTemplate('condition', 'ValueEquals', [
       `id="${attributes.id}"`,
       `value="${attributes.value}"`,
     ])
@@ -220,7 +211,7 @@ export const toValueReachedTemplate = (attributes: Attr<ConditionValueReached>):
 
   isKeyInAtt('value', attributes) && props.push(`value="${attributes.value}"`);
 
-  return renderTemplate('ValueReached', props);
+  return renderTemplate('condition', 'ValueReached', props);
 };
 
 /** Render `LogicalCondition` template */

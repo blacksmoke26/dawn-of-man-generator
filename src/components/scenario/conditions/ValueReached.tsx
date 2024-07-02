@@ -1,3 +1,5 @@
+// noinspection HtmlUnknownAttribute
+
 /**
  * @author Junaid Atari <mj.atari@gmail.com>
  * @see https://github.com/blacksmoke26/dawn-of-man-generator
@@ -9,24 +11,31 @@ import cn from 'classname';
 import merge from 'deepmerge';
 import {capitalCase} from 'change-case';
 import {Col, Row} from 'react-bootstrap';
+import uniqueRandomArray from 'unique-random-array';
 
 // elemental components
-import NumberInput from '~/components/ui/NumberInput';
-import Select, {Option} from '~/components/ui/Select';
+import TextInput from '~/components/ui/TextInput';
+import PropertyLabel from '~/components/ui/PropertyLabel';
 import ConditionHeader from './../elements/ConditionHeader';
+import AttributeSelect from '~/components/ui/elements/AttributeSelect';
 
 // hooks
-import useAttributes from '~/hooks/use-attributes';
+import useValues from '~/hooks/use-values';
 
 // utils
-import {defaultsParams, VALUE_REACHED} from '~/utils/condition';
 import {subConditionDefaultProps} from './utils/condition-logical';
 import {filterEmpty, toConditionTemplate} from '~/utils/parser/templates';
+import {defaultsParams, VALUE_EQUALS} from '~/utils/condition';
 
 // types
-import type {ConditionAttributesProps, ConditionProps, ConditionValueReached} from '~/types/condition.types';
+import type {
+  ConditionAttributesProps, ConditionProps, ConditionValueReached
+} from '~/types/condition.types';
 
 interface Props extends ConditionProps<ConditionValueReached> {
+}
+
+export interface ValueReachedAttributes extends ConditionAttributesProps {
 }
 
 const CONDITION_NAME: string = 'ValueReached';
@@ -34,98 +43,77 @@ const CONDITION_NAME: string = 'ValueReached';
 const ValueReached = (props: Props) => {
   const newProps = merge<Required<Props>>(subConditionDefaultProps, props);
 
-  const [attributes, setAttr, getAttr] = useAttributes<ConditionAttributesProps>({
+  const valuer = useValues<Partial<ConditionValueReached>>(
+    merge(defaultsParams?.valueReached || {}, props?.initialValues || {}),
+  );
+
+  const state = useValues<ValueReachedAttributes>({
     enabled: newProps.enabled as boolean,
     disabledCheckbox: newProps.disabledCheckbox as boolean,
     expanded: newProps.expanded as boolean || true,
   });
 
-  const [values, setValue, getValue] = useAttributes<ConditionValueReached>(
-    merge(defaultsParams?.valueReached || {}, newProps?.initialValues || {}),
-  );
-
   React.useEffect(() => {
-    if (attributes.enabled) {
-      setValue('id', props?.values?.id, true);
-      setValue('value', props?.values?.value, true);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    attributes.enabled,
-    props?.values?.id, props?.values?.value,
-  ]);
+    const changeValues = {...valuer.data};
 
-  // Reflect values changes
-  React.useEffect(() => {
-    newProps?.onTemplate(toConditionTemplate('ValueReached', values, !attributes.enabled));
-    newProps?.onValuesChange(filterEmpty(values));
+    newProps?.onTemplate(toConditionTemplate('ValueReached', changeValues, !state.data.enabled));
+    newProps?.onValuesChange(filterEmpty(changeValues));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [attributes.enabled, values]);
+  }, [state.data.enabled, valuer.data]);
 
   // Reflect state changes
   React.useEffect(() => {
-    newProps.onChange(attributes);
+    newProps.onChange(state.data);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [attributes]);
+  }, [state.data]);
 
   // Reflect prop changes
   React.useEffect(() => {
-    setAttr('enabled', props?.enabled, true);
-    setAttr('disabledCheckbox', props?.disabledCheckbox, true);
-    setAttr('expanded', props?.expanded, true);
+    state.set('enabled', props?.enabled, true);
+    state.set('disabledCheckbox', props?.disabledCheckbox, true);
+    state.set('expanded', props?.expanded, true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props?.enabled, props?.disabledCheckbox, props?.expanded]);
 
-  const isDisabled = getAttr('disabledCheckbox') || !getAttr('enabled');
+  const isDisabled = state.data.disabledCheckbox || !state.data.enabled;
 
   return (
     <div className={cn('mb-2', {'text-muted': isDisabled}, 'checkbox-align')}>
       <ConditionHeader
         caption={CONDITION_NAME} showCheckbox={newProps.showCheckbox}
-        enabled={getAttr('enabled')}
-        onEnabled={(isEnabled: boolean) => setAttr('enabled', isEnabled)}
-        disabledCheckbox={getAttr('disabledCheckbox')}
+        enabled={state.data.enabled}
+        onEnabled={(isEnabled: boolean) => state.set('enabled', isEnabled)}
+        disabledCheckbox={state.data.disabledCheckbox}
         removeIcon={newProps.removeIcon}
         onRemoveClick={newProps.onRemoveClick}
-        onExpandedClick={(state: boolean) => setAttr('expanded', state)}
-        expanded={getAttr('expanded')}/>
-      {getAttr('expanded') && (
+        onExpandedClick={(isExpended: boolean) => state.set('expanded', isExpended)}
+        expanded={state.data.expanded}/>
+      {state.data.expanded && (
         <>
-          <Row className="mb-1 mt-2">
-            <Col xs="2">
-              <div className="position-relative pl-3" style={{top: 7}}>ID</div>
-            </Col>
-            <Col xs="5">
-              <Select
-                isDisabled={isDisabled}
-                isSearchable={false}
-                defaultValue={getValue('id') ? {label: getValue('id'), value: getValue('id')} : null}
-                menuPortalTarget={document.body}
-                options={VALUE_REACHED.map(value => ({label: capitalCase(value), value}))}
-                placeholder="Choose..."
-                onChange={(option: Option | any, {action}): void => {
-                  if (action === 'select-option' && option) {
-                    setValue('id', option.value);
-                  }
-                }}
-              />
-            </Col>
+          <Row className="mb-2 mt-2">
+            <PropertyLabel caption="ID"/>
+            <AttributeSelect
+              className="w-75"
+              colProps={{sm: 6}}
+              disabled={isDisabled}
+              options={VALUE_EQUALS.map(value => ({label: capitalCase(value), value}))}
+              value={valuer.get('id', 'Population')}
+              onSelect={option => valuer.set('id', option.value)}
+              allowShuffle
+              onShuffle={() => valuer.set('id', uniqueRandomArray(VALUE_EQUALS))}
+            />
           </Row>
+
           <Row className="mb-1 mt-2">
-            <Col xs="2">
-              <div className="position-relative pl-3" style={{top: 7}}>Value</div>
-            </Col>
-            <Col xs="3">
-              <NumberInput
-                maxLength={4}
-                min={1}
-                max={9990}
+            <PropertyLabel caption="Value" disabled={isDisabled}/>
+            <Col xs="4">
+              <TextInput
+                selectOnLoad={true}
+                focusOnLoad={true}
                 disabled={isDisabled}
-                allowClear={true}
-                placeholder="e.g. 350"
-                value={getValue('value')}
-                onChange={value => setValue('value', value)}
-                shuffle={false}/>
+                value={valuer.get('value', '')}
+                placeholder="e.g., 2"
+                onChange={value => valuer.set('value', value)}/>
             </Col>
           </Row>
         </>
@@ -142,7 +130,8 @@ ValueReached.propTypes = {
   onRemoveClick: PropTypes.func,
   expanded: PropTypes.bool,
   onChange: PropTypes.func,
-  id: PropTypes.oneOf(VALUE_REACHED),
+  counter: PropTypes.oneOf(COUNTERS),
+  entityType: PropTypes.oneOf(ENTITIES),
   value: PropTypes.number,*/
 };
 

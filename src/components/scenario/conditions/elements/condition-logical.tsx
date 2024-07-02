@@ -1,3 +1,5 @@
+// noinspection HtmlUnknownAnchorTarget
+
 /**
  * @author Junaid Atari <mj.atari@gmail.com>
  * @see https://github.com/blacksmoke26/dawn-of-man-generator
@@ -5,12 +7,15 @@
  */
 
 import React from 'react';
-import {Button, ButtonProps} from 'react-bootstrap';
+import cn from 'classname';
+import {nanoid} from 'nanoid';
+import {Button, ButtonProps, Form} from 'react-bootstrap';
 
 // icons
 import {
-  COLOR_REDDISH, IconChevronDown, IconChevronUp,
-  IconClear, IconConditionAnd, IconConditionNot, IconConditionOr,
+  COLOR_DISABLED,
+  COLOR_REDDISH, IconChevronDown, IconChevronSimpleDown, IconChevronSimpleUp, IconChevronUp,
+  IconClear, IconCondition, IconConditionAnd, IconConditionLogical, IconConditionNot, IconConditionOr,
 } from '~/components/icons/app';
 
 // types
@@ -128,3 +133,81 @@ export const RemoveAllButton = (props: CButtonProps = {}) => {
     </div>
   );
 };
+
+export const ToggleCheckbox = (props: { attr: boolean, disabled: boolean, onClick: () => void }) => (
+  <span
+    className={cn('mr-1', {'text-muted': !props.attr})}>
+      <a href="#disable"
+         className={cn({'text-muted': props.disabled})}
+         onClick={(e) => {
+           e.preventDefault();
+           props.onClick();
+         }} style={{
+        cursor: !props.disabled ? 'pointer' : 'default',
+        color: '#FFF',
+      }}>
+        <span className="position-relative" style={{top: 0}}>
+
+        <IconConditionLogical
+          width="17" height="17"
+          color={!props.attr ? COLOR_DISABLED : COLOR_REDDISH}/>
+          {' '} <strong>Condition:</strong>
+          {' '} SubConditions
+      </span>
+      </a>
+    </span>
+);
+
+export const OperatorIcon = (props: { operator: LogicalCondition, disabled: boolean }) => (
+  <div className={cn('d-inline-block', {'text-muted-deep': props.disabled})}>
+    <strong
+      style={{color: '#ebeaea'}}
+      className={cn('text-size-sm')}>
+      {conditionIcon(props.operator)}
+      {' '}
+      <span className="position-relative" style={{top: '0.01rem'}}>
+        {props.operator?.toUpperCase()}
+      </span>
+    </strong>
+  </div>
+);
+
+export const ToggleIcon = (props: {
+  disabledCheckbox: boolean,
+  expanded: boolean,
+  disabled: boolean,
+  onClick: () => void
+}) => {
+  return (
+    <div className="d-inline-block ml-2">
+      <Button
+        variant="link" className="p-0" style={{top: '-0.080rem'}}
+        disabled={props.disabledCheckbox || props.disabled}
+        onClick={() => props.onClick()}>
+        {!props.expanded
+          ? <IconChevronSimpleUp width="16" height="16"/>
+          : <IconChevronSimpleDown width="16" height="16"/>}
+      </Button>
+    </div>
+  );
+};
+export const ToggleExpand = (props: { disabledCheckbox: boolean, disabled: boolean, onChange: (state: boolean) => void }) => (
+  <Form.Check
+    type="switch"
+    id={`switch-${nanoid(5)}`}
+    label={(
+      <span className="position-relative" style={{top: 0}}>
+        <span className={cn({'text-muted': props.disabled})}>
+          <IconCondition
+            width="17" height="17"
+            color={props.disabled ? COLOR_DISABLED : COLOR_REDDISH}/>
+          {' '} <strong>Condition:</strong>
+          {' '} SubConditions
+        </span>
+      </span>
+    )}
+    checked={!props.disabled}
+    disabled={props.disabledCheckbox}
+    onChange={e => props.onChange(e.target.checked)}
+  />
+);
