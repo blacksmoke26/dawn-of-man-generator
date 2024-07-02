@@ -8,11 +8,14 @@ import React from 'react';
 import * as PropTypes from 'prop-types';
 import cn from 'classname';
 import merge from 'deepmerge';
-import {nanoid} from 'nanoid';
-import {Col, Form, Row} from 'react-bootstrap';
+import {Col, Row} from 'react-bootstrap';
+import uniqueRandomArray from 'unique-random-array';
 
 // elemental components
-import Select, {Option} from '~/components/ui/Select';
+import TextInput from '~/components/ui/TextInput';
+import PropertyLabel from '~/components/ui/PropertyLabel';
+import PanelToolbar from '~/components/environment/PanelToolbar';
+import AttributeSelect from '~/components/ui/elements/AttributeSelect';
 
 // redux
 import {useAppSelector} from '~redux/hooks';
@@ -24,9 +27,7 @@ import {DEFAULT_SEASONS} from '~/utils/defaults';
 import {toStartingConditionTemplate} from '~/utils/parser/templates-general';
 
 // types
-import type {$Keys} from 'utility-types';
 import type {Season} from '~/utils/seasons.types';
-import {Json} from '~/types/json.types';
 
 /** StartingCondition `props` type */
 interface Attributes {
@@ -62,7 +63,7 @@ const StartingCondition = (props: Props) => {
     visualSetupId: props.visualSetupId as string,
   });
 
-  const setAttribute = <T = any>(name: $Keys<Attributes>, value: T) => {
+  const setAttribute = <T = any>(name: keyof Attributes, value: T) => {
     setAttributes(current => {
       return ({...current, [name]: value as T});
     });
@@ -83,74 +84,48 @@ const StartingCondition = (props: Props) => {
   React.useEffect(() => {
     const {enabled, ...attrs} = attributes;
     typeof props.onChange === 'function' && props.onChange(
-      toStartingConditionTemplate(attrs, enabled), attributes
+      toStartingConditionTemplate(attrs, enabled), attributes,
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [attributes]);
 
-  const renderSelectOptions = React.useCallback((): Json[] => {
-    return DEFAULT_SEASONS
-      .map(v => ({label: v, value: v}));
-  }, []);
-
   return (
-    <div className={cn('mb-2', {'text-muted': !attributes.enabled}, 'checkbox-align')}>
-      <Row className="mb-1">
-        <Col xs="10">
-          Starting conditions
-          <div className="text-size-xxs text-muted mt-1">
-            Defines the conditions when game is started.
-          </div>
-        </Col>
-        <Col xs="2" className="text-right">
-          <Form.Check
-            className="pull-right"
-            type="switch"
-            id={`category-switch-${nanoid(5)}`}
-            label=""
-            checked={attributes.enabled}
-            onChange={e => setAttribute('enabled', e.target.checked)}
-          />
-        </Col>
+    <div className={cn('mb-2 checkbox-align', {'text-muted-deep': !attributes.enabled})}>
+      <PanelToolbar
+        checked={attributes.enabled}
+        heading="Starting conditions"
+        checkboxPosition="right"
+        description="Defines the conditions when game is started."
+        onCheckboxChange={state => setAttribute('enabled', state)}
+        value=""
+        disabled={!attributes.enabled}/>
+
+      <Row className="mb-1 mt-3">
+        <PropertyLabel disabled={!attributes.enabled} caption="Season"/>
+        <AttributeSelect
+          className="w-75"
+          colProps={{sm: 6}}
+          disabled={!attributes.enabled}
+          selectProps={{isSearchable: false}}
+          options={DEFAULT_SEASONS.map(value => ({label: value, value}))}
+          value={attributes?.seasonId}
+          onSelect={option => setAttribute('seasonId', option.value)}
+          allowShuffle
+          onShuffle={() => {
+            setAttribute('seasonId', uniqueRandomArray(DEFAULT_SEASONS)());
+          }}
+        />
       </Row>
       <Row className="mb-1 mt-3">
-        <Col xs="2">
-            <span className="position-relative" style={{top: 9}}>
-              Season
-            </span>
-        </Col>
+        <PropertyLabel disabled={!attributes.enabled} caption="Visual Setup"/>
         <Col xs="6">
-          <Select id={`starting_conditions-${nanoid(5)}`}
-                  isDisabled={!attributes.enabled}
-                  menuPortalTarget={document.body}
-                  isSearchable={false}
-                  placeholder="Choose season"
-                  value={{label: attributes.seasonId, value: attributes.seasonId}}
-                  options={renderSelectOptions()}
-                  onChange={(option: Option | any, {action}): void => {
-                    if (action === 'select-option' && option) {
-                      setAttribute('seasonId', option.value);
-                    }
-                  }}/>
-        </Col>
-      </Row>
-      <Row className="mb-1 mt-3">
-        <Col xs="2">
-            <span className="position-relative" style={{top: 9}}>
-              Visual Setup
-            </span>
-        </Col>
-        <Col xs="6">
-          <Form.Control
-            type="text"
+          <TextInput
+            caseType="PASCAL_CASE"
             disabled={!attributes.enabled}
-            className="pull-right"
-            aria-disabled={!attributes.enabled}
-            id={`visual_setup_id-${nanoid(5)}`}
+            value={attributes?.visualSetupId ?? ''}
             placeholder="e.g., WinterSnow"
-            value={attributes.visualSetupId}
-            onChange={e => setAttribute('visualSetupId', e.target.value.replace(/['"]+/ig, ``))}
-          />
+            allowClear
+            onChange={theValue => setAttribute('visualSetupId', theValue as string)}/>
         </Col>
       </Row>
     </div>
