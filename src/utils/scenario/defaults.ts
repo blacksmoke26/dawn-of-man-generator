@@ -14,6 +14,22 @@ export const MILESTONES_MIN: number = 1;
 
 export const MILESTONES_MAX: number = 20;
 
+export const PRESTIGE_MIN: number = 1;
+
+export const PRESTIGE_MAX: number = 1500;
+
+export const GAME_SPEED_MIN: number = 1;
+
+export const GAME_SPEED_MAX: number = 20;
+
+export const KNOWLEDGE_MIN: number = 1;
+
+export const KNOWLEDGE_MAX: number = 20;
+
+export const CHALLENGES_MIN: number = 1;
+
+export const CHALLENGES_MAX: number = 20;
+
 export const LOCATION_COUNT_MIN: number = 1;
 
 export const LOCATION_COUNT_MAX: number = 12;
