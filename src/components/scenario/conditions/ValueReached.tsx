@@ -10,7 +10,7 @@ import React from 'react';
 import cn from 'classname';
 import merge from 'deepmerge';
 import {capitalCase} from 'change-case';
-import {Col, Row} from 'react-bootstrap';
+import {Row} from 'react-bootstrap';
 import uniqueRandomArray from 'unique-random-array';
 
 // elemental components
