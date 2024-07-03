@@ -212,3 +212,14 @@
 }
 
 .text-underline-dotted { text-decoration: underline dotted; }
+
+.ui-json-editor {
+    min-height: 69.9vh;
+    height: 69.9vh;
+    max-height: 69.9vh;
+    font-size: 15px;
+    overflow-y: auto;
+    padding-top: .5rem;
+    border-radius: 2px;
+    font-family: SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+}

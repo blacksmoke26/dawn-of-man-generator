@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.2.5",
+    "ace-builds": "^1.35.2",
     "bootstrap": "^4.6.2",
     "change-case": "^5.4.4",
     "classname": "^0.0.0",
@@ -17,6 +18,7 @@
     "deepmerge": "^4.3.1",
     "fast-xml-parser": "^4.4.0",
     "file-saver": "^2.0.5",
+    "json-edit-react": "^1.13.2",
     "lucide-react": "^0.390.0",
     "nanoid": "^5.0.7",
     "object-path": "^0.11.8",
@@ -25,6 +27,7 @@
     "rc-slider": "^10.6.2",
     "rc-tooltip": "^6.2.0",
     "react": "^18.3.1",
+    "react-ace": "^12.0.0",
     "react-bootstrap": "^2.10.2",
     "react-bootstrap-typeahead": "^6.3.2",
     "react-dom": "^18.3.1",
