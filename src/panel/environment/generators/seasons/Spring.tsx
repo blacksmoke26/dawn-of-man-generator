@@ -219,40 +219,29 @@ const Spring = (props: Props) => {
 
       <SeasonAttributeSlider
         disabled={!enabled}
-        value={season.fishBoost}
-        onChange={val => updateValue('fishBoost', val)}
-        allowNumberInput
-        caption="Fish Boost"
-        title="Fish in banks will replenish by this amount at the beginning of this season."
-        allowRestore allowShuffle allowMin allowMax
-        onShuffle={() => updateValue('fishBoost', random.randomFloat())}
-        onRestore={() => updateValue('fishBoost', SpringConfig.fish_boost)}>
-        <Slider
-          disabled={!enabled}
-          min={0} max={1} step={0.01}
-          value={season.fishBoost}
-          onChange={v => updateValue('fishBoost', v)}/>
-      </SeasonAttributeSlider>
-
-      <SeasonAttributeSlider
-        disabled={!enabled}
         displayValue={() => (
           <>
             <PopoverNumberInput
               {...temperatureNumberInputProps(enabled)}
               min={Defaults.SEASON_TEMPERATURE_MIN}
-              max={0}
+              max={Defaults.SEASON_TEMPERATURE_MAX}
               formatValue={value => <>{value}°</>}
               value={season.minTemperatureValue as number}
-              onSave={value => updateValue('minTemperatureValue', value)}/>
+              onSave={value => {
+                const maxValue = season.maxTemperatureValue as number;
+                updateValue('maxTemperatureValue', value > maxValue ? maxValue : value);
+              }}/>
             <strong style={{marginRight: 5, marginLeft: 3, color: COLOR_WHITISH}}>,</strong>
             <PopoverNumberInput
               {...temperatureNumberInputProps(enabled)}
-              min={1}
+              min={Defaults.SEASON_TEMPERATURE_MIN}
               max={Defaults.SEASON_TEMPERATURE_MAX}
               formatValue={value => <>{value}°</>}
               value={season.maxTemperatureValue as number}
-              onSave={value => updateValue('maxTemperatureValue', value)}/>
+              onSave={value => {
+                const minValue = season.minTemperatureValue as number;
+                updateValue('maxTemperatureValue', value < minValue ? minValue : value);
+              }}/>
           </>
         )}
         caption="Temperature"
