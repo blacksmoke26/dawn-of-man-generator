@@ -6,7 +6,7 @@
  */
 
 // utils
-import {ENV_DEV} from '~/utils/env';
+//import {ENV_DEV} from '~/utils/env';
 
 // types
 import type {ConfigurationState} from './reducers.types';
@@ -15,8 +15,8 @@ import type {ConfigurationState} from './reducers.types';
 export default {
   initiated: false,
   panels: {
-    showXmlToJson: ENV_DEV,
-    showXmlToScenario: ENV_DEV,
-    showXmlToEnvironment: ENV_DEV,
+    showXmlToJson: true,
+    showXmlToScenario: true,
+    showXmlToEnvironment: true,
   },
 } as ConfigurationState;
