@@ -107,7 +107,6 @@ const XmlToJson = (props: XmlToJsonProps) => {
     }
   };
 
-  console.log('V', value);
   return (
     <Row className="mb-1">
       <Col sm="6" className="pr-1">
