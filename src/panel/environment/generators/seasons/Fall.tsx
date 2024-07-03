@@ -203,18 +203,24 @@ const Fall = (props: Props) => {
             <PopoverNumberInput
               {...temperatureNumberInputProps(enabled)}
               min={Defaults.SEASON_TEMPERATURE_MIN}
-              max={0}
+              max={Defaults.SEASON_TEMPERATURE_MAX}
               formatValue={value => <>{value}°</>}
               value={season.minTemperatureValue as number}
-              onSave={value => updateValue('minTemperatureValue', value)}/>
+              onSave={value => {
+                const maxValue = season.maxTemperatureValue as number;
+                updateValue('maxTemperatureValue', value > maxValue ? maxValue : value);
+              }}/>
             <strong style={{marginRight: 5, marginLeft: 3, color: COLOR_WHITISH}}>,</strong>
             <PopoverNumberInput
               {...temperatureNumberInputProps(enabled)}
-              min={1}
+              min={Defaults.SEASON_TEMPERATURE_MIN}
               max={Defaults.SEASON_TEMPERATURE_MAX}
               formatValue={value => <>{value}°</>}
               value={season.maxTemperatureValue as number}
-              onSave={value => updateValue('maxTemperatureValue', value)}/>
+              onSave={value => {
+                const minValue = season.minTemperatureValue as number;
+                updateValue('maxTemperatureValue', value < minValue ? minValue : value);
+              }}/>
           </>
         )}
         caption="Temperature"
