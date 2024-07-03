@@ -127,7 +127,7 @@ const XmlToJson = (props: XmlToJsonProps) => {
           style={{
             height: '69.9vh',
             fontFamily: 'SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace',
-            fontSize: 14,
+            fontSize: 16,
           }}
           highlightActiveLine={true}
           value={value}
