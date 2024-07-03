@@ -12,11 +12,12 @@ import * as PropTypes from 'prop-types';
 import cn from 'classname';
 import {nanoid} from 'nanoid';
 import merge from 'deepmerge';
-import {Button, Col, Form, Row, Tab, Tabs} from 'react-bootstrap';
+import {Button, Form, Tab, Tabs} from 'react-bootstrap';
 
 // components
 import Slider from '~/components/ui/Slider';
 import Select, {Option} from '~/components/ui/Select';
+import SeasonAttributeSlider from '~/panel/environment/generators/seasons/elements/SeasonAttributeSlider';
 
 // utils
 import * as random from '~/utils/random';
@@ -34,8 +35,6 @@ import {useAppSelector} from '~redux/hooks';
 import type {Json, KVDocument} from '~/types/json.types';
 import type {Disasters} from '~/types/scenario.types';
 import type {DisasterNode} from '~/utils/parser/templates-general';
-import {FallConfig} from '~/utils/seasons';
-import SeasonAttributeSlider from '~/panel/environment/generators/seasons/elements/SeasonAttributeSlider';
 
 export interface Attributes {
   enabled?: boolean;
