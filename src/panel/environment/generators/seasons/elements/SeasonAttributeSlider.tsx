@@ -70,7 +70,7 @@ const SeasonAttributeSlider = (props: React.PropsWithChildren<SeasonAttributeSli
           {props?.title && (
             <div
               className={cn('float-left text-size-xxs position-relative font-italic font-weight-light')}
-              style={{top: 10, color: isDisabled ? 'rgba(255, 255, 255, .1)' : 'rgba(255, 255, 255, .7)'}}>
+              style={{top: 7, color: isDisabled ? 'rgba(255, 255, 255, .1)' : 'rgba(255, 255, 255, .7)'}}>
               {props?.title}
             </div>
           )}
