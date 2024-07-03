@@ -14,10 +14,12 @@ import {Col, Row} from 'react-bootstrap';
 import uniqueRandomArray from 'unique-random-array';
 
 // elemental components
-import TextInput from '~/components/ui/TextInput';
 import PropertyLabel from '~/components/ui/PropertyLabel';
-import ConditionHeader from './../elements/ConditionHeader';
 import AttributeSelect from '~/components/ui/elements/AttributeSelect';
+
+// components
+import ConditionValue from './components/ConditionValue';
+import ConditionHeader from './../elements/ConditionHeader';
 
 // hooks
 import useValues from '~/hooks/use-values';
@@ -106,15 +108,12 @@ const ValueEquals = (props: Props) => {
 
           <Row className="mb-1 mt-2">
             <PropertyLabel caption="Value" disabled={isDisabled}/>
-            <Col xs="4">
-              <TextInput
-                selectOnLoad={true}
-                focusOnLoad={true}
-                disabled={isDisabled}
-                value={valuer.get('value', '')}
-                placeholder="e.g., 2"
-                onChange={value => valuer.set('value', value)}/>
-            </Col>
+            <ConditionValue
+              type={valuer.get('id', 'Population')}
+              value={valuer.get('value', '')}
+              disabled={isDisabled}
+              onChange={value => valuer.set('value', value)}
+            />
           </Row>
         </>
       )}
