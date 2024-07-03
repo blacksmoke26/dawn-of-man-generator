@@ -145,9 +145,11 @@ const MilestoneContainer = (props: Props) => {
           </ButtonGroup>
           <InputGroup>
             <InputGroup.Text
-              className={cn('border-0 pl-2 pr-2', {
-                'text-muted text-line-through': !checked || total < 1,
-              })}>Total: {total}</InputGroup.Text>
+              as="span"
+              className={cn('text-size-sm border-0 pl-2 pr-2 pt-0 pb-0 bg-transparent', {
+                'text-muted text-line-through': !checked,
+              })}>{!total ? <>&nbsp;</> : <>{total} / {MAX_COUNT}</>}
+            </InputGroup.Text>
           </InputGroup>
         </ButtonToolbar>
       </div>

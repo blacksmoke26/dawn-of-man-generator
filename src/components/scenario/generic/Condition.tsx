@@ -25,6 +25,8 @@ const Condition = (props: Props) => {
 
   if (LOGICAL_CONDITION.includes(props?.type)) {
     componentProps.operator = props?.type;
+    componentProps.values = props?.initialValues?.conditions || [];
+    delete componentProps.initialValues;
   }
 
   return (
