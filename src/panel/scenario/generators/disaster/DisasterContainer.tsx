@@ -34,6 +34,8 @@ import {useAppSelector} from '~redux/hooks';
 import type {Json, KVDocument} from '~/types/json.types';
 import type {Disasters} from '~/types/scenario.types';
 import type {DisasterNode} from '~/utils/parser/templates-general';
+import {FallConfig} from '~/utils/seasons';
+import SeasonAttributeSlider from '~/panel/environment/generators/seasons/elements/SeasonAttributeSlider';
 
 export interface Attributes {
   enabled?: boolean;
@@ -204,7 +206,7 @@ const DisasterContainer = (props: Props) => {
             </>
           }
           as="div">
-          <div>
+          <div className="mb-3">
             <div className="float-right text-right position-relative" style={{height: 15}}>
               <Button
                 variant="link"
@@ -245,52 +247,51 @@ const DisasterContainer = (props: Props) => {
             <div className="clearfix"></div>
           </div>
 
-          <Form.Group as={Row} className={cn('mb-2', {'text-muted': !isEnabled})}>
-            <Form.Label column={true} sm="2">
-                <span style={{textDecoration: 'underline dotted'}}
-                      title="How long this disater lasts (year)">
-                  Period
-                </span>
-            </Form.Label>
-            <Col sm="10">
-									<span className="text-size-xs font-family-code">
-										Value: <code className={cn({'text-muted': !isEnabled})}>{attr.period}y</code>
-									</span>
-              <Button
-                disabled={!isEnabled}
-                className="button-reset-sm" variant="link"
-                onClick={() => modifySelection(name, {period: random.randomPeriod()})}>
-                Random
-              </Button>
-              <Slider
-                disabled={!isEnabled}
-                step={0.1} min={Defaults.PERIOD_MIN} max={Defaults.PERIOD_MAX}
-                value={parseFloat(attr?.period ?? '0')}
-                onChange={(value: any) => modifySelection(name, {period: value})}/>
-            </Col>
-          </Form.Group>
-          <Form.Group as={Row} className={cn('mb-2', {'text-muted': !isEnabled})}>
-            <Form.Label column={true} sm="2">
-                <span style={{textDecoration: 'underline dotted'}}
-                      title="How long this variance lasts (year)">
-                  Variance
-                </span>
-            </Form.Label>
-            <Col sm="10">
-									<span className="text-size-xs font-family-code">
-										Value: <code className={cn({'text-muted': !isEnabled})}>{attr.variance}y</code>
-									</span>
-              <Button disabled={!isEnabled}
-                      className="button-reset-sm" variant="link"
-                      onClick={() => modifySelection(name, {variance: random.randomPeriod()})}>
-                Random
-              </Button>
-              <Slider disabled={!isEnabled}
-                      step={0.1} min={Defaults.PERIOD_MIN} max={Defaults.PERIOD_MAX}
-                      value={parseFloat(attr?.variance ?? '0')}
-                      onChange={(value: any) => modifySelection(name, {variance: value})}/>
-            </Col>
-          </Form.Group>
+          <SeasonAttributeSlider
+            disabled={!enabled}
+            value={parseFloat(attr?.period ?? '0')}
+            onChange={(value: any) => modifySelection(name, {period: value})}
+            allowNumberInput
+            caption="Period"
+            title="How long this disater lasts (year)"
+            allowShuffle
+            numberInputProps={{
+              formatValue: value => `${value}y`,
+              decimals: 1,
+              min: Defaults.PERIOD_MIN,
+              max: Defaults.PERIOD_MAX,
+              inputProps: {labelAfter: 'y'},
+            }}
+            onShuffle={() => modifySelection(name, {period: random.randomPeriod()})}>
+            <Slider
+              disabled={!isEnabled}
+              step={0.1} min={Defaults.PERIOD_MIN} max={Defaults.PERIOD_MAX}
+              value={parseFloat(attr?.period ?? '0')}
+              onChange={(value: any) => modifySelection(name, {period: value})}/>
+          </SeasonAttributeSlider>
+
+          <SeasonAttributeSlider
+            disabled={!enabled}
+            value={parseFloat(attr?.variance ?? '0')}
+            onChange={(value: any) => modifySelection(name, {variance: value})}
+            allowNumberInput
+            caption="Variance"
+            title="How long this variance lasts (year)"
+            allowShuffle
+            numberInputProps={{
+              formatValue: value => `${value}y`,
+              decimals: 1,
+              min: Defaults.PERIOD_MIN,
+              max: Defaults.PERIOD_MAX,
+              inputProps: {labelAfter: 'y'},
+            }}
+            onShuffle={() => modifySelection(name, {variance: random.randomPeriod()})}>
+            <Slider
+              disabled={!isEnabled}
+              step={0.1} min={Defaults.PERIOD_MIN} max={Defaults.PERIOD_MAX}
+              value={parseFloat(attr?.variance ?? '0')}
+              onChange={(value: any) => modifySelection(name, {variance: value})}/>
+          </SeasonAttributeSlider>
         </Tab>,
       );
     }
@@ -332,7 +333,7 @@ const DisasterContainer = (props: Props) => {
         <Tabs
           id="disasters-tab"
           activeKey={activeKey}
-          className={cn('nav-tabs-bottom mt-1', {'border-0': !total})}
+          className={cn('nav-tabs-bottom mt-1 mb-1', {'border-0': !total})}
           onSelect={k => setActiveKey(k as string)}>
           {selectionNodes()}
         </Tabs>
