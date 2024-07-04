@@ -54,8 +54,8 @@ export const SUN_ANGLE_FACTOR_DEFAULT: number = 1;
 export const PERIOD_MIN: number = 0;
 export const PERIOD_MAX: number = 35;
 
-export const RADIUS_MIN: number = 1;
-export const RADIUS_MAX: number = 300;
+export const RADIUS_MIN: number = 0;
+export const RADIUS_MAX: number = 360;
 
 export const ROTATION_MIN: number = 1;
 export const ROTATION_MAX: number = 360;
@@ -75,13 +75,13 @@ export const ANIMAL_POPULATION_MIN: number = 0;
 export const ANIMAL_POPULATION_MAX: number = 500;
 
 export const DECREASE_START_POPULATION_MIN: number = 1;
-export const DECREASE_START_POPULATION_MAX: number = 500;
+export const DECREASE_START_POPULATION_MAX: number = 3000;
 
 export const DECREASE_HALFING_POPULATION_MIN: number = 1;
-export const DECREASE_HALFING_POPULATION_MAX: number = 500;
+export const DECREASE_HALFING_POPULATION_MAX: number = 3000;
 
-export const INDIVIDUAL_DISEASE_CHANCE_MIN: number = 1;
-export const INDIVIDUAL_DISEASE_CHANCE_MAX: number = 50;
+export const INDIVIDUAL_DISEASE_CHANCE_MIN: number = 0;
+export const INDIVIDUAL_DISEASE_CHANCE_MAX: number = 10;
 
 export const TECH_COST_MULTIPLIER_MIN: number = 1;
 export const TECH_COST_MULTIPLIER_MAX: number = 3;
