@@ -32,6 +32,20 @@ export const isFloat = (value: any): boolean => {
 };
 
 /**
+ * Checks that the given value is numeric or not
+ */
+export const isNumeric = (value: any): boolean => {
+  return isFloat(value) || isInt(value);
+};
+
+/**
+ * Count decimals of the given value
+ */
+export const countDecimals = (value: any): number => {
+  return !isFloat(value) ? 0 : String(value).split('.').length;
+};
+
+/**
  * Converts slider steps into decimals count
  * @param decimal - The decimal number
  * @returns The slider steps
