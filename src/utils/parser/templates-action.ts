@@ -94,17 +94,18 @@ export const toFocusCameraTemplate = (attributes: ActionFocusCamera): string => 
 
 /** Render `HideUi` attributes template */
 export const toHideUiTemplate = (attributes: ActionHideUi): string => {
-  if (!attributes?.entityTypes?.length || !attributes?.buildableCategories?.trim()) {
-    return '';
-  }
+  const props: string[] = [];
 
-  const props: string[] = [
-    `entity_types="${attributes.entityTypes.join(',')}"`,
-    `buildable_categories="${attributes.buildableCategories}"`,
-  ];
+  isKeyInAtt('entityTypes', attributes) && attributes?.entityTypes?.length
+  && props.push(`entity_types="${attributes.entityTypes.join(' ')}"`);
 
+  isKeyInAtt('buildableCategories', attributes) && props.push(`buildable_categories="${attributes.buildableCategories}"`);
   isKeyInAtt('hideDisabledUi', attributes) && props.push(`hide_disabled_ui="${'' + attributes?.hideDisabledUi}"`);
   isKeyInAtt('hideQuickPanels', attributes) && props.push(`hide_quick_panels="${'' + attributes?.hideQuickPanels}"`);
+
+  if ( !props.length ) {
+    return '';
+  }
 
   return renderTemplate('action', 'HideUi', props);
 };
@@ -452,12 +453,14 @@ export const toTriggerRaiderAttackTemplate = (attributes: ActionTriggerRaiderAtt
 
 /** Render `Unlock` attributes template */
 export const toUnlockTemplate = (attributes: ActionUnlock): string => {
-  return !attributes.techEra?.trim() || !attributes.techType?.trim()
+  const props: string[] = [];
+
+  isKeyInAtt('techEra', attributes) && props.push(`tech_era="${attributes?.techEra}"`);
+  isKeyInAtt('techType', attributes) && props.push(`tech_type="${attributes?.techType}"`);
+
+  return !props.length
     ? ''
-    : renderTemplate('action', 'Unlock', [
-      `tech_era="${attributes?.techEra}"`,
-      `tech_type="${attributes?.techType}"`,
-    ]);
+    : renderTemplate('action', 'Unlock', props);
 };
 
 const funcRegistry: KVDocument<Function> = {

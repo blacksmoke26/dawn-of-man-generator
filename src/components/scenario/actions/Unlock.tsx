@@ -14,9 +14,10 @@ import {capitalCase} from 'change-case';
 import uniqueRandomArray from 'unique-random-array';
 
 // elemental components
+import Accordion from '~/components/ui/Accordion';
 import ActionHeader from './elements/ActionHeader';
-import PropertyLabel from '~/components/ui/PropertyLabel';
 import AttributeSelect from '~/components/ui/elements/AttributeSelect';
+import PropertyCheckboxLabel from '~/components/ui/PropertyCheckboxLabel';
 import RandomizeValuesButton from '~/components/ui/RandomizeValuesButton';
 
 // hooks
@@ -42,6 +43,8 @@ export interface Props extends ActionProps<ActionUnlock> {
 }
 
 export interface UnlockActionAttributesProps extends ActionAttributesProps {
+  techEraChecked: boolean;
+  techTypeChecked: boolean;
 }
 
 const ACTION_NAME: ActionName = 'Unlock';
@@ -57,17 +60,23 @@ const Unlock = (props: Props) => {
     disabled: newProps.disabled as boolean,
     disabledCheckbox: newProps.disabledCheckbox as boolean,
     expanded: newProps.expanded as boolean || true,
+    techEraChecked: !valuer.is('techEra', undefined),
+    techTypeChecked: !valuer.is('techType', undefined),
   });
 
   // Reflect values changes
   React.useEffect(() => {
     const changeValues = {...valuer.data};
 
+    !state.data.techEraChecked && (changeValues.techEra = undefined);
+    !state.data.techTypeChecked && (changeValues.techType = undefined);
+
     newProps?.onTemplate(toActionTemplate(ACTION_NAME, changeValues, state.data.disabled));
     newProps?.onValuesChange(filterEmpty(changeValues));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     state.data.disabled, valuer.data,
+    state.data.techEraChecked, state.data.techTypeChecked,
   ]);
 
   // Reflect state changes
@@ -100,42 +109,67 @@ const Unlock = (props: Props) => {
       )}
       {state.data.expanded && (
         <>
-          <Row className="mb-1 mt-3">
-            <PropertyLabel caption="Tech era"/>
-            <AttributeSelect
-              className="w-75"
-              colProps={{sm: '6'}}
-              disabled={isDisabled}
-              options={ERAS.map(value => ({label: capitalCase(value), value}))}
-              value={valuer.get('techEra', null)}
-              onSelect={option => valuer.set('techEra', option.value)}
-              allowShuffle
-              onShuffle={() => {
-                valuer.set('techEra', uniqueRandomArray(ERAS));
-              }}
-            />
-          </Row>
+          <Accordion
+            noBodyPad={true}
+            noCard={true}
+            header="Optional parameters"
+            eventKey="hide_ui_optional_parameters">
+            <Row className="mb-1 mt-2">
+              <PropertyCheckboxLabel
+                caption="Tech era"
+                checked={state.get<boolean>('techEraChecked', false)}
+                disabled={isDisabled}
+                undefinedSetter={[valuer, 'techEra', 'Paleolithic']}
+                onChange={isChecked => {
+                  state.set('techEraChecked', isChecked);
+                }}
+              />
+              <AttributeSelect
+                className="w-75"
+                colProps={{sm: '6'}}
+                disabled={isDisabled || !state.get<boolean>('techEraChecked', false)}
+                options={ERAS.map(value => ({label: capitalCase(value), value}))}
+                value={valuer.get('techEra', 'Paleolithic')}
+                onSelect={option => valuer.set('techEra', option.value)}
+                allowShuffle
+                onShuffle={() => {
+                  valuer.set('techEra', uniqueRandomArray(ERAS));
+                }}
+              />
+            </Row>
+            <Row className="mb-1 mt-2">
+              <PropertyCheckboxLabel
+                caption="Tech type"
+                checked={state.get<boolean>('techTypeChecked', false)}
+                disabled={isDisabled}
+                undefinedSetter={[valuer, 'techType', 'None']}
+                onChange={isChecked => {
+                  state.set('techTypeChecked', isChecked);
+                }}
+              />
+              <AttributeSelect
+                className="w-75"
+                colProps={{sm: '6'}}
+                disabled={isDisabled || !state.get<boolean>('techTypeChecked', false)}
+                options={techEntities.map(value => ({label: capitalCase(value), value}))}
+                value={valuer.get('techType', 'None')}
+                onSelect={option => valuer.set('techType', option.value)}
+                allowShuffle
+                onShuffle={() => {
+                  valuer.set('techType', uniqueRandomArray(techEntities));
+                }}
+              />
+            </Row>
+          </Accordion>
 
-          <Row className="mb-1 mt-3">
-            <PropertyLabel caption="Tech type"/>
-            <AttributeSelect
-              className="w-75"
-              colProps={{sm: '6'}}
-              disabled={isDisabled}
-              options={techEntities.map(value => ({label: capitalCase(value), value}))}
-              value={valuer.get('techType', 'None')}
-              onSelect={option => valuer.set('techType', option.value)}
-              allowShuffle
-              onShuffle={() => {
-                valuer.set('techType', uniqueRandomArray(techEntities));
-              }}
-            />
-          </Row>
           <RandomizeValuesButton
             disabled={isDisabled}
             onClick={() => {
-              valuer.set('techEra', uniqueRandomArray(ERAS));
-              valuer.set('techType', uniqueRandomArray(techEntities));
+              state.get<boolean>('techEraChecked', false)
+              && valuer.set('techEra', uniqueRandomArray(ERAS));
+
+              state.get<boolean>('techTypeChecked', false)
+              && valuer.set('techType', uniqueRandomArray(techEntities));
             }}
           />
         </>

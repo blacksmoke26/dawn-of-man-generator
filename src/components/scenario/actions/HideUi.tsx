@@ -9,6 +9,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import cn from 'classname';
 import merge from 'deepmerge';
+import randomInt from 'random-int';
 import {Row} from 'react-bootstrap';
 import {capitalCase} from 'change-case';
 import uniqueRandomArray from 'unique-random-array';
@@ -16,7 +17,6 @@ import uniqueRandomArray from 'unique-random-array';
 // elemental components
 import Accordion from '~/components/ui/Accordion';
 import ActionHeader from './elements/ActionHeader';
-import PropertyLabel from '~/components/ui/PropertyLabel';
 import PropertyCheckboxLabel from '~/components/ui/PropertyCheckboxLabel';
 import RandomizeValuesButton from '~/components/ui/RandomizeValuesButton';
 import AttributeCheckbox from '~/components/ui/elements/AttributeCheckbox';
@@ -28,8 +28,8 @@ import useValues from '~/hooks/use-values';
 // utils
 import {randomArray} from '~/utils/random';
 import {actionDefaultProps} from './utils/default';
-import {BUILDABLE_CATEGORIES, defaultsParams} from '~/utils/action';
 import {ENTITIES, ENTITIES_OPTIONS} from '~/utils/entities';
+import {BUILDABLE_CATEGORIES, defaultsParams} from '~/utils/action';
 
 // parsers
 import {filterEmpty} from '~/utils/template';
@@ -42,6 +42,8 @@ export interface Props extends ActionProps<ActionHideUi> {
 }
 
 export interface HideUiActionAttributesProps extends ActionAttributesProps {
+  entityTypesChecked: boolean;
+  buildableCategoriesChecked: boolean;
   hideDisabledUiChecked: boolean;
   hideQuickPanelsChecked: boolean;
 }
@@ -59,6 +61,8 @@ const HideUi = (props: Props) => {
     disabled: newProps.disabled as boolean,
     disabledCheckbox: newProps.disabledCheckbox as boolean,
     expanded: newProps.expanded as boolean || true,
+    entityTypesChecked: !valuer.is('entityTypes', undefined),
+    buildableCategoriesChecked: !valuer.is('buildableCategories', undefined),
     hideDisabledUiChecked: !valuer.is('hideDisabledUi', undefined),
     hideQuickPanelsChecked: !valuer.is('hideQuickPanels', undefined),
   });
@@ -67,20 +71,20 @@ const HideUi = (props: Props) => {
   React.useEffect(() => {
     const changeValues = {...valuer.data};
 
-    if (!state.data.hideDisabledUiChecked) {
-      changeValues.hideDisabledUi = undefined;
-    }
-
-    if (!state.data.hideQuickPanelsChecked) {
-      changeValues.hideQuickPanels = undefined;
-    }
+    !state.data.entityTypesChecked && (changeValues.entityTypes = undefined);
+    !state.data.buildableCategoriesChecked && (changeValues.buildableCategories = undefined);
+    !state.data.hideDisabledUiChecked && (changeValues.hideDisabledUi = undefined);
+    !state.data.hideQuickPanelsChecked && (changeValues.hideQuickPanels = undefined);
 
     newProps?.onTemplate(toActionTemplate(ACTION_NAME, changeValues, state.data.disabled));
     newProps?.onValuesChange(filterEmpty(changeValues));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
-    state.data.disabled, state.data.hideDisabledUiChecked,
-    state.data.hideQuickPanelsChecked, valuer.data,
+    state.data.disabled, valuer.data,
+    state.data.entityTypesChecked,
+    state.data.buildableCategoriesChecked,
+    state.data.hideDisabledUiChecked,
+    state.data.hideQuickPanelsChecked,
   ]);
 
   // Reflect state changes
@@ -113,12 +117,25 @@ const HideUi = (props: Props) => {
       )}
       {state.data.expanded && (
         <>
+          <Accordion
+            noBodyPad={true}
+            noCard={true}
+            header="Optional parameters"
+            eventKey="hide_ui_optional_parameters">
           <Row className="mb-3 mt-2">
-            <PropertyLabel caption="Entity types"/>
+            <PropertyCheckboxLabel
+              caption="Entity types"
+              checked={state.get<boolean>('entityTypesChecked', false)}
+              disabled={isDisabled}
+              undefinedSetter={[valuer, 'entityTypes', []]}
+              onChange={isChecked => {
+                state.set('entityTypesChecked', isChecked);
+              }}
+            />
             <AttributeSelect
               className="w-75"
               colProps={{sm: '10'}}
-              disabled={isDisabled}
+              disabled={isDisabled || !state.get<boolean>('entityTypesChecked', false)}
               options={ENTITIES_OPTIONS as unknown as Option[]}
               value={valuer.get<string[]>('entityTypes', [])?.map(value => ({label: capitalCase(value), value})) || []}
               selectProps={{isSearchable: true, isMulti: true}}
@@ -129,16 +146,24 @@ const HideUi = (props: Props) => {
               }}
               allowShuffle
               onShuffle={() => {
-                valuer.set('entityTypes', [...(new Set<string>(randomArray(ENTITIES, 5) as string[]) as unknown as string[])]);
+                valuer.set('entityTypes', randomArray(ENTITIES, randomInt(1, 6), true));
               }}
               allowClear
               onClear={() => valuer.set('entityTypes', [])}
             />
           </Row>
           <Row className="mb-3 mt-2">
-            <PropertyLabel caption="Buildable categories"/>
-            <AttributeSelect
+            <PropertyCheckboxLabel
+              caption="Buildable categories"
+              checked={state.get<boolean>('buildableCategoriesChecked', false)}
               disabled={isDisabled}
+              undefinedSetter={[valuer, 'buildableCategories', 'Residence']}
+              onChange={isChecked => {
+                state.set('buildableCategoriesChecked', isChecked);
+              }}
+            />
+            <AttributeSelect
+              disabled={isDisabled || !state.get<boolean>('buildableCategoriesChecked', false)}
               options={BUILDABLE_CATEGORIES.map(value => ({label: capitalCase(value), value}))}
               value={valuer.get('buildableCategories', 'Residence')}
               onSelect={option => valuer.set('buildableCategories', option.value)}
@@ -148,13 +173,7 @@ const HideUi = (props: Props) => {
               }}
             />
           </Row>
-
-          <Accordion
-            noBodyPad={true}
-            noCard={true}
-            header="Optional parameters"
-            eventKey="hide_ui_optional_parameters">
-          <Row className="mb-1 mt-3">
+          <Row className="mb-1 mt-2">
             <PropertyCheckboxLabel
               caption="Disabled UI"
               checked={state.get<boolean>('hideDisabledUiChecked', false)}
@@ -197,8 +216,14 @@ const HideUi = (props: Props) => {
           <RandomizeValuesButton
             disabled={isDisabled}
             onClick={() => {
-              valuer.set('entityTypes', [...(new Set<string>(randomArray(ENTITIES, 5) as string[]) as unknown as string[])]);
-              valuer.set('buildableCategories', uniqueRandomArray(BUILDABLE_CATEGORIES));
+
+              if (state.is('entityTypesChecked', true)) {
+                valuer.set('entityTypes', randomArray(ENTITIES, randomInt(1, 6), true));
+              }
+
+              if (state.is('buildableCategoriesChecked', true)) {
+                valuer.set('buildableCategories', uniqueRandomArray(BUILDABLE_CATEGORIES));
+              }
 
               if (state.is('hideDisabledUiChecked', true)) {
                 valuer.set('hideDisabledUi', randomArray([true, false], 1)[0]);
