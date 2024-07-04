@@ -14,6 +14,7 @@ import type {JsonToReduxOptions} from '~/utils/parser/index.types';
 import {DEFAULT_DISASTER} from '~/utils/defaults';
 import {validatePeriod} from '~/utils/scenario/validator';
 import {transformObjectAttributesArray} from '~/utils/parser/transform';
+import {toFloat} from '~/helpers/number';
 
 /** Convert `scenario` json into redux data */
 export const jsonToRedux = (json: Json, options: JsonToReduxOptions = {}): Json => {
@@ -23,7 +24,7 @@ export const jsonToRedux = (json: Json, options: JsonToReduxOptions = {}): Json 
   return transformObjectAttributesArray(json, merge({
     root: 'scenario.disasters.disaster',
     wrapperKey: 'disasters',
-    uniqueKey: 'disaster_type',
+    uniqueKey: 'disasterType',
     required: allAttrs,
     only: allAttrs,
     minItems: 1,
@@ -36,7 +37,7 @@ export const jsonToRedux = (json: Json, options: JsonToReduxOptions = {}): Json 
       return !(periodAttrs.includes(name) && !validatePeriod(value));
     },
     transform(name: string, value: any): any {
-      return periodAttrs.includes(name) ? parseFloat(String(value)) : value;
+      return periodAttrs.includes(name) ? toFloat('' + value, 2) : value;
     },
   }, options));
 };
