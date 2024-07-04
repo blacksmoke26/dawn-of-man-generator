@@ -7,11 +7,13 @@
  */
 
 import React from 'react';
-import xmlFormatter from 'xml-formatter';
-import {ButtonGroup, Button, Modal, Form, Alert, Row, Col} from 'react-bootstrap';
+import {Button, ButtonGroup, Modal} from 'react-bootstrap';
+
+// elemental components
+import XmlEditorInput from '~/components/ui/XmlEditorInput';
 
 // icons
-import {IconCheck, IconCodeXml, IconEraser, IconWandSparkles} from '~/components/icons/app';
+import {IconCheck, IconCodeXml} from '~/components/icons/app';
 
 // utils
 import {validate, ValidationError} from '~/helpers/xml';
@@ -27,11 +29,9 @@ function XmlTextLoader() {
   const inputRef = React.createRef<HTMLTextAreaElement>();
 
   const [showModel, setShowModel] = React.useState<boolean>(false);
-  const [error, setError] = React.useState<string>('');
   const [value, setValue] = React.useState<string>('');
 
   const xmlValidated: boolean | ValidationError = validate(value.trim());
-  const xmlError: string = typeof xmlValidated !== 'boolean' ? xmlValidated.err.msg : '';
   const isXmlValid: boolean = xmlValidated === true;
 
   /** Focus input field */
@@ -40,32 +40,14 @@ function XmlTextLoader() {
   };
 
   /** Import button click handler */
-  const onImportClick = React.useCallback(async () => {
+  const onImportClick = () => {
     try {
       const json = xmlToReduxJson(value);
       dispatch(updateValuesRaw(json?.environment ?? {}));
       setShowModel(false);
     } catch (e: any) {
-      setError(e.message);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value]);
-
-  /** Prettify button click handler */
-  const onPrettifyClick = React.useCallback((): void => {
-    setValue(
-      xmlFormatter(value, {indentation: '  '}),
-    );
-    focusInput();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value]);
-
-  /** Clear button click handler */
-  const onClearClick = React.useCallback((): void => {
-    setValue('');
-    focusInput();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value]);
+  };
 
   return (
     <>
@@ -76,8 +58,10 @@ function XmlTextLoader() {
       </Button>
       <Modal
         size="xl"
+        dialogClassName="mw-85"
         show={showModel}
         onShow={() => focusInput()}
+        fullscreen
         onHide={() => setShowModel(false)}
         backdrop="static"
         keyboard={false}>
@@ -87,58 +71,29 @@ function XmlTextLoader() {
             onClick={() => setShowModel(false)} type="button" className="close"><span aria-hidden="true">×</span><span
             className="sr-only">Close</span></button>
         </Modal.Header>
-        <Modal.Body>
-          <Form.Control
-            ref={inputRef}
+        <Modal.Body className="pb-0">
+          <XmlEditorInput
             value={value}
-            placeholder="Paste environment xml text here..."
-            as="textarea" className="font-family-code"
-            style={{height: 500}}
-            onChange={(e) => {
-              const val: string = String(e.currentTarget.value).trim();
-              setValue(val);
-              setTimeout(() => setError(''), 50);
-            }}/>
-          {value.trim() && (error || xmlError.trim()) && (
-            <Alert className="mt-3 mb-0" variant="danger">
-              <strong>Error</strong>: {error || xmlError.trim()}
-            </Alert>
-          )}
+            onChange={setValue} />
         </Modal.Body>
         <Modal.Footer className="d-block">
-          <Row>
-            <Col sm="6">
-              <ButtonGroup size="sm">
-                <Button
-                  variant=""
-                  disabled={!isXmlValid}
-                  onClick={() => onPrettifyClick()}>
-                  <IconWandSparkles/> Prettify</Button>
-                <Button
-                  variant=""
-                  disabled={!value.trim()}
-                  onClick={() => onClearClick()}>
-                  <IconEraser/> Clear</Button>
-              </ButtonGroup>
-            </Col>
-            <Col sm="6" className="text-right">
-              <ButtonGroup size="sm">
-                <Button
-                  className="pl-2 pr-2"
-                  variant="success"
-                  disabled={!isXmlValid}
-                  onClick={() => onImportClick()}>
-                  <IconCheck/> Import
-                </Button>
-                <Button
-                  className="pl-3 pr-3"
-                  variant="secondary"
-                  onClick={() => setShowModel(false)}>
-                  Discard
-                </Button>
-              </ButtonGroup>
-            </Col>
-          </Row>
+          <div className="text-right">
+            <ButtonGroup size="sm">
+              <Button
+                className="pl-2 pr-2"
+                variant="success"
+                disabled={!isXmlValid}
+                onClick={() => onImportClick()}>
+                <IconCheck/> Import
+              </Button>
+              <Button
+                className="pl-3 pr-3"
+                variant="secondary"
+                onClick={() => setShowModel(false)}>
+                Discard
+              </Button>
+            </ButtonGroup>
+          </div>
         </Modal.Footer>
       </Modal>
     </>
