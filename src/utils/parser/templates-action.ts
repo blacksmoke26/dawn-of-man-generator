@@ -453,12 +453,14 @@ export const toTriggerRaiderAttackTemplate = (attributes: ActionTriggerRaiderAtt
 
 /** Render `Unlock` attributes template */
 export const toUnlockTemplate = (attributes: ActionUnlock): string => {
-  return !attributes.techEra?.trim() || !attributes.techType?.trim()
+  const props: string[] = [];
+
+  isKeyInAtt('techEra', attributes) && props.push(`tech_era="${attributes?.techEra}"`);
+  isKeyInAtt('techType', attributes) && props.push(`tech_type="${attributes?.techType}"`);
+
+  return !props.length
     ? ''
-    : renderTemplate('action', 'Unlock', [
-      `tech_era="${attributes?.techEra}"`,
-      `tech_type="${attributes?.techType}"`,
-    ]);
+    : renderTemplate('action', 'Unlock', props);
 };
 
 const funcRegistry: KVDocument<Function> = {
