@@ -94,17 +94,18 @@ export const toFocusCameraTemplate = (attributes: ActionFocusCamera): string => 
 
 /** Render `HideUi` attributes template */
 export const toHideUiTemplate = (attributes: ActionHideUi): string => {
-  if (!attributes?.entityTypes?.length || !attributes?.buildableCategories?.trim()) {
-    return '';
-  }
+  const props: string[] = [];
 
-  const props: string[] = [
-    `entity_types="${attributes.entityTypes.join(',')}"`,
-    `buildable_categories="${attributes.buildableCategories}"`,
-  ];
+  isKeyInAtt('entityTypes', attributes) && attributes?.entityTypes?.length
+  && props.push(`entity_types="${attributes.entityTypes.join(' ')}"`);
 
+  isKeyInAtt('buildableCategories', attributes) && props.push(`buildable_categories="${attributes.buildableCategories}"`);
   isKeyInAtt('hideDisabledUi', attributes) && props.push(`hide_disabled_ui="${'' + attributes?.hideDisabledUi}"`);
   isKeyInAtt('hideQuickPanels', attributes) && props.push(`hide_quick_panels="${'' + attributes?.hideQuickPanels}"`);
+
+  if ( !props.length ) {
+    return '';
+  }
 
   return renderTemplate('action', 'HideUi', props);
 };
