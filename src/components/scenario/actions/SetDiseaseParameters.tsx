@@ -24,7 +24,7 @@ import useValues from '~/hooks/use-values';
 // utils
 import {actionDefaultProps} from './utils/default';
 import {defaultsParams} from '~/utils/action';
-import {PERIOD_MAX, PERIOD_MIN} from '~/utils/defaults';
+import {INDIVIDUAL_DISEASE_CHANCE_MAX, INDIVIDUAL_DISEASE_CHANCE_MIN, PERIOD_MAX, PERIOD_MIN} from '~/utils/defaults';
 import {randomIndividualDiseaseChance, randomPeriod} from '~/utils/random';
 
 // parsers
@@ -193,9 +193,9 @@ const SetDiseaseParameters = (props: Props) => {
               <Col sm="4">
                 <NumberInput
                   maxLength={3}
-                  decimals={1}
-                  min={PERIOD_MIN}
-                  max={PERIOD_MAX}
+                  decimals={2}
+                  min={INDIVIDUAL_DISEASE_CHANCE_MIN}
+                  max={INDIVIDUAL_DISEASE_CHANCE_MAX}
                   disabled={isDisabled || !state.data.individualDiseaseChanceChecked}
                   placeholder="e.g. 0.5"
                   value={valuer.get('individualDiseaseChance', 0.5)}
