@@ -176,6 +176,7 @@ const SetAnimalPopulation = (props: Props) => {
                 sliderProps={{
                   min: ANIMAL_POPULATION_MIN,
                   max: ANIMAL_POPULATION_MAX,
+                  step: 0
                 }}
                 allowRestore
                 onRestore={(excludeMin, excludeMax) => {
