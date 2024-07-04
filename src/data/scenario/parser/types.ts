@@ -7,6 +7,7 @@
 
 // types
 import {Season} from '~/utils/seasons.types';
+import {Event as AnyEvent} from '~/types/event.types';
 import {Disaster as DisasterName} from '~/types/scenario.types';
 import {
   ConditionAnyTasksActive,
@@ -44,7 +45,11 @@ export namespace scenario {
     locations?: Location[];
     goals?: Goal[];
     milestones?: Milestone[];
+    events?: AnyEvent[];
   }
+
+  export type Event = AnyEvent;
+  export type Events = Event[];
 
   export interface StartingConditions {
     seasonId: Season;
