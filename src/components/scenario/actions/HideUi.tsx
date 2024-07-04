@@ -9,6 +9,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import cn from 'classname';
 import merge from 'deepmerge';
+import randomInt from 'random-int';
 import {Row} from 'react-bootstrap';
 import {capitalCase} from 'change-case';
 import uniqueRandomArray from 'unique-random-array';
@@ -145,7 +146,7 @@ const HideUi = (props: Props) => {
               }}
               allowShuffle
               onShuffle={() => {
-                valuer.set('entityTypes', [...(new Set<string>(randomArray(ENTITIES, 5) as string[]) as unknown as string[])]);
+                valuer.set('entityTypes', randomArray(ENTITIES, randomInt(1, 6), true));
               }}
               allowClear
               onClear={() => valuer.set('entityTypes', [])}
@@ -156,7 +157,7 @@ const HideUi = (props: Props) => {
               caption="Buildable categories"
               checked={state.get<boolean>('buildableCategoriesChecked', false)}
               disabled={isDisabled}
-              undefinedSetter={[valuer, 'buildableCategories', []]}
+              undefinedSetter={[valuer, 'buildableCategories', 'Residence']}
               onChange={isChecked => {
                 state.set('buildableCategoriesChecked', isChecked);
               }}
@@ -217,7 +218,7 @@ const HideUi = (props: Props) => {
             onClick={() => {
 
               if (state.is('entityTypesChecked', true)) {
-                valuer.set('entityTypes', [...(new Set<string>(randomArray(ENTITIES, 5) as string[]) as unknown as string[])]);
+                valuer.set('entityTypes', randomArray(ENTITIES, randomInt(1, 6), true));
               }
 
               if (state.is('buildableCategoriesChecked', true)) {
