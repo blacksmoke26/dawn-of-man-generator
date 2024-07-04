@@ -21,6 +21,7 @@ import ScenarioContainer from '~/panel/scenario/ScenarioContainer';
 import ScenarioTemplateXMLViewer from '~/panel/scenario/TemplateXMLViewer';
 
 // dev panels
+import XmlEditor from '~/dev/panels/XmlEditor';
 import XmlToPlainJson from '~/dev/panels/XmlToPlainJson';
 import XmlToScenarioJson from '~/dev/panels/XmlToScenarioJson';
 import XmlToEnvironmentJson from '~/dev/panels/XmlToEnvironmentJson';
@@ -73,6 +74,17 @@ const App = () => {
               </Col>
               <Col sm="6">
                 <ScenarioTemplateXMLViewer/>
+              </Col>
+            </Row>
+          </Tab>
+          <Tab as="div" eventKey="xml_editor" title={
+            <div className="pl-4 pr-4" style={{fontSize: '0.95rem'}}>
+              <IconCodeXml width="16" height="16"/> Xml Editor
+            </div>
+          }>
+            <Row>
+              <Col sm="12">
+                <XmlEditor/>
               </Col>
             </Row>
           </Tab>
