@@ -189,8 +189,8 @@ export const defaultsParams: DeepPartial<ActionDefaultParams> = {
     rotation: undefined,
   },
   hideUi: {
-    entityTypes: [],
-    buildableCategories: 'Residence',
+    entityTypes: undefined,
+    buildableCategories: undefined,
     hideDisabledUi: undefined,
     hideQuickPanels: undefined,
   },
@@ -312,7 +312,7 @@ export const defaultsParams: DeepPartial<ActionDefaultParams> = {
     amount: 1,
   },
   unlock: {
-    techType: 'archery',
-    techEra: 'Paleolithic',
+    techType: undefined,
+    techEra: undefined,
   },
 };
