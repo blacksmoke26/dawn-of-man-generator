@@ -86,12 +86,7 @@ const XmlEditorInput = (props: Props) => {
         }}
         name={nanoid(10)}
         className="font-family-code w-100"
-        value={value}
-        onPaste={xmlStr => {
-          setTimeout(() => {
-            invokeHandler(props, 'onChange', formatXmlString(xmlStr));
-          }, 30);
-        }}/>
+        value={value}/>
       <div className="mt-2 mb-2" style={{marginLeft: 0}}>
         <ButtonToolbar
           className="d-flex justify-content-between text-orange"
