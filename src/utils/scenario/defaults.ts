@@ -48,5 +48,5 @@ export const LOCATION_POSITION_MAX: number = MAP_SIZE_MAX * 512;
 
 export const LOCATION_SEED_MIN: number = 0;
 
-export const LOCATION_SEED_MAX: number = 99999999;
+export const LOCATION_SEED_MAX: number = 999999999;
 
