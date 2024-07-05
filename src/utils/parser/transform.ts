@@ -27,6 +27,8 @@ import {
   TransformObjectAttributesOptionsArray,
   NormalizeNodeAttributesOptions,
 } from './transform.types';
+import {isString, toString} from '~/helpers/string';
+import {isNumeric} from '~/helpers/number';
 
 /**
  * @public
@@ -37,6 +39,8 @@ export const transformObject = (node: Json, options: TransformObjectOptions = {}
     wrapperKey: '',
     requiredProp: null,
     requiredPropValidator: () => true,
+    transformOutput: obj => obj,
+    transformPropertyValue: (_name, value) => value,
     optionalProps: [],
     nullResolver: () => ({}),
   }, options);
@@ -57,16 +61,19 @@ export const transformObject = (node: Json, options: TransformObjectOptions = {}
 
   for (let optPrp of opt.optionalProps) {
     if (typeof optPrp === 'string') {
-      const value: any = op.get(node, `${optPrp}.value`, null);
-      value !== null && (container[optPrp] = value);
+      let value: any = op.get(node, `${optPrp}.value`, null);
+      (value !== null
+        && (value = opt.transformPropertyValue(optPrp, value)) !== null)
+      && (container[optPrp] = value);
       continue;
     }
 
     if (isObject(optPrp)) {
       const {group, key} = optPrp;
-      const value = op.get<number | null>(node, `${key}.value`, null);
+      let value = op.get<number | null>(node, `${key}.value`, null);
 
-      if (value === null) {
+      if (value === null
+        || (value = opt.transformPropertyValue(key, value)) === null) {
         continue;
       }
 
@@ -78,7 +85,7 @@ export const transformObject = (node: Json, options: TransformObjectOptions = {}
     }
   }
 
-  return container;
+  return opt.transformOutput(container);
 };
 
 /**
@@ -99,7 +106,7 @@ export const transformOverrideObject = (json: Json, options: TransformOverrideOb
   if (isObject(parsed)) {
     const node = transformObject(parsed, opt.transformOptions);
 
-    if (!node.hasOwnProperty('id')) {
+    if (!('id' in node)) {
       return opt.nullResolver(opt.wrapperKey);
     }
 
@@ -149,20 +156,17 @@ export const transformNumeric = (json: Json, options: TransformNumericOptions): 
 
   const parsed = op.get<number | any | null>(json, opt.root, null);
 
-  if ( parsed === null
-    || 'number' !== typeof parsed
-    || !opt.validate(parsed)) {
+  if (!isNumeric(parsed) || !opt.validate(parsed)) {
     return opt.nullResolver(opt.wrapperKey);
   }
 
-  if (
-    (opt?.min !== undefined && parsed < opt.min)
-    || (opt?.max !== undefined && parsed > opt.max)
-  ) {
-    return opt.nullResolver(opt.wrapperKey);
-  }
+  const hasMin = opt?.min !== undefined && parsed < opt.min;
+  const hasMax = opt?.max !== undefined && parsed > opt.max;
 
-  return {[opt.wrapperKey]: opt.transform(parsed)};
+  return hasMin || hasMax
+    ? opt.nullResolver(opt.wrapperKey) : {
+      [opt.wrapperKey]: opt.transform(parsed),
+    };
 };
 
 /**
@@ -190,7 +194,8 @@ export const transformSplitStringArray = (json: Json, options: TransformSplitStr
   const opt = merge<Required<TransformSplitStringArrayOptions>>({
     splitChar: ' ',
     itemsValidator: () => true,
-    transformValue: (value: string) => value,
+    transformValue: value => value,
+    transformOutput: values => values,
     minItems: 0,
     maxItems: 0,
     nullResolver: () => ({}),
@@ -198,15 +203,19 @@ export const transformSplitStringArray = (json: Json, options: TransformSplitStr
 
   const parsed: any = op.get(json, options.root, null);
 
-  if (parsed === null || !String(parsed || '')) {
+  if (!isString(parsed, true)) {
     return opt.nullResolver(opt.wrapperKey);
   }
 
-  const list: string[] = String(parsed)
+  let list: string[] = toString(parsed)
     .split(opt.splitChar)
-    .map(d => String(d || '').trim())
+    .map(d => toString(d).trim())
     .map(opt.transformValue)
     .filter(opt.itemsValidator);
+
+  opt.unique && (list = [...new Set(list) as unknown as any[]]);
+
+  list = opt.transformOutput(list);
 
   if (opt.minItems > 0 && list.length < opt.minItems) {
     return opt.nullResolver(opt.wrapperKey);
@@ -267,9 +276,7 @@ export const transformString = (json: Json, options: TransformStringOptions): Js
 
   const value = op.get<string | any | null>(json, opt.root, null);
 
-  if ( value === null
-    || 'string' !== typeof value
-    || !opt.validate(value)) {
+  if (!isString(value, true) || !opt.validate(value)) {
     return opt.nullResolver(opt.wrapperKey);
   }
 
@@ -287,7 +294,7 @@ export const normalizeNodeAttributes = (node: Json | null, options: NormalizeNod
     only: [],
     camelKeys: false,
     failed: () => true,
-    transform: (name, value) => value,
+    transform: (_name, value) => value,
     filter: () => true,
     filterRequired: () => true,
   }, options);
@@ -330,7 +337,7 @@ export const transformObjectAttributes = (node: Json, options: TransformObjectAt
     required: [],
     only: [],
     camelKeys: false,
-    transform(name, value) {
+    transform(_name, value) {
       return value;
     },
     filter() {

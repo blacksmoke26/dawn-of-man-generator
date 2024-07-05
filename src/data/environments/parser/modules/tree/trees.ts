@@ -8,14 +8,19 @@
 import type {Json} from '~/types/json.types';
 import type {JsonToReduxOptions} from '~/utils/parser/index.types';
 
-// Utils
-import { transformSplitStringArray } from '~/utils/parser/transform';
+// utils
+import {trees} from '~/utils/objects';
+import {transformSplitStringArray} from '~/utils/parser/transform';
 
 /** Convert environment json into redux data */
-export const jsonToRedux = ( json: Json, options: JsonToReduxOptions = {} ): Json => {
-	return transformSplitStringArray(json, {
-		root: 'environment.trees.values',
-		wrapperKey: 'trees',
-		...options,
-	});
+export const jsonToRedux = (json: Json, options: JsonToReduxOptions = {}): Json => {
+  return transformSplitStringArray(json, {
+    root: 'environment.trees.values',
+    wrapperKey: 'trees',
+    minItems: 1,
+    maxItems: 23,
+    unique: true,
+    itemsValidator: value => (trees as unknown as string[]).includes(value),
+    ...options,
+  });
 };

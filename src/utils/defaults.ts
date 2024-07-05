@@ -12,6 +12,9 @@ export const HUMIDITY_MAX: number = 1;
 export const HUMIDITY_MIN_DEFAULT: number = 0;
 export const HUMIDITY_MAX_DEFAULT: number = 1;
 
+export const BACKDROP_SCALE_MIN: number = 0;
+export const BACKDROP_SCALE_MAX: number = 1;
+
 export const ALTITUDE_MIN: number = -20;
 export const ALTITUDE_MAX: number = 100;
 export const ALTITUDE_MIN_DEFAULT: number = 5;
@@ -38,6 +41,21 @@ export const SEASON_TEMPERATURE_MAX = 100;
 
 export const SEASON_WIND_MIN = 0;
 export const SEASON_WIND_MAX = 50;
+
+export const SEASON_DURATION_MIN = 0;
+export const SEASON_DURATION_MAX = 1;
+
+export const SEASON_PRECIPITATION_CHANCE_MIN = 0;
+export const SEASON_PRECIPITATION_CHANCE_MAX = 1;
+
+export const SEASON_WINDY_CHANCE_MIN = 0;
+export const SEASON_WINDY_CHANCE_MAX = 1;
+
+export const SEASON_VERY_WINDY_CHANCE_MIN = 0;
+export const SEASON_VERY_WINDY_CHANCE_MAX = 1;
+
+export const SEASON_FISH_BOOST_MIN = 0;
+export const SEASON_FISH_BOOST_MAX = 1;
 
 export const FORD_DISTANCE_FACTOR_MIN: number = 0;
 export const FORD_DISTANCE_FACTOR_MAX: number = 20;
