@@ -66,3 +66,42 @@ export const stepToDecimal = (step: number): number => {
     ? step
     : String(step).replace(/^.+\./g, '').length;
 };
+
+
+export type Callable<T = any> = (value: T) => void;
+
+interface NumberNormalizeOptions {
+  min: number;
+  max: number;
+}
+
+type WithCallback<O, T> = O & { callback?: Callable<T> }
+
+export const normalizeMinMax = (value: number, options: NumberNormalizeOptions): number => {
+  return value < options.min ? options.min : (
+    value > options.max
+      ? options.max
+      : value
+  );
+};
+export const normalizeInt = (value: number, options: WithCallback<NumberNormalizeOptions, number>): false | number => {
+  if (!isInt(value)) {
+    return false;
+  }
+
+  const _value = normalizeMinMax(value, options);
+  'function' === typeof options?.callback && options?.callback(_value);
+  return _value;
+};
+
+export const normalizeFloat = (value: number, options: WithCallback<NumberNormalizeOptions, number> & {
+  decimals?: number
+}): false | number => {
+  if (!isNumeric(value)) {
+    return false;
+  }
+
+  const _value = toFloat(normalizeMinMax(value, options), options?.decimals || 1);
+  'function' === typeof options?.callback && options?.callback(_value);
+  return _value;
+};
