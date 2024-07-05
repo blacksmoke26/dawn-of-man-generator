@@ -205,12 +205,12 @@ export const validateTimeOfYear = (value: number | any): boolean => {
 };
 
 /**
- * Checks if the timescale index is valid or not
+ * Checks if the timescale is valid or not
  * @param value - The value to check
  * @returns True if valid, false otherwise
  */
-export const validateTimeScaleIndex = (value: number | any): boolean => {
-  return !isNumeric(value)
+export const validateTimeScale = (value: number | any): boolean => {
+  return !isInt(value)
     ? false
     : !(value < TIME_SCALE_INDEX_MIN || value > TIME_SCALE_INDEX_MAX);
 };
