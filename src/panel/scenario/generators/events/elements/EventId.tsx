@@ -13,9 +13,6 @@ import {Col, Row} from 'react-bootstrap';
 import TextInput from '~/components/ui/TextInput';
 import PropertyLabel from '~/components/ui/PropertyLabel';
 
-// icons
-import {IconEvent} from '~/components/icons/app';
-
 // types
 import type {Required} from 'utility-types';
 
