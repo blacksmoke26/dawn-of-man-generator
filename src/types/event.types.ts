@@ -16,6 +16,7 @@ import type {AnyCondition} from '~/types/condition.types';
 export type EventFlagType = typeof EVENT_FLAGS[number];
 
 export interface Event {
+  id?: string;
   flags?: EventFlagType[];
   condition: AnyCondition;
   actions: AnyAction[];

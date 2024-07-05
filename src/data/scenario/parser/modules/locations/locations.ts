@@ -7,10 +7,6 @@
 import merge from 'deepmerge';
 import {snakeCase} from 'change-case';
 
-// types
-import type {Json} from '~/types/json.types';
-import type {JsonToReduxOptions} from '~/utils/parser/index.types';
-
 // utils
 import {isBool} from '~/helpers/bool';
 import {transformObjectAttributesArray} from '~/utils/parser/transform';
@@ -22,9 +18,13 @@ import {
   validateLocationCoordinates,
 } from '~/utils/scenario/validator';
 
+// types
+import type {Json} from '~/types/json.types';
+import type {JsonToReduxOptions} from '~/utils/parser/index.types';
+
 const transform = (name: string, value: any): any => {
   if ('seed' === name) {
-    return Number(value).toFixed(0).padStart(8, '0');
+    return Number(value).toFixed(0).padStart(9, '0');
   }
 
   if (['id', 'environment'].includes(name)) {

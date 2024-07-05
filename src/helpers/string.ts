@@ -13,4 +13,10 @@ export const toString = <T extends string = string>(value: any, defaultValue: T 
 /**
  * Checks that the given value is a string or not
  */
-export const isString = (value: any): boolean => 'string' === typeof value;
+export const isString = (value: any, checkEmpty: boolean = false): boolean => {
+  if ('string' !== typeof value) {
+    return false;
+  }
+
+  return checkEmpty ? Boolean(value?.trim()) : true;
+};
