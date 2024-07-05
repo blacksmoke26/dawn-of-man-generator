@@ -4,10 +4,14 @@
  * @since 2.3
  */
 
+import {snakeCase} from 'change-case';
+
 // helpers
-import {isInt} from '~/helpers/number';
 import {isObject} from '~/helpers/object';
 import {isString} from '~/helpers/string';
+
+// utils
+import {normalizePerformers} from '~/utils/scenario/normalizer-condition';
 
 // types
 import type {Json} from '~/types/json.types';
@@ -21,18 +25,16 @@ export const jsonToRedux = (node: Json | any): Json | null => {
     return null;
   }
 
-  if ((!isString(node?.task_type) || !node?.task_type.trim())) {
+  if (!isString(node?.task_type, true)) {
     return null;
   }
 
   const condition: Json = {
     type: CONDITION_TYPE,
-    task_type: node?.task_type.trim(),
+    taskType: snakeCase(node?.task_type),
   };
 
-  if (isInt(node?.min_performers) && node?.min_performers >= 0) {
-    condition.minPerformers = node?.min_performers;
-  }
+  normalizePerformers(node?.min_performers, num => condition.minPerformers = num);
 
   return condition;
 };

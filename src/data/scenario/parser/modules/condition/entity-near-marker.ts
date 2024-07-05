@@ -5,10 +5,12 @@
  */
 
 // helpers
-import {isInt} from '~/helpers/number';
+import {isInList} from '~/helpers/array';
 import {isObject} from '~/helpers/object';
-import {isString} from '~/helpers/string';
 import {ENTITIES} from '~/utils/entities';
+
+// utils
+import {normalizeDistance} from '~/utils/scenario/normalizer-condition';
 
 // types
 import type {Json} from '~/types/json.types';
@@ -22,7 +24,7 @@ export const jsonToRedux = (node: Json | any): Json | null => {
     return null;
   }
 
-  if (!isString(node?.entity_type) || !ENTITIES.includes(node?.entity_type)) {
+  if (!isInList(node?.entity_type, ENTITIES)) {
     return null;
   }
 
@@ -31,9 +33,7 @@ export const jsonToRedux = (node: Json | any): Json | null => {
     entityType: node?.entity_type,
   };
 
-  if (isInt(node?.value) && node?.value >= 0) {
-    condition.value = node?.value;
-  }
+  normalizeDistance(node?.value, value => condition.value = value);
 
   return condition;
 };

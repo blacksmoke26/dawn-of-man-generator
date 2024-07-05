@@ -5,11 +5,13 @@
  */
 
 // helpers
-import {isInt} from '~/helpers/number';
+import {isInList} from '~/helpers/array';
 import {isObject} from '~/helpers/object';
-import {isString} from '~/helpers/string';
 import {ENTITIES} from '~/utils/entities';
 import {COUNTERS} from '~/utils/condition';
+
+// utils
+import {normalizeEntityCount} from '~/utils/scenario/normalizer-condition';
 
 // types
 import type {Json} from '~/types/json.types';
@@ -23,22 +25,19 @@ export const jsonToRedux = (node: Json | any): Json | null => {
     return null;
   }
 
-  if (!isString(node?.entity_type) || !ENTITIES.includes(node?.entity_type)) {
+  if (!isInList(node?.entity_type, ENTITIES)) {
     return null;
   }
 
   const condition: Json = {
     type: CONDITION_TYPE,
-    entityType: node?.entity_type,
   };
 
-  if (isString(node?.counter) && COUNTERS.includes(node?.counter)) {
-    condition.counter = node?.counter;
-  }
+  isInList(node?.counter, COUNTERS, value => condition.counter = value)
 
-  if (isInt(node?.value) && node?.value >= 0) {
-    condition.value = node?.value;
-  }
+  condition.entityType = node?.entity_type;
+
+  normalizeEntityCount(node?.value, value => condition.value = value);
 
   return condition;
 };

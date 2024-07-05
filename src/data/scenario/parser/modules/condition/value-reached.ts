@@ -5,9 +5,9 @@
  */
 
 // helpers
+import {isNumeric, toInteger} from '~/helpers/number';
+import {isInList} from '~/helpers/array';
 import {isObject} from '~/helpers/object';
-import {isString} from '~/helpers/string';
-import {isInt} from '~/helpers/number';
 import {VALUE_REACHED} from '~/utils/condition';
 
 // types
@@ -22,7 +22,7 @@ export const jsonToRedux = (node: Json | any): Json | null => {
     return null;
   }
 
-  if ((!isString(node?.id) || !VALUE_REACHED.includes(node?.id))) {
+  if (!isInList(node?.id, VALUE_REACHED)) {
     return null;
   }
 
@@ -31,9 +31,7 @@ export const jsonToRedux = (node: Json | any): Json | null => {
     id: node?.id,
   };
 
-  if (isInt(node?.value) && node?.value >= 0) {
-    condition.value = node?.value;
-  }
+  isNumeric(node?.value) && (condition.value = toInteger(node?.value));
 
   return condition;
 };

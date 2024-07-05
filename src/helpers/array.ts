@@ -4,6 +4,9 @@
  * @since 2.3
  */
 
+import {isString} from '~/helpers/string';
+import {Callable} from '~/helpers/number';
+
 /**
  * Checks if the array contains all the keys in the list.
  * @param list - The list of keys.
@@ -23,3 +26,14 @@ export const hasKeysInArray = (list: string[], keys: string[]): boolean => {
 /**
  * Check that array values are equal */
 export const allEqual = <T = any>(arr: T[]): boolean => arr.every(v => v === arr[0]);
+
+/**
+ * Check that value exists in given array */
+export const isInList = <T = any>(key: T, arr: T[], callback?: Callable<T>): boolean => {
+  if (!isString(key, true) || !arr.includes(key)) {
+    return false;
+  }
+
+  'function' === typeof callback && callback(key);
+  return true;
+};
