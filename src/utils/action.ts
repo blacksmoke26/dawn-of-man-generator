@@ -132,6 +132,7 @@ export const PROMINENT_ACTIONS_NAME: ActionName[] = [
   'SetGameplayFlags',
   'SetKnowledgeParameters',
   'SetMigrationParameters',
+  'Spawn',
   'SetRaider',
   'SetTraderPeriod',
 ] as const;
