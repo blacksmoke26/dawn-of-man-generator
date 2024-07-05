@@ -14,10 +14,12 @@ import {Tab, Tabs} from 'react-bootstrap';
 
 // elemental components
 import TabTitle from '~/components/ui/TabTitle';
+import Accordion from '~/components/ui/Accordion';
 import Action from '~/components/scenario/generic/Action';
 import Condition from '~/components/scenario/generic/Condition';
 
 // components
+import EventId from './elements/EventId';
 import FlagsDropdown from './elements/FlagsDropdown';
 import ActionDropdown from './elements/ActionDropdown';
 import ConditionDropdown from './elements/ConditionDropdown';
@@ -66,9 +68,10 @@ export interface EventState extends Omit<EventType, 'actions'> {
 }
 
 export const changedValuesToEventValues = (data: EventState): EventType => {
-  const {flags, condition, actions} = data;
+  const {flags, condition, actions, id = ''} = data;
 
   return {
+    id,
     flags,
     condition,
     actions: Object.values(actions),
@@ -82,6 +85,7 @@ const Event = (props: Props) => {
   const [actionActiveKey, setActionActiveKey] = React.useState<string>('');
 
   const valuer = useValues<EventState>(merge({
+    id: '',
     flags: [],
     condition: {} as AnyCondition,
     actions: {},
@@ -91,12 +95,10 @@ const Event = (props: Props) => {
     disabled: boolean;
     disabledCheckbox: boolean;
     actionsExpanded: boolean;
-    flagsExpanded: boolean;
   }>({
     disabled: newProps.disabled,
     disabledCheckbox: newProps.disabledCheckbox,
     actionsExpanded: true,
-    flagsExpanded: false,
   });
 
   //<editor-fold desc="Reflect values changes">
@@ -193,17 +195,24 @@ const Event = (props: Props) => {
   return (
     <div className={cn('mt-0 checkbox-align', {'text-muted': isDisabled})}>
       <div className="pt-2 pl-3 pr-3 pb-2 mt-2 mb-1">
+        <Accordion
+          noBodyPad={true}
+          noCard={true}
+          header="Optional parameters"
+          eventKey="clear_trees_optional_parameters">
+        <EventId
+          disabled={isDisabled}
+          value={valuer.get('id', '')}
+          onChange={value => valuer.set('id', value as string)}/>
         <FlagsDropdown
-          expanded={meta.data.flagsExpanded}
-          onCaptionClick={() => {
-            meta.set('flagsExpanded', current => !current);
-          }}
           value={valuer.get('flags', [])}
           disabled={isDisabled}
           onChange={(flags: string[]) => {
             valuer.overwrite('flags', flags);
           }}
         />
+        </Accordion>
+        <div className="mb-3"></div>
 
         {!hasCondition && (
           <ConditionDropdown

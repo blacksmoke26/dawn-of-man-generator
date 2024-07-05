@@ -22,6 +22,9 @@ export const toEventTemplate = (attributes: EventType, disabled: boolean = false
 
   const eventProps: string[] = [];
 
+  attributes?.id?.length
+  && eventProps.push(`id="${attributes?.id}"`);
+
   attributes?.flags?.length
   && eventProps.push(`flags="${attributes?.flags?.join(',')}"`);
 
