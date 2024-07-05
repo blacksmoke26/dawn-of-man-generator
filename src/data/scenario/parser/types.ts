@@ -56,38 +56,56 @@ export namespace scenario {
     visualSetupId?: string;
   }
 
-  export type ConditionWithType<N, O> = { type: N } & O;
+  export namespace condition {
+    type ConditionWithType<N, O> = { type: N } & O;
 
-  export interface ConditionLogical {
-    type: LogicalCondition;
-    conditions: ConditionPlain[];
+    export type AnyTasksActive = ConditionWithType<'AnyTasksActive', ConditionAnyTasksActive>;
+    export type AnyWorkAreasActive = ConditionWithType<'AnyWorkAreasActive', ConditionAnyWorkAreasActive>;
+    export type EntityCountComparison = ConditionWithType<'EntityCountComparison', ConditionEntityCountComparison>;
+    export type EntityCountReached = ConditionWithType<'EntityCountReached', ConditionEntityCountReached>;
+    export type EntityNearMarker = ConditionWithType<'EntityNearMarker', ConditionEntityNearMarker>;
+    export type EraUnlocked = ConditionWithType<'EraUnlocked', ConditionEraUnlocked>;
+    export type InitGame = ConditionWithType<'InitGame', ConditionInitGame>;
+    export type IsAlive = ConditionWithType<'IsAlive', ConditionIsAlive>;
+    export type IsGameInteractionPending = ConditionWithType<'IsGameInteractionPending', ConditionIsGameInteractionPending>;
+    export type NewGame = ConditionWithType<'NewGame', ConditionNewGame>;
+    export type ScenarioCompleted = ConditionWithType<'ScenarioCompleted', ConditionScenarioCompleted>;
+    export type TechUnlocked = ConditionWithType<'TechUnlocked', ConditionTechUnlocked>;
+    export type TimeElapsed = ConditionWithType<'TimeElapsed', ConditionTimeElapsed>;
+    export type ValueEquals = ConditionWithType<'ValueEquals', ConditionValueEquals>;
+    export type ValueReached = ConditionWithType<'ValueReached', ConditionValueReached>;
+
+    export type GeneralCondition =
+      | condition.AnyTasksActive
+      | condition.AnyWorkAreasActive
+      | condition.EntityCountComparison
+      | condition.EntityCountReached
+      | condition.EntityNearMarker
+      | condition.EraUnlocked
+      | condition.InitGame
+      | condition.IsAlive
+      | condition.IsGameInteractionPending
+      | condition.NewGame
+      | condition.ScenarioCompleted
+      | condition.TechUnlocked
+      | condition.TimeElapsed
+      | condition.ValueEquals
+      | condition.ValueReached
+
+    export interface LogicalCondition {
+      type: LogicalCondition;
+      conditions: GeneralCondition[];
+    }
   }
-
-  export type ConditionPlain =
-    | ConditionWithType<'AnyTasksActive', ConditionAnyTasksActive>
-    | ConditionWithType<'AnyWorkAreasActive', ConditionAnyWorkAreasActive>
-    | ConditionWithType<'EntityCountComparison', ConditionEntityCountComparison>
-    | ConditionWithType<'EntityCountReached', ConditionEntityCountReached>
-    | ConditionWithType<'EntityNearMarker', ConditionEntityNearMarker>
-    | ConditionWithType<'EraUnlocked', ConditionEraUnlocked>
-    | ConditionWithType<'InitGame', ConditionInitGame>
-    | ConditionWithType<'IsAlive', ConditionIsAlive>
-    | ConditionWithType<'IsGameInteractionPending', ConditionIsGameInteractionPending>
-    | ConditionWithType<'NewGame', ConditionNewGame>
-    | ConditionWithType<'ScenarioCompleted', ConditionScenarioCompleted>
-    | ConditionWithType<'TechUnlocked', ConditionTechUnlocked>
-    | ConditionWithType<'TimeElapsed', ConditionTimeElapsed>
-    | ConditionWithType<'ValueEquals', ConditionValueEquals>
-    | ConditionWithType<'ValueReached', ConditionValueReached>;
 
   export interface Milestone {
     id: Lowercase<string>;
-    conditions: (ConditionPlain | ConditionLogical)[];
+    conditions: (condition.GeneralCondition | condition.LogicalCondition)[];
   }
 
   export interface Goal {
     id: Lowercase<string>;
-    conditions: (ConditionPlain | ConditionLogical)[];
+    conditions: (condition.GeneralCondition | condition.LogicalCondition)[];
   }
 
   export interface Disaster {
