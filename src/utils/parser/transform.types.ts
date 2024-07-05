@@ -85,6 +85,11 @@ export interface TransformSplitStringArrayOptions {
   minItems?: number,
   /** Maximum limit of items [0 = no limit] */
   maxItems?: number,
+  /** Setting true will remove duplicate values from array */
+  unique?: boolean,
+
+  /** Transform whole array */
+  transformList?(list: string[]): string[],
 
   /** Parsed list validator */
   itemsValidator?(value: string): boolean,

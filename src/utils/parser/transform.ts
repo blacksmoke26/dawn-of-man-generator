@@ -27,6 +27,8 @@ import {
   TransformObjectAttributesOptionsArray,
   NormalizeNodeAttributesOptions,
 } from './transform.types';
+import {isString, toString} from '~/helpers/string';
+import {isNumeric} from '~/helpers/number';
 
 /**
  * @public
@@ -149,20 +151,17 @@ export const transformNumeric = (json: Json, options: TransformNumericOptions): 
 
   const parsed = op.get<number | any | null>(json, opt.root, null);
 
-  if ( parsed === null
-    || 'number' !== typeof parsed
-    || !opt.validate(parsed)) {
+  if (!isNumeric(parsed) || !opt.validate(parsed)) {
     return opt.nullResolver(opt.wrapperKey);
   }
 
-  if (
-    (opt?.min !== undefined && parsed < opt.min)
-    || (opt?.max !== undefined && parsed > opt.max)
-  ) {
-    return opt.nullResolver(opt.wrapperKey);
-  }
+  const hasMin = opt?.min !== undefined && parsed < opt.min;
+  const hasMax = opt?.max !== undefined && parsed > opt.max;
 
-  return {[opt.wrapperKey]: opt.transform(parsed)};
+  return hasMin || hasMax
+    ? opt.nullResolver(opt.wrapperKey) : {
+      [opt.wrapperKey]: opt.transform(parsed),
+    };
 };
 
 /**
@@ -190,7 +189,8 @@ export const transformSplitStringArray = (json: Json, options: TransformSplitStr
   const opt = merge<Required<TransformSplitStringArrayOptions>>({
     splitChar: ' ',
     itemsValidator: () => true,
-    transformValue: (value: string) => value,
+    transformValue: value => value,
+    transformList: values => values,
     minItems: 0,
     maxItems: 0,
     nullResolver: () => ({}),
@@ -198,15 +198,17 @@ export const transformSplitStringArray = (json: Json, options: TransformSplitStr
 
   const parsed: any = op.get(json, options.root, null);
 
-  if (parsed === null || !String(parsed || '')) {
+  if (!isString(parsed, true)) {
     return opt.nullResolver(opt.wrapperKey);
   }
 
-  const list: string[] = String(parsed)
+  let list: string[] = toString(parsed)
     .split(opt.splitChar)
-    .map(d => String(d || '').trim())
+    .map(d => toString(d).trim())
     .map(opt.transformValue)
     .filter(opt.itemsValidator);
+
+  list = opt.transformList(list);
 
   if (opt.minItems > 0 && list.length < opt.minItems) {
     return opt.nullResolver(opt.wrapperKey);
@@ -215,6 +217,8 @@ export const transformSplitStringArray = (json: Json, options: TransformSplitStr
   if (opt.maxItems > 0 && list.length > opt.maxItems) {
     return opt.nullResolver(opt.wrapperKey);
   }
+
+  opt.unique && (list = [...new Set(list) as unknown as any[]]);
 
   return !list.length ? {} : {
     [opt.wrapperKey]: list,
@@ -267,9 +271,7 @@ export const transformString = (json: Json, options: TransformStringOptions): Js
 
   const value = op.get<string | any | null>(json, opt.root, null);
 
-  if ( value === null
-    || 'string' !== typeof value
-    || !opt.validate(value)) {
+  if (!isString(value, true) || !opt.validate(value)) {
     return opt.nullResolver(opt.wrapperKey);
   }
 
@@ -287,7 +289,7 @@ export const normalizeNodeAttributes = (node: Json | null, options: NormalizeNod
     only: [],
     camelKeys: false,
     failed: () => true,
-    transform: (name, value) => value,
+    transform: (_name, value) => value,
     filter: () => true,
     filterRequired: () => true,
   }, options);
@@ -330,7 +332,7 @@ export const transformObjectAttributes = (node: Json, options: TransformObjectAt
     required: [],
     only: [],
     camelKeys: false,
-    transform(name, value) {
+    transform(_name, value) {
       return value;
     },
     filter() {
