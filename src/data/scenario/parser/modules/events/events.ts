@@ -9,10 +9,12 @@ import op from 'object-path';
 
 // utils
 import {isObject} from '~/helpers/object';
+import {filterRawEvents, parseEvent} from './utils/filter';
 
 // types
-import type {Json} from '~/types/json.types';
 import type {Required} from 'utility-types';
+import type {Json} from '~/types/json.types';
+import type {scenario} from '~/data/scenario/parser/types';
 import type {JsonToReduxOptions} from '~/utils/parser/index.types';
 import type {TransformOverrideObjectOptions} from '~/utils/parser/transform.types';
 
@@ -31,14 +33,22 @@ export const jsonToRedux = (json: Json, options: JsonToReduxOptions = {}): Json 
     return nullValue;
   }
 
-  const eventsList = (isObject(parsed) ? [parsed] : parsed) as Json[];
-  //const collection: Json[] = [];
+  const eventsList = filterRawEvents(([] as Json[]).concat(parsed));
 
   if (!eventsList.length) {
     return nullValue;
   }
 
-  // TODO: Implement events parser logic here
+  const events = [] as scenario.Events;
 
-  return nullValue;
+  for (const event of eventsList) {
+    const parsed = parseEvent(event);
+    if (parsed !== null) {
+      events.push(parsed);
+    }
+  }
+
+  return !events.length
+    ? nullValue
+    : {events};
 };
