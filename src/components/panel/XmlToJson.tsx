@@ -8,8 +8,8 @@
 import React, {useEffect} from 'react';
 import merge from 'deepmerge';
 import copyClipboard from 'clipboard-copy';
-import {JsonEditor, JsonEditorProps, Theme, themes} from 'json-edit-react';
 import {ButtonGroup, Col, Row} from 'react-bootstrap';
+import {JsonEditor, JsonEditorProps, Theme, themes} from 'json-edit-react';
 
 // elemental components
 import LinkButton from '~/components/ui/LinkButton';
@@ -85,14 +85,14 @@ const XmlToJson = (props: XmlToJsonProps) => {
 
   return (
     <Row className="mb-1">
-      <Col sm="6" className="pr-1">
+      <Col sm="7" className="pr-1">
         <XmlEditorInput
           value={value}
           placeholder={newProps.placeholder}
           onChange={setValue}
         />
       </Col>
-      <Col sm="6">
+      <Col sm="5">
         <div className="syntax-highlighter">
           <JsonEditor
             collapse={2}
@@ -104,8 +104,8 @@ const XmlToJson = (props: XmlToJsonProps) => {
             restrictEdit
             restrictDrag
             restrictTypeSelection
-            showCollectionCount="when-closed"
-            enableClipboard={false}
+            icons={{copy: <IconCopy/>}}
+            enableClipboard={true}
             className="ui-json-editor"
             indent={2}
             rootName={key}
@@ -124,7 +124,7 @@ const XmlToJson = (props: XmlToJsonProps) => {
 
             <LinkButton
               disabled={!Object.keys(json).length}
-              title="Copy to Clipboard"
+              title="Collapse All"
               onClick={() => setEditorConfig(current => ({
                 ...current,
                 collapse: 1,
@@ -134,17 +134,17 @@ const XmlToJson = (props: XmlToJsonProps) => {
 
             <LinkButton
               disabled={!Object.keys(json).length}
-              title="Copy to Clipboard"
+              title="Expand all"
               onClick={() => setEditorConfig(current => ({
                 ...current,
-                collapse: 5,
+                collapse: 6,
               }))}>
               <IconChevronDown/> Expand
             </LinkButton>
 
             <LinkButton
               disabled={!Object.keys(json).length}
-              title="Copy to Clipboard"
+              title="Sort keys by name"
               onClick={() => setEditorConfig(current => ({
                 ...current,
                 keySort: !current?.keySort,
