@@ -56,8 +56,7 @@ export namespace environment {
     duration: number;
     precipitationChance: number;
     windyChance: number;
-    minWind: number;
-    maxWind: number;
+    wind: [number, number];
     temperature: [number, number];
   }
 

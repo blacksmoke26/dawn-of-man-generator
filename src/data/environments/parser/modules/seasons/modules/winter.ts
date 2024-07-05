@@ -7,36 +7,67 @@
 import op from 'object-path';
 
 // helpers
-import { isObject } from '~/helpers/object';
+import {isBool} from '~/helpers/bool';
+import {isObject} from '~/helpers/object';
+import {toFallSeasonParsed, WinterConfig} from '~/utils/seasons';
 
 // utils
-import { WinterConfig } from '~/utils/seasons';
+import {
+  normalizeSeasonDuration,
+  normalizeSeasonPrecipitationChance,
+  normalizeSeasonTemperatureMinMax,
+  normalizeSeasonVeryWindyChance,
+  normalizeSeasonWindyChance,
+} from '~/utils/parser/environment/normalizer-season';
 
 // types
 import type {Json} from '~/types/json.types';
 
 /** Convert a season object into redux data */
-export const jsonToRedux = ( seasons: Json[] ): Json => {
-	const node = seasons.find(s => s.id === WinterConfig.id) as Json | null;
+export const jsonToRedux = (seasons: Json[]): Json => {
+  const node = seasons.find(s => s.id === WinterConfig.id) as Json;
 
-	if ( node === null || !isObject(node) ) {
-		return {};
-	}
+  if (!isObject(node)) {
+    return {[WinterConfig.id]: toFallSeasonParsed()};
+  }
 
-	const duration = op.get<number>(node, 'duration', WinterConfig.duration);
-	const precipitationChance = op.get<number>(node, 'precipitation_chance', WinterConfig.precipitation_chance);
-	const windyChance = op.get<number>(node, 'windy_chance', WinterConfig.windy_chance);
-	const veryWindyChance = op.get<number>(node, 'very_windy_chance', WinterConfig.very_windy_chance);
-	const reducedFauna = op.get<boolean>(node, 'reduced_fauna', WinterConfig.reduced_fauna);
-	const minTemperature = op.get<number>(node, 'min_temperature.value', WinterConfig.min_temperature.value);
-	const maxTemperature = op.get<number>(node, 'max_temperature.value', WinterConfig.max_temperature.value);
+  const duration = normalizeSeasonDuration(
+    op.get(node, 'duration'),
+    WinterConfig.duration,
+  );
 
-	return {[WinterConfig.id]: {
-			duration,
-			precipitationChance,
-			windyChance,
-			veryWindyChance,
-			reducedFauna,
-			temperature: [minTemperature, maxTemperature],
-		}};
+  const precipitationChance = normalizeSeasonPrecipitationChance(
+    op.get(node, 'precipitation_chance'),
+    WinterConfig.precipitation_chance,
+  );
+
+  const windyChance = normalizeSeasonWindyChance(
+    op.get(node, 'windy_chance'),
+    WinterConfig.windy_chance,
+  );
+
+  const veryWindyChance = normalizeSeasonVeryWindyChance(
+    op.get(node, 'very_windy_chance'),
+    WinterConfig.very_windy_chance,
+  );
+
+  const reducedFauna = isBool(op.get(node, 'reduced_fauna'))
+    ? op.get(node, 'reduced_fauna')
+    : WinterConfig.reduced_fauna;
+
+  return {
+    [WinterConfig.id]: {
+      duration,
+      precipitationChance,
+      windyChance,
+      veryWindyChance,
+      reducedFauna,
+      temperature: normalizeSeasonTemperatureMinMax({
+        min: op.get(node, 'min_temperature.value'),
+        minDefault: WinterConfig.min_temperature.value,
+        max: op.get(node, 'max_temperature.value'),
+        maxDefault: WinterConfig.max_temperature.value,
+      }),
+    },
+  };
 };

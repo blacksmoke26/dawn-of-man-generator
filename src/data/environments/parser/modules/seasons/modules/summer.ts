@@ -7,36 +7,61 @@
 import op from 'object-path';
 
 // helpers
-import { isObject } from '~/helpers/object';
+import {isObject} from '~/helpers/object';
+import {SummerConfig, toSummerSeasonParsed} from '~/utils/seasons';
 
 // utils
-import { SummerConfig } from '~/utils/seasons';
+import {
+  normalizeSeasonDuration,
+  normalizeSeasonPrecipitationChance,
+  normalizeSeasonTemperatureMinMax,
+  normalizeSeasonWindMinMax,
+  normalizeSeasonWindyChance,
+} from '~/utils/parser/environment/normalizer-season';
 
 // types
 import type {Json} from '~/types/json.types';
 
 /** Convert a season object into redux data */
-export const jsonToRedux = ( seasons: Json[] ): Json => {
-	const node = seasons.find(s => s.id === SummerConfig.id) as Json | null;
+export const jsonToRedux = (seasons: Json[]): Json => {
+  const node = seasons.find(s => s.id === SummerConfig.id) as Json;
 
-	if ( node === null || !isObject(node) ) {
-		return {};
-	}
+  if (!isObject(node)) {
+    return {[SummerConfig.id]: toSummerSeasonParsed()};
+  }
 
-	const duration = op.get<number>(node, 'duration', SummerConfig.duration);
-	const precipitationChance = op.get<number>(node, 'precipitation_chance', SummerConfig.precipitation_chance);
-	const windyChance = op.get<number>(node, 'windy_chance', SummerConfig.windy_chance);
-	const minWind = op.get<number>(node, 'min_wind.value', SummerConfig.min_wind);
-	const maxWind = op.get<number>(node, 'max_wind.value', SummerConfig.max_wind);
-	const minTemperature = op.get<number>(node, 'min_temperature.value', SummerConfig.min_temperature.value);
-	const maxTemperature = op.get<number>(node, 'max_temperature.value', SummerConfig.max_temperature.value);
+  const duration = normalizeSeasonDuration(
+    op.get(node, 'duration'),
+    SummerConfig.duration,
+  );
 
-	return {[SummerConfig.id]: {
-		duration,
-		precipitationChance,
-		windyChance,
-		minWind,
-		maxWind,
-		temperature: [minTemperature, maxTemperature],
-	}};
+  const precipitationChance = normalizeSeasonPrecipitationChance(
+    op.get(node, 'precipitation_chance'),
+    SummerConfig.precipitation_chance,
+  );
+
+  const windyChance = normalizeSeasonWindyChance(
+    op.get(node, 'windy_chance'),
+    SummerConfig.windy_chance,
+  );
+
+  return {
+    [SummerConfig.id]: {
+      duration,
+      precipitationChance,
+      windyChance,
+      wind: normalizeSeasonWindMinMax({
+        min: op.get(node, 'min_wind.value'),
+        minDefault: SummerConfig.min_wind,
+        max: op.get(node, 'max_wind.value'),
+        maxDefault: SummerConfig.max_wind,
+      }),
+      temperature: normalizeSeasonTemperatureMinMax({
+        min: op.get(node, 'min_temperature.value'),
+        minDefault: SummerConfig.min_temperature.value,
+        max: op.get(node, 'max_temperature.value'),
+        maxDefault: SummerConfig.max_temperature.value,
+      }),
+    },
+  };
 };

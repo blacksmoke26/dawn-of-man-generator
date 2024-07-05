@@ -4,13 +4,13 @@
  * @since 2020-08-29
  */
 
-// types
-import type {Json} from '~/types/json.types';
-import type {JsonToReduxOptions} from '~/utils/parser/index.types';
-
 // utils
 import {deposits} from '~/utils/random';
 import {transformSplitStringArray} from '~/utils/parser/transform';
+
+// types
+import type {Json} from '~/types/json.types';
+import type {JsonToReduxOptions} from '~/utils/parser/index.types';
 
 /** Convert environment json into redux data */
 export const jsonToRedux = ( json: Json, options: JsonToReduxOptions = {} ): Json => {
@@ -18,7 +18,10 @@ export const jsonToRedux = ( json: Json, options: JsonToReduxOptions = {} ): Jso
 		root: 'environment.deposits.values',
 		wrapperKey: 'deposits',
 		splitChar: ' ',
-		itemsValidator: (value: string) => deposits.includes(value),
+		minItems: 1,
+		maxItems: 4,
+		unique: true,
+		itemsValidator: value => deposits.includes(value),
 		...options,
 	});
 };

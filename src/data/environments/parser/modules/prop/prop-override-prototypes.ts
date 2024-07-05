@@ -4,13 +4,14 @@
  * @since 2020-08-29
  */
 
-// types
-import type {Json} from '~/types/json.types';
-import type {JsonToReduxOptions} from '~/utils/parser/index.types';
-
 // utils
 import {props} from '~/utils/random';
 import {transformOverrideObject} from '~/utils/parser/transform';
+import {transformObjectOutput, transformPrototypesPropertyValue} from '../../utils/prototypes';
+
+// types
+import type {Json} from '~/types/json.types';
+import type {JsonToReduxOptions} from '~/utils/parser/index.types';
 
 /** Convert environment json into redux data */
 export const jsonToRedux = (json: Json, options: JsonToReduxOptions = {}): Json => {
@@ -20,6 +21,8 @@ export const jsonToRedux = (json: Json, options: JsonToReduxOptions = {}): Json 
     transformOptions: {
       requiredProp: 'id',
       requiredPropValidator: id => props.includes(id),
+      transformPropertyValue: transformPrototypesPropertyValue,
+      transformOutput: transformObjectOutput,
       optionalProps: [
         'density',
         {group: 'altitude', key: 'min_altitude'},
