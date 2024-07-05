@@ -4,33 +4,41 @@
  * @since 2020-08-29
  */
 
+import {KVDocument} from '~/types/json.types';
+
 /** transformObject() options argument type */
 export interface TransformObjectOptions {
   /** Required property */
-  requiredProp?: string | null,
+  requiredProp?: string | null;
   /** Optional properties list */
-  optionalProps?: (string | { group: string, key: string })[],
+  optionalProps?: (string | { group: string, key: string })[];
   /** Wrapper object key (e.g., 'overrideDetails') */
-  wrapperKey?: string,
+  wrapperKey?: string;
 
   /** Required property validator */
-  requiredPropValidator?(value: any): boolean,
+  requiredPropValidator?(value: any): boolean;
+
+  /** Transform whole object */
+  transformOutput?(list: KVDocument): KVDocument;
+
+  /** Transform each object property value, return null to skip */
+  transformPropertyValue?(key: string, value: any): any;
 
   /** Null or none-exist value transformer (Defaults to {}) */
-  nullResolver?(wrapperKey: string): any,
+  nullResolver?(wrapperKey: string): any;
 }
 
 /** transformOverrideObject() options argument type */
 export interface TransformOverrideObjectOptions {
   /** Path to node (e.g., 'abc.def') */
-  root?: string,
+  root?: string;
   /** Wrapper object key (e.g., 'overrideDetails') */
-  wrapperKey?: string,
+  wrapperKey?: string;
   /** transformObject() options */
-  transformOptions?: TransformObjectOptions,
+  transformOptions?: TransformObjectOptions;
 
   /** Null or none-exist value transformer (Defaults to {}) */
-  nullResolver?(wrapperKey: string): any,
+  nullResolver?(wrapperKey: string): any;
 }
 
 /** transformNumeric() options argument type */
@@ -89,7 +97,7 @@ export interface TransformSplitStringArrayOptions {
   unique?: boolean,
 
   /** Transform whole array */
-  transformList?(list: string[]): string[],
+  transformOutput?(list: string[]): string[],
 
   /** Parsed list validator */
   itemsValidator?(value: string): boolean,

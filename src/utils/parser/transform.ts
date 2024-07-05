@@ -39,6 +39,8 @@ export const transformObject = (node: Json, options: TransformObjectOptions = {}
     wrapperKey: '',
     requiredProp: null,
     requiredPropValidator: () => true,
+    transformOutput: obj => obj,
+    transformPropertyValue: (_name, value) => value,
     optionalProps: [],
     nullResolver: () => ({}),
   }, options);
@@ -59,16 +61,19 @@ export const transformObject = (node: Json, options: TransformObjectOptions = {}
 
   for (let optPrp of opt.optionalProps) {
     if (typeof optPrp === 'string') {
-      const value: any = op.get(node, `${optPrp}.value`, null);
-      value !== null && (container[optPrp] = value);
+      let value: any = op.get(node, `${optPrp}.value`, null);
+      (value !== null
+        && (value = opt.transformPropertyValue(optPrp, value)) !== null)
+      && (container[optPrp] = value);
       continue;
     }
 
     if (isObject(optPrp)) {
       const {group, key} = optPrp;
-      const value = op.get<number | null>(node, `${key}.value`, null);
+      let value = op.get<number | null>(node, `${key}.value`, null);
 
-      if (value === null) {
+      if (value === null
+        || (value = opt.transformPropertyValue(key, value)) === null) {
         continue;
       }
 
@@ -80,7 +85,7 @@ export const transformObject = (node: Json, options: TransformObjectOptions = {}
     }
   }
 
-  return container;
+  return opt.transformOutput(container);
 };
 
 /**
@@ -101,7 +106,7 @@ export const transformOverrideObject = (json: Json, options: TransformOverrideOb
   if (isObject(parsed)) {
     const node = transformObject(parsed, opt.transformOptions);
 
-    if (!node.hasOwnProperty('id')) {
+    if (!('id' in node)) {
       return opt.nullResolver(opt.wrapperKey);
     }
 
@@ -190,7 +195,7 @@ export const transformSplitStringArray = (json: Json, options: TransformSplitStr
     splitChar: ' ',
     itemsValidator: () => true,
     transformValue: value => value,
-    transformList: values => values,
+    transformOutput: values => values,
     minItems: 0,
     maxItems: 0,
     nullResolver: () => ({}),
@@ -208,7 +213,9 @@ export const transformSplitStringArray = (json: Json, options: TransformSplitStr
     .map(opt.transformValue)
     .filter(opt.itemsValidator);
 
-  list = opt.transformList(list);
+  opt.unique && (list = [...new Set(list) as unknown as any[]]);
+
+  list = opt.transformOutput(list);
 
   if (opt.minItems > 0 && list.length < opt.minItems) {
     return opt.nullResolver(opt.wrapperKey);
@@ -217,8 +224,6 @@ export const transformSplitStringArray = (json: Json, options: TransformSplitStr
   if (opt.maxItems > 0 && list.length > opt.maxItems) {
     return opt.nullResolver(opt.wrapperKey);
   }
-
-  opt.unique && (list = [...new Set(list) as unknown as any[]]);
 
   return !list.length ? {} : {
     [opt.wrapperKey]: list,
