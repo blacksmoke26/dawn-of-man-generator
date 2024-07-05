@@ -84,6 +84,12 @@ export const normalizeMinMax = (value: number, options: NumberNormalizeOptions):
       : value
   );
 };
+
+export const normalizeMinMaxRange = (min: number, max: number): [number, number] => {
+  if ( min > max ) return [max, max];
+  if ( max < min ) return [min, min];
+  return [min, max];
+};
 export const normalizeInt = (value: number, options: WithCallback<NumberNormalizeOptions, number>): false | number => {
   if (!isInt(value)) {
     return false;

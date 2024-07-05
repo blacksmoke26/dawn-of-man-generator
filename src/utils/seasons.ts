@@ -4,17 +4,19 @@
  * @since 2020-08-29
  */
 
-// Utils
+// utils
 import * as random from './random';
 
+// types
+import {Json} from '~/types/json.types';
 import type {
   FallSeasonProps,
   SeasonsProp,
   SpringSeasonProps,
   SummerSeasonProps,
-  WinterSeasonProps
+  WinterSeasonProps,
 } from './seasons.types';
-import {Json} from '~/types/json.types';
+import {environment} from '~/data/environments/parser/types';
 
 export const SpringConfig = {
   id: 'Spring',
@@ -79,6 +81,52 @@ export const WinterConfig = {
     value: 10,
   },
 };
+
+export const toSpringSeasonParsed = (): environment.Seasons['Spring'] => ({
+  duration: SpringConfig.duration,
+  precipitationChance: SpringConfig.precipitation_chance,
+  windyChance: SpringConfig.windy_chance,
+  veryWindyChance: SpringConfig.very_windy_chance,
+  fishBoost: SpringConfig.fish_boost,
+  temperature: [
+    SpringConfig.min_temperature.value,
+    SpringConfig.max_temperature.value,
+  ],
+});
+
+export const toSummerSeasonParsed = (): environment.Seasons['Summer'] => ({
+  duration: SummerConfig.duration,
+  precipitationChance: SummerConfig.precipitation_chance,
+  windyChance: SummerConfig.windy_chance,
+  wind: [SummerConfig.min_wind, SummerConfig.max_wind],
+  temperature: [
+    SummerConfig.min_temperature.value,
+    SummerConfig.max_temperature.value,
+  ],
+});
+
+export const toFallSeasonParsed = (): environment.Seasons['Fall'] => ({
+  duration: FallConfig.duration,
+  precipitationChance: FallConfig.precipitation_chance,
+  windyChance: FallConfig.windy_chance,
+  veryWindyChance: FallConfig.very_windy_chance,
+  temperature: [
+    FallConfig.min_temperature.value,
+    FallConfig.max_temperature.value,
+  ],
+});
+
+export const toWinterSeasonParsed = (): environment.Seasons['Winter'] => ({
+  duration: WinterConfig.duration,
+  precipitationChance: WinterConfig.precipitation_chance,
+  windyChance: WinterConfig.windy_chance,
+  veryWindyChance: WinterConfig.very_windy_chance,
+  reducedFauna: WinterConfig.reduced_fauna,
+  temperature: [
+    WinterConfig.min_temperature.value,
+    WinterConfig.max_temperature.value,
+  ],
+});
 
 /**
  * @public
@@ -259,6 +307,6 @@ export const normalizeWinter = (data: Json): WinterSeasonProps => {
     veryWindyChance: data?.veryWindyChance ?? data?.very_windy_chance ?? WinterConfig?.very_windy_chance,
     minTemperatureValue: data?.minTemperatureValue ?? data?.min_temperature?.value ?? data?.temperature?.[0] ?? WinterConfig?.min_temperature?.value,
     maxTemperatureValue: data?.maxTemperatureValue ?? data?.max_temperature?.value ?? data?.temperature?.[1] ?? WinterConfig?.max_temperature?.value,
-    reducedFauna: data?.reducedFauna ?? data?.reduced_fauna ?? WinterConfig?.reduced_fauna
+    reducedFauna: data?.reducedFauna ?? data?.reduced_fauna ?? WinterConfig?.reduced_fauna,
   };
 };
