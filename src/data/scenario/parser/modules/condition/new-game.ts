@@ -5,8 +5,8 @@
  */
 
 // helpers
+import {isInList} from '~/helpers/array';
 import {isObject} from '~/helpers/object';
-import {isString} from '~/helpers/string';
 import {START_MODES} from '~/utils/condition';
 
 // types
@@ -25,9 +25,7 @@ export const jsonToRedux = (node: Json | any): Json | null => {
     type: CONDITION_TYPE,
   };
 
-  if (isString(node?.start_mode) && START_MODES.includes(node?.start_mode)) {
-    condition.startMode = node?.start_mode;
-  }
+  isInList(node?.start_mode, START_MODES, value => condition.startMode = value);
 
   return condition;
 };

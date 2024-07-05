@@ -5,9 +5,9 @@
  */
 
 // helpers
-import {INTERACTIONS} from '~/utils/condition';
+import {isInList} from '~/helpers/array';
 import {isObject} from '~/helpers/object';
-import {isString} from '~/helpers/string';
+import {INTERACTIONS} from '~/utils/condition';
 
 // types
 import type {Json} from '~/types/json.types';
@@ -25,9 +25,7 @@ export const jsonToRedux = (node: Json | any): Json | null => {
     type: CONDITION_TYPE,
   };
 
-  if (isString(node?.value) && INTERACTIONS.includes(node?.value)) {
-    condition.value = node?.value;
-  }
+  isInList(node?.value, INTERACTIONS, value => condition.value = value);
 
   return condition;
 };

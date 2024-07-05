@@ -5,11 +5,13 @@
  */
 
 // helpers
-import {isInt} from '~/helpers/number';
 import {isObject} from '~/helpers/object';
-import {isString} from '~/helpers/string';
 import {ENTITIES} from '~/utils/entities';
+import {isInList} from '~/helpers/array';
 import {COMPARISONS, COUNTERS} from '~/utils/condition';
+
+// utils
+import {normalizeEntityCount} from '~/utils/scenario/normalizer-condition';
 
 // types
 import type {Json} from '~/types/json.types';
@@ -23,8 +25,8 @@ export const jsonToRedux = (node: Json | any): Json | null => {
     return null;
   }
 
-  if ((!isString(node?.comparison) || !COMPARISONS.includes(node?.comparison))
-    || (!isString(node?.entity_type) || !ENTITIES.includes(node?.entity_type))) {
+  if (!isInList(node?.comparison, COMPARISONS)
+    || !isInList(node?.entity_type, ENTITIES)) {
     return null;
   }
 
@@ -32,17 +34,13 @@ export const jsonToRedux = (node: Json | any): Json | null => {
     type: CONDITION_TYPE,
   };
 
-  if (isString(node?.counter) && COUNTERS.includes(node?.counter)) {
-    condition.counter = node?.counter;
-  }
+  isInList(node?.counter, COUNTERS, value => condition.counter = value)
 
-  condition.entityType = node?.entity_type;
+  condition.entityType = node.entity_type;
 
-  if (isInt(node?.value) && node?.value >= 0) {
-    condition.value = node?.value;
-  }
+  normalizeEntityCount(node?.value, num => condition.value = num);
 
-  condition.comparison = node?.comparison;
+  condition.comparison = node.comparison;
 
   return condition;
 };

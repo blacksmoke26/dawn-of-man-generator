@@ -4,7 +4,10 @@
  * @since 2.3
  */
 
+import {snakeCase} from 'change-case';
+
 // helpers
+import {isInList} from '~/helpers/array';
 import {isObject} from '~/helpers/object';
 import {isString} from '~/helpers/string';
 import {GAME_MODES} from '~/utils/condition';
@@ -21,18 +24,16 @@ export const jsonToRedux = (node: Json | any): Json | null => {
     return null;
   }
 
-  if (!isString(node?.id) || !node?.id.trim()) {
+  if (!isString(node?.id, true)) {
     return null;
   }
 
   const condition: Json = {
     type: CONDITION_TYPE,
-    id: node?.id.trim(),
+    id: snakeCase(node.id),
   };
 
-  if (isString(node?.game_mode) && GAME_MODES.includes(node?.game_mode)) {
-    condition.gameMode = node?.game_mode;
-  }
+  isInList(node?.game_mode, GAME_MODES, value => condition.gameMode = value);
 
   return condition;
 };

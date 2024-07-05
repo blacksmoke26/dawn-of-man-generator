@@ -5,11 +5,12 @@
  */
 
 // helpers
+import {isInList} from '~/helpers/array';
 import {isObject} from '~/helpers/object';
-import {isString} from '~/helpers/string';
-import {toFloat} from '~/helpers/number';
 import {TIME_ELAPSED} from '~/utils/condition';
-import {validatePeriod} from '~/utils/scenario/validator';
+
+// utils
+import {normalizePeriod} from '~/utils/scenario/normalizer-condition';
 
 // types
 import type {Json} from '~/types/json.types';
@@ -23,15 +24,15 @@ export const jsonToRedux = (node: Json | any): Json | null => {
     return null;
   }
 
-  const condition: Json = {type: CONDITION_TYPE};
+  const condition: Json = {
+    type: CONDITION_TYPE
+  };
 
-  if (isString(node?.timer) && TIME_ELAPSED.includes(node?.timer)) {
-    condition.timer = node?.timer;
-  }
+  isInList(node?.timer, TIME_ELAPSED, value => condition.timer = value);
 
-  if (isString(node?.value) && validatePeriod(node?.value, true)) {
-    condition.value = toFloat(node?.value);
-  }
+  normalizePeriod(node?.value, value => condition.value = value);
 
-  return condition;
+  return Object.keys(condition).length === 1
+    ? null
+    : condition;
 };

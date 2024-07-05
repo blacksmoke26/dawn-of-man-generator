@@ -5,6 +5,7 @@
  */
 
 // helpers
+import {isInList} from '~/helpers/array';
 import {isObject} from '~/helpers/object';
 import {isString} from '~/helpers/string';
 import {techEntities} from '~/utils/entities';
@@ -37,13 +38,14 @@ export const jsonToRedux = (node: Json | any): Json | null => {
     type: CONDITION_TYPE,
   };
 
-  if (isString(node?.tech) && techEntities.includes(node?.tech)) {
-    condition.tech = node?.tech;
-  }
+  isInList(node?.tech, techEntities, value => condition.tech = value);
 
-  if (isString(node?.techs)) {
+  if (isString(node?.techs, true)) {
     const techList = parseTechs(node?.techs);
-    techList.length && (condition.techs = techList);
+    if (techList.length) {
+      delete condition.tech;
+      condition.techs = techList;
+    }
   }
 
   return Object.keys(condition).length === 1

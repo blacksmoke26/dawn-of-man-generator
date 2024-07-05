@@ -4,6 +4,8 @@
  * @since 2.3
  */
 
+import {snakeCase} from 'change-case';
+
 // helpers
 import {isObject} from '~/helpers/object';
 import {isString} from '~/helpers/string';
@@ -20,8 +22,8 @@ export const jsonToRedux = (node: Json | any): Json | null => {
     return null;
   }
 
-  return !isString(node?.name) || !node?.name.trim() ? null : {
+  return !isString(node?.name, true) ? null : {
     type: CONDITION_TYPE,
-    name: node?.name.trim(),
+    name: snakeCase(node?.name),
   };
 };

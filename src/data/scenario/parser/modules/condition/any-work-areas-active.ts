@@ -4,10 +4,14 @@
  * @since 2.3
  */
 
+import {snakeCase} from 'change-case';
+
 // helpers
-import {isInt} from '~/helpers/number';
 import {isObject} from '~/helpers/object';
 import {isString} from '~/helpers/string';
+
+// utils
+import {normalizeWorkers} from '~/utils/scenario/normalizer-condition';
 
 // types
 import type {Json} from '~/types/json.types';
@@ -21,18 +25,16 @@ export const jsonToRedux = (node: Json | any): Json | null => {
     return null;
   }
 
-  if (!isString(node?.work_area_id) || !node?.work_area_id.trim()) {
+  if (!isString(node?.work_area_id, true)) {
     return null;
   }
 
   const condition: Json = {
     type: CONDITION_TYPE,
-    workAreaId: node?.work_area_id.trim(),
+    workAreaId: snakeCase(node?.work_area_id),
   };
 
-  if (node?.max_workers && isInt(node?.max_workers) && node?.max_workers >= 0) {
-    condition.maxWorkers = node?.max_workers;
-  }
+  normalizeWorkers(node?.max_workers, num => condition.maxWorkers = num);
 
   return condition;
 };

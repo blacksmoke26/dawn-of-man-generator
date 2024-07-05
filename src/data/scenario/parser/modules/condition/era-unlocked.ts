@@ -6,8 +6,8 @@
 
 // helpers
 import {ERAS} from '~/utils/condition';
+import {isInList} from '~/helpers/array';
 import {isObject} from '~/helpers/object';
-import {isString} from '~/helpers/string';
 
 // types
 import type {Json} from '~/types/json.types';
@@ -21,7 +21,7 @@ export const jsonToRedux = (node: Json | any): Json | null => {
     return null;
   }
 
-  if (!isString(node?.era) || !ERAS.includes(node?.era)) {
+  if (!isInList(node?.era, ERAS)) {
     return null;
   }
 

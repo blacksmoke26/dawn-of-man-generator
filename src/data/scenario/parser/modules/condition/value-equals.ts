@@ -5,9 +5,8 @@
  */
 
 // helpers
+import {isInList} from '~/helpers/array';
 import {isObject} from '~/helpers/object';
-import {isString} from '~/helpers/string';
-import {toFloat} from '~/helpers/number';
 import {VALUE_EQUALS} from '~/utils/condition';
 
 // types
@@ -22,16 +21,13 @@ export const jsonToRedux = (node: Json | any): Json | null => {
     return null;
   }
 
-  const value = node?.value || null;
-
-  if ((!isString(node?.id) || !VALUE_EQUALS.includes(node?.id))
-    || value === null) {
+  if (!isInList(node?.id, VALUE_EQUALS) || !node?.value) {
     return null;
   }
 
   return {
     type: CONDITION_TYPE,
-    id: node?.id,
-    value: toFloat(value),
+    id: node.id,
+    value: node.value,
   };
 };
