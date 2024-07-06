@@ -57,7 +57,7 @@ export namespace environment {
     duration: number;
     precipitationChance: number;
     windyChance: number;
-    wind: [number, number];
+    wind?: [number, number];
     temperature: [number, number];
   }
 
@@ -72,7 +72,7 @@ export namespace environment {
 
   export type OverridePrototypes<T extends string> = {
     [key in T]?: {
-      density: number;
+      density?: number;
       altitude?: [number, number];
       humidity?: [number, number];
       angle?: [number, number];
