@@ -67,58 +67,87 @@ export interface TransformNumericOptions {
   validate?(value: number): boolean;
 
   /** Null or none-exist value transformer (Defaults to {}) */
-  nullResolver?(wrapperKey: string): any,
+  nullResolver?(wrapperKey: string): any;
 }
 
 /** transformBoolean() options argument type */
 export interface TransformBooleanOptions {
   /** Path to node (e.g., 'abc.def') */
-  root?: string,
+  root?: string;
   /** Wrapper object key (e.g., 'overrideDetails') */
-  wrapperKey?: string,
+  wrapperKey?: string;
 
   /** Null or none-exist value transformer (Defaults to {}) */
-  nullResolver?(wrapperKey: string): any,
+  nullResolver?(wrapperKey: string): any;
 }
+
+type NullResolverReturn = (wrapperKey: string) => any
+type EmptyResolver = object;
 
 /** transformSplitStringArray() options argument type */
 export interface TransformSplitStringArrayOptions {
   /** Path to node (e.g., 'abc.def') */
-  root: string,
+  root: string;
   /** Wrapper object key (e.g., 'overrideDetails') */
-  wrapperKey: string,
+  wrapperKey: string;
   /** Split char (e.g., ' ') */
-  splitChar?: string,
+  splitChar?: string;
   /** Minimum required items [0 = no limit] */
-  minItems?: number,
+  minItems?: number;
   /** Maximum limit of items [0 = no limit] */
-  maxItems?: number,
+  maxItems?: number;
   /** Setting true will remove duplicate values from array */
-  unique?: boolean,
+  unique?: boolean;
 
   /** Transform whole array */
-  transformOutput?(list: string[]): string[],
+  transformOutput?(list: string[]): string[];
 
   /** Parsed list validator */
-  itemsValidator?(value: string): boolean,
+  itemsValidator?(value: string): boolean;
 
   /** Transform each value */
-  transformValue?(value: string): any,
+  transformValue?(value: string): any;
 
   /** Null or none-exist value transformer (Defaults to {}) */
-  nullResolver?(wrapperKey: string): any,
+  nullResolver?(wrapperKey: string): any;
+
+  /**
+   * Empty value `''` resolver (Defaults to `nullResolver`)
+   *
+   * @example
+   * emptyResolver(nullResolver, nodePresent, wrapperKey): any {
+   *   return nodePresent ? {[wrapperKey]: []} : nullResolver;
+   * },
+   * */
+  emptyResolver?(nullResolver: NullResolverReturn, nodePresent: boolean, wrapperKey: string): NullResolverReturn;
+
+  /**
+   * Empty list resolver (Defaults to `{}`)<br>
+   * Note: Passing `{}` will simply ignore the node.
+   *
+   * @example Ignore the node (default behavior)
+   * emptyListResolver (emptyResolver): any {
+   *   return emptyResolver;
+   * }
+   *
+   * @example Returns empty list
+   * emptyListResolver (emptyResolver, wrapperKey): any {
+   *   return {[wrapperKey]: []};
+   * }
+   */
+  emptyListResolver?(emptyResolver: EmptyResolver, wrapperKey: string): EmptyResolver;
 }
 
 /** transformNumericArray() options argument type */
 export interface TransformNumericArrayOptions {
   /** Path to node (e.g., 'abc.def') */
-  root: string,
+  root: string;
   /** Wrapper object key (e.g., 'overrideDetails') */
-  wrapperKey: string,
+  wrapperKey: string;
   /** Minimum required items [0 = no limit] */
-  minItems?: number,
+  minItems?: number;
   /** Maximum limit of items [0 = no limit] */
-  maxItems?: number,
+  maxItems?: number;
 
   /** Null or none-exist value transformer (Defaults to {}) */
   nullResolver?(wrapperKey: string): any,
@@ -127,9 +156,9 @@ export interface TransformNumericArrayOptions {
 /** transformString() options argument type */
 export interface TransformStringOptions {
   /** Path to node (e.g., 'abc.def') */
-  root?: string,
+  root?: string;
   /** Wrapper object key (e.g., 'overrideDetails') */
-  wrapperKey?: string,
+  wrapperKey?: string;
 
   /**
    * Convert/Cast or transform the value
@@ -146,7 +175,7 @@ export interface TransformStringOptions {
   validate?(value: string): boolean;
 
   /** Null or none-exist value transformer (Defaults to {}) */
-  nullResolver?(wrapperKey: string): any,
+  nullResolver?(wrapperKey: string): any;
 }
 
 /** transformObjectAttributes() options argument type */
