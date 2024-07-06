@@ -14,10 +14,13 @@ import {jsonToRedux} from '~/data/environments/parser';
 
 // redux
 import initialState from './initial-state';
+import {resetValues as envResetValues} from '~/data/environments/parser/defaults';
 
 // types
 import type {PayloadAction} from '@reduxjs/toolkit';
-import type {Environment} from '~/types/environment.types';
+import type {environment} from '~/data/environments/parser/types';
+
+type Environment = environment.Environment;
 
 const environmentSlice = createSlice({
   name: 'environment',
@@ -38,6 +41,12 @@ const environmentSlice = createSlice({
      */
     updateValuesRaw(state, action: PayloadAction<Environment>) {
       state.values = merge(state.values, action.payload);
+    },
+    /**
+     * Reset environment values (simply removing everything in forms)
+     */
+    resetValues(state) {
+      state.values = {...envResetValues};
     },
     /**
      * Update xml template from the given action.
@@ -61,9 +70,24 @@ const environmentSlice = createSlice({
      * Update environment state value by the given path. No value will be set if the path does not exist.<br>
      * **Warning:** It will overwrite the existing value.
      */
-    updateByPath(state, action: PayloadAction<{ path: Path; value: any }>) {
-      const {path, value} = action.payload;
-      objPath.set(state, path, value);
+    updateByPath(state, action: PayloadAction<
+      | { path: Path; value: any , overwrite?: boolean}
+      | { path: keyof Environment; value: any, overwrite?: boolean }
+    >) {
+      const path = action.payload.path;
+      const values = {...state.values};
+
+      action.payload?.overwrite && objPath.empty(values, path);
+
+      objPath.set(values, path, action.payload.value);
+
+      state.values = merge(state.values, values as Environment);
+    },
+    /**
+     * Clears environment property
+     */
+    clearProperty(state, action: PayloadAction<keyof Environment>) {
+      state.values = {...state.values, [action.payload]: undefined};
     },
   },
 });
@@ -75,6 +99,8 @@ export const {
   updateString,
   updateName,
   updateByPath,
+  resetValues,
+  clearProperty,
 } = environmentSlice.actions;
 
 export const reducer = environmentSlice.reducer;

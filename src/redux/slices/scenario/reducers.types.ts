@@ -6,11 +6,11 @@
  */
 
 // types
-import type {Scenario} from '~/types/scenario.types';
+import type {scenario} from '~/data/scenario/parser/types';
 
 export interface ScenarioState {
   name: string,
-  values: Scenario;
+  values: scenario.Scenario;
   template: string;
   strings: string;
 }
