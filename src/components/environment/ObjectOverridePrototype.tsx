@@ -53,24 +53,26 @@ export interface Props {
   onRemove?(): void,
 }
 
+const defaultValues = {
+  disabled: false,
+  initialValues: {},
+  onChange() {
+  },
+  onRemove() {
+  },
+  onTemplate() {
+  },
+};
+
 /** ObjectOverridePrototype functional component */
 const ObjectOverridePrototype = (props: Props) => {
-  const newProps = merge<Required<Props>>({
-    disabled: false,
-    initialValues: {},
-    onChange() {
-    },
-    onRemove() {
-    },
-    onTemplate() {
-    },
-  }, props);
+  const newProps = merge<Required<Props>>(defaultValues, props);
 
   const accessor = obPath(props?.initialValues || {});
 
   const valuer = useValues<ValuesState>({
     density: {
-      disabled: !accessor.get('density', true),
+      disabled: !accessor.has('density'),
       value: +accessor.get('density', Defaults.DENSITY_DEFAULT),
     },
     angle: {
@@ -139,7 +141,7 @@ const ObjectOverridePrototype = (props: Props) => {
   const isAltitudeEnabled = isEnabled && valuer.is('altitude.disabled', false);
   const isHumidityEnabled = isEnabled && valuer.is('humidity.disabled', false);
 
-  const allValuesDisabled = !isDensityEnabled && !isAngleEnabled && !isAltitudeEnabled && !isHumidityEnabled;
+  const allValuesDisabled = !(isDensityEnabled === isAngleEnabled === isAltitudeEnabled === isHumidityEnabled);
 
   return (
     <>
