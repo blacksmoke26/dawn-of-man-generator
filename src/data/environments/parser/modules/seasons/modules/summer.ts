@@ -45,23 +45,27 @@ export const jsonToRedux = (seasons: Json[]): Json => {
     SummerConfig.windy_chance,
   );
 
+  const attributes: Json = {
+    duration,
+    precipitationChance,
+    windyChance,
+    wind: normalizeSeasonWindMinMax({
+      min: op.get(node, 'min_wind.value'),
+      minDefault: SummerConfig.min_wind,
+      max: op.get(node, 'max_wind.value'),
+      maxDefault: SummerConfig.max_wind,
+    }),
+    temperature: normalizeSeasonTemperatureMinMax({
+      min: op.get(node, 'min_temperature.value'),
+      minDefault: SummerConfig.min_temperature.value,
+      max: op.get(node, 'max_temperature.value'),
+      maxDefault: SummerConfig.max_temperature.value,
+    }),
+  };
+
+  !('wind' in node) && delete attributes.wind;
+
   return {
-    [SummerConfig.id]: {
-      duration,
-      precipitationChance,
-      windyChance,
-      wind: normalizeSeasonWindMinMax({
-        min: op.get(node, 'min_wind.value'),
-        minDefault: SummerConfig.min_wind,
-        max: op.get(node, 'max_wind.value'),
-        maxDefault: SummerConfig.max_wind,
-      }),
-      temperature: normalizeSeasonTemperatureMinMax({
-        min: op.get(node, 'min_temperature.value'),
-        minDefault: SummerConfig.min_temperature.value,
-        max: op.get(node, 'max_temperature.value'),
-        maxDefault: SummerConfig.max_temperature.value,
-      }),
-    },
+    [SummerConfig.id]: attributes,
   };
 };
