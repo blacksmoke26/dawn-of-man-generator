@@ -21,6 +21,8 @@ import ObjectOverridePrototype, {InitialValues} from '~/components/environment/O
 import {IconMountain} from '~/components/icons/app';
 
 // utils
+import {isObject} from '~/helpers/object';
+import {findNextTabKey} from '~/helpers/ui';
 import {
   optionsByType,
   toTemplateText,
@@ -31,13 +33,12 @@ import {
 } from '~/components/environment/utils/object-override';
 
 // redux
-import {useAppSelector} from '~redux/hooks';
-import {isObject} from '~/helpers/object';
+import {useAppDispatch, useAppSelector} from '~redux/hooks';
+import {clearProperty} from '~redux/slices/environment/reducers';
 
 // types
 import type {ObjectType} from '~/utils/objects';
 import type {Json, KVDocument} from '~/types/json.types';
-import {findNextTabKey} from '~/helpers/ui';
 
 export type Props = Omit<BaseProp, 'type' | 'checked' | 'noCard' | 'objectNoCard' | 'optionIcon' | 'values'>;
 
@@ -46,40 +47,41 @@ const OPTION_ICON: React.ReactElement = <IconMountain width="16" height="16"/>;
 
 /** DetailOverride functional component */
 const DetailOverride = (props: Props) => {
+  const dispatch = useAppDispatch();
+
   const [checked, setChecked] = React.useState<boolean>(true);
   const [values, setValues] = React.useState<ObjectsList>({});
-  const [isInit, setIsInit] = React.useState<boolean>(false);
   const [templates, setTemplates] = React.useState<KVDocument<string>>({});
   const [activeKey, setActiveKey] = React.useState<string>('');
 
-  const detailOverridePrototypesAttribute = useAppSelector(({environment}) => environment?.values?.detailOverridePrototypes);
+  const reduxState = useAppSelector(({environment}) => environment?.values?.depositOverridePrototypes);
 
   const reflectValues = (values: ObjectsList) => {
     setTemplates(valuesToTemplates(values));
     setValues(values);
-    setIsInit(false);
+    setActiveKey(Object.keys(values)[0]);
   };
 
   // Reflect redux-specific changes
   React.useEffect(() => {
-    const extValue = detailOverridePrototypesAttribute ?? null;
-
-    if (typeof extValue === 'boolean') {
-      setChecked(extValue);
-    }
-
-    if (isObject(extValue)) {
+    if (reduxState === null) {
       setChecked(true);
-      reflectValues(extValueToSelection(extValue as Json));
+      setValues({});
+      setTemplates({});
+      setActiveKey('');
+      dispatch(clearProperty('depositOverridePrototypes'));
+    } else if (isObject(reduxState)) {
+      setChecked(true);
+      reflectValues(extValueToSelection(reduxState as Json));
     }
-  }, [detailOverridePrototypesAttribute]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reduxState]);
 
   // Reflect state changes
   React.useEffect(() => {
     typeof props.onChange === 'function' && props.onChange(toTemplateText(OBJECT_TYPE, templates));
-    !isInit && setIsInit(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [templates, isInit]);
+  }, [templates]);
 
   const removeObject = (name: string) => {
     setTemplates(current => {

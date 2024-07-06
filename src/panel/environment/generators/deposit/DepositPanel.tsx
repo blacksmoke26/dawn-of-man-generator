@@ -6,58 +6,43 @@
 
 import React from 'react';
 import * as PropTypes from 'prop-types';
-import merge from 'deepmerge';
 
 // Components
 import Deposits from './Deposits';
 import DepositOverride from './DepositOverride';
-
-type ExportValues = {
-	deposits: string,
-	depositOverride: string,
-};
 
 /**
  * DepositPanel `props` type
  * @type {Object}
  */
 type Props = {
-	onChange ( template: string, values: ExportValues ): void,
+  onChange(template: string): void,
 };
 
 /** DepositPanel functional component */
-const DepositPanel = ( props: Props ) => {
-	props = merge({
-		onChange: () => {},
-	}, props);
+const DepositPanel = (props: Props) => {
+  const [deposits, setDeposits] = React.useState<string>('');
+  const [depositOverride, setDepositOverride] = React.useState<string>('');
 
-	const [deposits, setDeposits] = React.useState<string>('');
-	const [depositOverride, setDepositOverride] = React.useState<string>('');
+  // Reflect state changes
+  React.useEffect(() => {
+    typeof props.onChange === 'function'
+    && props.onChange(deposits + depositOverride);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [deposits, depositOverride]);
 
-	// Reflect state changes
-	React.useEffect(() => {
-		typeof props.onChange === 'function'
-			&& props.onChange(toTemplateText(), {deposits, depositOverride});
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [deposits, depositOverride]);
-
-	/** Generate xml code */
-	const toTemplateText = React.useCallback((): string => {
-		return `${deposits}${depositOverride}`;
-	}, [deposits, depositOverride]);
-
-	return (
-		<>
-			<Deposits onChange={v => setDeposits(v)}/>
-			<hr className="mt-1"/>
-			<DepositOverride onChange={v => setDepositOverride(v)}/>
-		</>
-	);
+  return (
+    <>
+      <Deposits onChange={v => setDeposits(v)}/>
+      <hr className="mt-1"/>
+      <DepositOverride onChange={v => setDepositOverride(v)}/>
+    </>
+  );
 };
 
 // Properties validation
 DepositPanel.propTypes = {
-	onChange: PropTypes.func,
+  onChange: PropTypes.func,
 };
 
 export default DepositPanel;

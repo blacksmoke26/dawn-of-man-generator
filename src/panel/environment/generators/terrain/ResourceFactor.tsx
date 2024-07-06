@@ -7,7 +7,6 @@
 import React from 'react';
 import * as PropTypes from 'prop-types';
 import cn from 'classname';
-import merge from 'deepmerge';
 
 // elemental components
 import Slider from '~/components/ui/Slider';
@@ -16,9 +15,14 @@ import PanelToolbar from '~/components/environment/PanelToolbar';
 // utils
 import * as random from '~/utils/random';
 import * as Defaults from '~/utils/defaults';
+import {RESOURCE_FACTOR_DEFAULT} from '~/utils/defaults';
+
+// parsers
+import {toResourceFactorTemplate} from '~/utils/parser/environment/templates';
 
 // redux
-import {useAppSelector} from '~redux/hooks';
+import {useAppDispatch, useAppSelector} from '~redux/hooks';
+import {clearProperty} from '~redux/slices/environment/reducers';
 
 /**
  * ResourceFactor `props` type
@@ -32,41 +36,31 @@ export interface ResourceFactorProps {
 
 /** ResourceFactor functional component */
 const ResourceFactor = (props: ResourceFactorProps) => {
-  props = merge({
-    checked: false,
-    resource: random.randomResource(),
-    onChange: () => {
-    },
-  }, props);
+  const dispatch = useAppDispatch();
 
-  const [checked, setChecked] = React.useState<boolean>(props.checked as boolean);
-  const [resource, setResource] = React.useState<number>(props.resource as number);
+  const [checked, setChecked] = React.useState<boolean>(props?.checked ?? false);
+  const [resource, setResource] = React.useState<number>(props?.resource ?? random.randomResource());
 
-  const resourceFactorAttribute = useAppSelector(({environment}) => environment.values?.resourceFactor);
+  const reduxState = useAppSelector(({environment}) => environment.values?.resourceFactor);
 
   // Reflect attributes changes
   React.useEffect(() => {
-    const extValue = resourceFactorAttribute ?? null;
-
-    if (typeof extValue === 'boolean') {
-      setChecked(extValue);
-    } else if (typeof extValue === 'number') {
+    if (reduxState === null) {
+      setChecked(false);
+      setResource(RESOURCE_FACTOR_DEFAULT);
+      dispatch(clearProperty('resourceFactor'));
+    } else if (typeof reduxState === 'number') {
       setChecked(true);
-      setResource(extValue);
+      setResource(reduxState);
     }
-  }, [resourceFactorAttribute]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reduxState]);
 
   // Reflect state changes
   React.useEffect(() => {
-    typeof props.onChange === 'function' && props.onChange(toTemplateText(), resource);
+    typeof props.onChange === 'function'
+    && props.onChange(toResourceFactorTemplate(resource, !checked), resource);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [resource, checked]);
-
-  /** Generate xml code */
-  const toTemplateText = React.useCallback((): string => {
-    return checked
-      ? `<resource_factor value="${resource}"/>`
-      : '';
   }, [resource, checked]);
 
   return (
@@ -74,6 +68,7 @@ const ResourceFactor = (props: ResourceFactorProps) => {
       <PanelToolbar
         value={resource}
         checked={checked}
+        checkboxPosition="right"
         heading="Resource Factor"
         description="The amount of resources in the map."
         allowNumberInput
@@ -82,7 +77,7 @@ const ResourceFactor = (props: ResourceFactorProps) => {
           max: Defaults.RESOURCE_FACTOR_MAX,
           decimals: 2,
         }}
-        onCheckboxChange={state => setChecked(state)}
+        onCheckboxChange={setChecked}
         onChange={(val: number) => setResource(+val)}
         allowShuffle
         onShuffle={() => setResource(random.randomResource(true))}

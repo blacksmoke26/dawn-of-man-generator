@@ -5,9 +5,8 @@
  */
 
 import React from 'react';
-import cn from 'classname';
-import merge from 'deepmerge';
 import * as PropTypes from 'prop-types';
+import cn from 'classname';
 
 // elemental components
 import Slider from '~/components/ui/Slider';
@@ -20,12 +19,21 @@ import {COLOR_REDDISH, COLOR_WHITISH} from '~/components/icons/app';
 // utils
 import * as random from '~/utils/random';
 import * as Defaults from '~/utils/defaults';
+import {BACKDROP_SCALE_DEFAULT} from '~/utils/defaults';
+
+// parsers
+import {toBackdropScaleTemplate} from '~/utils/parser/environment/templates';
 
 // redux
-import {useAppSelector} from '~redux/hooks';
+import {useAppDispatch, useAppSelector} from '~redux/hooks';
+import {clearProperty} from '~redux/slices/environment/reducers';
 
 // types
-import {Json} from '~/types/json.types';
+import type {Json} from '~/types/json.types';
+
+const ANGLE1_DEFAULT = BACKDROP_SCALE_DEFAULT[0] as number;
+const ANGLE2_DEFAULT = BACKDROP_SCALE_DEFAULT[1] as number;
+const ANGLE3_DEFAULT = BACKDROP_SCALE_DEFAULT[2] as number;
 
 /**
  * BackdropScale `props` type
@@ -39,54 +47,42 @@ export interface BackdropScaleProps {
   onChange?(template: string, values?: Json): void;
 }
 
-/** Default values */
-const defaultValues: { angle3: number; angle1: number; angle2: number } = {
-  angle1: 1.0,
-  angle2: 0.25,
-  angle3: 1.0,
-};
-
 /** BackdropScale functional component */
 const BackdropScale = (props: BackdropScaleProps) => {
-  props = merge({
-    checked: false,
-    ...defaultValues,
-    onChange: () => {
-    },
-  }, props);
+  const dispatch = useAppDispatch();
 
-  const [checked, setChecked] = React.useState<boolean>(props.checked as boolean);
-  const [angle1, setAngle1] = React.useState<number | string>(props.angle1 as number);
-  const [angle2, setAngle2] = React.useState<number | string>(props.angle2 as number);
-  const [angle3, setAngle3] = React.useState<number | string>(props.angle3 as number);
+  const [checked, setChecked] = React.useState<boolean>(props?.checked ?? false);
+  const [angle1, setAngle1] = React.useState<number>(props?.angle1 ?? ANGLE1_DEFAULT as number);
+  const [angle2, setAngle2] = React.useState<number>(props?.angle2 ?? ANGLE2_DEFAULT as number);
+  const [angle3, setAngle3] = React.useState<number>(props?.angle3 ?? ANGLE3_DEFAULT as number);
 
-  const backdropScaleAttribute = useAppSelector(({environment}) => environment?.values?.backdropScale);
+  const reduxState = useAppSelector(({environment}) => environment?.values?.backdropScale);
 
   // Reflect attributes changes
   React.useEffect(() => {
-    const extValue = backdropScaleAttribute ?? null;
-
-    if (typeof extValue === 'boolean') {
-      setChecked(extValue);
-    } else if (Array.isArray(extValue)) {
+    if (reduxState === null) {
+      setChecked(false);
+      setAngle1(ANGLE1_DEFAULT);
+      setAngle2(ANGLE2_DEFAULT);
+      setAngle3(ANGLE3_DEFAULT);
+      dispatch(clearProperty('backdropScale'));
+    } else if (Array.isArray(reduxState)) {
       setChecked(true);
-      setAngle1(extValue[0]);
-      setAngle2(extValue[1]);
-      setAngle3(extValue[2]);
+      setAngle1(reduxState[0] || ANGLE1_DEFAULT);
+      setAngle2(reduxState[1] || ANGLE2_DEFAULT);
+      setAngle3(reduxState[2] || ANGLE3_DEFAULT);
     }
-  }, [backdropScaleAttribute]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reduxState]);
 
   // Reflect state changes
   React.useEffect(() => {
-    typeof props.onChange === 'function' && props.onChange(toTemplateText(), {angle1, angle2, angle3});
+    typeof props.onChange === 'function'
+    && props.onChange(
+      toBackdropScaleTemplate([angle1, angle2, angle3], !checked),
+      {angle1, angle2, angle3}
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [checked, angle1, angle2, angle3]);
-
-  /** Generate xml code */
-  const toTemplateText = React.useCallback((): string => {
-    return checked
-      ? `<backdrop_scale value="${angle1}, ${angle2}, ${angle3}"/>`
-      : '';
   }, [checked, angle1, angle2, angle3]);
 
   const numberInputProps = {
@@ -104,6 +100,7 @@ const BackdropScale = (props: BackdropScaleProps) => {
     <div className={cn('mb-2', {'text-muted': !checked})}>
       <PanelToolbar
         checked={checked}
+        checkboxPosition="right"
         heading="Backdrop Scale"
         description="Change the size of backdrops (the mountains you see beyond the map)."
         onCheckboxChange={state => setChecked(state)}
@@ -111,18 +108,18 @@ const BackdropScale = (props: BackdropScaleProps) => {
           <>
             <PopoverNumberInput
               {...numberInputProps}
-              value={angle1 as number}
-              onSave={value => setAngle1(value as number)}/>
+              value={angle1 || ANGLE1_DEFAULT as number}
+              onSave={setAngle1}/>
             <strong style={{marginRight: 7, color: COLOR_WHITISH}}>,</strong>
             <PopoverNumberInput
               {...numberInputProps}
-              value={angle2 as number}
-              onSave={value => setAngle2(value as number)}/>
+              value={angle2 || ANGLE1_DEFAULT}
+              onSave={setAngle2}/>
             <strong style={{marginRight: 7, color: COLOR_WHITISH}}>,</strong>
             <PopoverNumberInput
               {...numberInputProps}
-              value={angle3 as number}
-              onSave={value => setAngle3(value as number)}/>
+              value={angle3 || ANGLE1_DEFAULT}
+              onSave={setAngle3}/>
           </>
         )}
         allowShuffle
@@ -134,25 +131,25 @@ const BackdropScale = (props: BackdropScaleProps) => {
         }}
         allowRestore
         onRestore={() => {
-          setAngle1(defaultValues.angle1);
-          setAngle2(defaultValues.angle2);
-          setAngle3(defaultValues.angle3);
+          setAngle1(ANGLE1_DEFAULT);
+          setAngle2(ANGLE2_DEFAULT);
+          setAngle3(ANGLE3_DEFAULT);
         }}
         disabled={!checked}/>
       <div className="mb-2">
         <Slider
-          disabled={!checked} step={0.01} value={Number(angle1)}
-          onChange={v => setAngle1(v as number)}/>
+          disabled={!checked} step={0.01} value={angle1}
+          onChange={value => setAngle1(+value)}/>
       </div>
       <div className="mb-2">
         <Slider
-          disabled={!checked} step={0.01} value={Number(angle2)}
-          onChange={v => setAngle2(v as number)}/>
+          disabled={!checked} step={0.01} value={angle2}
+          onChange={value => setAngle2(+value)}/>
       </div>
       <div className="mb-2">
         <Slider
-          disabled={!checked} step={0.01} value={Number(angle3)}
-          onChange={v => setAngle3(v as number)}/>
+          disabled={!checked} step={0.01} value={angle3}
+          onChange={value => setAngle3(+value)}/>
       </div>
     </div>
   );

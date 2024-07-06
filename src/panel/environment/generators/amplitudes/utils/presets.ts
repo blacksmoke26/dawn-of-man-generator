@@ -7,7 +7,7 @@
 
 // types
 import {NoiseAmplitudes} from '~/types/environment.types';
-import {ValueFrequencies} from '../NoiseAmplitudes';
+import {ValueFrequencies} from './general';
 import {KVDocument} from '~/types/json.types';
 
 const toNoiseAmplitudes = (params: string): NoiseAmplitudes => {

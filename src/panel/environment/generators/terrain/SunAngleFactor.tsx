@@ -7,18 +7,22 @@
 import React from 'react';
 import * as PropTypes from 'prop-types';
 import cn from 'classname';
-import merge from 'deepmerge';
 
 // elemental components
 import Slider from '~/components/ui/Slider';
 import PanelToolbar from '~/components/environment/PanelToolbar';
 
-// Utils
+// utils
 import * as random from '~/utils/random';
 import * as Defaults from '~/utils/defaults';
+import {SUN_ANGLE_FACTOR_DEFAULT} from '~/utils/defaults';
+
+// parsers
+import {toSunAngleFactorTemplate} from '~/utils/parser/environment/templates';
 
 // redux
-import {useAppSelector} from '~redux/hooks';
+import {useAppDispatch, useAppSelector} from '~redux/hooks';
+import {clearProperty} from '~redux/slices/environment/reducers';
 
 /**
  * SunAngleFactor `props` type
@@ -32,41 +36,31 @@ export interface SunAngleFactorProps {
 
 /** SunAngleFactor functional component */
 const SunAngleFactor = (props: SunAngleFactorProps) => {
-  props = merge({
-    checked: false,
-    angle: random.randomSunAngleFactor(),
-    onChange: () => {
-    },
-  }, props);
+  const dispatch = useAppDispatch();
 
-  const [checked, setChecked] = React.useState<boolean>(props.checked as boolean);
-  const [angle, setAngle] = React.useState<number>(props.angle as number);
+  const [checked, setChecked] = React.useState<boolean>(props?.checked ?? false);
+  const [angle, setAngle] = React.useState<number>(props?.angle ?? random.randomSunAngleFactor());
 
-  const sunAngleFactorAttribute = useAppSelector(({environment}) => environment.values?.sunAngleFactor);
+  const reduxState = useAppSelector(({environment}) => environment.values?.sunAngleFactor);
 
   // Reflect attributes changes
   React.useEffect(() => {
-    const extValue = sunAngleFactorAttribute ?? null;
-
-    if (typeof extValue === 'boolean') {
-      setChecked(extValue);
-    } else if (typeof extValue === 'number') {
+    if (reduxState === null) {
+      setChecked(false);
+      setAngle(SUN_ANGLE_FACTOR_DEFAULT);
+      dispatch(clearProperty('sunAngleFactor'));
+    } else if (typeof reduxState === 'number') {
       setChecked(true);
-      setAngle(extValue);
+      setAngle(reduxState);
     }
-  }, [sunAngleFactorAttribute]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reduxState]);
 
   // Reflect state changes
   React.useEffect(() => {
-    typeof props.onChange === 'function' && props.onChange(toTemplateText(), angle);
+    typeof props.onChange === 'function'
+    && props.onChange(toSunAngleFactorTemplate(angle, !checked), angle);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [angle, checked]);
-
-  /** Generate xml code */
-  const toTemplateText = React.useCallback((): string => {
-    return checked
-      ? `<sun_angle_factor value="${angle}"/>`
-      : '';
   }, [angle, checked]);
 
   return (
@@ -74,6 +68,7 @@ const SunAngleFactor = (props: SunAngleFactorProps) => {
       <PanelToolbar
         value={angle}
         checked={checked}
+        checkboxPosition="right"
         heading="Sun Angle Factor"
         description="How high is the sun in the sky"
         allowNumberInput

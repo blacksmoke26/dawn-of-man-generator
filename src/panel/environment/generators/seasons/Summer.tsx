@@ -8,7 +8,6 @@
 
 import React from 'react';
 import * as PropTypes from 'prop-types';
-import merge from 'deepmerge';
 import {ButtonGroup, Form} from 'react-bootstrap';
 
 // elemental components
@@ -30,168 +29,136 @@ import {
   IconShuffle,
 } from '~/components/icons/app';
 
+// hooks
+import useValues from '~/hooks/use-values';
+
 // utils
 import * as random from '~/utils/random';
-import * as Defaults from '~/utils/defaults';
 import {isObject} from '~/helpers/object';
+import * as Defaults from '~/utils/defaults';
+import {invokeHandler} from '~/utils/callback';
 import {temperatureNumberInputProps} from './utils/params';
-import {normalizeSummer, randomizeSummer, seasonsPropsDefault, SummerConfig} from '~/utils/seasons';
+
+// parsers
+import {toSeasonSummerTemplate} from '~/utils/parser/environment/templates';
 
 // redux
 import {useAppSelector} from '~redux/hooks';
 
 // types
-import type {Json} from '~/types/json.types';
-import type {SummerSeasonProps} from '~/utils/seasons.types';
-
-/** Transform extended value into a selection object */
-const extValueToSeason = (data: Json | boolean): SummerSeasonProps | boolean => {
-  if (typeof data === 'boolean') {
-    return data;
-  }
-
-  const keyRaw: string = SummerConfig?.id;
-  const key: string = keyRaw.toLowerCase();
-
-  if (!isObject(data) || (!(key in data) && !(keyRaw in data))) {
-    return false;
-  }
-
-  return normalizeSummer(data[keyRaw] || data[key]);
-};
+import type {environment} from '~/data/environments/parser/types';
 
 /** Summer `props` type */
-export interface Props {
-  enabled?: boolean,
-  season?: SummerSeasonProps,
+export interface SummerProps {
+  disabled?: boolean,
 
-  onChange?(template: string, values: SummerSeasonProps): void,
+  onValuesChange?(values: environment.SummerSeason): void,
+
+  onTemplate?(template: string): void,
 }
 
+const DEFAULT_VALUES = Defaults.SEASONS_DEFAULT.Summer;
+
 /** Summer functional component */
-const Summer = (props: Props) => {
-  props = merge({
-    enabled: true,
-    season: seasonsPropsDefault().summer,
-    onChange: () => {
-    },
-  }, props);
+const Summer = (props: SummerProps) => {
+  const valuer = useValues<environment.SummerSeason>(DEFAULT_VALUES);
 
-  const [enabled, setEnabled] = React.useState<boolean>(props.enabled as boolean);
+  const [disabled, setDisabled] = React.useState<boolean>(props?.disabled ?? false);
   const [windEnabled, setWindEnabled] = React.useState<boolean>(false);
-  const [season, setSeason] = React.useState<SummerSeasonProps>(props.season as SummerSeasonProps);
 
-  const isWindEnabled = enabled && windEnabled;
-
-  const seasonsAttribute = useAppSelector(({environment}) => environment.values?.seasons);
+  const reduxState = useAppSelector(({environment}) => environment?.values?.seasons) as environment.Seasons;
 
   // Reflect attributes changes
   React.useEffect(() => {
-    const extValue = seasonsAttribute ?? null;
-
-    if (typeof extValue === 'boolean') {
-      setEnabled(extValue);
+    if (reduxState === null) {
+      setDisabled(true);
+      setWindEnabled(false);
+      valuer.setAll(DEFAULT_VALUES);
+    } else if (isObject(reduxState?.Summer)) {
+      setDisabled(false);
+      setWindEnabled(false);
+      console.log('reduxState?.Summer:', reduxState?.Summer);
+      Array.isArray(reduxState?.Summer?.wind) && setWindEnabled(true);
+      valuer.setAll(reduxState?.Summer);
     }
-
-    if (isObject(extValue) && Object.keys(extValue as Json).length) {
-      setEnabled(true);
-      setSeason(extValueToSeason(extValue as Json) as SummerSeasonProps);
-    }
-  }, [seasonsAttribute]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reduxState]);
 
   // Reflect attributes changes
   React.useEffect(() => {
-    setEnabled(props.enabled as boolean);
-  }, [props.enabled, props.season]);
+    setDisabled(props.disabled as boolean);
+  }, [props?.disabled]);
 
   // Reflect state changes
   React.useEffect(() => {
-    typeof props.onChange === 'function' && props.onChange(toTemplateText(), season);
+    const changedValues = {...valuer.data};
+
+    !windEnabled && delete changedValues.wind;
+
+    invokeHandler(props, 'onValuesChange', changedValues);
+    invokeHandler(props, 'onTemplate', toSeasonSummerTemplate(changedValues, disabled));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [season, enabled, isWindEnabled]);
-
-  /** Generate xml code */
-  const toTemplateText = React.useCallback((): string => {
-    const windTpl: string = isWindEnabled ? `<min_wind value="${season.minWind}" /><max_wind value="${season.maxWind}"/>` : '';
-    return enabled ? (
-      `<season id="Summer" setup_id="Summer"
-				duration="${season.duration}"
-				precipitation_chance="${season.precipitationChance}"
-				windy_chance="${season.windyChance}">
-				  ${windTpl}
-					<min_temperature value="${season.minTemperatureValue}"/>
-					<max_temperature value="${season.maxTemperatureValue}"/>
-			</season>`
-    ) : '';
-  }, [season, enabled, isWindEnabled]);
-
-  /** Update season */
-  const updateValue = (name: string, value: any): void => {
-    setSeason(current => ({
-      ...current,
-      [name]: value,
-    }));
-  };
+  }, [valuer.data, disabled, windEnabled]);
 
   return (
     <div className="ml-1 pt-3" style={{minHeight: 351}}>
       <SeasonAttributeSlider
-        disabled={!enabled}
-        value={season.duration}
-        onChange={val => updateValue('duration', val)}
+        disabled={disabled}
+        value={valuer.data.duration}
+        onChange={val => valuer.set('duration', val)}
         allowNumberInput
         caption="Duration"
         title="How long this season is, in terms of a fraction of a
 						year, all season durations have to add up to 1."
         allowRestore allowShuffle allowMin allowMax
-        onShuffle={() => updateValue('duration', random.randomFloat())}
-        onRestore={() => updateValue('duration', SummerConfig.duration)}>
+        onShuffle={() => valuer.set('duration', random.randomSeasonDuration())}
+        onRestore={() => valuer.set('duration', DEFAULT_VALUES.duration)}>
         <Slider
-          disabled={!enabled}
-          min={0} max={1} step={0.01}
-          value={season.duration}
-          onChange={v => updateValue('duration', v)}/>
+          disabled={disabled}
+          min={Defaults.SEASON_DURATION_MIN} max={Defaults.SEASON_DURATION_MAX}
+          step={0.01} value={valuer.data.duration}
+          onChange={v => valuer.set('duration', v)}/>
       </SeasonAttributeSlider>
 
       <SeasonAttributeSlider
-        disabled={!enabled}
-        value={season.precipitationChance}
-        onChange={val => updateValue('precipitationChance', val)}
+        disabled={disabled}
+        value={valuer.data.precipitationChance}
+        onChange={val => valuer.set('precipitationChance', val)}
         allowNumberInput
         caption="Precipitation Chance"
         title="How likely it is to rain/snow in this season."
         allowRestore allowShuffle allowMin allowMax
-        onShuffle={() => updateValue('precipitationChance', random.randomFloat())}
-        onRestore={() => updateValue('precipitationChance', SummerConfig.precipitation_chance)}>
+        onShuffle={() => valuer.set('precipitationChance', random.randomSeasonPrecipitationChance())}
+        onRestore={() => valuer.set('precipitationChance', DEFAULT_VALUES.precipitationChance)}>
         <Slider
-          disabled={!enabled}
-          min={0} max={1} step={0.01}
-          value={season.precipitationChance}
-          onChange={v => updateValue('precipitationChance', v)}/>
+          disabled={disabled}
+          min={Defaults.SEASON_PRECIPITATION_CHANCE_MIN} max={Defaults.SEASON_PRECIPITATION_CHANCE_MAX}
+          step={0.01} value={valuer.data.precipitationChance}
+          onChange={v => valuer.set('precipitationChance', v)}/>
       </SeasonAttributeSlider>
 
       <SeasonAttributeSlider
-        disabled={!isWindEnabled}
+        disabled={disabled || !windEnabled}
         displayValue={() => (
           <>
             <PopoverNumberInput
-              {...temperatureNumberInputProps(enabled)}
+              {...temperatureNumberInputProps(!disabled)}
               min={Defaults.SEASON_WIND_MIN}
               max={25}
-              value={season.minWind as number}
-              onSave={value => updateValue('minWind', value)}/>
+              value={valuer.get<number>('wind.0', DEFAULT_VALUES.wind?.[0] as number)}
+              onSave={value => valuer.set('wind.0', value)}/>
             <strong style={{marginRight: 5, marginLeft: 3, color: COLOR_WHITISH}}>,</strong>
             <PopoverNumberInput
-              {...temperatureNumberInputProps(enabled)}
+              {...temperatureNumberInputProps(!disabled)}
               min={26}
-              max={Defaults.SEASON_TEMPERATURE_MAX}
-              value={season.maxWind as number}
-              onSave={value => updateValue('maxWind', value)}/>
+              max={Defaults.SEASON_WIND_MAX}
+              value={valuer.get<number>('wind.1', DEFAULT_VALUES.wind?.[1] as number)}
+              onSave={value => valuer.set('wind.1', value)}/>
           </>
         )}
         caption={(
           <Form.Check
-            disabled={!enabled}
+            disabled={disabled}
             className="text-size-xs"
             type="switch"
             id={`switch-seasons-wind-enabled`}
@@ -203,68 +170,63 @@ const Summer = (props: Props) => {
         title="The speed of wind between a range"
         allowRestore allowShuffle
         onShuffle={() => {
-          const [min, max] = random.randomSeasonWind();
-          updateValue('minWind', min);
-          updateValue('maxWind', max);
+          valuer.overwrite('wind', random.randomSeasonWind());
         }}
         onRestore={() => {
-          updateValue('minWind', SummerConfig.min_wind);
-          updateValue('maxWind', SummerConfig.max_wind);
+          valuer.overwrite('wind', DEFAULT_VALUES.wind);
         }}>
         <Range
           min={Defaults.SEASON_WIND_MIN}
           max={Defaults.SEASON_WIND_MAX}
           step={0}
-          disabled={!isWindEnabled}
-          value={[season.minWind as number, season.maxWind as number]}
+          disabled={!windEnabled}
+          value={valuer.get('wind', DEFAULT_VALUES.wind)}
           onChange={value => {
-            const [min, max] = value as number[];
-            updateValue('minWind', min);
-            updateValue('maxWind', max);
+            valuer.overwrite('wind', value as number[]);
           }}/>
       </SeasonAttributeSlider>
 
       <SeasonAttributeSlider
-        disabled={!enabled}
-        value={season.windyChance}
-        onChange={val => updateValue('windyChance', val)}
+        disabled={disabled}
+        value={valuer.data.windyChance}
+        onChange={val => valuer.set('windyChance', val)}
         allowNumberInput
         caption="Windy Chance"
         title="How likely it is for it to be windy in this season."
         allowRestore allowShuffle allowMin allowMax
-        onShuffle={() => updateValue('windyChance', random.randomFloat())}
-        onRestore={() => updateValue('windyChance', SummerConfig.windy_chance)}>
+        onShuffle={() => valuer.set('windyChance', random.randomSeasonWindyChance())}
+        onRestore={() => valuer.set('windyChance', DEFAULT_VALUES.windyChance)}>
         <Slider
-          disabled={!enabled}
-          min={0} max={1} step={0.01}
-          value={season.windyChance}
-          onChange={v => updateValue('windyChance', v)}/>
+          disabled={disabled}
+          min={Defaults.SEASON_WINDY_CHANCE_MIN} max={Defaults.SEASON_WINDY_CHANCE_MAX}
+          step={0.01} value={valuer.data.windyChance}
+          onChange={v => valuer.set('windyChance', v)}/>
       </SeasonAttributeSlider>
 
       <SeasonAttributeSlider
-        disabled={!enabled}
+        disabled={disabled}
         displayValue={() => (
           <>
             <PopoverNumberInput
-              {...temperatureNumberInputProps(enabled)}
+              {...temperatureNumberInputProps(!disabled)}
               min={Defaults.SEASON_TEMPERATURE_MIN}
               max={Defaults.SEASON_TEMPERATURE_MAX}
               formatValue={value => <>{value}°</>}
-              value={season.minTemperatureValue as number}
+              value={valuer.data.temperature[0]}
               onSave={value => {
-                const maxValue = season.maxTemperatureValue as number;
-                updateValue('maxTemperatureValue', value > maxValue ? maxValue : value);
+                const maxValue = valuer.data.temperature[1] as number;
+                valuer.set('temperature.0', value > maxValue ? maxValue : value);
               }}/>
             <strong style={{marginRight: 5, marginLeft: 3, color: COLOR_WHITISH}}>,</strong>
             <PopoverNumberInput
-              {...temperatureNumberInputProps(enabled)}
+              {...temperatureNumberInputProps(!disabled)}
               min={Defaults.SEASON_TEMPERATURE_MIN}
               max={Defaults.SEASON_TEMPERATURE_MAX}
               formatValue={value => <>{value}°</>}
-              value={season.maxTemperatureValue as number}
+              value={valuer.data.temperature[1]}
               onSave={value => {
-                const minValue = season.minTemperatureValue as number;
-                updateValue('maxTemperatureValue', value < minValue ? minValue : value);
+                const minValue = valuer.data.temperature[0] as number;
+                valuer.set('temperature.1', value < minValue ? minValue : value);
               }}/>
           </>
         )}
@@ -272,24 +234,19 @@ const Summer = (props: Props) => {
         title="Temperature will randomly oscillate between these 2 values (in Celsius)"
         allowRestore allowShuffle
         onShuffle={() => {
-          const [min, max] = random.randomSeasonTemperature();
-          updateValue('minTemperatureValue', min);
-          updateValue('maxTemperatureValue', max);
+          valuer.overwrite('temperature', random.randomSeasonTemperature());
         }}
         onRestore={() => {
-          updateValue('minTemperatureValue', SummerConfig.min_temperature.value);
-          updateValue('maxTemperatureValue', SummerConfig.max_temperature.value);
+          valuer.overwrite('temperature', DEFAULT_VALUES.temperature);
         }}>
         <Range
           min={Defaults.SEASON_TEMPERATURE_MIN}
           max={Defaults.SEASON_TEMPERATURE_MAX}
-          disabled={!enabled}
+          disabled={disabled}
           step={0}
-          value={[season.minTemperatureValue as number, season.maxTemperatureValue as number]}
+          value={valuer.data.temperature}
           onChange={value => {
-            const [min, max] = value as number[];
-            updateValue('minTemperatureValue', min);
-            updateValue('maxTemperatureValue', max);
+            valuer.overwrite('temperature', value as number[]);
           }}/>
       </SeasonAttributeSlider>
 
@@ -297,27 +254,24 @@ const Summer = (props: Props) => {
         <ButtonGroup>
           <LinkButton
             title="Randomize season parameters"
-            disabled={!enabled}
-            style={{color: !enabled ? COLOR_DISABLED : COLOR_WHITISH, fontSize: '.716rem'}}
+            disabled={disabled}
+            style={{color: disabled ? COLOR_DISABLED : COLOR_WHITISH, fontSize: '.716rem'}}
             className="p-0 ml-0 mr-2"
             onClick={() => {
-              const values = randomizeSummer();
-              if ( !windEnabled ) {
-                values.minWind = season.minWind;
-                values.maxWind = season.maxWind;
-              }
+              const values = random.randomSeasonSummer();
+              !windEnabled && (values.wind = valuer.data.wind);
 
-              setSeason(values);
+              valuer.setAll(values);
             }}>
             <IconShuffle width="14" height="14"/> Randomize
           </LinkButton>
           <LinkButton
             title="Restore season parameters to their default"
-            disabled={!enabled}
-            style={{color: !enabled ? COLOR_DISABLED : COLOR_REDDISH, fontSize: '.718rem'}}
+            disabled={disabled}
+            style={{color: disabled ? COLOR_DISABLED : COLOR_REDDISH, fontSize: '.718rem'}}
             className="p-0 ml-0"
-            onClick={() => setSeason(seasonsPropsDefault().summer as SummerSeasonProps)}>
-            <IconRestore width="14" height="14" color={!props?.enabled ? COLOR_DISABLED : COLOR_ORANGE}/> Restore
+            onClick={() => valuer.setAll(DEFAULT_VALUES)}>
+            <IconRestore width="14" height="14" color={props?.disabled ? COLOR_DISABLED : COLOR_ORANGE}/> Restore
           </LinkButton>
         </ButtonGroup>
       </div>
@@ -327,15 +281,9 @@ const Summer = (props: Props) => {
 
 // Properties validation
 Summer.propTypes = {
-  enabled: PropTypes.bool,
-  season: PropTypes.shape({
-    duration: PropTypes.number,
-    precipitationChance: PropTypes.number,
-    windyChance: PropTypes.number,
-    minTemperatureValue: PropTypes.number,
-    maxTemperatureValue: PropTypes.number,
-  }),
-  onChange: PropTypes.func,
+  disabled: PropTypes.bool,
+  onValuesChange: PropTypes.func,
+  onTemplate: PropTypes.func,
 };
 
 export default Summer;

@@ -6,53 +6,36 @@
 
 import React from 'react';
 import * as PropTypes from 'prop-types';
-import merge from 'deepmerge';
 
 // components
 import PropOverride from './PropOverride';
 
-type ExportValues = {
-	propOverride: string,
-};
-
 /**
- * DepositPanel `props` type
- * @type {Object}
+ * PropPanel `props` type
  */
 type Props = {
-	onChange ( template: string, values: ExportValues ): void,
+  onChange?(template: string): void,
 };
 
-/** DepositPanel functional component */
-const PropPanel = ( props: Props ) => {
-	props = merge({
-		onChange: () => {},
-	}, props);
+/** PropPanel functional component */
+const PropPanel = (props: Props) => {
+  const [propOverride, setPropOverride] = React.useState<string>('');
 
-	const [propOverride, setPropOverride] = React.useState<string>('');
+  // Reflect state changes
+  React.useEffect(() => {
+    typeof props.onChange === 'function'
+    && props.onChange(propOverride);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [propOverride]);
 
-	// Reflect state changes
-	React.useEffect(() => {
-		typeof props.onChange === 'function'
-			&& props.onChange(toTemplateText(), {propOverride});
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [propOverride]);
-
-	/** Generate xml code */
-	const toTemplateText = React.useCallback((): string => {
-		return `${propOverride}`;
-	}, [propOverride]);
-
-	return (
-		<>
-			<PropOverride onChange={v => setPropOverride(v)}/>
-		</>
-	);
+  return (
+    <PropOverride onChange={template => setPropOverride(template)}/>
+  );
 };
 
 // Properties validation
 PropPanel.propTypes = {
-	onChange: PropTypes.func,
+  onChange: PropTypes.func,
 };
 
 export default PropPanel;

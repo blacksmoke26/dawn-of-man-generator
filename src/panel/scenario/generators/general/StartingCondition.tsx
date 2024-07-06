@@ -55,7 +55,7 @@ const StartingCondition = (props: Props) => {
     },
   }, props);
 
-  const startingConditionAttribute = useAppSelector(({scenario}) => scenario.values?.startingCondition);
+  const startingConditionAttribute = useAppSelector(({scenario}) => scenario.values?.startingConditions);
 
   const [attributes, setAttributes] = React.useState<Attributes>({
     seasonId: props.seasonId as Season,

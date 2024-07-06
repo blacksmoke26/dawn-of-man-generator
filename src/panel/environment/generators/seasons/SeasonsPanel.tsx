@@ -8,10 +8,7 @@ import React from 'react';
 import * as PropTypes from 'prop-types';
 import merge from 'deepmerge';
 import {nanoid} from 'nanoid';
-import {
-  Button, ButtonGroup, ButtonToolbar,
-  Form, InputGroup, Tab, Tabs,
-} from 'react-bootstrap';
+import {Button, ButtonGroup, ButtonToolbar, Form, InputGroup, Tab, Tabs} from 'react-bootstrap';
 
 // components
 import Spring from './Spring';
@@ -19,36 +16,35 @@ import Summer from './Summer';
 import Fall from './Fall';
 import Winter from './Winter';
 
-// utils
-import {isObject} from '~/helpers/object';
-import {seasonsPropsDefault, seasonsPropsRandomize} from '~/utils/seasons';
-
-// redux
-import {useAppSelector, useAppDispatch} from '~redux/hooks';
-import {updateValuesRaw} from '~redux/slices/environment/reducers';
-
 // icons
 import {
-  IconRestore, IconShuffle,
-  IconFall, IconSpring, IconSummer, IconWinter,
-  COLOR_DISABLED, COLOR_WHITISH, COLOR_ORANGE,
+  COLOR_DISABLED,
+  COLOR_ORANGE,
+  COLOR_WHITISH,
+  IconFall,
+  IconRestore,
+  IconShuffle,
+  IconSpring,
+  IconSummer,
+  IconWinter,
 } from '~/components/icons/app';
 
-// types
-import type {Json} from '~/types/json.types';
-import type {SeasonsProp} from '~/utils/seasons.types';
+// utils
+import {isObject} from '~/helpers/object';
+import {randomSeasons} from '~/utils/random';
+import {SEASONS_DEFAULT} from '~/utils/defaults';
 
-export interface ExportValues {
-  spring: Json;
-  summer: Json;
-  fall: Json;
-  winter: Json;
-}
+// parsers
+import {toSeasonsTemplate} from '~/utils/parser/environment/templates';
+
+// redux
+import {useAppDispatch, useAppSelector} from '~redux/hooks';
+import {clearProperty, updateByPath} from '~redux/slices/environment/reducers';
 
 export interface Props {
   enabled?: boolean;
 
-  onChange?(template: string, values: ExportValues): void;
+  onChange?(template: string): void;
 }
 
 /** SeasonsPanel functional component */
@@ -66,40 +62,26 @@ const SeasonsPanel = (props: Props) => {
   const [summer, setSummer] = React.useState<string>('');
   const [fall, setFall] = React.useState<string>('');
   const [winter, setWinter] = React.useState<string>('');
-  const [seasonProps] = React.useState<SeasonsProp>(seasonsPropsDefault());
 
-  const {spring: springConfig, summer: summerConfig, fall: fallConfig, winter: winterConfig} = seasonProps;
-
-  const seasonsAttribute = useAppSelector(({environment}) => environment.values?.seasons);
+  const reduxState = useAppSelector(({environment}) => environment.values?.seasons);
 
   // Reflect attributes changes
   React.useEffect(() => {
-    const extValue = seasonsAttribute ?? null;
-
-    if (typeof extValue === 'boolean') {
-      setEnabled(extValue);
-    }
-
-    if (isObject(extValue) && Object.keys(extValue as Json).length) {
+    if (reduxState === null) {
+      setEnabled(false);
+      setTimeout(() => dispatch(clearProperty('seasons')), 75);
+    } else if (isObject(reduxState)) {
       setEnabled(true);
     }
-  }, [seasonsAttribute]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reduxState]);
 
   // Reflect state changes
   React.useEffect(() => {
-    typeof props.onChange === 'function' && props.onChange(toTemplateText(), seasonProps as ExportValues);
+    typeof props.onChange === 'function'
+    && props.onChange(toSeasonsTemplate(spring + summer + fall + winter, !enabled));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enabled, spring, summer, fall, winter]);
-
-  /** Generate xml code */
-  const toTemplateText = (): string => {
-    return enabled
-      ? (
-        `<seasons>
-					${spring + summer + fall + winter}
-				</seasons>`
-      ) : '';
-  };
 
   return (
     <div className="checkbox-align">
@@ -125,7 +107,7 @@ const SeasonsPanel = (props: Props) => {
               disabled={!enabled} variant="link" size="sm"
               style={{color: enabled ? COLOR_WHITISH : COLOR_DISABLED}}
               onClick={() => {
-                dispatch(updateValuesRaw({seasons: seasonsPropsRandomize()}));
+                dispatch(updateByPath({path: 'seasons', value: randomSeasons(), overwrite: true}));
               }}>
               <IconShuffle/> Randomize All
             </Button>
@@ -135,7 +117,7 @@ const SeasonsPanel = (props: Props) => {
               style={{color: enabled ? COLOR_WHITISH : COLOR_DISABLED}}
               disabled={!enabled} variant="link" size="sm"
               onClick={() => {
-                dispatch(updateValuesRaw({seasons: seasonsPropsDefault()}));
+                dispatch(updateByPath({path: 'seasons', value: SEASONS_DEFAULT, overwrite: true}));
               }}>
               <IconRestore color={enabled ? COLOR_ORANGE : COLOR_DISABLED}/> Restore All
             </Button>
@@ -152,7 +134,7 @@ const SeasonsPanel = (props: Props) => {
           key="spring"
           title={<span className="text-size-sm"><IconSpring width="17" height="17"/> Spring</span>}
           as="div">
-          <Spring season={springConfig} onChange={v => setSpring(v)} enabled={enabled}/>
+          <Spring onTemplate={xml => setSpring(xml)} disabled={!enabled}/>
         </Tab>
         <Tab
           disabled={!enabled}
@@ -160,7 +142,7 @@ const SeasonsPanel = (props: Props) => {
           key="summer"
           title={<span className="text-size-sm"><IconSummer width="17" height="17"/> Summer</span>}
           as="div">
-          <Summer season={summerConfig} onChange={v => setSummer(v)} enabled={enabled}/>
+          <Summer onTemplate={xml => setSummer(xml)} disabled={!enabled}/>
         </Tab>
         <Tab
           disabled={!enabled}
@@ -168,7 +150,7 @@ const SeasonsPanel = (props: Props) => {
           key="fall"
           title={<span className="text-size-sm"><IconFall width="17" height="17"/> Fall</span>}
           as="div">
-          <Fall season={fallConfig} onChange={v => setFall(v)} enabled={enabled}/>
+          <Fall onTemplate={xml => setFall(xml)} disabled={!enabled}/>
         </Tab>
         <Tab
           disabled={!enabled}
@@ -176,7 +158,7 @@ const SeasonsPanel = (props: Props) => {
           key="winter"
           title={<span className="text-size-sm"><IconWinter width="17" height="17"/> Winter</span>}
           as="div">
-          <Winter season={winterConfig} onChange={v => setWinter(v)} enabled={enabled}/>
+          <Winter onTemplate={xml => setWinter(xml)} disabled={!enabled}/>
         </Tab>
       </Tabs>
     </div>
