@@ -6,11 +6,11 @@
  */
 
 // types
-import type {Environment} from '~/types/environment.types';
+import type {environment} from '~/data/environments/parser/types';
 
 export interface EnvironmentState {
   name: string,
-  values: Environment;
+  values: environment.Environment;
   template: string;
   strings: string;
 }

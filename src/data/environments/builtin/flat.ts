@@ -7,95 +7,59 @@
  * @since 2020-08-29
  */
 
+// utils
+import {resetValues} from '../parser/defaults';
+
+// types
+import {environment} from '~/data/environments/parser/types';
+
 /** Environment info */
 export const info = {
-	label: 'Flat',
-	value: 'flat',
-	desc: 'Flat land with specific resources',
+  label: 'Flat',
+  value: 'flat',
+  desc: 'Flat land with specific resources',
 };
 
 /** Environment raw data */
-const environmentData = {
-	environment: {
-		noise_amplitudes: {
-			values: 0
-		},
-		trees: {
-			values: 'Oak'
-		},
-		trees_everywhere: {
-			value: true
-		},
-		seasons: {
-			season: [
-				{
-					id: 'Spring',
-					setup_id: 'Spring',
-					duration: 0.25,
-					precipitation_chance: 0,
-					windy_chance: 0,
-					very_windy_chance: 0,
-					min_temperature: {
-						value: 5
-					},
-					max_temperature: {
-						value: 25
-					}
-				},
-				{
-					id: 'Summer',
-					setup_id: 'Summer',
-					duration: 0.25,
-					precipitation_chance: 0,
-					windy_chance: 0,
-					very_windy_chance: 0,
-					min_temperature: {
-						value: 20
-					},
-					max_temperature: {
-						value: 35
-					},
-					min_wind: {
-						value: 0
-					},
-					max_wind: {
-						value: 5
-					}
-				},
-				{
-					id: 'Fall',
-					setup_id: 'Fall',
-					duration: 0.25,
-					precipitation_chance: 0,
-					windy_chance: 0,
-					very_windy_chance: 0,
-					min_temperature: {
-						value: 5
-					},
-					max_temperature: {
-						value: 25
-					}
-				},
-				{
-					id: 'Winter',
-					setup_id: 'Winter',
-					snow_setup_id: 'WinterSnow',
-					duration: 0.25,
-					precipitation_chance: 0,
-					windy_chance: 0,
-					very_windy_chance: 0,
-					min_temperature: {
-						value: -15
-					},
-					max_temperature: {
-						value: 10
-					}
-				}
-			]
-		}
-	}
+const environmentData: environment.Environment = {
+  ...resetValues,
+  noiseAmplitudes: [0],
+  treesEverywhere: true,
+  trees: ['Oak'],
+  seasons: {
+    Spring: {
+      duration: 0.25,
+      precipitationChance: 0.25,
+      windyChance: 0.5,
+      veryWindyChance: 0.1,
+      fishBoost: 0.5,
+      temperature: [5, 25],
+    },
+    Summer: {
+      duration: 0.25,
+      precipitationChance: 0,
+      windyChance: 0.25,
+      temperature: [20, 35],
+    },
+    Fall: {
+      duration: 0.25,
+      precipitationChance: 0.25,
+      windyChance: 0.5,
+      veryWindyChance: 0.1,
+      temperature: [5, 25],
+    },
+    Winter: {
+      duration: 0.25,
+      precipitationChance: 0.25,
+      windyChance: 0.5,
+      veryWindyChance: 0.1,
+      reducedFauna: true,
+      temperature: [-15, 10],
+    },
+  },
 };
 
+/** Get environment data */
 export default function getData() {
-	return Object.assign({}, environmentData);
+  return {environment: environmentData};
 }

@@ -10,20 +10,21 @@ import {DepositType, DetailType, PropType, TreeType} from '~/utils/objects';
 
 export namespace environment {
   export interface Environment {
-    noiseAmplitudes?: NoiseAmplitudes;
-    resourceFactor?: number;
-    fordDistanceFactor?: number;
-    sunAngleFactor?: number;
-    backdropScale?: [number, number, number];
-    deposits?: DepositType[];
-    depositOverridePrototypes?: OverridePrototypes<DepositType>;
-    detailOverridePrototypes?: OverridePrototypes<DetailType>;
-    propOverridePrototypes?: OverridePrototypes<PropType>;
-    globalTreeDensity?: number;
-    treesEverywhere?: boolean;
-    trees?: TreeType[];
-    treeOverridePrototypes?: OverridePrototypes<TreeType>;
-    seasons?: Seasons;
+    noiseAmplitudes?: null | NoiseAmplitudes;
+    resourceFactor?: null | number;
+    distanceHeightOffset?: null | number;
+    fordDistanceFactor?: null | number;
+    sunAngleFactor?: null | number;
+    backdropScale?: null | [number, number, number];
+    deposits?: null | DepositType[];
+    depositOverridePrototypes?: null | OverridePrototypes<DepositType>;
+    detailOverridePrototypes?: null | OverridePrototypes<DetailType>;
+    propOverridePrototypes?: null | OverridePrototypes<PropType>;
+    globalTreeDensity?: null | number;
+    treesEverywhere?: null | boolean;
+    trees?: null | TreeType[];
+    treeOverridePrototypes?: null | OverridePrototypes<TreeType>;
+    seasons?: null | Seasons;
   }
 
   export type NoiseAmplitudes = [number, number?, number?, number?, number?, number?, number?, number?];
@@ -56,7 +57,7 @@ export namespace environment {
     duration: number;
     precipitationChance: number;
     windyChance: number;
-    wind: [number, number];
+    wind?: [number, number];
     temperature: [number, number];
   }
 
@@ -71,7 +72,7 @@ export namespace environment {
 
   export type OverridePrototypes<T extends string> = {
     [key in T]?: {
-      density: number;
+      density?: number;
       altitude?: [number, number];
       humidity?: [number, number];
       angle?: [number, number];

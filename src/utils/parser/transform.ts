@@ -10,7 +10,7 @@ import {camelCase} from 'change-case';
 
 // helpers
 import {isObject} from '~/helpers/object';
-import {hasKeysInArray} from '~/helpers/array';
+import {filterUnique, hasKeysInArray} from '~/helpers/array';
 
 // types
 import type {Required} from 'utility-types';
@@ -199,12 +199,15 @@ export const transformSplitStringArray = (json: Json, options: TransformSplitStr
     minItems: 0,
     maxItems: 0,
     nullResolver: () => ({}),
+    emptyResolver: nullRes => nullRes,
+    emptyListResolver: emptyRes => emptyRes,
   }, options);
 
   const parsed: any = op.get(json, options.root, null);
 
   if (!isString(parsed, true)) {
-    return opt.nullResolver(opt.wrapperKey);
+    const nodePresent: boolean = op.has(json, options.root);
+    return opt.emptyResolver(opt.nullResolver(opt.wrapperKey), nodePresent, opt.wrapperKey);
   }
 
   let list: string[] = toString(parsed)
@@ -213,7 +216,7 @@ export const transformSplitStringArray = (json: Json, options: TransformSplitStr
     .map(opt.transformValue)
     .filter(opt.itemsValidator);
 
-  opt.unique && (list = [...new Set(list) as unknown as any[]]);
+  opt.unique && (list = filterUnique(list));
 
   list = opt.transformOutput(list);
 
@@ -225,9 +228,9 @@ export const transformSplitStringArray = (json: Json, options: TransformSplitStr
     return opt.nullResolver(opt.wrapperKey);
   }
 
-  return !list.length ? {} : {
-    [opt.wrapperKey]: list,
-  };
+  return !list.length
+    ? opt.emptyListResolver({}, opt.wrapperKey)
+    : {[opt.wrapperKey]: list};
 };
 
 /**

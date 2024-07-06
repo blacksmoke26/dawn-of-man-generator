@@ -7,18 +7,22 @@
 import React from 'react';
 import * as PropTypes from 'prop-types';
 import cn from 'classname';
-import merge from 'deepmerge';
 
 // elemental components
 import Slider from '~/components/ui/Slider';
 import PanelToolbar from '~/components/environment/PanelToolbar';
 
-// Utils
+// utils
 import * as random from '~/utils/random';
 import * as Defaults from '~/utils/defaults';
+import {FORD_DISTANCE_FACTOR_DEFAULT} from '~/utils/defaults';
+
+// parsers
+import {toFordDistanceFactorTemplate} from '~/utils/parser/environment/templates';
 
 // redux
-import {useAppSelector} from '~redux/hooks';
+import {useAppDispatch, useAppSelector} from '~redux/hooks';
+import {clearProperty} from '~redux/slices/environment/reducers';
 
 /**
  * FordDistanceFactor `props` type
@@ -32,43 +36,31 @@ export interface FordDistanceFactorProps {
 
 /** FordDistanceFactor functional component */
 function FordDistanceFactor(props: FordDistanceFactorProps) {
-  props = merge({
-    checked: false,
-    distance: random.randomFloat(),
-    onChange: () => {
-    },
-  }, props);
+  const dispatch = useAppDispatch();
 
-  const [checked, setChecked] = React.useState<boolean>(props.checked as boolean);
-  const [distance, setDistance] = React.useState<number>(props.distance as number);
+  const [checked, setChecked] = React.useState<boolean>(props?.checked ?? false);
+  const [distance, setDistance] = React.useState<number>(props?.distance ?? random.randomFloat());
 
-  const fordDistanceFactorAttribute = useAppSelector(({environment}) => environment.values?.fordDistanceFactor);
+  const reduxState = useAppSelector(({environment}) => environment.values?.fordDistanceFactor);
 
   // Reflect attributes changes
   React.useEffect(() => {
-    const extValue = fordDistanceFactorAttribute ?? null;
-
-    if (typeof extValue === 'boolean') {
-      setChecked(extValue);
-    }
-
-    if (typeof extValue === 'number') {
+    if (reduxState === null) {
+      setChecked(false);
+      setDistance(FORD_DISTANCE_FACTOR_DEFAULT);
+      dispatch(clearProperty('fordDistanceFactor'));
+    } else if(typeof reduxState === 'number') {
       setChecked(true);
-      setDistance(extValue);
+      setDistance(reduxState);
     }
-  }, [fordDistanceFactorAttribute]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reduxState]);
 
   // Reflect state changes
   React.useEffect(() => {
-    typeof props.onChange === 'function' && props.onChange(toTemplateText(), distance);
+    typeof props.onChange === 'function'
+    && props.onChange(toFordDistanceFactorTemplate(distance, !checked), distance);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [distance, checked]);
-
-  /** Generate xml code */
-  const toTemplateText = React.useCallback((): string => {
-    return checked
-      ? `<ford_distance_factor value="${distance}"/>`
-      : '';
   }, [distance, checked]);
 
   return (
@@ -76,6 +68,7 @@ function FordDistanceFactor(props: FordDistanceFactorProps) {
       <PanelToolbar
         value={distance}
         checked={checked}
+        checkboxPosition="right"
         heading="Ford Distance Factor"
         description="The average distance between river fords"
         allowNumberInput

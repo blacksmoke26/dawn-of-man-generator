@@ -7,7 +7,6 @@
 import React from 'react';
 import * as PropTypes from 'prop-types';
 import cn from 'classname';
-import merge from 'deepmerge';
 
 // elemental components
 import Slider from '~/components/ui/Slider';
@@ -17,57 +16,54 @@ import PanelToolbar from '~/components/environment/PanelToolbar';
 import * as random from '~/utils/random';
 import * as Defaults from '~/utils/defaults';
 
+// parsers
+import {toGlobalTreeDensityTemplate} from '~/utils/parser/environment/templates';
+
 // redux
-import {useAppSelector} from '~redux/hooks';
+import {useAppDispatch, useAppSelector} from '~redux/hooks';
+import {clearProperty} from '~redux/slices/environment/reducers';
 
 export interface GlobalTreeDensityProps {
-	checked?: boolean,
+  checked?: boolean,
 
-	onChange(template: string, value: number): void,
+  onChange(template: string, value: number): void,
 }
 
 /** GlobalTreeDensity functional component */
-const GlobalTreeDensity = ( props: GlobalTreeDensityProps ) => {
-	props = merge({
-		enabled: false,
-		onChange: () => {},
-	}, props);
+const GlobalTreeDensity = (props: GlobalTreeDensityProps) => {
+  const dispatch = useAppDispatch();
 
-	const [value, setValue] = React.useState<number>(random.randomDensity());
-	const [checked, setChecked] = React.useState<boolean>(props.checked || false);
+  const [value, setValue] = React.useState<number>(random.randomDensity());
+  const [checked, setChecked] = React.useState<boolean>(props?.checked ?? false);
 
-	const globalTreeDensityAttribute = useAppSelector(({environment}) => environment.values?.globalTreeDensity);
+  const reduxState = useAppSelector(({environment}) => environment.values?.globalTreeDensity);
 
-	// Reflect attributes changes
-	React.useEffect(() => {
-		const extValue = globalTreeDensityAttribute ?? null;
+  // Reflect attributes changes
+  React.useEffect(() => {
+    if (reduxState === null) {
+      setChecked(false);
+      setValue(Defaults.DENSITY_DEFAULT);
+      dispatch(clearProperty('globalTreeDensity'));
+    } else if (typeof reduxState === 'number') {
+      setChecked(true);
+      setValue(reduxState);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reduxState]);
 
-		if ( typeof extValue === 'boolean' ) {
-			setChecked(extValue);
-		} else if ( typeof extValue === 'number' ) {
-			setChecked(true);
-			setValue(extValue);
-		}
-	}, [globalTreeDensityAttribute]);
+  // Reflect state changes
+  React.useEffect(() => {
+    typeof props.onChange === 'function'
+    && props.onChange(toGlobalTreeDensityTemplate(value, !checked), value);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value, checked]);
 
-	// Reflect state changes
-	React.useEffect(() => {
-		typeof props.onChange === 'function' && props.onChange(toTemplateText(), value);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [value, checked]);
-
-	/** Generate xml code */
-	const toTemplateText = (): string => {
-		return checked
-			? `<global_tree_density value="${value}"/>`
-			: '';
-	}
-
-	return (
+  return (
     <div className={cn('mb-2', {'text-muted': !checked})}>
-			<PanelToolbar
+      <PanelToolbar
         value={+value}
         checked={checked}
+        checkboxPosition="right"
         heading="Global Tree Density"
         description="The global tree density in the environment."
         allowNumberInput

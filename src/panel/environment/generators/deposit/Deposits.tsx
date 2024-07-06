@@ -7,18 +7,23 @@
 import React from 'react';
 import * as PropTypes from 'prop-types';
 import cn from 'classname';
-import merge from 'deepmerge';
 import {Form} from 'react-bootstrap';
 
 // elemental components
 import PanelToolbar from '~/components/environment/PanelToolbar';
 
+// icons
+import {COLOR_WHITISH} from '~/components/icons/app';
+
 // utils
 import * as random from '~/utils/random';
 
+// parsers
+import {toDepositsTemplate} from '~/utils/parser/environment/templates';
+
 // redux
-import {useAppSelector} from '~redux/hooks';
-import {COLOR_WHITISH} from '~/components/icons/app';
+import {useAppDispatch, useAppSelector} from '~redux/hooks';
+import {clearProperty} from '~redux/slices/environment/reducers';
 
 /** Deposits `props` type */
 export interface Props {
@@ -30,47 +35,39 @@ export interface Props {
 
 /** Deposits functional component */
 const Deposits = (props: Props) => {
-  props = merge({
-    checked: false,
-    deposits: random.randomDeposits(),
-    onChange: () => {
-    },
-  }, props);
+  const dispatch = useAppDispatch();
 
-  const [checked, setChecked] = React.useState<boolean>(props.checked as boolean);
-  const [deposits, setDeposits] = React.useState<string[]>(props.deposits as string[]);
+  const [checked, setChecked] = React.useState<boolean>(props?.checked ?? false);
+  const [deposits, setDeposits] = React.useState<string[]>(props?.deposits ?? random.randomDeposits());
 
-  const depositsAttribute = useAppSelector(({environment}) => environment?.values?.deposits);
+  const reduxState = useAppSelector(({environment}) => environment?.values?.deposits);
 
   // Reflect attributes changes
   React.useEffect(() => {
-    const extValue = depositsAttribute ?? null;
-
-    if (typeof extValue === 'boolean') {
-      setChecked(extValue);
-    } else if (Array.isArray(extValue)) {
+    if (reduxState === null) {
+      setChecked(false);
+      setDeposits(random.deposits);
+      dispatch(clearProperty('deposits'));
+    } else if (Array.isArray(reduxState)) {
       setChecked(true);
-      setDeposits(extValue);
+      setDeposits(reduxState);
     }
-  }, [depositsAttribute]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reduxState]);
 
   // Reflect state changes
   React.useEffect(() => {
-    typeof props.onChange === 'function' && props.onChange(toTemplateText(), deposits);
+    typeof props.onChange === 'function' && props.onChange(
+      toDepositsTemplate(deposits, !checked), deposits,
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [deposits, checked]);
-
-  /** Generate xml code */
-  const toTemplateText = React.useCallback((): string => {
-    return checked && deposits.length
-      ? `<deposits values="${deposits.join(' ')}"/>`
-      : '';
   }, [deposits, checked]);
 
   return (
     <div className={cn('mb-2', {'text-muted': !checked})}>
       <PanelToolbar
         checked={checked}
+        checkboxPosition="right"
         heading="Deposits"
         description="What types of deposit are present in the level."
         onCheckboxChange={state => setChecked(state)}
@@ -93,21 +90,23 @@ const Deposits = (props: Props) => {
 
       <ul className="list-unstyled list-inline mb-0 fixed-width">
         {random.deposits.map(v => (
-          <li key={v} className="list-inline-item checkbox-align">
-            <Form.Check
-              type="switch"
-              disabled={!checked}
-              data-value={v}
-              checked={deposits.findIndex(val => v === val) !== -1}
-              id={`deposit_${v}`}
-              label={v}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                const list = deposits.filter(val => val !== e.target.getAttribute('data-value'));
-                e.target.checked && list.push(v);
-                setDeposits([...list]);
-              }}
-            />
-          </li>
+          <React.Fragment key={v}>
+            <li className="list-inline-item checkbox-align">
+              <Form.Check
+                type="switch"
+                disabled={!checked}
+                data-value={v}
+                checked={deposits.findIndex(val => v === val) !== -1}
+                id={`deposit_${v}`}
+                label={v}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  const list = deposits.filter(val => val !== e.target.getAttribute('data-value'));
+                  e.target.checked && list.push(v);
+                  setDeposits([...list]);
+                }}
+              />
+            </li>
+          </React.Fragment>
         ))}
       </ul>
     </div>

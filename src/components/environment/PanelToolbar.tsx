@@ -34,6 +34,7 @@ interface Props {
   checked?: boolean;
   disabled?: boolean;
   value?: any;
+  displayValue?(value: any): React.ReactNode;
   heading?: React.ReactNode;
   description?: React.ReactNode;
 
@@ -67,10 +68,10 @@ interface Props {
 
 export type {Props as PanelToolbarProps};
 
-export const invokeHandler = <T extends object = Props>(props: T, func: keyof T, value: unknown | unknown[] = undefined) => {
+export const invokeHandler = <T extends object = Props>(props: T, func: keyof T, value: unknown | unknown[] = undefined): any => {
   if (func in props && 'function' === typeof props[func]) {
     const args = value !== undefined ? [].concat(value as any) as any : [];
-    (props[func] as Function)(...args);
+    return (props[func] as Function)(...args);
   }
 };
 
@@ -114,7 +115,7 @@ const PanelToolbar = (props: React.PropsWithChildren<Props>) => {
             <span
               style={{top: 2, color: COLOR_REDDISH, marginRight: 1}}
               className="text-size-xs position-relative cursor-default d-inline-block">
-            {props?.value ?? 0}
+              {invokeHandler(props, 'displayValue', props?.value)}
           </span>
           )}
           {props?.allowNumberInput && (

@@ -37,3 +37,10 @@ export const isInList = <T = any>(key: T, arr: T[], callback?: Callable<T>): boo
   'function' === typeof callback && callback(key);
   return true;
 };
+
+
+/**
+ * Remove duplicate items from array */
+export const filterUnique = <T = any>(ary: T[]): T[] => {
+  return [...new Set(ary) as unknown as T[]];
+};

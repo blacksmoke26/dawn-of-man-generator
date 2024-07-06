@@ -41,7 +41,7 @@ const LoadingScreen = (props: Props) => {
   const [value, setValue] = React.useState<string>(props.value as string);
   const [enabled, setEnabled] = React.useState<boolean>(props.enabled as boolean);
 
-  const loadingScreenAttribute = useAppSelector(({scenario}) => scenario?.values?.loadingScreen);
+  const loadingScreenAttribute = useAppSelector(({scenario}) => scenario?.values?.loadingScreens);
 
   // Reflect attributes changes
   React.useEffect(() => {

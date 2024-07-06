@@ -13,15 +13,18 @@ import type {Json} from '~/types/json.types';
 import type {JsonToReduxOptions} from '~/utils/parser/index.types';
 
 /** Convert environment json into redux data */
-export const jsonToRedux = ( json: Json, options: JsonToReduxOptions = {} ): Json => {
-	return transformSplitStringArray(json, {
-		root: 'environment.deposits.values',
-		wrapperKey: 'deposits',
-		splitChar: ' ',
-		minItems: 1,
-		maxItems: 4,
-		unique: true,
-		itemsValidator: value => deposits.includes(value),
-		...options,
-	});
+export const jsonToRedux = (json: Json, options: JsonToReduxOptions = {}): Json => {
+  return transformSplitStringArray(json, {
+    root: 'environment.deposits.values',
+    wrapperKey: 'deposits',
+    splitChar: ' ',
+    minItems: 0,
+    maxItems: 4,
+    unique: true,
+    emptyResolver(nullResolver, nodePresent, wrapperKey): any {
+      return nodePresent ? {[wrapperKey]: []} : nullResolver;
+    },
+    itemsValidator: value => deposits.includes(value),
+    ...options,
+  });
 };

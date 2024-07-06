@@ -7,58 +7,41 @@
 
 import React from 'react';
 import * as PropTypes from 'prop-types';
-import {nanoid} from 'nanoid';
-import merge from 'deepmerge';
-import {Button, ButtonGroup, Form} from 'react-bootstrap';
+import {Button, ButtonGroup} from 'react-bootstrap';
 
 // icons
+import {Scroll} from 'lucide-react';
 import {
-  IconShuffle,
-  IconRaiseUp,
-  IconRaiseDown,
-  IconEnabled,
+  COLOR_DISABLED,
+  COLOR_REDDISH,
+  COLOR_WHITISH,
   IconDisabled,
-  COLOR_DISABLED, COLOR_WHITISH, COLOR_REDDISH,
+  IconEnabled,
+  IconRaiseDown,
+  IconRaiseUp,
+  IconShuffle,
 } from '~/components/icons/app';
 
 // components
+import Header from './elements/Header';
 import FrequencyAttribute from './elements/FrequencyAttribute';
 import PopoverDropdown from '~/components/ui/PopoverDropdown';
 
 // utils
+import presets from './utils/presets';
 import {randomFrequencies} from '~/utils/random';
-import presets, {valuesToValueFrequencies} from './utils/presets';
+import {
+  filterEnabledFrequencies,
+  type FrequencyEnabled,
+  resetAllValues,
+  toggleAllFrequencies,
+  toTemplateText,
+  type ValueFrequencies,
+} from './utils/general';
 
 // redux
-import {useAppSelector} from '~redux/hooks';
-
-// types
-import type {$Keys} from 'utility-types';
-import type {NoiseAmplitudes as NoiseAmplitudesType} from '~/types/environment.types';
-import {Scroll} from 'lucide-react';
-
-/** Frequencies type  */
-export interface ValueFrequencies {
-  freq1: number,
-  freq2?: number,
-  freq3?: number,
-  freq4?: number,
-  freq5?: number,
-  freq6?: number,
-  freq7?: number,
-  freq8?: number,
-}
-
-/** Frequencies type  */
-export interface FrequencyEnabled {
-  freq2: boolean,
-  freq3: boolean,
-  freq4: boolean,
-  freq5: boolean,
-  freq6: boolean,
-  freq7: boolean,
-  freq8: boolean,
-}
+import {useAppDispatch, useAppSelector} from '~redux/hooks';
+import {clearProperty} from '~redux/slices/environment/reducers';
 
 /** NoiseAmplitudes `props` type */
 export interface Props {
@@ -70,99 +53,41 @@ export interface Props {
 
 /** NoiseAmplitudes functional component */
 const NoiseAmplitudes = (props: Props) => {
-  props = merge({
-    enabled: true,
-    frequencies: {...randomFrequencies()},
-    onChange: () => {
-    },
-  }, props);
+  const dispatch = useAppDispatch();
 
-  const [frequencies, setFrequencies] = React.useState<ValueFrequencies>(props.frequencies as ValueFrequencies);
-  // @ts-ignore
-  const [enabled, setEnabled] = React.useState<boolean>(props.frequencies !== false || props.enabled);
-  // @ts-ignore
-  const [freqEnabled, setFreqEnabled] = React.useState<FrequencyEnabled>({
-    freq2: true,
-    freq3: true,
-    freq4: true,
-    freq5: true,
-    freq6: true,
-    freq7: true,
-    freq8: true,
-  });
+  const [checked, setChecked] = React.useState<boolean>(props?.enabled ?? false);
+  const [isOn, setIsOn] = React.useState<boolean>(true);
+  const [frequencies, setFrequencies] = React.useState<ValueFrequencies>(props?.frequencies ?? randomFrequencies());
+  const [freqEnabled, setFreqEnabled] = React.useState<FrequencyEnabled>(toggleAllFrequencies(true));
 
-  const freq2Enabled = enabled && freqEnabled.freq2;
-  const freq3Enabled = enabled && freqEnabled.freq3;
-  const freq4Enabled = enabled && freqEnabled.freq4;
-  const freq5Enabled = enabled && freqEnabled.freq5;
-  const freq6Enabled = enabled && freqEnabled.freq6;
-  const freq7Enabled = enabled && freqEnabled.freq7;
-  const freq8Enabled = enabled && freqEnabled.freq8;
-
-  const toggleFrequency = (name: $Keys<FrequencyEnabled>, status: boolean): void => {
-    setFreqEnabled(current => ({
-      ...current,
-      [name]: status,
-    }));
+  const toggleFrequency = (name: keyof FrequencyEnabled, status: boolean): void => {
+    setFreqEnabled(current => ({...current, [name]: status}));
   };
 
-  const noiseAmplitudesAttribute = useAppSelector(({environment}) => environment.values?.noiseAmplitudes);
-
-  const filterEnabledFrequencies = <T = string>(list: T[]): Record<keyof ValueFrequencies, T> => {
-    const values: Partial<Record<keyof ValueFrequencies, T>> = {
-      freq1: list[0],
-    };
-
-    freqEnabled.freq2 && (values.freq2 = list[1]);
-    freqEnabled.freq3 && (values.freq3 = list[2]);
-    freqEnabled.freq4 && (values.freq4 = list[3]);
-    freqEnabled.freq5 && (values.freq5 = list[4]);
-    freqEnabled.freq6 && (values.freq6 = list[5]);
-    freqEnabled.freq7 && (values.freq7 = list[6]);
-    freqEnabled.freq8 && (values.freq8 = list[7]);
-    return values as Record<keyof ValueFrequencies, T>;
-  };
+  const reduxState = useAppSelector(({environment}) => environment.values?.noiseAmplitudes);
 
   // Reflect attributes changes
   React.useEffect(() => {
-    const extValue = noiseAmplitudesAttribute ?? null;
-
-    if (typeof extValue === 'boolean') {
-      setEnabled(extValue);
-    }
-    if (Array.isArray(extValue) && extValue.length === 8) {
+    if (reduxState === null) {
+      setIsOn(true);
+      dispatch(clearProperty('noiseAmplitudes'));
+      resetAllValues({setChecked, setFreqEnabled, setFrequencies});
+    } else if (Array.isArray(reduxState) && reduxState.length) {
+      setChecked(true);
       for (let i = 0; i <= 7; i++) {
-        setFrequency(`freq${i + 1}`, extValue[i] as unknown as number);
+        const value = reduxState?.[i] ?? false;
+        setFrequency(`freq${i + 1}`, value || 0);
+        toggleFrequency(`freq${i + 1}` as keyof FrequencyEnabled, value !== false);
       }
-      setEnabled(true);
-      setFreqEnabled({
-        freq2: true,
-        freq3: true,
-        freq4: true,
-        freq5: true,
-        freq6: true,
-        freq7: true,
-        freq8: true,
-      });
     }
-  }, [noiseAmplitudesAttribute]);
+  }, [reduxState]);
 
   // Reflect state changes
   React.useEffect(() => {
-    typeof props.onChange === 'function' && props.onChange(toTemplateText(), frequencies);
+    typeof props.onChange === 'function' && props.onChange(
+      toTemplateText(frequencies, freqEnabled, !checked), frequencies);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [enabled, frequencies, freqEnabled]);
-
-  /** Generate xml code */
-  const toTemplateText = React.useCallback((): string => {
-    if (!enabled) {
-      return '';
-    }
-
-    const list: number[] = Object.values(frequencies).map(Number);
-    const values = filterEnabledFrequencies<number>(list);
-    return `<noise_amplitudes values="${Object.values(values).join(' ')}"/>`;
-  }, [frequencies, enabled, freqEnabled]);
+  }, [checked, frequencies, freqEnabled]);
 
   /** Update frequency value */
   const setFrequency = (name: string, value: number): void => {
@@ -174,33 +99,11 @@ const NoiseAmplitudes = (props: Props) => {
 
   return (
     <>
-      <div className="text-size-xxs text-muted mb-1">
-        Modify the amplitudes of the different noise layers, the initial numbers
-        define the amplitudes of the low-frequencies (the height of large mountains), and the later
-        numbers define the amplitudes of the high_frequencies (the height of the small bumps).
-        <p className="mt-1">
-          For a complete guide: <a href="https://steamcommunity.com/sharedfiles/filedetails/?id=2087224377"
-                                   title="This guide explains how the <noise_amplitude> element works in Environment configuration files. It will help build your intuition for how amplitudes influence one another so you can more quickly achieve the results you're looking for."
-                                   target="_blank" rel="noopener noreferrer">
-          Understanding Amplitudes in Environment
-        </a>.
-        </p>
-        <div className="mt-2 mb-2">
-          <Form>
-            <Form.Switch
-              className="pull-right"
-              id={`switch-${nanoid(5)}`}
-              label="Override noise amplitudes parameters"
-              checked={enabled}
-              onChange={(e: any) => setEnabled(e.target.checked)}
-            />
-          </Form>
-        </div>
-      </div>
+      <Header checked={checked} onChange={setChecked}/>
       <FrequencyAttribute
-        disabled={!enabled}
-        disabledCheckbox={!enabled}
         checked={true}
+        disabled={!checked}
+        disabledCheckbox={!checked}
         checkboxProps={{readOnly: true}}
         label="Frequency 1"
         value={frequencies.freq1}
@@ -208,8 +111,8 @@ const NoiseAmplitudes = (props: Props) => {
       />
 
       <FrequencyAttribute
-        disabled={!freq2Enabled}
-        disabledCheckbox={!enabled}
+        disabled={!checked || !freqEnabled.freq2}
+        disabledCheckbox={!checked}
         checked={freqEnabled.freq2}
         label="Frequency 2"
         value={frequencies.freq2}
@@ -218,8 +121,8 @@ const NoiseAmplitudes = (props: Props) => {
       />
 
       <FrequencyAttribute
-        disabled={!freq3Enabled}
-        disabledCheckbox={!enabled}
+        disabled={!checked || !freqEnabled.freq3}
+        disabledCheckbox={!checked}
         checked={freqEnabled.freq3}
         label="Frequency 3"
         value={frequencies.freq3}
@@ -228,8 +131,8 @@ const NoiseAmplitudes = (props: Props) => {
       />
 
       <FrequencyAttribute
-        disabled={!freq4Enabled}
-        disabledCheckbox={!enabled}
+        disabled={!checked || !freqEnabled.freq4}
+        disabledCheckbox={!checked}
         checked={freqEnabled.freq4}
         label="Frequency 4"
         value={frequencies.freq4}
@@ -238,8 +141,8 @@ const NoiseAmplitudes = (props: Props) => {
       />
 
       <FrequencyAttribute
-        disabled={!freq5Enabled}
-        disabledCheckbox={!enabled}
+        disabled={!checked || !freqEnabled.freq5}
+        disabledCheckbox={!checked}
         checked={freqEnabled.freq5}
         label="Frequency 5"
         value={frequencies.freq5}
@@ -248,8 +151,8 @@ const NoiseAmplitudes = (props: Props) => {
       />
 
       <FrequencyAttribute
-        disabled={!freq6Enabled}
-        disabledCheckbox={!enabled}
+        disabled={!checked || !freqEnabled.freq6}
+        disabledCheckbox={!checked}
         checked={freqEnabled.freq6}
         label="Frequency 6"
         value={frequencies.freq6}
@@ -258,8 +161,8 @@ const NoiseAmplitudes = (props: Props) => {
       />
 
       <FrequencyAttribute
-        disabled={!freq7Enabled}
-        disabledCheckbox={!enabled}
+        disabled={!checked || !freqEnabled.freq7}
+        disabledCheckbox={!checked}
         checked={freqEnabled.freq7}
         label="Frequency 7"
         value={frequencies.freq7}
@@ -268,8 +171,8 @@ const NoiseAmplitudes = (props: Props) => {
       />
 
       <FrequencyAttribute
-        disabled={!freq8Enabled}
-        disabledCheckbox={!enabled}
+        disabled={!checked || !freqEnabled.freq8}
+        disabledCheckbox={!checked}
         checked={freqEnabled.freq8}
         label="Frequency 8"
         value={frequencies.freq8}
@@ -280,63 +183,43 @@ const NoiseAmplitudes = (props: Props) => {
       <div className="mt-2">
         <ButtonGroup size="sm">
           <Button
-            disabled={!enabled} variant="link"
-            style={{color: !enabled ? COLOR_DISABLED : COLOR_WHITISH}}
+            disabled={!checked} variant="link"
+            title={isOn ? 'Enable optional sliders' : 'Disable optional sliders'}
+            style={{color: !checked ? COLOR_DISABLED : (isOn ? COLOR_WHITISH : COLOR_REDDISH)}}
             className="text-size-sm button-reset-sm p-0 ml-0 mr-3" size="sm"
             onClick={() => {
-              setFreqEnabled({
-                freq2: true,
-                freq3: true,
-                freq4: true,
-                freq5: true,
-                freq6: true,
-                freq7: true,
-                freq8: true,
-              });
-            }}><IconEnabled/> Enable</Button>
+              setIsOn(current => !current);
+              setFreqEnabled(toggleAllFrequencies(isOn));
+            }}>{isOn ? <IconEnabled/> : <IconDisabled/>} {isOn ? 'Enable' : 'Disable'}</Button>
           <Button
-            disabled={!enabled} variant="link"
-            style={{color: !enabled ? COLOR_DISABLED : COLOR_WHITISH}}
+            disabled={!checked} variant="link"
+            style={{color: !checked ? COLOR_DISABLED : COLOR_WHITISH}}
             className="text-size-sm button-reset-sm p-0 mr-3" size="sm"
             onClick={() => {
-              const values = filterEnabledFrequencies<number>(Object.values(randomFrequencies(null))) as ValueFrequencies;
+              const values = filterEnabledFrequencies(freqEnabled, Object.values(randomFrequencies(null))) as ValueFrequencies;
               setFrequencies((current) => ({...current, ...values}));
             }}><IconShuffle/> Randomize</Button>
           <Button
-            disabled={!enabled} variant="link"
-            style={{color: !enabled ? COLOR_DISABLED : COLOR_WHITISH}}
+            disabled={!checked} variant="link"
+            style={{color: !checked ? COLOR_DISABLED : COLOR_WHITISH}}
             className="text-size-sm button-reset-sm p-0 mr-3" size="sm"
             onClick={() => {
-              const values = filterEnabledFrequencies<number>(Object.values(randomFrequencies(0))) as ValueFrequencies;
+              const values = filterEnabledFrequencies(freqEnabled, Object.values(randomFrequencies(0))) as ValueFrequencies;
               setFrequencies((current) => ({...current, ...values}));
             }}><IconRaiseDown/> Min</Button>
           <Button
-            disabled={!enabled} variant="link"
-            style={{color: !enabled ? COLOR_DISABLED : COLOR_WHITISH}}
-            className="text-size-sm button-reset-sm p-0 mr-3" size="sm"
-            onClick={() => {
-              const values = filterEnabledFrequencies<number>(Object.values(randomFrequencies(1))) as ValueFrequencies;
-              setFrequencies((current) => ({...current, ...values}));
-            }}><IconRaiseUp/> Max</Button>
-          <Button
-            disabled={!enabled} variant="link"
-            style={{color: !enabled ? COLOR_DISABLED : COLOR_REDDISH}}
+            disabled={!checked} variant="link"
+            style={{color: !checked ? COLOR_DISABLED : COLOR_WHITISH}}
             className="text-size-sm button-reset-sm p-0" size="sm"
             onClick={() => {
-              setFreqEnabled({
-                freq2: false,
-                freq3: false,
-                freq4: false,
-                freq5: false,
-                freq6: false,
-                freq7: false,
-                freq8: false,
-              });
-            }}><IconDisabled/> Disable</Button>
+              const values = filterEnabledFrequencies(freqEnabled, Object.values(randomFrequencies(1))) as ValueFrequencies;
+              setFrequencies((current) => ({...current, ...values}));
+            }}><IconRaiseUp/> Max</Button>
         </ButtonGroup>
+
         <div className="d-inline-block ml-3">
           <PopoverDropdown
-            disabled={!enabled}
+            disabled={!checked}
             className="text-size-sm"
             placeholder="Presets"
             heading="Schwifty Presets"
@@ -345,10 +228,10 @@ const NoiseAmplitudes = (props: Props) => {
             )}
             onSelect={option => {
               const params = (presets.find(item => item.id === option.value)?.values || []) as number[];
-              const values = filterEnabledFrequencies<number>(params);
+              const values = filterEnabledFrequencies(freqEnabled, params);
               setFrequencies((current) => ({...current, ...values}));
             }}
-            options={presets.map(item =>({
+            options={presets.map(item => ({
               label: item.caption,
               value: item.id,
             }))}/>

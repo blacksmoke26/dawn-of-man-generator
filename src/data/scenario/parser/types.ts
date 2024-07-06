@@ -25,27 +25,27 @@ import {
   ConditionTimeElapsed,
   ConditionValueEquals,
   ConditionValueReached,
-  LogicalCondition,
 } from '~/types/condition.types';
 
 export namespace scenario {
   export interface Scenario {
-    hardcoreModeAllowed?: boolean;
-    nomadModeAllowed?: boolean;
-    category?: Capitalize<string>;
-    groupId?: Lowercase<string>;
-    size?: number;
-    showCompletionIcon?: boolean;
-    requiredMilestones?: number;
-    customSettlementNameAllowed?: boolean;
-    loadingScreens?: Lowercase<string>;
-    startingConditions?: StartingConditions;
-    visible?: boolean;
-    disasters?: Disaster[];
-    locations?: Location[];
-    goals?: Goal[];
-    milestones?: Milestone[];
-    events?: AnyEvent[];
+    hardcoreModeAllowed?: null | boolean;
+    nomadModeAllowed?: null | boolean;
+    category?: null | Capitalize<string>;
+    groupId?: null | Lowercase<string>;
+    size?: null | number;
+    showCompletionIcon?: null | boolean;
+    requiredScenario?: null | Lowercase<string>;
+    requiredMilestones?: null | number;
+    customSettlementNameAllowed?: null | boolean;
+    loadingScreens?: null | Lowercase<string>;
+    startingConditions?: null | StartingConditions;
+    visible?: null | boolean;
+    disasters?: null | Disaster[];
+    milestones?: null | Milestone[];
+    goals?: null | Goal[];
+    events?: null | AnyEvent[];
+    locations?: null | Location[];
   }
 
   export type Event = AnyEvent;

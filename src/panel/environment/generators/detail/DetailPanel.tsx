@@ -6,53 +6,37 @@
 
 import React from 'react';
 import * as PropTypes from 'prop-types';
-import merge from 'deepmerge';
 
 // components
 import DetailOverride from './DetailOverride';
 
-type ExportValues = {
-	detailOverride: string,
-};
-
 /**
- * DepositPanel `props` type
+ * DetailPanel `props` type
  * @type {Object}
  */
 type Props = {
-	onChange ( template: string, values: ExportValues ): void,
+  onChange?(template: string): void,
 };
 
-/** DepositPanel functional component */
-const DetailPanel = ( props: Props ) => {
-	props = merge({
-		onChange: () => {},
-	}, props);
+/** DetailPanel functional component */
+const DetailPanel = (props: Props) => {
+  const [detailOverride, setDetailOverride] = React.useState<string>('');
 
-	const [detailOverride, setDetailOverride] = React.useState<string>('');
+  // Reflect state changes
+  React.useEffect(() => {
+    typeof props.onChange === 'function'
+    && props.onChange(detailOverride);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [detailOverride]);
 
-	// Reflect state changes
-	React.useEffect(() => {
-		typeof props.onChange === 'function'
-			&& props.onChange(toTemplateText(), {detailOverride});
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [detailOverride]);
-
-	/** Generate xml code */
-	const toTemplateText = React.useCallback((): string => {
-		return `${detailOverride}`;
-	}, [detailOverride]);
-
-	return (
-		<>
-			<DetailOverride onChange={v => setDetailOverride(v)}/>
-		</>
-	);
+  return (
+    <DetailOverride onChange={template => setDetailOverride(template)}/>
+  );
 };
 
 // Properties validation
 DetailPanel.propTypes = {
-	onChange: PropTypes.func,
+  onChange: PropTypes.func,
 };
 
 export default DetailPanel;
