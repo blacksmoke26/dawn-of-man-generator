@@ -29,7 +29,7 @@ export const jsonToRedux = (json: Json, options: JsonToReduxOptions = {}): Json 
   const noiseAmplitudes: Array<number> = typeof parsed === 'number'
     ? new Array<number>(8).fill(parsed, 0, 8)
     : parsed.split(' ').map(num => {
-      return normalizeFloat(toFloat(num), {min: 0, max: 1, decimals: 4}) as number;
+      return normalizeFloat(toFloat(num, 4), {min: 0, max: 1, decimals: 4}) as number;
     }).slice(0, 8);
 
   return {noiseAmplitudes};
