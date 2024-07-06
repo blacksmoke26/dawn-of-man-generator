@@ -25,6 +25,7 @@ import {
 // types
 import {DisasterType} from '~/types/scenario.types';
 import {EraFactor} from '~/types/action.types';
+import {environment} from '~/data/environments/parser/types';
 
 /** Deposits types */
 export const deposits: string[] = [
@@ -143,6 +144,77 @@ export const randomSeasonWind = (): [number, number] => {
   return randomMinMaxTuple(Defaults.SEASON_WIND_MIN, Defaults.SEASON_WIND_MAX);
 };
 
+export const randomSeasonDuration = (): number => {
+  return randomFloat(2, Defaults.SEASON_DURATION_MIN, Defaults.SEASON_DURATION_MAX);
+};
+
+export const randomSeasonPrecipitationChance = (): number => {
+  return randomFloat(2, Defaults.SEASON_PRECIPITATION_CHANCE_MIN, Defaults.SEASON_PRECIPITATION_CHANCE_MAX);
+};
+
+export const randomSeasonWindyChance = (): number => {
+  return randomFloat(2, Defaults.SEASON_WINDY_CHANCE_MIN, Defaults.SEASON_WINDY_CHANCE_MAX);
+};
+
+export const randomSeasonVeryWindyChance = (): number => {
+  return randomFloat(2, Defaults.SEASON_VERY_WINDY_CHANCE_MIN, Defaults.SEASON_VERY_WINDY_CHANCE_MAX);
+};
+
+export const randomSeasonFishBoost = (): number => {
+  return randomFloat(2, Defaults.SEASON_FISH_BOOST_MIN, Defaults.SEASON_FISH_BOOST_MAX);
+};
+
+export const randomSeasonSpring = (): environment.SpringSeason => {
+  return {
+    duration: randomSeasonDuration(),
+    precipitationChance: randomSeasonPrecipitationChance(),
+    windyChance: randomSeasonWindyChance(),
+    veryWindyChance: randomSeasonVeryWindyChance(),
+    fishBoost: randomSeasonFishBoost(),
+    temperature: randomSeasonTemperature(),
+  };
+};
+
+export const randomSeasonSummer = (): environment.SummerSeason => {
+  return {
+    duration: randomSeasonDuration(),
+    precipitationChance: randomSeasonPrecipitationChance(),
+    windyChance: randomSeasonWindyChance(),
+    wind: randomSeasonWind(),
+    temperature: randomSeasonTemperature(),
+  };
+};
+
+export const randomSeasonFall = (): environment.FallSeason => {
+  return {
+    duration: randomSeasonDuration(),
+    precipitationChance: randomSeasonPrecipitationChance(),
+    windyChance: randomSeasonWindyChance(),
+    veryWindyChance: randomSeasonVeryWindyChance(),
+    temperature: randomSeasonTemperature(),
+  };
+};
+
+export const randomSeasonWinter = (): environment.WinterSeason => {
+  return {
+    duration: randomSeasonDuration(),
+    precipitationChance: randomSeasonPrecipitationChance(),
+    windyChance: randomSeasonWindyChance(),
+    veryWindyChance: randomSeasonVeryWindyChance(),
+    reducedFauna: randomArray<boolean>([true, false], 1)[0],
+    temperature: randomSeasonTemperature(),
+  };
+};
+
+export const randomSeasons = (): environment.Seasons => {
+  return {
+    Spring: randomSeasonSpring(),
+    Summer: randomSeasonSummer(),
+    Fall: randomSeasonFall(),
+    Winter: randomSeasonWinter(),
+  };
+}
+
 /** Random Humidity */
 export const randomHumidity = (): [number, number] => [
   Number(randomFloatMod(Defaults.HUMIDITY_MIN, 0.50)).toFixed(2) as unknown as number,
@@ -150,10 +222,10 @@ export const randomHumidity = (): [number, number] => [
 ];
 
 /** Random backdrop Scale */
-export const randomBackdropScale = (): [string, string, string] => [
-  Number(randomFloatMod(0, 1)).toFixed(2),
-  Number(randomFloatMod(0, 1)).toFixed(2),
-  Number(randomFloatMod(0, 1)).toFixed(2),
+export const randomBackdropScale = (): [number, number, number] => [
+  +Number(randomFloatMod(0, 1)).toFixed(2),
+  +Number(randomFloatMod(0, 1)).toFixed(2),
+  +Number(randomFloatMod(0, 1)).toFixed(2),
 ];
 
 /** Random Altitude */
@@ -172,7 +244,7 @@ export const randomTreesEverywhere = (): boolean => {
 };
 
 /** Random Frequencies */
-export const randomFrequencies = (value: number | null | undefined = undefined): Record<string, number> => {
+export const randomFrequencies = <T extends string = string>(value: number | null | undefined = undefined): Record<T, number> => {
   const frequencies: string[] = [
     'freq1', 'freq2', 'freq3', 'freq4',
     'freq5', 'freq6', 'freq7', 'freq8',
