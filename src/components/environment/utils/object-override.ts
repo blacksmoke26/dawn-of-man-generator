@@ -6,20 +6,18 @@
  */
 
 import React from 'react';
-import PropTypes from 'prop-types';
-import xmlFormatter from 'xml-formatter';
-
-// elemental components
-import {Option} from '~/components/ui/Select';
 
 // utils
 import * as objects from '~/utils/objects';
+import {isNumeric} from '~/helpers/number';
 
 // types
+import type {Option} from '~/components/ui/Select';
+import type {ObjectType} from '~/utils/objects';
 import type {Json, KVDocument} from '~/types/json.types';
-import type {ObjectAttributes, ObjectType} from '~/utils/objects';
+import type {environment} from '~/data/environments/parser/types';
 
-export type ObjectsList = KVDocument<ObjectAttributes>;
+export type ObjectsList = environment.OverridePrototypes<string>;
 
 export interface Props {
   type: ObjectType;
@@ -31,13 +29,6 @@ export interface Props {
 
   onChange?(template: string): void;
 }
-
-export const defaultValues: Partial<Props> = {
-  checked: true,
-  noCard: false,
-  objectNoCard: false,
-  values: {},
-};
 
 /**
  * Returns the list of objects for the given type
@@ -87,20 +78,12 @@ export const optionsByType = (type: ObjectType, excluded: string[] = []): Option
  */
 
 export const toTemplateText = (type: ObjectType, values: KVDocument<string>): string => {
-  if (!Object.keys(values).length) {
-    return '';
-  }
+  const template = Object.values(values).join('').trim();
 
-  const template: string = Object.values(values).join('').trim();
-
-  if (!template) {
-    return '';
-  }
-
-  return xmlFormatter(
+  return !template.length ? '' : !template ? '' : (
     `<${type}_override_prototypes>
       ${template}
-    </${type}_override_prototypes>`,
+    </${type}_override_prototypes>`
   );
 };
 
@@ -125,74 +108,15 @@ export const valuesToTemplates = (values: ObjectsList | undefined): KVDocument<s
 export const extValueToSelection = (data: Json = {}): ObjectsList => {
   const selection: ObjectsList = {};
   for (const [name, attr] of Object.entries(data)) {
-    const attributes: ObjectAttributes = {};
+    const attributes: ObjectsList = {};
 
-    if ('density' in attr) {
-      attributes.density = {
-        disabled: false,
-        value: attr.density,
-      };
-    }
-
-    if ('angle' in attr) {
-      attributes.angle = {
-        disabled: false,
-        min: attr.angle[0],
-        max: attr.angle[1],
-      };
-    }
-
-    if ('humidity' in attr) {
-      attributes.humidity = {
-        disabled: false,
-        min: attr.humidity[0],
-        max: attr.humidity[1],
-      };
-    }
-
-    if ('altitude' in attr) {
-      attributes.altitude = {
-        disabled: false,
-        min: attr.altitude[0],
-        max: attr.altitude[1],
-      };
-    }
+    isNumeric(attr?.density) && (attributes.density = attr.density);
+    Array.isArray(attr?.angle) && (attributes.angle = attr.angle);
+    Array.isArray(attr?.humidity) && (attributes.humidity = attr.humidity);
+    Array.isArray(attr?.altitude) && (attributes.altitude = attr.altitude);
 
     selection[name] = attributes;
   }
 
   return selection;
-};
-
-// Properties validation
-export const propTypes = {
-  type: PropTypes.oneOf(objects.objects).isRequired,
-  checked: PropTypes.bool,
-  noCard: PropTypes.bool,
-  objectNoCard: PropTypes.bool,
-  values: PropTypes.objectOf(
-    PropTypes.shape({
-      density: PropTypes.exact({
-        disabled: PropTypes.bool,
-        value: PropTypes.number,
-      }),
-      altitude: PropTypes.exact({
-        disabled: PropTypes.bool,
-        min: PropTypes.number,
-        max: PropTypes.number,
-      }),
-      angle: PropTypes.exact({
-        disabled: PropTypes.bool,
-        min: PropTypes.number,
-        max: PropTypes.number,
-      }),
-      humidity: PropTypes.exact({
-        disabled: PropTypes.bool,
-        min: PropTypes.number,
-        max: PropTypes.number,
-      }),
-    }),
-  ),
-  optionIcon: PropTypes.element,
-  onChange: PropTypes.func,
 };
