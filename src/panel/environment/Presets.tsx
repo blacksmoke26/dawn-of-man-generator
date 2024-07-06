@@ -13,14 +13,13 @@ import Select, {Option} from '~/components/ui/Select';
 import {IconEnvironment} from '~/components/icons/app';
 
 // utils
-import {labels, environments} from '~/data/environments/builtin';
+import {BuiltinEnvironmentName, environments, labels} from '~/data/environments/builtin';
 
 // redux
 import {useAppDispatch} from '~redux/hooks';
-import {updateValues} from '~redux/slices/environment/reducers';
+import {updateValuesRaw} from '~redux/slices/environment/reducers';
 
 // types
-import type {$Keys} from 'utility-types';
 import type {Json} from '~/types/json.types';
 
 /**
@@ -35,12 +34,12 @@ const Presets = () => {
         isSearchable={false}
         formatOptionLabel={(option: Option | any) => {
           return (
-            <div>
+            <>
               <div className="text-info" style={{color: '#8dccff'}}>
                 <IconEnvironment width="13" height="13"/> {option?.label}
               </div>
               <div className="text-size-xxs text-muted">{option?.desc}</div>
-            </div>
+            </>
           );
         }}
         isClearable={true}
@@ -53,9 +52,10 @@ const Presets = () => {
         placeholder="Choose to load built-in preset..."
         onChange={(option: Option | any, {action}): void => {
           if (action === 'select-option' && option) {
-            const value = option.value as $Keys<typeof environments>;
-            const {environment} = environments[value]();
-            dispatch(updateValues(environment as Json));
+            if (option.value in environments) {
+              const {environment} = environments[option.value as BuiltinEnvironmentName]();
+              dispatch(updateValuesRaw(environment as Json));
+            }
           }
         }}
       />
