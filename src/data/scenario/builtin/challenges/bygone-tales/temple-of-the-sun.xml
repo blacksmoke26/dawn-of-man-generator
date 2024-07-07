@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<scenario>
+	<group_id value="bygone_tales"/>
+	<hardcore_mode_allowed value="true"/>
+	<category value="Challenge"/>
+	<size value="4"/>
+	<show_completion_icon value="true"/>
+	<required_scenario value="the_long_march"/>
+	<locations>
+		<location id="main" seed="42771235" environment="eurasia_flatlands" map_location="0.35,0.35" lakes="10"/>
+	</locations>
+	<goals>
+		<goal id="temple_of_the_sun_stone_circle">
+			<condition type="EntityCountReached" counter="BuiltStructures" entity_type="stone_circle" value="1"/>
+		</goal>
+		<goal id="temple_of_the_sun_menhirs">
+			<condition type="EntityCountReached" counter="BuiltStructures" entity_type="menhir" value="4"/>
+		</goal>
+	</goals>
+	<events>
+		<!-- This gets run every time the game is started or loaded, to allow for easy iteration -->
+		<event>
+			<condition type="NewGame"/>
+			<actions>
+				<!-- Clear trees around start location -->
+				<action type="ClearTrees" radius="30"/>
+				<!-- Spawn initial entities -->
+				<action type="Spawn" entity_type="hearth" amount="1" placement="StartLocationCircular" radius="0"/>
+				<action type="Spawn" entity_type="hut" amount="2" placement="StartLocationCircular" radius="15"/>
+				<action type="Spawn" entity_type="storage_hut" amount="1" placement="StartLocationCircular" radius="15"/>
+				<action type="Spawn" entity_type="crafter" amount="1" placement="StartLocationCircular" radius="16"/>
+				<action type="Spawn" entity_type="mortar" amount="1" placement="StartLocationCircular" radius="10"/>
+				<action type="Spawn" entity_type="primitive_human" amount="4" placement="StartLocationCircular" angle="35" radius="3" age="Adult" gender="Male"/>
+				<action type="Spawn" entity_type="primitive_human" amount="1" placement="StartLocationCircular" angle="35" radius="3" years_old="20" gender="Male" name="Morkar" behaviour="NoTasks,NoOutfitChange"/>
+				<action type="Spawn" entity_type="primitive_human" amount="3" placement="StartLocationCircular" angle="35" radius="3" age="Adult" gender="Female"/>
+				<action type="Spawn" entity_type="primitive_human" amount="1" placement="StartLocationCircular" angle="35" radius="3" age="Young" gender="Male"/>
+				<action type="Spawn" entity_type="primitive_human" amount="1" placement="StartLocationCircular" angle="35" radius="3" age="Young" gender="Female"/>
+				<action type="Spawn" entity_type="wool_outfit" amount="1" placement="Morkar"/>
+				<action type="Spawn" entity_type="skins_outfit" amount="9" placement="Human"/>
+				<action type="Spawn" entity_type="flint_spear" amount="6" placement="Human"/>
+				<action type="Spawn" entity_type="flint_knife" amount="4" placement="Human"/>
+				<action type="Spawn" entity_type="flint_sickle" amount="2" placement="Human"/>
+				<action type="Spawn" entity_type="flint_pick" amount="2" placement="Human"/>
+				<action type="Spawn" entity_type="bone_harpoon" amount="2" placement="Human"/>
+				<action type="Spawn" entity_type="sticks" amount="5" placement="Storage"/>
+				<action type="Spawn" entity_type="flint" amount="5" placement="Storage"/>
+				<action type="Spawn" entity_type="berries" amount="5" placement="Storage"/>
+				<action type="Spawn" entity_type="dry_skin" amount="5" placement="Storage"/>
+				<action type="Spawn" entity_type="dry_fish" amount="5" placement="Storage"/>
+				<action type="Spawn" entity_type="cured_meat" amount="5" placement="Storage"/>
+				<!-- Set the main goal -->
+				<action type="SetGoal" id="temple_of_the_sun_stone_circle"/>
+				<action type="SetGoal" id="temple_of_the_sun_menhirs"/>
+			</actions>
+		</event>
+		<!-- This gets run every time the game is started or loaded, to allow for easy iteration -->
+		<event flags="MultipleExecutions">
+			<condition type="InitGame"/>
+			<actions>
+				<!-- Set animal populations, these will get spawned automatically -->
+				<action type="SetAnimalPopulation" animal_types="vulture dove eagle" min="7" max="12"/>
+				<action type="SetAnimalPopulation" animal_types="wolf bear" min="12" max="25"/>
+				<action type="SetAnimalPopulation" animal_types="ibex mouflon boar wild_horse wild_donkey" min="15" max="25"/>
+				<action type="SetAnimalPopulation" animal_type="deer" min="15" max="40"/>
+				<action type="SetAnimalPopulation" animal_type="reindeer" min="25" max="40"/>
+				<action type="SetAnimalPopulation" animal_type="bison" min="20" max="25"/>
+				<action type="SetAnimalPopulation" animal_type="aurochs" min="10" max="25"/>
+				<!-- Set migration parameters -->
+				<action type="SetMigrationParameters" min="2" max="4" period="1y" decrease_start_population="75" decrease_halfing_population="50"/>
+				<action type="SetBirthParameters" decrease_start_population="150" decrease_halfing_population="100"/>
+				<!-- Disable knowledge and techs -->
+				<action type="SetFeatureEnabled" feature="Knowledge" value="false"/>
+				<action type="SetGoalsHint" value="goals_hint_temple_of_the_sun"/>
+				<action type="HideUi" hide_disabled_ui="true"/>
+				<action type="HideUi" entity_types="tent storage_tent recipe_biface recipe_wooden_spear recipe_wooden_harpoon recipe_leather_outfit" hide_disabled_ui="true"/>
+				<!-- Do this every time, because more mesolithic techs could be added -->
+				<action type="Unlock" tech_era="Mesolithic"/>
+				<action type="Unlock" tech_type="thatching"/>
+				<action type="Unlock" tech_type="megalithism"/>
+				<action type="Unlock" tech_type="well_digging"/>
+				<action type="Unlock" tech_type="underground_mining"/>
+				<action type="Unlock" tech_type="goat_domestication"/>
+				<action type="Unlock" tech_type="pig_domestication"/>
+				<action type="Unlock" tech_type="cereal_domestication"/>
+				<action type="Unlock" tech_type="rye_domestication"/>
+				<action type="Unlock" tech_type="pulse_domestication"/>
+			</actions>
+		</event>
+		<!-- Show done message -->
+		<event id="done">
+			<condition type="TimeElapsed" timer="GoalsCompletedTime" value="3"/>
+			<actions>
+				<action type="ShowMessage" title="temple_of_the_sun_well_done" text="temple_of_the_sun_completed"/>
+			</actions>
+		</event>
+		<!-- Completion -->
+		<event id="back_to_game" flags="RequiresPrevious,ClearUi">
+			<condition type="TimeElapsed" timer="MessageTime" value="2"/>
+			<actions>
+				<action type="QuitGame" success="true"/>
+			</actions>
+		</event>
+		<!-- Failure condition -->
+		<event>
+			<condition type="Not">
+				<sub_condition type="IsAlive" name="Morkar"/>
+			</condition>
+		</event>
+		<event flags="RequiresPrevious">
+			<condition type="TimeElapsed" timer="EventTriggeredTime" value="3"/>
+			<actions>
+				<action type="ShowMessage" title="temple_of_the_sun_failed_title" text="temple_of_the_sun_failed_description"/>
+			</actions>
+		</event>
+		<event flags="RequiresPrevious">
+			<condition type="TimeElapsed" timer="MessageTime" value="2"/>
+			<actions>
+				<action type="QuitGame" success="false"/>
+			</actions>
+		</event>
+	</events>
+</scenario>
