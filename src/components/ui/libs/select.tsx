@@ -2,29 +2,32 @@
  * @author Junaid Atari <mj.atari@gmail.com>
  * @see https://github.com/blacksmoke26/dawn-of-man-generator
  * @since 2020-08-29
- */
+ */export const COMMON_THEME_COLORS = {
+  danger: '#DE350B',
+  dangerLight: '#FFBDAD',
+  neutral0: '#353f53',
+  neutral10: '#353f53',
+  neutral20: '#4f515a',
+  neutral30: '#53555c', // over input border
+  neutral40: 'rgba(255,255,255,.6)',
+  neutral50: 'rgba(255,255,255,.2)',
+  neutral60: 'rgba(255,255,255,.7)',
+  neutral70: 'rgba(255,255,255,.7)',
+  neutral80: 'rgba(255,255,255,.5)',
+  neutral90: 'rgba(255,255,255,.1)',
+  primary: '#353f53',
+  primary25: '#363847',
+  primary50: '#33343e',
+  primary75: '#37373e',
+}
+
 
 export const theme = (theme: any) => ({
   ...theme,
   borderRadius: 0,
   colors: {
     ...theme.colors,
-    danger: '#DE350B',
-    dangerLight: '#FFBDAD',
-    neutral0: '#353f53',
-    neutral10: '#353f53',
-    neutral20: '#4f515a',
-    neutral30: '#53555c', // over input border
-    neutral40: 'rgba(255,255,255,.6)',
-    neutral50: 'rgba(255,255,255,.2)',
-    neutral60: 'rgba(255,255,255,.7)',
-    neutral70: 'rgba(255,255,255,.7)',
-    neutral80: 'rgba(255,255,255,.5)',
-    neutral90: 'rgba(255,255,255,.1)',
-    primary: '#353f53',
-    primary25: '#363847',
-    primary50: '#33343e',
-    primary75: '#37373e',
+    ...COMMON_THEME_COLORS,
   },
 });
 

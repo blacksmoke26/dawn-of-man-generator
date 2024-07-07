@@ -13,7 +13,7 @@ import Select, {Option} from '~/components/ui/Select';
 import {IconEnvironment} from '~/components/icons/app';
 
 // utils
-import {BuiltinEnvironmentName, environments, labels} from '~/data/environments/builtin';
+import {EnvironmentName, presetOptions, presetsXmlToJson} from '~/data/environments/builtin';
 
 // redux
 import {useAppDispatch} from '~redux/hooks';
@@ -32,13 +32,13 @@ const Presets = () => {
     <div className="mb-2">
       <Select
         isSearchable={false}
-        formatOptionLabel={(option: Option | any) => {
+        formatOptionLabel={(option: Option | any, {selectValue}) => {
           return (
             <>
               <div className="text-info" style={{color: '#8dccff'}}>
                 <IconEnvironment width="13" height="13"/> {option?.label}
               </div>
-              <div className="text-size-xxs text-muted">{option?.desc}</div>
+              <div className="text-size-xxs text-muted">{option?.description}</div>
             </>
           );
         }}
@@ -48,14 +48,12 @@ const Presets = () => {
           control: styles => ({...styles, paddingTop: 5, paddingBottom: 5}),
         }}
         menuPortalTarget={document.body}
-        options={labels}
+        options={presetOptions}
         placeholder="Choose to load built-in preset..."
         onChange={(option: Option | any, {action}): void => {
           if (action === 'select-option' && option) {
-            if (option.value in environments) {
-              const {environment} = environments[option.value as BuiltinEnvironmentName]();
-              dispatch(updateValuesRaw(environment as Json));
-            }
+            const {environment} = presetsXmlToJson(option.value as EnvironmentName);
+            dispatch(updateValuesRaw(environment as Json));
           }
         }}
       />
