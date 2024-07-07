@@ -29,6 +29,8 @@ export namespace environment {
 
   export type NoiseAmplitudes = [number, number?, number?, number?, number?, number?, number?, number?];
 
+  export type SeasonName = keyof Seasons;
+
   export interface Seasons {
     Spring: SpringSeason;
     Fall: FallSeason;
