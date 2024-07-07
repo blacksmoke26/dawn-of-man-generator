@@ -77,9 +77,8 @@ const Summer = (props: SummerProps) => {
     } else if (isObject(reduxState?.Summer)) {
       setDisabled(false);
       setWindEnabled(false);
-      console.log('reduxState?.Summer:', reduxState?.Summer);
       Array.isArray(reduxState?.Summer?.wind) && setWindEnabled(true);
-      valuer.setAll(reduxState?.Summer);
+      valuer.setAll({...reduxState?.Summer});
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reduxState]);
