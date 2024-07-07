@@ -9,8 +9,6 @@
 import {toFloat} from '~/helpers/number';
 
 // types
-import {ValueFrequencies} from './general';
-import {KVDocument} from '~/types/json.types';
 import {environment} from '~/data/environments/parser/types';
 
 const toNoiseAmplitudes = (params: string): environment.NoiseAmplitudes => {
