@@ -75,6 +75,7 @@ const NoiseAmplitudes = (props: Props) => {
     } else if (Array.isArray(reduxState) && reduxState.length) {
       setChecked(true);
       configureFrequencies(reduxState, {setFrequencies, setFreqEnabled});
+      dispatch(clearProperty('noiseAmplitudes'));
     }
   }, [reduxState]);
 

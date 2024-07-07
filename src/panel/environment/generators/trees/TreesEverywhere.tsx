@@ -55,6 +55,7 @@ const TreesEverywhere = (props: TreesEverywhereProps) => {
     } else if (typeof reduxState === 'boolean') {
       setChecked(true);
       setValue(reduxState);
+      dispatch(clearProperty('treesEverywhere'));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reduxState]);

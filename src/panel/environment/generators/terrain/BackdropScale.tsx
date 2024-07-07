@@ -71,6 +71,7 @@ const BackdropScale = (props: BackdropScaleProps) => {
       setAngle1(reduxState[0] || ANGLE1_DEFAULT);
       setAngle2(reduxState[1] || ANGLE2_DEFAULT);
       setAngle3(reduxState[2] || ANGLE3_DEFAULT);
+      dispatch(clearProperty('backdropScale'));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reduxState]);

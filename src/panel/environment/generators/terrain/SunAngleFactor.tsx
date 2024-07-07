@@ -52,6 +52,7 @@ const SunAngleFactor = (props: SunAngleFactorProps) => {
     } else if (typeof reduxState === 'number') {
       setChecked(true);
       setAngle(reduxState);
+      dispatch(clearProperty('sunAngleFactor'));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reduxState]);

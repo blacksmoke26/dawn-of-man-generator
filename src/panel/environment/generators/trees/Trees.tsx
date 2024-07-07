@@ -52,6 +52,7 @@ const Trees = (props: Props) => {
     } else if (Array.isArray(reduxState)) {
       setChecked(true);
       setTrees(reduxState);
+      dispatch(clearProperty('trees'));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reduxState]);

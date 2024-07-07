@@ -47,6 +47,7 @@ const GlobalTreeDensity = (props: GlobalTreeDensityProps) => {
     } else if (typeof reduxState === 'number') {
       setChecked(true);
       setValue(reduxState);
+      dispatch(clearProperty('globalTreeDensity'));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reduxState]);
