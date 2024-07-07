@@ -95,7 +95,7 @@ export const toTemplateText = (type: ObjectType, values: KVDocument<string>): st
 export const valuesToTemplates = (values: ObjectsList | undefined): KVDocument<string> => {
   const templates: KVDocument<string> = {};
   Object.keys(values || {}).forEach(id => {
-    templates[id] = id;
+    templates[id] = '';
   });
   return templates;
 };
