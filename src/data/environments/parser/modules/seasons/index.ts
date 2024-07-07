@@ -31,9 +31,9 @@ export const jsonToRedux = ( json: Json, options: JsonToReduxOptions = {} ): Jso
 		nullResolver: () => ({}),
 	}, options);
 
-	const parsed: Json[] = op.get(json, 'environment.seasons.season', []);
+	const parsed: Json[] = op.get(json, 'environment.seasons.season', []) || [];
 
-	if ( parsed === null || !Array.isArray(parsed) ) {
+	if ( !Array.isArray(parsed) || !parsed.length ) {
 		return opt.nullResolver('seasons');
 	}
 

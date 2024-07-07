@@ -51,6 +51,7 @@ const Deposits = (props: Props) => {
     } else if (Array.isArray(reduxState)) {
       setChecked(true);
       setDeposits(reduxState);
+      dispatch(clearProperty('deposits'));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reduxState]);

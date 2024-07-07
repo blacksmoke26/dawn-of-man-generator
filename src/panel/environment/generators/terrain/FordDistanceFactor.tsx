@@ -52,6 +52,7 @@ function FordDistanceFactor(props: FordDistanceFactorProps) {
     } else if(typeof reduxState === 'number') {
       setChecked(true);
       setDistance(reduxState);
+      dispatch(clearProperty('fordDistanceFactor'));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reduxState]);

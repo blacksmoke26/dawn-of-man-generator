@@ -4,10 +4,9 @@
  * @since 2020-08-29
  */
 
-import {xmlToJson} from '~/helpers/xml';
-
 // utils
-import {allEqual} from '~/helpers/array';
+import {xmlToJson} from '~/helpers/xml';
+import {isObject} from '~/helpers/object';
 
 // parsers
 import {jsonToRedux} from './../parser';
@@ -28,11 +27,9 @@ export const xmlToReduxJson = (xml: string): Json => {
     throw new Error('Not a valid environment XML');
   }
 
-  const converted: Json = jsonToRedux(json, {
-    nullResolver: (key: string) => ({[key]: false}),
-  });
+  const converted: Json = jsonToRedux(json);
 
-  if (allEqual(Object.values(converted?.environment || {}))) {
+  if (!isObject(converted?.environment) || !Object.keys(converted?.environment).length) {
     throw new Error('XML text contains no environment data');
   }
 

@@ -69,9 +69,10 @@ const SeasonsPanel = (props: Props) => {
   React.useEffect(() => {
     if (reduxState === null) {
       setEnabled(false);
-      setTimeout(() => dispatch(clearProperty('seasons')), 75);
+      dispatch(clearProperty('seasons'));
     } else if (isObject(reduxState)) {
       setEnabled(true);
+      setTimeout(() => dispatch(clearProperty('seasons')), 150)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reduxState]);

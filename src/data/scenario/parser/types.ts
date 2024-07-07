@@ -6,9 +6,8 @@
  */
 
 // types
-import {Season} from '~/utils/seasons.types';
+import {environment} from '~/data/environments/parser/types';
 import {Event as AnyEvent} from '~/types/event.types';
-import {Disaster as DisasterName} from '~/types/scenario.types';
 import {
   ConditionAnyTasksActive,
   ConditionAnyWorkAreasActive,
@@ -28,6 +27,14 @@ import {
 } from '~/types/condition.types';
 
 export namespace scenario {
+  export type DisasterName = | 'Storm' | 'Blizzard';
+
+  export interface Disaster {
+    disasterType: DisasterName;
+    period: number;
+    variance: number;
+  }
+
   export interface Scenario {
     hardcoreModeAllowed?: null | boolean;
     nomadModeAllowed?: null | boolean;
@@ -51,8 +58,10 @@ export namespace scenario {
   export type Event = AnyEvent;
   export type Events = Event[];
 
+  export type SeasonName = environment.SeasonName;
+
   export interface StartingConditions {
-    seasonId: Season;
+    seasonId: SeasonName;
     visualSetupId?: string;
   }
 
@@ -106,12 +115,6 @@ export namespace scenario {
   export interface Goal {
     id: Lowercase<string>;
     conditions: (condition.GeneralCondition | condition.LogicalCondition)[];
-  }
-
-  export interface Disaster {
-    disasterType: DisasterName;
-    period: number;
-    variance: number;
   }
 
   export interface Location {

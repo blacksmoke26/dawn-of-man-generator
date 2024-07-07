@@ -5,13 +5,14 @@
  * @version 2.5.0
  */
 
-// types
-import {NoiseAmplitudes} from '~/types/environment.types';
-import {ValueFrequencies} from './general';
-import {KVDocument} from '~/types/json.types';
+// utils
+import {toFloat} from '~/helpers/number';
 
-const toNoiseAmplitudes = (params: string): NoiseAmplitudes => {
-  return params.split(' ') as unknown as NoiseAmplitudes;
+// types
+import {environment} from '~/data/environments/parser/types';
+
+const toNoiseAmplitudes = (params: string): environment.NoiseAmplitudes => {
+  return params.split(' ').map(freq => toFloat(freq, 4)) as unknown as environment.NoiseAmplitudes;
 };
 
 export default [{
@@ -44,15 +45,4 @@ export default [{
   group: 'Schwifty',
   id: 'schwifty_small_village',
   values: toNoiseAmplitudes('0.003 0.2 0.01 0.05 0.075 0.01 0.0 0.04'),
-}] as { caption: string; id: string; group?: string; values: NoiseAmplitudes }[];
-
-export const valuesToValueFrequencies = (values: NoiseAmplitudes): ValueFrequencies => {
-  const params = {} as KVDocument;
-
-  values.forEach((value, index) => {
-    const key = `freq` + (index + 1);
-    params[key] = value;
-  });
-
-  return params as ValueFrequencies;
-};
+}] as { caption: string; id: string; group?: string; values: environment.NoiseAmplitudes }[];

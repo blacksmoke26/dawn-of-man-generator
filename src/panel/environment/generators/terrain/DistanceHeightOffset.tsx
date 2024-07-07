@@ -52,6 +52,7 @@ const DistanceHeightOffset = (props: DistanceHeightOffsetProps) => {
     } else if (typeof reduxState === 'number') {
       setChecked(true);
       setDistance(reduxState);
+      dispatch(clearProperty('distanceHeightOffset'));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reduxState]);

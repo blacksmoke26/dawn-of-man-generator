@@ -21,12 +21,11 @@ import {xmlToReduxJson} from '~/data/environments/loader';
 
 // redux
 import {useAppDispatch} from '~redux/hooks';
-import {updateValuesRaw} from '~redux/slices/environment/reducers';
+import {overwriteValues, resetValues} from '~redux/slices/environment/reducers';
 
 /** XmlTextLoader functional component */
 function XmlTextLoader() {
   const dispatch = useAppDispatch();
-  const inputRef = React.createRef<HTMLTextAreaElement>();
 
   const [showModel, setShowModel] = React.useState<boolean>(false);
   const [value, setValue] = React.useState<string>('');
@@ -34,16 +33,12 @@ function XmlTextLoader() {
   const xmlValidated: boolean | ValidationError = validate(value.trim());
   const isXmlValid: boolean = xmlValidated === true;
 
-  /** Focus input field */
-  const focusInput = (): void => {
-    inputRef.current && inputRef.current.focus();
-  };
-
   /** Import button click handler */
   const onImportClick = () => {
     try {
-      const json = xmlToReduxJson(value);
-      dispatch(updateValuesRaw(json?.environment ?? {}));
+      const json = xmlToReduxJson(value)?.environment ?? {};
+      dispatch(resetValues());
+      setTimeout(() => dispatch(overwriteValues(json)), 30);
       setShowModel(false);
     } catch (e: any) {
     }
@@ -60,20 +55,26 @@ function XmlTextLoader() {
         size="xl"
         dialogClassName="mw-85"
         show={showModel}
-        onShow={() => focusInput()}
         fullscreen
         onHide={() => setShowModel(false)}
         backdrop="static"
         keyboard={false}>
         <Modal.Header>
-          <Modal.Title><IconCodeXml width="20" height="20"/> Import Environment XML</Modal.Title>
+          <Modal.Title>
+            <IconCodeXml width="20" height="20"/> Import Environment XML
+          </Modal.Title>
           <button
-            onClick={() => setShowModel(false)} type="button" className="close"><span aria-hidden="true">×</span><span
-            className="sr-only">Close</span></button>
+            onClick={() => setShowModel(false)}
+            type="button"
+            className="close">
+            <span aria-hidden="true">×</span>
+            <span className="sr-only">Close</span>
+          </button>
         </Modal.Header>
         <Modal.Body className="pb-0">
           <XmlEditorInput
             value={value}
+            editorProps={{focus: true}}
             onChange={setValue} />
         </Modal.Body>
         <Modal.Footer className="d-block">

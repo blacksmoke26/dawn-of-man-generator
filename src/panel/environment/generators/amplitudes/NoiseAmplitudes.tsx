@@ -31,6 +31,7 @@ import PopoverDropdown from '~/components/ui/PopoverDropdown';
 import presets from './utils/presets';
 import {randomFrequencies} from '~/utils/random';
 import {
+  configureFrequencies,
   filterEnabledFrequencies,
   type FrequencyEnabled,
   resetAllValues,
@@ -42,6 +43,9 @@ import {
 // redux
 import {useAppDispatch, useAppSelector} from '~redux/hooks';
 import {clearProperty} from '~redux/slices/environment/reducers';
+
+// types
+import {environment} from '~/data/environments/parser/types';
 
 /** NoiseAmplitudes `props` type */
 export interface Props {
@@ -60,25 +64,18 @@ const NoiseAmplitudes = (props: Props) => {
   const [frequencies, setFrequencies] = React.useState<ValueFrequencies>(props?.frequencies ?? randomFrequencies());
   const [freqEnabled, setFreqEnabled] = React.useState<FrequencyEnabled>(toggleAllFrequencies(true));
 
-  const toggleFrequency = (name: keyof FrequencyEnabled, status: boolean): void => {
-    setFreqEnabled(current => ({...current, [name]: status}));
-  };
-
   const reduxState = useAppSelector(({environment}) => environment.values?.noiseAmplitudes);
 
   // Reflect attributes changes
   React.useEffect(() => {
     if (reduxState === null) {
       setIsOn(true);
-      dispatch(clearProperty('noiseAmplitudes'));
       resetAllValues({setChecked, setFreqEnabled, setFrequencies});
+      dispatch(clearProperty('noiseAmplitudes'));
     } else if (Array.isArray(reduxState) && reduxState.length) {
       setChecked(true);
-      for (let i = 0; i <= 7; i++) {
-        const value = reduxState?.[i] ?? false;
-        setFrequency(`freq${i + 1}`, value || 0);
-        toggleFrequency(`freq${i + 1}` as keyof FrequencyEnabled, value !== false);
-      }
+      configureFrequencies(reduxState, {setFrequencies, setFreqEnabled});
+      dispatch(clearProperty('noiseAmplitudes'));
     }
   }, [reduxState]);
 
@@ -91,10 +88,11 @@ const NoiseAmplitudes = (props: Props) => {
 
   /** Update frequency value */
   const setFrequency = (name: string, value: number): void => {
-    setFrequencies(current => ({
-      ...current,
-      [name]: value,
-    }));
+    setFrequencies(current => ({...current, [name]: value}));
+  };
+
+  const toggleFrequency = (name: keyof FrequencyEnabled, status: boolean): void => {
+    setFreqEnabled(current => ({...current, [name]: status}));
   };
 
   return (
@@ -227,9 +225,8 @@ const NoiseAmplitudes = (props: Props) => {
               <><Scroll color={COLOR_WHITISH} className="mr-1" width="16"/>{option.label}</>
             )}
             onSelect={option => {
-              const params = (presets.find(item => item.id === option.value)?.values || []) as number[];
-              const values = filterEnabledFrequencies(freqEnabled, params);
-              setFrequencies((current) => ({...current, ...values}));
+              const params = (presets.find(item => item.id === option.value)?.values || [0]) as environment.NoiseAmplitudes;
+              configureFrequencies(params, {setFrequencies, setFreqEnabled});
             }}
             options={presets.map(item => ({
               label: item.caption,

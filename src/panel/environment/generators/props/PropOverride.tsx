@@ -73,6 +73,7 @@ const DetailOverride = (props: Props) => {
     } else if (isObject(reduxState)) {
       setChecked(true);
       reflectValues(extValueToSelection(reduxState as Json));
+      dispatch(clearProperty('propOverridePrototypes'));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reduxState]);

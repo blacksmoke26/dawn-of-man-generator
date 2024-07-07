@@ -1,6 +1,6 @@
 [![GitHub release](https://img.shields.io/github/v/release/blacksmoke26/dawn-of-man-generator)](https://github.com/blacksmoke26/dawn-of-man-generator/releases/latest) [![GitHub issues](https://img.shields.io/github/issues/blacksmoke26/dawn-of-man-generator?style=plastic)](https://github.com/blacksmoke26/dawn-of-man-generator/issues) [![Netlify Status](https://api.netlify.com/api/v1/badges/d15bd739-2ab5-4f27-bd99-9cf624936425/deploy-status)](https://app.netlify.com/sites/dawn-of-man-mod-gen/deploys)
 
-## Dawn of Man - Environment/Scenario Generator v2.4
+## Dawn of Man - Environment/Scenario Generator v2.5
 
 I 😍 this game, Yeah! So that's why I 🖌️ created this utility in the first place. A really cool web app made on the top
 of TypeScript / [ReactJS](https://reactjs.org/docs/hooks-intro.html) to generate environment and location data. It
@@ -77,6 +77,8 @@ https://dawn-of-man-mod-gen.netlify.app/
 * [Lucide (icons)](https://lucide.dev/icons)
 * [Fast XML Parser](https://naturalintelligence.github.io/fast-xml-parser/)
 * [React Syntax Highlighter](https://github.com/react-syntax-highlighter/react-syntax-highlighter)
+* [React Ace Editor](https://github.com/securingsincity/react-ace)
+* [Json Editor](https://github.com/CarlosNZ/json-edit-react)
 * [XML Formatter](https://github.com/chrisbottin/xml-formatter#readme)
 * [Slugify](https://github.com/simov/slugify)
 * [Nano ID](https://www.npmjs.com/package/nanoid)

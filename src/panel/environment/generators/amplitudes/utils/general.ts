@@ -13,6 +13,11 @@ import {toFloat} from '~/helpers/number';
 // parsers
 import {toNoiseAmplitudesTemplate} from '~/utils/parser/environment/templates';
 
+// types
+import {environment} from '~/data/environments/parser/types';
+
+type SetStateDispatch<T> = React.Dispatch<React.SetStateAction<T>>;
+
 /** Frequencies type  */
 export interface ValueFrequencies {
   freq1: number,
@@ -50,9 +55,9 @@ export const toggleAllFrequencies = (state: boolean = true): FrequencyEnabled =>
 };
 
 export const resetAllValues = ({setFrequencies, setChecked, setFreqEnabled}: {
-  setFrequencies: React.Dispatch<ValueFrequencies>,
-  setChecked: React.Dispatch<boolean>,
-  setFreqEnabled: React.Dispatch<FrequencyEnabled>,
+  setFrequencies: SetStateDispatch<ValueFrequencies>,
+  setChecked: SetStateDispatch<boolean>,
+  setFreqEnabled: SetStateDispatch<FrequencyEnabled>,
 }) => {
   setChecked(false);
   setFrequencies({
@@ -66,6 +71,18 @@ export const resetAllValues = ({setFrequencies, setChecked, setFreqEnabled}: {
     freq8: 0,
   });
   setFreqEnabled(toggleAllFrequencies(false));
+};
+
+export const configureFrequencies = (amplitudes: environment.NoiseAmplitudes, {setFrequencies, setFreqEnabled}: {
+  setFrequencies: SetStateDispatch<ValueFrequencies>,
+  setFreqEnabled: SetStateDispatch<FrequencyEnabled>,
+}) => {
+  for (let i = 0; i <= 7; i++) {
+    const name = `freq${i + 1}` as unknown as keyof ValueFrequencies;
+    const value = amplitudes?.[i] ?? false;
+    setFrequencies((current) => ({...current, [name]: value || 0}));
+    setFreqEnabled((current: FrequencyEnabled) => ({...current, [name]: value !== false}));
+  }
 };
 
 export const filterEnabledFrequencies = (freqEnabled: FrequencyEnabled, list: number[]): Record<keyof ValueFrequencies, number> => {

@@ -43,6 +43,12 @@ const environmentSlice = createSlice({
       state.values = merge(state.values, action.payload);
     },
     /**
+     * Update environment values from the given action. It will simply merge without post-processing.
+     */
+    overwriteValues(state, action: PayloadAction<Environment>) {
+      state.values = {...envResetValues, ...action.payload};
+    },
+    /**
      * Reset environment values (simply removing everything in forms)
      */
     resetValues(state) {
@@ -101,6 +107,7 @@ export const {
   updateByPath,
   resetValues,
   clearProperty,
+  overwriteValues,
 } = environmentSlice.actions;
 
 export const reducer = environmentSlice.reducer;

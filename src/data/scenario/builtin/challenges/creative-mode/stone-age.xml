@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<scenario>
+	<group_id value="creative_mode"/>
+	<category value="Challenge"/>
+	<size value="4"/>
+	<locations>
+		<location id="main" seed="3214645" environment="eurasia_warm" map_location="0.35,0.35"/>
+	</locations>
+	<events>
+		<event>
+			<condition type="NewGame"/>
+			<actions>
+				<!-- Clear trees around start location -->
+				<action type="ClearTrees" radius="30"/>
+				<!-- Spawn initial entities -->
+				<action type="Spawn" entity_type="hearth" amount="1" placement="StartLocationCircular" radius="0"/>
+				<action type="Spawn" entity_type="tent" amount="3" placement="StartLocationCircular" radius="12"/>
+				<action type="Spawn" entity_type="wood_pile" amount="1" placement="StartLocationCircular" radius="6"/>
+				<action type="Spawn" entity_type="crafter" amount="1" placement="StartLocationCircular" radius="12"/>
+				<action type="Spawn" entity_type="storage_tent" amount="1" placement="StartLocationCircular" angle="60" radius="12"/>
+				<action type="Spawn" entity_type="primitive_human" amount="2" placement="StartLocationCircular" angle="51" radius="2" age="Adult" gender="Male"/>
+				<action type="Spawn" entity_type="primitive_human" amount="2" placement="StartLocationCircular" angle="51" radius="2" age="Adult" gender="Male"/>
+				<action type="Spawn" entity_type="primitive_human" amount="2" placement="StartLocationCircular" angle="51" radius="2" age="Adult" gender="Female"/>
+				<action type="Spawn" entity_type="primitive_human" amount="2" placement="StartLocationCircular" angle="51" radius="4" age="Adult" gender="Female"/>
+				<action type="Spawn" entity_type="primitive_human" amount="1" placement="StartLocationCircular" angle="51" radius="4" age="Young" gender="Male"/>
+				<action type="Spawn" entity_type="primitive_human" amount="1" placement="StartLocationCircular" angle="51" radius="4" age="Old" gender="Male"/>
+				<action type="Spawn" entity_type="primitive_human" amount="1" placement="StartLocationCircular" angle="51" radius="4" age="Young" gender="Female"/>
+				<action type="Spawn" entity_type="skins_outfit" amount="11" placement="Human"/>
+				<action type="Spawn" entity_type="biface" amount="8" placement="Human"/>
+				<action type="Spawn" entity_type="wooden_spear" amount="6" placement="Human"/>
+				<action type="Spawn" entity_type="wooden_harpoon" amount="3" placement="Human"/>
+				<action type="Spawn" entity_type="sticks" amount="15" placement="Storage"/>
+				<action type="Spawn" entity_type="flint" amount="15" placement="Storage"/>
+				<action type="Spawn" entity_type="berries" amount="10" placement="Storage"/>
+				<action type="Spawn" entity_type="dry_skin" amount="10" placement="Storage"/>
+				<action type="Spawn" entity_type="dry_fish" amount="10" placement="Storage"/>
+				<action type="Spawn" entity_type="cured_meat" amount="10" placement="Storage"/>
+			</actions>
+		</event>
+		<event flags="MultipleExecutions">
+			<condition type="InitGame"/>
+			<actions>
+				<!-- Set animal populations, these will get spawned automatically -->
+				<action type="SetAnimalPopulation" animal_types="vulture dove eagle" min="7" max="12"/>
+				<action type="SetAnimalPopulation" animal_types="ibex mouflon boar" min="25" max="35"/>
+				<action type="SetAnimalPopulation" animal_types="wild_donkey" min="25" max="35"/>
+				<action type="SetAnimalPopulation" animal_types="wild_horse" min="25" max="35" era_factors="1 1 1 1 0.5 0"/>
+				<action type="SetAnimalPopulation" animal_types="feral_horse" min="25" max="35" era_factors="0 0 0 0 0.5 1"/>
+				<action type="SetAnimalPopulation" animal_type="deer" min="20" max="35" era_factors="0 0 0.25 1 1 1"/>
+				<action type="SetAnimalPopulation" animal_type="reindeer" min="30" max="40" era_factors="1 0.75 0.5 0.25 0 0"/>
+				<action type="SetAnimalPopulation" animal_type="ancient_bison" min="20" max="25" era_factors="1 0.75 0.5 0.25 0 0"/>
+				<action type="SetAnimalPopulation" animal_type="bison" min="20" max="25" era_factors="0 0.25 0.5 0.75 1 1"/>
+				<action type="SetAnimalPopulation" animal_type="aurochs" min="10" max="25"/>
+				<action type="SetAnimalPopulation" animal_type="megaloceros" min="25" max="35" era_factors="1 0.75 0.5 0.25 0 0"/>
+				<action type="SetAnimalPopulation" animal_type="mammoth" min="10" max="15" era_factors="1 0.75 0.5 0 0 0"/>
+				<action type="SetAnimalPopulation" animal_type="woolly_rhinoceros" min="10" max="15" era_factors="1 0.5 0.25 0 0 0"/>
+				<!-- Enable hints -->
+				<action type="SetFeatureEnabled" feature="Hints" value="true"/>
+				<action type="SetFeatureEnabled" feature="TechConfirmMessages" value="false"/>
+				<action type="SetFeatureEnabled" feature="TameableAnimalSpawn" value="true"/>
+				<!-- Parameters -->
+				<action type="SetMigrationParameters" min="3" max="6" period="1y" decrease_start_population="75" decrease_halfing_population="50"/>
+				<action type="SetBirthParameters" decrease_start_population="150" decrease_halfing_population="150"/>
+				<action type="SetTraderPeriod" value="0.5y"/>
+				<action type="SetDiseaseParameters" period="0.0"/>
+				<!-- Knowledge -->
+				<action type="SetKnowledgeParameters" tech_cost_multiplier="0.6"/>
+			</actions>
+		</event>
+	</events>
+</scenario>

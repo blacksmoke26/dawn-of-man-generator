@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<scenario>
+	<group_id value="bygone_tales"/>
+	<hardcore_mode_allowed value="true"/>
+	<custom_settlement_name_allowed value="false"/>
+	<category value="Challenge"/>
+	<size value="5"/>
+	<show_completion_icon value="true"/>
+	<starting_conditions season_id="Winter" visual_setup_id="WinterSnow"/>
+	<locations>
+		<location id="main" seed="6756725" environment="eurasia_glacial" map_location="0.35,0.35" position="423,360"/>
+	</locations>
+	<disasters>
+		<disaster disaster_type="Storm" period="1y" variance="0.25y"/>
+		<disaster disaster_type="Blizzard" period="1y" variance="0.25y"/>
+	</disasters>
+	<goals>
+		<goal id="the_long_march_location1" show_status="false">
+			<condition type="EntityNearMarker" entity_type="mammoth" distance="10"/>
+		</goal>
+		<goal id="the_long_march_location2" show_status="false">
+			<condition type="EntityNearMarker" entity_type="mammoth" distancee="10"/>
+		</goal>
+		<goal id="the_long_march_location3" show_status="false">
+			<condition type="EntityNearMarker" entity_type="mammoth" distance="10"/>
+		</goal>
+		<goal id="the_long_march_location4" show_status="false">
+			<condition type="EntityNearMarker" entity_type="mammoth" distance="10"/>
+		</goal>
+	</goals>
+	<events>
+		<!-- This gets run once, when the game is first started -->
+		<event>
+			<condition type="NewGame"/>
+			<actions>
+				<action type="ClearTrees" position="423,375" radius="20"/>
+				<action type="Spawn" entity_type="mammoth" amount="1" placement="Position" position="423,375" gender="Female" age="Old" spawn_type="Leader"/>
+				<action type="Spawn" entity_type="mammoth" amount="2" placement="Position" gender="Female" age="Adult" spawn_type="Follower"/>
+				<action type="Spawn" entity_type="mammoth" amount="1" placement="Position" gender="Female" age="Young" spawn_type="Follower"/>
+				<action type="Spawn" entity_type="mammoth" amount="1" placement="Position" gender="Male" age="Young" spawn_type="Follower"/>
+				<!-- Set first marker -->
+				<action type="SetGoal" id="the_long_march_location1"/>
+				<action type="SetLocationMarker" marker_type="Position" position="916.7, 727.7" scale="8.0"/>
+			</actions>
+		</event>
+		<!-- This gets run every time the game is started or loaded, to allow for easy iteration -->
+		<event flags="MultipleExecutions">
+			<condition type="InitGame"/>
+			<actions>
+				<!-- Set animal populations, these will get spawned automatically -->
+				<action type="SetAnimalPopulation" animal_types="vulture dove eagle" min="10" max="10"/>
+				<action type="SetAnimalPopulation" animal_types="cave_bear" min="50" max="50"/>
+				<action type="SetAnimalPopulation" animal_types="cave_lion cave_hyena wolf" min="34" max="34"/>
+				<action type="SetAnimalPopulation" animal_type="ancient_bison" min="7" max="7"/>
+				<action type="SetAnimalPopulation" animal_type="aurochs" min="7" max="7"/>
+				<action type="SetAnimalPopulation" animal_type="muskox" min="7" max="7"/>
+				<action type="SetAnimalPopulation" animal_type="megaloceros" min="15" max="15"/>
+				<action type="SetAnimalPopulation" animal_types="woolly_rhinoceros elasmotherium" min="10" max="10"/>
+				<!-- Gameplay -->
+				<action type="SetGameplayFlags" flags="DisableFailureConditions,AnimalControl" controllable_animal="mammoth"/>
+				<action type="SetFeatureEnabled" feature="Knowledge" value="false"/>
+				<action type="SetFeatureEnabled" feature="Warnings" value="false"/>
+				<!-- Gameplay -->
+				<action type="SetUiLocked" lock_flags="BuildMenu,WorkAreas,ContextActions,CraftRecipes,Techs,Management,PrimalVision"/>
+				<action type="HideUi" hide_disabled_ui="true" hide_quick_panels="true"/>
+				<action type="SetGoalsHint" value="goals_hint_the_long_march"/>
+			</actions>
+		</event>
+		<!-- Intro -->
+		<event>
+			<condition type="TimeElapsed" timer="MessageTime" value="6"/>
+			<actions>
+				<action type="ShowMessage" title="the_long_march_intro_title" text="the_long_march_intro"/>
+			</actions>
+		</event>
+		<!-- Location 1 -->
+		<event flags="RequiresPrevious,ClearUi">
+			<condition type="TimeElapsed" timer="GoalsCompletedTime" value="1"/>
+			<actions>
+				<action type="SetGoal" id="the_long_march_location2"/>
+				<action type="SetGoalsHint" value="goals_hint_the_long_march"/>
+				<action type="SetLocationMarker" marker_type="Position" position="669.2, 1139.0" required_goal="the_long_march_location2" scale="8.0"/>
+			</actions>
+		</event>
+		<!-- Location2 -->
+		<event flags="RequiresPrevious,ClearUi">
+			<condition type="TimeElapsed" timer="GoalsCompletedTime" value="1"/>
+			<actions>
+				<action type="SetGoal" id="the_long_march_location3"/>
+				<action type="SetGoalsHint" value="goals_hint_the_long_march"/>
+				<action type="SetLocationMarker" marker_type="Position" position="816.3, 1421.4" required_goal="the_long_march_location3" scale="8.0"/>
+			</actions>
+		</event>
+		<!-- Location 3 -->
+		<event flags="RequiresPrevious,ClearUi">
+			<condition type="TimeElapsed" timer="GoalsCompletedTime" value="1"/>
+			<actions>
+				<action type="SetGoal" id="the_long_march_location4"/>
+				<action type="SetGoalsHint" value="goals_hint_the_long_march"/>
+				<action type="SetLocationMarker" marker_type="Position" position="866.6, 1983.1" required_goal="the_long_march_location4" scale="8.0"/>
+			</actions>
+		</event>
+		<!-- Switch season -->
+		<event flags="RequiresPrevious">
+			<condition type="EntityNearMarker" entity_type="mammoth" distance="50"/>
+			<actions>
+				<action type="SetTimeOfYear" value="0.1"/>
+				<action type="SetWeather" value="Sunny"/>
+			</actions>
+		</event>
+		<!-- Done -->
+		<event flags="RequiresPrevious,ClearUi">
+			<condition type="TimeElapsed" timer="GoalsCompletedTime" value="3"/>
+			<actions>
+				<action type="ShowMessage" title="the_long_march_well_done" text="the_long_march_completed"/>
+			</actions>
+		</event>
+		<event flags="RequiresPrevious,ClearUi">
+			<condition type="TimeElapsed" timer="MessageTime" value="2"/>
+			<actions>
+				<action type="QuitGame" success="true"/>
+			</actions>
+		</event>
+		<!-- Failure condition -->
+		<event flags="ClearUi">
+			<condition type="EntityCountReached" counter="DeadAnimals" entity_type="mammoth" value="1"/>
+		</event>
+		<event flags="RequiresPrevious">
+			<condition type="TimeElapsed" timer="EventTriggeredTime" value="3"/>
+			<actions>
+				<action type="ShowMessage" title="the_long_march_failed_title" text="the_long_march_failed"/>
+			</actions>
+		</event>
+		<event flags="RequiresPrevious">
+			<condition type="TimeElapsed" timer="MessageTime" value="2"/>
+			<actions>
+				<action type="QuitGame" success="false"/>
+			</actions>
+		</event>
+	</events>
+</scenario>

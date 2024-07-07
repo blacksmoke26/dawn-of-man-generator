@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<scenario>
+	<group_id value="bygone_tales"/>
+	<hardcore_mode_allowed value="true"/>
+	<category value="Challenge"/>
+	<size value="4"/>
+	<show_completion_icon value="true"/>
+	<required_scenario value="temple_of_the_sun"/>
+	<locations>
+		<location id="main" seed="427712350" environment="eurasia_flatlands" map_location="0.35,0.35" lakes="10"/>
+	</locations>
+	<goals>
+		<goal id="the_shepherds_herd">
+			<condition type="ValueReached" id="DomesticAnimalCount" value="50"/>
+		</goal>
+		<goal id="the_shepherds_stables">
+			<condition type="EntityCountReached" counter="BuiltStructures" entity_type="stables" value="4"/>
+		</goal>
+	</goals>
+	<events>
+		<event>
+			<condition type="NewGame"/>
+			<actions>
+				<!-- Clear trees around start location -->
+				<action type="ClearTrees" radius="30"/>
+				<!-- Spawn initial entities -->
+				<action type="Spawn" entity_type="hearth" amount="1" placement="StartLocationCircular" radius="0"/>
+				<action type="Spawn" entity_type="hut" amount="3" placement="StartLocationCircular" radius="12"/>
+				<action type="Spawn" entity_type="storage_hut" amount="1" placement="StartLocationCircular" radius="15"/>
+				<action type="Spawn" entity_type="crafter" amount="1" placement="StartLocationCircular" radius="15"/>
+				<action type="Spawn" entity_type="mortar" amount="1" placement="StartLocationCircular" radius="5"/>
+				<action type="Spawn" entity_type="skins_dryer" amount="1" placement="StartLocationCircular" radius="7"/>
+				<action type="Spawn" entity_type="food_dryer" amount="1" placement="StartLocationCircular" radius="7"/>
+				<action type="Spawn" entity_type="goat" amount="1" placement="StartLocationCircular" angle="35" radius="5" age="Young" gender="Female"/>
+				<action type="Spawn" entity_type="cattle" amount="1" placement="StartLocationCircular" angle="35" radius="5" age="Young" gender="Female"/>
+				<action type="Spawn" entity_type="sheep" amount="1" placement="StartLocationCircular" angle="35" radius="5" age="Young" gender="Female"/>
+				<action type="Spawn" entity_type="goat" amount="1" placement="StartLocationCircular" angle="35" radius="5" age="Young" gender="Male"/>
+				<action type="Spawn" entity_type="cattle" amount="1" placement="StartLocationCircular" angle="35" radius="5" age="Young" gender="Male"/>
+				<action type="Spawn" entity_type="sheep" amount="1" placement="StartLocationCircular" angle="35" radius="5" age="Young" gender="Male"/>
+				<action type="Spawn" entity_type="goat" amount="1" placement="StartLocationCircular" angle="35" radius="5" age="Adult" gender="Female"/>
+				<action type="Spawn" entity_type="cattle" amount="1" placement="StartLocationCircular" angle="35" radius="5" age="Adult" gender="Female"/>
+				<action type="Spawn" entity_type="sheep" amount="1" placement="StartLocationCircular" angle="35" radius="5" age="Adult" gender="Female"/>
+				<action type="Spawn" entity_type="goat" amount="1" placement="StartLocationCircular" angle="35" radius="5" age="Adult" gender="Male"/>
+				<action type="Spawn" entity_type="cattle" amount="1" placement="StartLocationCircular" angle="35" radius="5" age="Adult" gender="Male"/>
+				<action type="Spawn" entity_type="sheep" amount="1" placement="StartLocationCircular" angle="35" radius="5" age="Adult" gender="Male"/>
+				<action type="Spawn" entity_type="primitive_human" amount="4" placement="StartLocationCircular" angle="35" radius="3" age="Adult" gender="Male"/>
+				<action type="Spawn" entity_type="primitive_human" amount="4" placement="StartLocationCircular" angle="35" radius="3" age="Adult" gender="Female"/>
+				<action type="Spawn" entity_type="primitive_human" amount="2" placement="StartLocationCircular" angle="35" radius="3" age="Young" gender="Male"/>
+				<action type="Spawn" entity_type="primitive_human" amount="2" placement="StartLocationCircular" angle="35" radius="3" age="Young" gender="Female"/>
+				<action type="Spawn" entity_type="skins_outfit" amount="12" placement="Human"/>
+				<action type="Spawn" entity_type="flint_spear" amount="6" placement="Human"/>
+				<action type="Spawn" entity_type="flint_knife" amount="4" placement="Human"/>
+				<action type="Spawn" entity_type="flint_sickle" amount="2" placement="Human"/>
+				<action type="Spawn" entity_type="flint_pick" amount="2" placement="Human"/>
+				<action type="Spawn" entity_type="bone_harpoon" amount="2" placement="Human"/>
+				<action type="Spawn" entity_type="bow" amount="10" placement="Storage"/>
+				<action type="Spawn" entity_type="sticks" amount="15" placement="Storage"/>
+				<action type="Spawn" entity_type="flint" amount="5" placement="Storage"/>
+				<action type="Spawn" entity_type="berries" amount="5" placement="Storage"/>
+				<action type="Spawn" entity_type="dry_skin" amount="5" placement="Storage"/>
+				<action type="Spawn" entity_type="dry_fish" amount="10" placement="Storage"/>
+				<action type="Spawn" entity_type="cured_meat" amount="10" placement="Storage"/>
+				<action type="Spawn" entity_type="straw" amount="10" placement="Storage"/>
+				<action type="Spawn" entity_type="grain" amount="10" placement="Storage"/>
+				<!-- Set the main goal -->
+				<action type="SetGoal" id="the_shepherds_herd"/>
+				<action type="SetGoal" id="the_shepherds_stables"/>
+			</actions>
+		</event>
+		<event flags="MultipleExecutions">
+			<condition type="InitGame"/>
+			<actions>
+				<!-- Set animal populations, these will get spawned automatically -->
+				<action type="SetAnimalPopulation" animal_types="vulture dove eagle" min="7" max="12"/>
+				<action type="SetAnimalPopulation" animal_types="ibex mouflon aurochs" min="0" max="10"/>
+				<action type="SetAnimalPopulation" animal_types="boar" min="5" max="20"/>
+				<action type="SetAnimalPopulation" animal_types="wolf" min="25" max="40"/>
+				<action type="SetAnimalPopulation" animal_types="cave_lion" min="1" max="10"/>
+				<action type="SetAnimalPopulation" animal_types="bear" min="10" max="30"/>
+				<action type="SetAnimalPopulation" animal_types="cave_bear" min="10" max="30"/>
+				<!-- Set migration parameters -->
+				<action type="SetMigrationParameters" min="2" max="4" period="1y" decrease_start_population="75" decrease_halfing_population="50"/>
+				<action type="SetBirthParameters" decrease_start_population="150" decrease_halfing_population="100"/>
+				<action type="SetTraderPeriod" value="0.55y"/>
+				<!-- Disable knowledge and techs -->
+				<action type="SetFeatureEnabled" feature="Knowledge" value="false"/>
+				<action type="HideUi" hide_disabled_ui="true"/>
+				<action type="HideUi" entity_types="tent storage_tent recipe_biface recipe_wooden_spear recipe_wooden_harpoon recipe_leather_outfit" hide_disabled_ui="true"/>
+				<action type="Unlock" tech_era="Mesolithic"/>
+				<action type="Unlock" tech_type="thatching"/>
+				<action type="Unlock" tech_type="megalithism"/>
+				<action type="Unlock" tech_type="well_digging"/>
+				<action type="Unlock" tech_type="underground_mining"/>
+				<action type="Unlock" tech_type="goat_domestication"/>
+				<action type="Unlock" tech_type="pig_domestication"/>
+				<action type="Unlock" tech_type="cattle_domestication"/>
+				<action type="Unlock" tech_type="cereal_domestication"/>
+				<action type="Unlock" tech_type="sheep_domestication"/>
+				<action type="Unlock" tech_type="flax_domestication"/>
+				<action type="Unlock" tech_type="weaving"/>
+				<action type="SetRaider" era="Neolithic" entity_types="bear" grace_period="0y" period="1y" variance="0.25y"/>
+			</actions>
+		</event>
+		<!-- Show done message -->
+		<event id="done">
+			<condition type="TimeElapsed" timer="GoalsCompletedTime" value="1"/>
+			<actions>
+				<action type="ShowMessage" title="the_shepherds_well_done" text="the_shepherds_completed"/>
+			</actions>
+		</event>
+		<!-- Quit game -->
+		<event id="back_to_game" flags="RequiresPrevious,ClearUi">
+			<condition type="TimeElapsed" timer="GoalsCompletedTime" value="1"/>
+			<actions>
+				<action type="QuitGame" success="true"/>
+			</actions>
+		</event>
+	</events>
+</scenario>

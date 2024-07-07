@@ -52,6 +52,7 @@ const ResourceFactor = (props: ResourceFactorProps) => {
     } else if (typeof reduxState === 'number') {
       setChecked(true);
       setResource(reduxState);
+      dispatch(clearProperty('resourceFactor'));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reduxState]);

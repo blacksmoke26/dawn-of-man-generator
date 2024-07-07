@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<scenario>
+	<group_id value="bygone_tales"/>
+	<hardcore_mode_allowed value="true"/>
+	<category value="Challenge"/>
+	<size value="4"/>
+	<show_completion_icon value="true"/>
+	<starting_conditions season_id="Winter" visual_setup_id="WinterSnow"/>
+	<required_scenario value="the_shepherds"/>
+	<locations>
+		<location id="main" seed="5492625" environment="eurasia_glacial" map_location="0.35,0.35"/>
+	</locations>
+	<disasters>
+		<disaster disaster_type="Storm" period="1.0y" variance="0.25y"/>
+		<disaster disaster_type="Blizzard" period="1.0y" variance="0.25y"/>
+	</disasters>
+	<goals>
+		<goal id="before_dawn_main" show_status="false">
+			<condition type="ValueReached" id="ResidentCount" value="50"/>
+		</goal>
+	</goals>
+	<events>
+		<event>
+			<condition type="NewGame"/>
+			<actions>
+				<!-- Clear trees around start location -->
+				<action type="ClearTrees" radius="30"/>
+				<!-- Spawn initial entities -->
+				<action type="Spawn" entity_type="hearth" amount="1" placement="StartLocationCircular" radius="0"/>
+				<action type="Spawn" entity_type="tent" amount="4" placement="StartLocationCircular" radius="10"/>
+				<action type="Spawn" entity_type="primitive_human" amount="4" placement="StartLocationCircular" angle="25" radius="3" age="Adult" gender="Male"/>
+				<action type="Spawn" entity_type="primitive_human" amount="4" placement="StartLocationCircular" angle="25" radius="3" age="Adult" gender="Female"/>
+				<action type="Spawn" entity_type="primitive_human" amount="2" placement="StartLocationCircular" angle="25" radius="3" age="Young" gender="Male"/>
+				<action type="Spawn" entity_type="primitive_human" amount="1" placement="StartLocationCircular" angle="25" radius="3" age="Old" gender="Male"/>
+				<action type="Spawn" entity_type="primitive_human" amount="1" placement="StartLocationCircular" angle="25" radius="3" age="Old" gender="Female"/>
+				<action type="Spawn" entity_type="primitive_human" amount="2" placement="StartLocationCircular" angle="25" radius="3" age="Young" gender="Female"/>
+				<action type="Spawn" entity_type="skins_outfit" amount="14" placement="Human"/>
+				<action type="Spawn" entity_type="biface" amount="6" placement="Human"/>
+				<action type="Spawn" entity_type="wooden_spear" amount="6" placement="Human"/>
+				<action type="Spawn" entity_type="wooden_harpoon" amount="4" placement="Human"/>
+				<action type="Spawn" entity_type="sticks" amount="2" placement="Storage"/>
+				<action type="Spawn" entity_type="flint" amount="1" placement="Storage"/>
+				<action type="Spawn" entity_type="berries" amount="2" placement="Storage"/>
+				<action type="Spawn" entity_type="raw_skin" amount="8" placement="Storage"/>
+				<action type="Spawn" entity_type="raw_fish" amount="4" placement="Storage"/>
+				<action type="Spawn" entity_type="raw_meat" amount="4
+				" placement="Storage"/>
+				<!-- Set the main goal -->
+				<action type="SetGoal" id="before_dawn_main"/>
+			</actions>
+		</event>
+		<event flags="MultipleExecutions">
+			<condition type="InitGame"/>
+			<actions>
+				<!-- Set animal populations, these will get spawned automatically -->
+				<action type="SetAnimalPopulation" animal_types="vulture eagle" min="10" max="15"/>
+				<action type="SetAnimalPopulation" animal_types="cave_lion cave_hyena" min="8" max="16"/>
+				<action type="SetAnimalPopulation" animal_types="wolf cave_bear" min="15" max="25"/>
+				<action type="SetAnimalPopulation" animal_types="boar" min="5" max="10"/>
+				<action type="SetAnimalPopulation" animal_types="wild_horse" min="5" max="15"/>
+				<action type="SetAnimalPopulation" animal_type="reindeer" min="10" max="10"/>
+				<action type="SetAnimalPopulation" animal_type="ancient_bison" min="5" max="10"/>
+				<action type="SetAnimalPopulation" animal_type="muskox" min="5" max="10"/>
+				<action type="SetAnimalPopulation" animal_type="aurochs" min="5" max="15"/>
+				<action type="SetAnimalPopulation" animal_type="megaloceros" min="10" max="15"/>
+				<action type="SetAnimalPopulation" animal_type="mammoth" min="7" max="12"/>
+				<action type="SetAnimalPopulation" animal_type="woolly_rhinoceros" min="7" max="12"/>
+				<action type="SetAnimalPopulation" animal_type="elasmotherium" min="7" max="12"/>
+				<!-- Disable knowledge and techs -->
+				<action type="SetFeatureEnabled" feature="Knowledge" value="false"/>
+				<action type="Unlock" tech_type="food_drying"/>
+				<!-- Disable entities -->
+				<action type="HideUi" hide_disabled_ui="true"/>
+				<!-- Attacks -->
+				<action type="SetRaider" era="Paleolithic" entity_types="cave_lion cave_bear cave_hyena woolly_rhinoceros elasmotherium" grace_period="0.25y" period="0.5y" variance="0.25y"/>
+				<!-- Set migration parameters -->
+				<action type="SetMigrationParameters" min="3" max="6" period="0.4y"/>
+			</actions>
+		</event>
+		<!-- Show done message -->
+		<event id="done">
+			<condition type="TimeElapsed" timer="GoalsCompletedTime" value="1"/>
+			<actions>
+				<action type="ShowMessage" title="before_dawn_well_done" text="before_dawn_completed"/>
+			</actions>
+		</event>
+		<!-- Quit game -->
+		<event id="back_to_game">
+			<condition type="TimeElapsed" timer="GoalsCompletedTime" value="1"/>
+			<actions>
+				<action type="QuitGame" success="true"/>
+			</actions>
+		</event>
+	</events>
+</scenario>
