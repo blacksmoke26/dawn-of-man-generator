@@ -24,6 +24,7 @@ import type {JSX} from 'react/jsx-runtime';
 import type {Json} from '~/types/json.types';
 import type {Option, Options} from './Select';
 import type {ActionMeta, FormatOptionLabelMeta, Props as SelectProps} from 'react-select';
+import {Property} from 'csstype';
 
 // public types
 export type {Option, Options};
@@ -43,6 +44,8 @@ export interface SelectPopoutProps {
 
   /** Display value element classname */
   className?: string;
+
+  dropdownWidth?: Property.Width<number>;
 
   /** Display value element classname */
   style?: React.CSSProperties;
@@ -110,7 +113,7 @@ export const SelectPopout = (props: SelectPopoutProps) => {
         menuIsOpen
         isSearchable={false}
         theme={theme}
-        styles={styles}
+        styles={styles({width: props?.dropdownWidth})}
         options={props?.options as Options}
         tabSelectsValue={false}
         value={value}
@@ -158,38 +161,42 @@ export const theme = (theme: any) => ({
   },
 });
 
-export const styles: SelectProps['styles'] = {
-  container: (current: Json) => ({
-    ...current,
-    minWidth: 150,
-  }),
-  menu: (current: Json) => ({
-    ...current,
-    paddingTop: 6,
-    paddingBottom: 6,
-    borderRadius: 2,
-    backgroundColor: '#44506b',
-  }),
-  groupHeading: (current: Json) => ({
-    ...current,
-    fontSize: '.66rem',
-    color: '#e4e4e4',
-    textTransform: 'none',
-  }),
-  control: (current: Json) => ({
-    ...current,
-    backgroundColor: '#44506b',
-  }),
-  option: (styles: any, {isDisabled, isSelected}: { isDisabled: boolean, isSelected: boolean }) => ({
-    ...styles,
-    paddingTop: 5,
-    paddingBottom: 5,
-    fontSize: '.75rem',
-    color: isDisabled
-      ? '#788bb1'
-      : (isSelected ? '#353f535c' : '#e4e4e4'),
-    singleValue: (styles: any) => ({...styles, color: '#ffb74d'}),
-  }),
+export const styles = ({width = 150}: {width?: Property.Width<number>}) => {
+  return {
+    container: (current: Json) => ({
+      ...current,
+      minWidth: 150,
+      width,
+      maxWidth: 300,
+    }),
+    menu: (current: Json) => ({
+      ...current,
+      paddingTop: 6,
+      paddingBottom: 6,
+      borderRadius: 2,
+      backgroundColor: '#44506b',
+    }),
+    groupHeading: (current: Json) => ({
+      ...current,
+      fontSize: '.66rem',
+      color: '#e4e4e4',
+      textTransform: 'none',
+    }),
+    control: (current: Json) => ({
+      ...current,
+      backgroundColor: '#44506b',
+    }),
+    option: (styles: any, {isDisabled, isSelected}: { isDisabled: boolean, isSelected: boolean }) => ({
+      ...styles,
+      paddingTop: 5,
+      paddingBottom: 5,
+      fontSize: '.75rem',
+      color: isDisabled
+        ? '#788bb1'
+        : (isSelected ? '#353f535c' : '#e4e4e4'),
+      singleValue: (styles: any) => ({...styles, color: '#ffb74d'}),
+    }),
+  } as SelectProps['styles']
 };
 
 export default SelectPopout;
