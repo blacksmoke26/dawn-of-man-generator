@@ -9,7 +9,7 @@ import React from 'react';
 
 // elemental components
 import XmlEditorInput from '~/components/ui/XmlEditorInput';
-import PopoverDropdown from '~/components/ui/PopoverDropdown';
+import SelectPopout, {Option, Options} from '~/components/ui/SelectPopout';
 
 // icons
 import {IconChevronSimpleDown, IconCodeXml, IconEnvironment, IconScenario} from '~/components/icons/app';
@@ -17,13 +17,37 @@ import {IconChevronSimpleDown, IconCodeXml, IconEnvironment, IconScenario} from 
 // hooks
 import {useAppSelector} from '~redux/hooks';
 
-// types
-import {Json} from '~/types/json.types';
+// parsers
+import {EnvironmentName, presetOptions as envPresetOptions, presets as envPresets} from '~/data/environments/builtin';
+import {presetOptions as scnPresetOptions, presets as scnPresets, ScenarioName} from '~/data/scenario/builtin';
 
-const iconsMap: Json = {
-  environment: IconEnvironment,
-  scenario: IconScenario,
+const getIcon = (option: Option): typeof IconCodeXml => {
+  if (option?.type === 'environment' || option.value === 'environment') {
+    return IconEnvironment;
+  }
+
+  if (option?.type === 'scenario' || option.value === 'scenario') {
+    return IconScenario;
+  }
+
+  return IconCodeXml;
 };
+
+const userlandOptions: Options = [{
+  label: 'User-land',
+  options: [{
+    label: 'Environment',
+    value: 'environment',
+
+  }, {
+    label: 'Scenario',
+    value: 'scenario',
+
+  }, {
+    label: 'Scenario (Strings)',
+    value: 'scenario_strings',
+  }],
+}];
 
 /** XmlToEnvironmentJson functional component */
 const XmlToEnvironmentJson = () => {
@@ -40,34 +64,36 @@ const XmlToEnvironmentJson = () => {
       onChange={setXmlText}
       buttons={(
         <span className="d-inline-block mt-1" style={{marginLeft: '.9rem'}}>
-          <PopoverDropdown
-            heading="Choose..."
+          <SelectPopout
+            dropdownWidth={250}
+            selectProps={{menuPlacement: 'top'}}
+            options={([] as Options).concat(userlandOptions, envPresetOptions, scnPresetOptions)}
             hideArrow
+            readOnly
+            placeholder="Templates"
+            formatOptionLabel={(option: Option) => {
+              const Icon = getIcon(option);
+              return (
+                <><Icon className="mr-1 d-inline"/> {option.label}</>
+              );
+            }}
             formatText={() => (
               <><IconCodeXml
                 style={{top: -1, marginRight: 3}}
                 className="d-inline-block position-relative"/>
                 Templates <IconChevronSimpleDown/></>
             )}
-            formatLabel={(option) => {
-              const Icon = iconsMap?.[option.value as string] || IconCodeXml;
-              return (
-                <><Icon className="mr-1"/> {option.label}</>
-              );
-            }}
-            options={[{
-              label: 'Environment',
-              value: 'environment',
+            onSelect={({value, type = null}) => {
+              if ( type === 'scenario') {
+                setXmlText(scnPresets?.[value as ScenarioName] as '');
+                return;
+              }
 
-            }, {
-              label: 'Scenario',
-              value: 'scenario',
+              if ( type === 'environment') {
+                setXmlText(envPresets?.[value as EnvironmentName] as '');
+                return;
+              }
 
-            }, {
-              label: 'Scenario (Strings)',
-              value: 'scenario_strings',
-            }]}
-            onSelect={({value}) => {
               switch (value) {
                 case 'environment':
                   setXmlText(environmentStrings);
