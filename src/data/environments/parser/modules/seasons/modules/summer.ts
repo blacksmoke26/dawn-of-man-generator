@@ -63,7 +63,7 @@ export const jsonToRedux = (seasons: Json[]): Json => {
     }),
   };
 
-  !('wind' in node) && delete attributes.wind;
+  !('min_wind' in node) && delete attributes.wind;
 
   return {
     [SummerConfig.id]: attributes,
