@@ -4,41 +4,78 @@
  * @since 2020-08-29
  */
 
-// utils
-import eurasia, {info as info1} from './eurasia';
-import eurasia_conflict, {info as info2} from './eurasia_conflict';
-import eurasia_flatlands, {info as info3} from './eurasia_flatlands';
-import eurasia_glacial, {info as info4} from './eurasia_glacial';
-import eurasia_north, {info as info5} from './eurasia_north';
-import eurasia_warm, {info as info6} from './eurasia_warm';
-import flat, {info as info7} from './flat';
+/* eslint import/no-webpack-loader-syntax: off */
+
+import generalEurasia from '!!raw-loader!./general/eurasia.xml';
+import generalEurasiaConflict from '!!raw-loader!./general/eurasia-conflict.xml';
+import generalEurasiaFlatlands from '!!raw-loader!./general/eurasia-flatlands.xml';
+import generalEurasiaGlacial from '!!raw-loader!./general/eurasia-glacial.xml';
+import generalEurasiaNorth from '!!raw-loader!./general/eurasia-north.xml';
+import generalEurasiaWarm from '!!raw-loader!./general/eurasia-warm.xml';
+import generalFlat from '!!raw-loader!./general/flat.xml';
+
+// parsers
+import {xmlToReduxJson} from '~/data/environments/loader';
 
 // types
-import {environment} from '~/data/environments/parser/types';
+import {Options} from '~/components/ui/Select';
 
-/** Builtin environments labels */
-export const labels: object[] = [
-  info1, info2, info3,
-  info4, info5, info6,
-  info7,
-];
+export const presets = {
+  // General
+  'general/eurasia': generalEurasia,
+  'general/eurasia_conflict': generalEurasiaConflict,
+  'general/eurasia_flatlands': generalEurasiaFlatlands,
+  'general/eurasia_glacial': generalEurasiaGlacial,
+  'general/eurasia_north': generalEurasiaNorth,
+  'general/eurasia_warm': generalEurasiaWarm,
+  'general/flat': generalFlat,
+};
 
-export type BuiltinEnvironmentName =
-  | 'eurasia'
-  | 'eurasia_conflict'
-  | 'eurasia_flatlands'
-  | 'eurasia_glacial'
-  | 'eurasia_north'
-  | 'eurasia_warm'
-  | 'flat';
+export type EnvironmentName = keyof typeof presets;
 
-/** Builtin environments */
-export const environments: Record<BuiltinEnvironmentName, (() => { environment: environment.Environment })> = {
-  eurasia,
-  eurasia_conflict,
-  eurasia_flatlands,
-  eurasia_glacial,
-  eurasia_north,
-  eurasia_warm,
-  flat,
+export const presetsName = Object.keys(presets) as EnvironmentName[];
+
+/** Environment presets */
+export const presetOptions: Options = [{
+  label: 'General',
+  options: [{
+    label: 'Eurasia',
+    value: 'general/eurasia',
+    description: 'Standard environment, used in the Continental Dawn freeplay scenario.',
+    type: 'environment',
+  }, {
+    label: 'Eurasia conflict',
+    value: 'general/eurasia_conflict',
+    description: 'Like eurasia but with less resources, used in the Ancient Warriors freeplay scenario.',
+    type: 'environment',
+  }, {
+    label: 'Eurasia flatlands',
+    value: 'general/eurasia_flatlands',
+    description: 'This scenario tailored to some of the challenges too',
+    type: 'environment',
+  }, {
+    label: 'Eurasia glacial',
+    value: 'general/eurasia_glacial',
+    description: 'This scenario tailored to some of the challenges too',
+    type: 'environment',
+  }, {
+    label: 'Eurasia north',
+    value: 'general/eurasia_north',
+    description: 'Longer winters, few resources, only perennial trees, used in the The Northlands freeplay scenario',
+    type: 'environment',
+  }, {
+    label: 'Eurasia warm',
+    value: 'general/eurasia_warm',
+    description: 'More resources, shorter winters. Used in Creative Mode.',
+    type: 'environment',
+  }, {
+    label: 'Flat',
+    value: 'general/flat',
+    description: 'Flat land with specific resources',
+    type: 'environment',
+  }],
+}];
+
+export const presetsXmlToJson = (name: EnvironmentName) => {
+  return xmlToReduxJson(presets[name]);
 };
