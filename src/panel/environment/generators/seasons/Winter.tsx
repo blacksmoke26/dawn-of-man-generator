@@ -69,7 +69,7 @@ function Winter(props: Props) {
       valuer.setAll(DEFAULT_VALUES);
     } else if (isObject(reduxState?.Winter)) {
       setDisabled(false);
-      valuer.setAll(reduxState?.Winter);
+      valuer.setAll({...reduxState?.Winter});
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reduxState]);

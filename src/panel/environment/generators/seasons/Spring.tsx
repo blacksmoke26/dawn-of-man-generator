@@ -74,7 +74,7 @@ const Spring = (props: Props) => {
       valuer.setAll(DEFAULT_VALUES);
     } else if (isObject(reduxState?.Spring)) {
       setDisabled(false)
-      valuer.setAll(reduxState?.Spring);
+      valuer.setAll({...reduxState?.Spring});
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reduxState]);

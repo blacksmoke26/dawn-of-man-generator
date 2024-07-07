@@ -72,7 +72,7 @@ const Fall = (props: Props) => {
       valuer.setAll(DEFAULT_VALUES);
     } else if (isObject(reduxState?.Fall)) {
       setDisabled(false)
-      valuer.setAll(reduxState?.Fall);
+      valuer.setAll({...reduxState?.Fall});
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reduxState]);
