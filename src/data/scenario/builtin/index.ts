@@ -38,42 +38,51 @@ export const presets = {
 export type ScenarioName = keyof typeof presets;
 
 /** Scenario presets */
-export const presetsList: { label: string, value: string, group: string }[] = [{
-  label: 'Ancient Warriors',
-  value: 'freeplay/ancient_warriors',
-  group: 'Freeplay',
+export const presetOptions = [{
+  label: 'Freeplay',
+  options: [{
+    label: 'Ancient Warriors',
+    value: 'freeplay/ancient_warriors',
+    type: 'scenario',
+  }, {
+    label: 'Continental Dawn',
+    value: 'freeplay/continental_dawn',
+    type: 'scenario',
+  }, {
+    label: 'The Northlands',
+    value: 'freeplay/the_northlands',
+    type: 'scenario',
+  }],
 }, {
-  label: 'Continental Dawn',
-  value: 'freeplay/continental_dawn',
-  group: 'Freeplay',
+  label: 'Bygone Tales (Challenges)',
+  options: [{
+    label: 'Before Dawn',
+    value: 'challenges/bygone_tales/before_dawn',
+    type: 'scenario',
+  }, {
+    label: 'Temple of the Sun',
+    value: 'challenges/bygone_tales/temple_of_the_sun',
+    type: 'scenario',
+  }, {
+    label: 'The Long March',
+    value: 'challenges/bygone_tales/the_long_march',
+    type: 'scenario',
+  }, {
+    label: 'The Shepherds',
+    value: 'challenges/bygone_tales/the_shepherds',
+    type: 'scenario',
+  }],
 }, {
-  label: 'The Northlands',
-  value: 'freeplay/the_northlands',
-  group: 'Freeplay',
-}, {
-  label: 'Before Dawn',
-  value: 'challenges/bygone_tales/before_dawn',
-  group: 'Challenges / Bygone Tales',
-}, {
-  label: 'Temple of the Sun',
-  value: 'challenges/bygone_tales/temple_of_the_sun',
-  group: 'Challenges / Bygone Tales',
-}, {
-  label: 'The Long March',
-  value: 'challenges/bygone_tales/the_long_march',
-  group: 'Challenges / Bygone Tales',
-}, {
-  label: 'The Shepherds',
-  value: 'challenges/bygone_tales/the_shepherds',
-  group: 'Challenges / Bygone Tales',
-}, {
-  label: 'Meta Age',
-  value: 'challenges/creative_mode/meta_age',
-  group: 'Challenges / Creative Mode',
-}, {
-  label: 'Stone Age',
-  value: 'challenges/creative_mode/stone_age',
-  group: 'Challenges / Creative Mode',
+  label: 'Creative mode (Challenges)',
+  options: [{
+    label: 'Metal Age',
+    value: 'challenges/creative_mode/metal_age',
+    type: 'scenario',
+  }, {
+    label: 'Stone Age',
+    value: 'challenges/creative_mode/stone_age',
+    type: 'scenario',
+  }],
 }];
 
 export const presetsXmlToJson = (name: ScenarioName) => {
