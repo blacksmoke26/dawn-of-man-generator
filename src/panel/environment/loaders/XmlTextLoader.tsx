@@ -21,7 +21,7 @@ import {xmlToReduxJson} from '~/data/environments/loader';
 
 // redux
 import {useAppDispatch} from '~redux/hooks';
-import {overwriteValues} from '~redux/slices/environment/reducers';
+import {overwriteValues, resetValues} from '~redux/slices/environment/reducers';
 
 /** XmlTextLoader functional component */
 function XmlTextLoader() {
@@ -37,7 +37,8 @@ function XmlTextLoader() {
   const onImportClick = () => {
     try {
       const json = xmlToReduxJson(value)?.environment ?? {};
-      dispatch(overwriteValues(json));
+      dispatch(resetValues());
+      setTimeout(() => dispatch(overwriteValues(json)), 30);
       setShowModel(false);
     } catch (e: any) {
     }
