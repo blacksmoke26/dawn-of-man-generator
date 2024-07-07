@@ -70,19 +70,18 @@ const XmlToEnvironmentJson = () => {
             options={([] as Options).concat(userlandOptions, envPresetOptions, scnPresetOptions)}
             hideArrow
             readOnly
-            placeholder="Templates"
+            placeholder={
+              <><IconCodeXml
+                style={{top: 0, marginRight: 3}}
+                className="d-inline-block position-relative"/>
+                Templates <IconChevronSimpleDown style={{top: 0}} className="position-relative d-inline"/></>
+            }
             formatOptionLabel={(option: Option) => {
               const Icon = getIcon(option);
               return (
                 <><Icon className="mr-1 d-inline"/> {option.label}</>
               );
             }}
-            formatText={() => (
-              <><IconCodeXml
-                style={{top: -1, marginRight: 3}}
-                className="d-inline-block position-relative"/>
-                Templates <IconChevronSimpleDown/></>
-            )}
             onSelect={({value, type = null}) => {
               if ( type === 'scenario') {
                 setXmlText(scnPresets?.[value as ScenarioName] as '');
