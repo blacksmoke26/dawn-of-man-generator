@@ -22,7 +22,8 @@ import {useAppDispatch, useAppSelector} from '~redux/hooks';
 const TemplateXMLViewer = () => {
   const dispatch = useAppDispatch();
 
-  const template = useAppSelector(({scenario}) => scenario.template);
+  const environmentName = useAppSelector(({environment}) => environment.name);
+  const template = useAppSelector(({scenario}) => scenario.template).replace('{{environment}}', environmentName);
   const strings = useAppSelector(({scenario}) => scenario.strings);
   const scenarioName = useAppSelector(({scenario}) => scenario.name);
 

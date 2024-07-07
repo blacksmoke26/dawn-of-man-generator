@@ -23,7 +23,7 @@ import {IconShuffle} from '~/components/icons/app';
 
 // utils
 import * as location from '~/utils/location';
-import {labels} from '~/data/environments/builtin';
+import {presetOptions} from '~/data/environments/builtin';
 import {POSITION_MAX, POSITION_MIN} from '~/utils/defaults';
 import {LOCATION_LAKES_MAX, LOCATION_LAKES_MIN} from '~/utils/scenario/defaults';
 
@@ -51,6 +51,7 @@ const Location = (props: Props) => {
   }, props);
 
   const environmentName = useAppSelector(({environment}) => environment.name);
+  const environmentVar = `{{environment}}`;
 
   const [values, setValues] = React.useState<LocationProps>(props.values as LocationProps);
   const [enabled, setEnabled] = React.useState<boolean>(props.enabled as boolean);
@@ -98,10 +99,12 @@ const Location = (props: Props) => {
     updateValue('position', [north ?? n, south ?? s]);
   };
 
-  const environments = [...labels, {
+  const builtinPresets = presetOptions.filter(v => v.label === 'General')?.[0]?.options;
+
+  const environments = [...builtinPresets, {
     label: capitalCase(environmentName),
-    value: environmentName,
-    desc: 'Custom tailored environment for the free play scenario',
+    value: environmentVar,
+    description: 'Custom tailored environment for the free play scenario',
   }];
 
   return (
@@ -196,16 +199,17 @@ const Location = (props: Props) => {
             placeholder="e.g., custom_environment"
             allowShuffle
             onShuffle={() => {
-              updateValue('environment', location.randomEnvironment([environmentName]));
+              updateValue('environment', location.randomEnvironment([environmentVar]));
             }}
             onChange={value => {
               updateValue('environment', value);
             }}/>
           <ul className="list-unstyled list-inline mb-0 mt-1">
+
             {environments.map((v: Json) => (
               <li className="list-inline-item text-size-xxs" key={`environment_key_${v.value}`}>
                 {enabled ? (
-                  <a href="/" title={v.desc} data-value={v.value} onClick={e => {
+                  <a href="/" title={v.description} data-value={v.value.replace('general/', '')} onClick={e => {
                     e.preventDefault();
                     // @ts-ignore
                     updateValue('environment', e.target.getAttribute('data-value'));
