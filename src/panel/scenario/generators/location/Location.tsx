@@ -89,7 +89,7 @@ const Location = (props: Props) => {
 
   // Reflect prop changes
   React.useEffect(() => {
-    //meta.set('disabled', props?.disabled, true);
+    meta.set('disabled', props?.disabled, true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props?.disabled]);
 
