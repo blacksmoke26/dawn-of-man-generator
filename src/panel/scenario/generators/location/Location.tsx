@@ -7,16 +7,17 @@
 import React from 'react';
 import * as PropTypes from 'prop-types';
 import cn from 'classname';
-import merge from 'deepmerge';
-import {nanoid} from 'nanoid';
 import {capitalCase} from 'change-case';
-import {Button, Col, Form, InputGroup, Row} from 'react-bootstrap';
+import {Col, InputGroup, Row} from 'react-bootstrap';
 
-// components
-import Slider from '~/components/ui/Slider';
+// elemental components
 import TextInput from '~/components/ui/TextInput';
 import LinkButton from '~/components/ui/LinkButton';
 import NumberInput from '~/components/ui/NumberInput';
+import PropertyLabel from '~/components/ui/PropertyLabel';
+import PropertyCheckboxLabel from '~/components/ui/PropertyCheckboxLabel';
+import AttributeCheckbox from '~/components/ui/elements/AttributeCheckbox';
+import AttributeRangeValue from '~/components/ui/elements/AttributeValueRange';
 
 // icons
 import {IconShuffle} from '~/components/icons/app';
@@ -24,80 +25,92 @@ import {IconShuffle} from '~/components/icons/app';
 // utils
 import * as location from '~/utils/location';
 import {presetOptions} from '~/data/environments/builtin';
-import {POSITION_MAX, POSITION_MIN} from '~/utils/defaults';
-import {LOCATION_LAKES_MAX, LOCATION_LAKES_MIN} from '~/utils/scenario/defaults';
+import {
+  LOCATION_LAKES_MAX,
+  LOCATION_LAKES_MIN,
+  LOCATION_MAP_MAX,
+  LOCATION_MAP_MIN,
+  LOCATION_POSITION_MAX,
+  LOCATION_POSITION_MIN,
+} from '~/utils/scenario/defaults';
+
+// hooks
+import useValues from '~/hooks/use-values';
+
+// parsers
+import {filterEmpty} from '~/utils/parser/templates';
+import {toLocationTemplate} from '~/utils/parser/templates-location';
 
 // redux
 import {useAppSelector} from '~redux/hooks';
 
 // types
 import type {Json} from '~/types/json.types';
-import type {LocationProps} from '~/utils/location';
+import type {scenario} from '~/data/scenario/parser/types';
 
 export interface Props {
-  enabled?: boolean,
-  values?: LocationProps,
+  disabled?: boolean;
+  initialValues?: scenario.Location;
 
-  onChange(location: LocationProps): void,
+  onChange?(values: LocationAttributes): void;
+
+  onValuesChange?(values: scenario.Location): void;
+
+  onTemplate?(template: string): void;
+}
+
+export interface LocationAttributes {
+  disabled?: boolean;
+  positionChecked?: boolean;
+  riverChecked?: boolean;
+  lakesChecked?: boolean;
 }
 
 /** Location functional component */
 const Location = (props: Props) => {
-  props = merge({
-    enabled: true,
-    values: location.randomizeLocation(),
-    onChange: () => {
-    },
-  }, props);
-
   const environmentName = useAppSelector(({environment}) => environment.name);
   const environmentVar = `{{environment}}`;
 
-  const [values, setValues] = React.useState<LocationProps>(props.values as LocationProps);
-  const [enabled, setEnabled] = React.useState<boolean>(props.enabled as boolean);
-  const [positionEnabled, setPositionEnabled] = React.useState<boolean>(false);
-  const [lakeEnabled, setLakeEnabled] = React.useState<boolean>(true);
-  const [riverEnabled, setRiverEnabled] = React.useState<boolean>(true);
+  const [position] = React.useState<scenario.LocationPosition>(location.randomPosition());
 
-  const isPositionEnabled = enabled && positionEnabled;
-  const isLakeEnabled = enabled && lakeEnabled;
-  const isRiverEnabled = enabled && riverEnabled;
-
-  // Reflect props changes
-  React.useEffect(() => {
-    setEnabled(props.enabled as boolean);
-  }, [props.enabled]);
+  const valuer = useValues<scenario.Location>({...(props?.initialValues ?? {})} as unknown as scenario.Location);
+  const meta = useValues<LocationAttributes>({
+    disabled: props?.disabled ?? false,
+    positionChecked: !valuer.is('position', undefined),
+    riverChecked: !valuer.is('river', undefined),
+    lakesChecked: !valuer.is('lakes', undefined),
+  });
 
   // Reflect state changes
   React.useEffect(() => {
-    typeof props.onChange === 'function' && props.onChange({
-      ...values,
-      positionEnabled: isPositionEnabled,
-      lakesEnabled: isLakeEnabled,
-      riverEnabled: isRiverEnabled,
-    });
+    'function' === typeof props.onChange && props.onChange(meta.data);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [values, isPositionEnabled, isLakeEnabled, isRiverEnabled]);
+  }, [meta.data]);
 
-  /** Update given value by name */
-  const updateValue = (name: string, value: any): void => {
-    setValues(current => ({
-      ...current,
-      [name]: value,
-    }));
-  };
+  // Reflect prop changes
+  React.useEffect(() => {
+    //meta.set('disabled', props?.disabled, true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props?.disabled]);
 
-  /** Update coordinate */
-  const updateCoordinate = (north: number | null = null, south: number | null = null): void => {
-    const [n, s] = values.coordinates;
-    updateValue('coordinates', [north ?? n, south ?? s]);
-  };
+  // Reflect values changes
+  React.useEffect(() => {
+    const changeValues = {...valuer.data};
 
-  /** Update position */
-  const updatePosition = (north: number | null = null, south: number | null = null): void => {
-    const [n, s] = values.position as number[];
-    updateValue('position', [north ?? n, south ?? s]);
-  };
+    !meta.data.positionChecked && (changeValues.position = undefined);
+    !meta.data.riverChecked && (changeValues.river = undefined);
+    !meta.data.lakesChecked && (changeValues.lakes = undefined);
+
+    const filteredValues = filterEmpty(changeValues);
+    'function' === typeof props?.onTemplate && props?.onTemplate(toLocationTemplate(filteredValues));
+    'function' === typeof props?.onValuesChange && props?.onValuesChange(filteredValues);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    meta.data.disabled, valuer.data,
+    meta.data.positionChecked,
+    meta.data.riverChecked,
+    meta.data.lakesChecked,
+  ]);
 
   const builtinPresets = presetOptions.filter(v => v.label === 'General')?.[0]?.options;
 
@@ -108,15 +121,20 @@ const Location = (props: Props) => {
   }];
 
   return (
-    <>
-      <Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled})}>
-        <Form.Label className="text-size-sm" column={true} sm="2">Name</Form.Label>
-        <Col sm="10">
+    <div className={cn('mb-2', {
+      'text-muted-deep': meta.data.disabled,
+    }, 'checkbox-align')}>
+      <Row className="mb-2">
+        <PropertyLabel
+          caption="Name"
+          tooltip="ID of the environment, will be used in strings file"
+        />
+        <Col sm="8">
           <InputGroup>
             <TextInput
               caseType="SNAKE_CASE"
-              disabled={!enabled}
-              value={values.slug}
+              disabled={meta.data.disabled}
+              value={valuer.get('id', 'eurasia')}
               maxLength={22}
               inputProps={{
                 className: 'd-inline-block position-relative',
@@ -124,73 +142,71 @@ const Location = (props: Props) => {
               }}
               placeholder="e.g., chakwal"
               allowShuffle
-              onShuffle={() => {
-                const {name, slug} = location.randomName();
-                updateValue('name', name);
-                updateValue('slug', slug);
-              }}
-              onChange={slug => {
-                updateValue('slug', slug);
-                updateValue('name', capitalCase(slug as string));
-              }}/>
+              onShuffle={() => valuer.set('id', location.randomName().slug)}
+              onChange={name => valuer.set('id', name)}/>
           </InputGroup>
         </Col>
-      </Form.Group>
-      <Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled})}>
-        <Form.Label className="text-size-sm" style={{textDecoration: 'underline dotted'}}
-                    title="Used to create a map" column={true} sm="2">Seed</Form.Label>
-        <Col sm="10">
+      </Row>
+      <Row className="mb-2">
+        <PropertyLabel
+          caption="Seed"
+          tooltip="Used to create a map/Environments"
+        />
+        <Col sm="8">
           <div className="float-left">
             <NumberInput
               maxLength={8}
-              min={1}
+              min={0}
               max={99999999}
-              disabled={!enabled}
+              disabled={meta.data.disabled}
               placeholder="e.g. 11111111"
-              value={values.seed}
-              inputProps={{style: {width: 150}, className: 'd-inline-block position-relative'}}
-              onChange={value => updateValue('seed', '' + value)}
+              value={valuer.data.seed}
+              inputProps={{
+                style: {width: 150},
+                className: 'd-inline-block position-relative',
+              }}
+              onChange={value => valuer.set('seed', value)}
               shuffle={true}
-              onShuffle={() => updateValue('seed', location.randomSeed())}
+              onShuffle={() => valuer.set('seed', location.randomSeed())}
             />
           </div>
           <div className="float-left mt-1">
             <LinkButton
-              className="text-size-sm"
-              title="Set all as 0"
-              disabled={!enabled}
-              onClick={() => updateValue('seed', '00000000')}>
+              className="text-size-sm position-relative"
+              title="Set all as 0" style={{top: -2}}
+              disabled={meta.data.disabled}
+              onClick={() => valuer.set('seed', 0)}>
               0x8
             </LinkButton>
             <LinkButton
-              className="mr-2 text-size-sm"
-              title="Set all as 1"
-              disabled={!enabled}
-              onClick={() => updateValue('seed', '11111111')}>
+              className="mr-2 text-size-sm position-relative"
+              title="Set all as 1" style={{top: -2}}
+              disabled={meta.data.disabled}
+              onClick={() => valuer.set('seed', 11111111)}>
               1x8
             </LinkButton>
             <LinkButton
-              className="mr-2 text-size-sm"
-              title="Set all as 9"
-              disabled={!enabled}
-              onClick={() => updateValue('seed', '99999999')}>
+              className="mr-2 text-size-sm position-relative"
+              title="Set all as 9" style={{top: -2}}
+              disabled={meta.data.disabled}
+              onClick={() => valuer.set('seed', 99999999)}>
               9x8
             </LinkButton>
           </div>
           <div className="clearfix"></div>
         </Col>
-      </Form.Group>
-      <Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled})}>
-        <Form.Label
-          className="text-size-sm" column={true} sm="2"
-          style={{textDecoration: 'underline dotted'}}
-          title="Reference to environment, custom environmnts must be placed in subfolder rootOtScenarioFile/Environments"
-        >Environment</Form.Label>
-        <Col sm="10">
+      </Row>
+      <Row>
+        <PropertyLabel
+          caption="Environment"
+          tooltip="Reference to environment, custom environmnts must
+          be placed in subfolder rootOtScenarioFile/Environments"
+        />
+        <Col sm="8">
           <TextInput
             caseType="SNAKE_CASE"
-            disabled={!enabled}
-            value={values.environment}
+            disabled={meta.data.disabled}
+            value={valuer.data.environment}
             maxLength={40}
             inputProps={{
               className: 'd-inline-block position-relative',
@@ -199,21 +215,22 @@ const Location = (props: Props) => {
             placeholder="e.g., custom_environment"
             allowShuffle
             onShuffle={() => {
-              updateValue('environment', location.randomEnvironment([environmentVar]));
+              valuer.set('environment', location.randomEnvironment([environmentVar]));
             }}
-            onChange={value => {
-              updateValue('environment', value);
-            }}/>
+            onChange={value => valuer.set('environment', value)}/>
           <ul className="list-unstyled list-inline mb-0 mt-1">
-
             {environments.map((v: Json) => (
-              <li className="list-inline-item text-size-xxs" key={`environment_key_${v.value}`}>
-                {enabled ? (
-                  <a href="/" title={v.description} data-value={v.value.replace('general/', '')} onClick={e => {
-                    e.preventDefault();
-                    // @ts-ignore
-                    updateValue('environment', e.target.getAttribute('data-value'));
-                  }}>{v.label}</a>
+              <li
+                className="list-inline-item text-size-xxs"
+                key={`environment_key_${v.value}`}>
+                {!meta.data.disabled ? (
+                  <a href="/" title={v.description}
+                     data-value={v.value.replace('general/', '')}
+                     onClick={e => {
+                       e.preventDefault();
+                       // @ts-ignore
+                       valuer.set('environment', e.target.getAttribute('data-value'));
+                     }}>{v.label}</a>
                 ) : (
                   <span className="text-muted cursor-default">{v.label}</span>
                 )}
@@ -221,192 +238,129 @@ const Location = (props: Props) => {
             ))}
           </ul>
         </Col>
-      </Form.Group>
-      <Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled})}>
-        <Form.Label
-          className="text-size-sm" column={true} sm="2"
-          style={{textDecoration: 'underline dotted'}}
-          title="Only affects the marker position on the minimap! this is not the starting position of the settlement see position for that">
-          Coordinates
-        </Form.Label>
-        <Col sm="10">
-          <div className="mb-2 text-size-xs">
-            North: <code className={cn('text-size-xs', {'text-muted': !enabled})}>{values.coordinates[0]}</code>
-            <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                    onClick={() => updateCoordinate(location.randomCoordinate())}>Random</Button>
-            <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                    onClick={() => updateCoordinate(0)}>Reset</Button>
-            <Slider disabled={!enabled} step={0.01}
-                    value={values.coordinates[0]}
-                    onChange={v => updateCoordinate(Number(v), null)}/>
-          </div>
-          <div className="mb-2 text-size-xs">
-            South: <code className={cn('text-size-xs', {'text-muted': !enabled})}>{values.coordinates[1]}</code>
-            <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                    onClick={() => updateCoordinate(null, location.randomCoordinate())}>Random</Button>
-            <Button disabled={!enabled} className="button-reset-sm" variant="link"
-                    onClick={() => updateCoordinate(null, 0)}>Reset</Button>
-            <Slider disabled={!enabled} step={0.01}
-                    value={values.coordinates[1]}
-                    onChange={v => updateCoordinate(null, Number(v))}/>
-          </div>
-          <div className="mt-2">
-            <LinkButton
-              className="p-0 m-0 mb-2"
-              disabled={!enabled}
-              onClick={() => updateValue('coordinates', location.randomCoordinates())}>
-              <IconShuffle/> Randomize
-            </LinkButton>
-          </div>
-        </Col>
-      </Form.Group>
-      <Form.Group as={Row} className={cn('mb-2', {'text-muted': !enabled || !positionEnabled}, 'checkbox-align')}>
-        <Form.Label className="text-size-sm" column={true} sm="2">
-          <Form.Check
-            type="switch"
-            disabled={!enabled}
-            id="position-enabled"
-            label=""
-            className="d-inline p-relative"
-            style={{top: 4}}
-            checked={positionEnabled}
-            onChange={e => setPositionEnabled(e.target.checked)}
-          /><span
-          style={{textDecoration: 'underline dotted'}}
-          title="Sets the starting position of the settlement, possible range is (0, <size>*512-1)">Position</span>
-        </Form.Label>
-        <Col sm="10" className={cn('mb-2 text-size-xs', {'text-muted': !isPositionEnabled})}>
-          <div className="mb-2 text-size-xs">
-            North: <code
-            className={cn('text-size-xs', {'text-muted': !isPositionEnabled})}>{values.position?.[0] as number}</code>
-            <Button disabled={!isPositionEnabled} className="button-reset-sm" variant="link"
-                    onClick={() => updatePosition(location.randomPosition()[0], null)}>Random</Button>
-            <Button disabled={!isPositionEnabled} className="button-reset-sm" variant="link"
-                    onClick={() => updatePosition(0)}>Reset</Button>
-            <Slider disabled={!isPositionEnabled} step={0} min={POSITION_MIN} max={POSITION_MAX}
-                    value={values.position?.[0] ?? 0}
-                    onChange={v => updatePosition(Number(v))}/>
-          </div>
-          <div>
-            South: <code
-            className={cn('text-size-xs', {'text-muted': !isPositionEnabled})}>{values.position?.[1] as number}</code>
-            <Button disabled={!isPositionEnabled} className="button-reset-sm" variant="link"
-                    onClick={() => updatePosition(null, location.randomPosition()[1])}>Random</Button>
-            <Button disabled={!isPositionEnabled} className="button-reset-sm" variant="link"
-                    onClick={() => updatePosition(null, 0)}>Reset</Button>
-            <Slider disabled={!isPositionEnabled} step={0}
-                    value={values.position?.[1] ?? 0} min={POSITION_MIN} max={POSITION_MAX}
-                    onChange={v => updatePosition(null, Number(v))}/>
-          </div>
-          <div className="mt-2">
-            <LinkButton
-              className="p-0 m-0"
-              disabled={!isPositionEnabled}
-              onClick={() => updateValue('position', location.randomPosition())}>
-              <IconShuffle/> Randomize
-            </LinkButton>
-          </div>
-        </Col>
-      </Form.Group>
-      <Form.Group as={Row} className={cn('mb-2', {'text-muted': !isRiverEnabled}, 'checkbox-align')}>
-        <Form.Label className="text-size-sm" column={true} sm="2">
-          <Form.Check
-            type="switch"
-            disabled={!enabled}
-            id={`river-switch-${nanoid(5)}`}
-            label=""
-            style={{top: 4}}
-            className="d-inline p-relative"
-            checked={riverEnabled}
-            onChange={e => setRiverEnabled(e.target.checked)}
-          /><span
-          style={{textDecoration: 'underline dotted'}}
-          title="Determines if rivers are created">River</span>
-        </Form.Label>
-
-        <Col sm="10">
-          <Form.Check
-            disabled={!enabled || !riverEnabled}
-            style={{top: 9}}
-            className="position-relative"
-            type="switch"
-            id={`river-switch-${nanoid(5)}`}
-            label="Display river on map?"
-            checked={values.river}
-            onChange={e => updateValue('river', e.target.checked)}
-          />
-        </Col>
-      </Form.Group>
-      <Form.Group as={Row} className={cn('mb-2', {'text-muted': !isLakeEnabled}, 'checkbox-align')}>
-        <Form.Label className="text-size-sm" column={true} sm="2">
-          <Form.Check
-            type="switch"
-            disabled={!enabled}
-            id={`lakes-switch-${nanoid(5)}`}
-            label=""
-            style={{top: 4}}
-            className="d-inline p-relative"
-            checked={lakeEnabled}
-            onChange={e => setLakeEnabled(e.target.checked)}
-          /><span
-          style={{textDecoration: 'underline dotted'}}
-          title="Number of lakes, no influence on size, lakes might intersect">Lakes</span>
-        </Form.Label>
-        <Col sm="10">
+      </Row>
+      <Row className="mb-2">
+        <PropertyLabel
+          caption="Location"
+          tooltip="Only affects the marker position on the minimap!
+          this is not the starting position of the settlement see position for that"
+        />
+        <AttributeRangeValue
+          colProps={{sm: 8}}
+          disabled={meta.data.disabled}
+          min={valuer.get('mapLocation.0', 0)}
+          max={valuer.get('mapLocation.1', 0)}
+          sliderProps={{min: LOCATION_MAP_MIN, max: LOCATION_MAP_MAX, step: 0.001}}
+          allowRestore={false}
+          allowShuffle
+          onShuffle={() => {
+            valuer.overwrite('mapLocation', location.randomCoordinates());
+          }}
+          onChange={(min, max) => valuer.overwrite('mapLocation', [min, max])}
+        />
+      </Row>
+      <Row className="mb-2">
+        <PropertyCheckboxLabel
+          caption="Position"
+          tooltip="Sets the starting position of the
+          settlement, possible range is (0, <size>*512-1)"
+          checked={meta.data.positionChecked}
+          disabled={meta.data.disabled}
+          onChange={isChecked => meta.set('positionChecked', isChecked)}
+          undefinedSetter={[valuer, 'position', position]}
+        />
+        <AttributeRangeValue
+          colProps={{sm: 8}}
+          disabled={meta.data.disabled || !meta.data.positionChecked}
+          min={valuer.get('position.0', position[0])}
+          max={valuer.get('position.1', position[1])}
+          sliderProps={{min: LOCATION_POSITION_MIN, max: LOCATION_POSITION_MAX, step: 0}}
+          allowShuffle
+          onShuffle={() => {
+            valuer.set('position', location.randomPosition());
+          }}
+          allowRestore={false}
+          onChange={(min, max) => valuer.overwrite('position', [min, max])}
+        />
+      </Row>
+      <Row className="mb-2">
+        <PropertyCheckboxLabel
+          checked={meta.data.riverChecked}
+          disabled={meta.data.disabled}
+          onChange={isChecked => meta.set('riverChecked', isChecked)}
+          caption="River"
+          tooltip="Determines if rivers are created"
+          undefinedSetter={[valuer, 'river', true]}
+        />
+        <AttributeCheckbox
+          disabled={meta.data.disabled || !meta.data.riverChecked}
+          caption="Display river on map?"
+          checked={valuer.data.river}
+          onChange={isChecked => valuer.set('river', isChecked)}/>
+      </Row>
+      <Row>
+        <PropertyCheckboxLabel
+          checked={meta.data.lakesChecked}
+          disabled={meta.data.disabled}
+          onChange={isChecked => meta.set('lakesChecked', isChecked)}
+          caption="Lakes"
+          tooltip="Number of lakes, no influence on size, lakes might intersect"
+          undefinedSetter={[valuer, 'lakes', 1]}
+        />
+        <Col sm="8">
           <NumberInput
-            disabled={!enabled || !lakeEnabled}
-            value={values.lakes}
-            min={LOCATION_LAKES_MIN} max={LOCATION_LAKES_MAX} maxLength={LOCATION_LAKES_MAX.toString().length}
+            disabled={meta.data.disabled || !meta.data.lakesChecked}
+            value={valuer.get('lakes', 1)}
+            min={LOCATION_LAKES_MIN} max={LOCATION_LAKES_MAX}
+            maxLength={LOCATION_LAKES_MAX.toString().length}
             inputProps={{
               className: 'd-inline-block position-relative',
               style: {maxWidth: 80},
             }}
             placeholder="1"
             shuffle
-            onShuffle={() => updateValue('lakes', location.randomLakes())}
+            onShuffle={() => valuer.set('lakes', location.randomLakes())}
             allowRestore
-            onRestore={() => updateValue('lakes', 1)}
-            onChange={value => updateValue('lakes', +value)}/>
+            onRestore={() => valuer.set('lakes', 1)}
+            onChange={value => valuer.set('lakes', value)}/>
         </Col>
-      </Form.Group>
-      <hr/>
-      <div className="mt-2">
+      </Row>
+      <hr className="mt-2 mb-2"/>
+      <div>
         <LinkButton
           className="ml-0"
           title="Randomize all values except for the disabled ones"
-          disabled={!enabled}
+          disabled={meta.data.disabled}
           onClick={() => {
-            const randLocation = location.randomizeLocation([environmentName]);
-            randLocation._id = values._id;
-            !isLakeEnabled && (randLocation.lakes = values.lakes);
-            !isRiverEnabled && (randLocation.river = values.river);
-            !isPositionEnabled && (randLocation.position = values.position);
-            setValues(randLocation);
+            const values = location.randomizeLocation([environmentVar]);
+            !meta.data.positionChecked && delete values.position;
+            !meta.data.riverChecked && delete values.river;
+            !meta.data.lakesChecked && delete values.lakes;
+
+            valuer.setAll({...values});
           }}>
           <IconShuffle/> Randomize values
         </LinkButton>
       </div>
-    </>
+    </div>
   );
 };
 
 // Properties validation
 Location.propTypes = {
-  values: PropTypes.shape({
-    _id: PropTypes.string,
-    name: PropTypes.string,
-    slug: PropTypes.string,
-    seed: PropTypes.string,
-    coordinates: PropTypes.arrayOf(PropTypes.number),
-    river: PropTypes.bool,
+  disabled: PropTypes.bool,
+  initialValues: PropTypes.shape({
+    id: PropTypes.string,
+    seed: PropTypes.number,
     environment: PropTypes.string,
-    lakes: PropTypes.number,
-    positionEnabled: PropTypes.bool,
+    mapLocation: PropTypes.arrayOf(PropTypes.number),
     position: PropTypes.arrayOf(PropTypes.number),
+    river: PropTypes.bool,
+    lakes: PropTypes.number,
   }),
-  enabled: PropTypes.bool,
+  onValuesChange: PropTypes.func,
+  onTemplate: PropTypes.func,
   onChange: PropTypes.func,
 };
 
 export default Location;
- 

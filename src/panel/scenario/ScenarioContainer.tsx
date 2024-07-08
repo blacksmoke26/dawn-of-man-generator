@@ -5,7 +5,6 @@
  */
 
 import React from 'react';
-import xmlFormatter from 'xml-formatter';
 
 // elemental components
 import Accordion from '~/components/ui/Accordion';
@@ -33,47 +32,13 @@ import EventContainer from './generators/events/EventContainer';
 // icons
 import {IconBlock, IconEvent, IconGoal, IconMapPin, IconMilestone, IconStorm} from '~/components/icons/app';
 
-// utils
-import {nodesToLanguageStrings} from '~/utils/location';
-
 // redux
 import {useAppDispatch, useAppSelector} from '~redux/hooks';
 import {updateTemplate, updateString} from '~redux/slices/scenario/reducers';
 
 // types
-import type {Json, KVDocument} from '~/types/json.types';
-
-/** Generate xml code */
-const toTemplateText = (templates: KVDocument<string>): string => {
-  const xml: string = `
-		<?xml version="1.0" encoding="utf-8"?>
-		<scenario>
-			${Object.values(templates).join('')}
-		</scenario>`;
-
-  return xmlFormatter(xml, {indentation: '  '});
-};
-
-/** Generate language string xml code */
-const toLanguageText = (strings: KVDocument<string | Json>): string => {
-  const data: Array<string> = [];
-
-  for (const nodes of Object.values(strings)) {
-    if ('string' === typeof nodes) {
-      data.push(nodes);
-      continue;
-    }
-
-    for (const [key, label] of Object.entries(nodes)) {
-      data.push(`<string name="${key}">${label}</string>`);
-    }
-  }
-
-  return xmlFormatter(`
-			<?xml version="1.0" encoding="utf-8"?>
-			<strings>${data.join('')}</strings>
-		`, {indentation: '  ', collapseContent: true});
-};
+import type {KVDocument} from '~/types/json.types';
+import {toStringsTemplate, toScenarioTemplate} from '~/utils/parser/templates-scenario';
 
 /** ScenarioContainer functional component */
 const ScenarioContainer = () => {
@@ -101,22 +66,15 @@ const ScenarioContainer = () => {
     goals: '',
     events: '',
   });
+
   const [langStrings, setLangStrings] = React.useState<KVDocument<string>>({
     locations: '',
     milestones: '',
     goals: '',
     events: '',
   });
-
-  /** Update templates raw texts */
-  const updateText = (name: string, value: string): void => {
-    setTemplateTexts(current => ({
-      ...current,
-      [name]: value,
-    }));
-  };
   React.useEffect(() => {
-    const text = toTemplateText(templateTexts);
+    const text = toScenarioTemplate(Object.values(templateTexts));
     if (text !== templateText) {
       dispatch(updateTemplate(text));
     }
@@ -124,18 +82,21 @@ const ScenarioContainer = () => {
   }, [templateTexts, templateText]);
 
   React.useEffect(() => {
-    const text = toLanguageText(langStrings);
+    const text = toStringsTemplate(langStrings);
     if (text !== stringsText) {
       dispatch(updateString(text));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [langStrings, stringsText]);
 
+  /** Update templates raw texts */
+  const updateText = (name: string, value: string): void => {
+    setTemplateTexts(current => ({...current, [name]: value}));
+  };
+
   /** Update language strings data */
   const updateLangString = (name: string, strings: string): void => {
-    setLangStrings(current => ({
-      ...current, [name]: strings,
-    }));
+    setLangStrings(current => ({...current, [name]: strings}));
   };
 
   return (
@@ -216,12 +177,14 @@ const ScenarioContainer = () => {
         />
       </Accordion>
       <Accordion
-        header={<span className="text-size-sm"><IconMapPin className="d-inline-block" width="17" height="17"/> Locations</span>}
+        header={<span className="text-size-sm">
+          <IconMapPin className="d-inline-block" width="17" height="17"/>
+          {' '} Locations
+        </span>}
         eventKey="locations" noBodyPad={true}>
-        <LocationContainer onChange={(template: string, list) => {
-          updateText('locations', template);
-          updateLangString('locations', template.trim() ? nodesToLanguageStrings(list) as any : '');
-        }}/>
+        <LocationContainer
+          onStrings={strings => updateLangString('locations', strings)}
+          onTemplate={template => updateText('locations', template)}/>
       </Accordion>
     </>
   );

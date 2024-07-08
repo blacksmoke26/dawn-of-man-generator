@@ -6,10 +6,11 @@
 
 import merge from 'deepmerge';
 import xmlFormatter, {XMLFormatterOptions} from 'xml-formatter';
-import {XMLValidator, XMLParser, validationOptions, X2jOptions, ValidationError} from 'fast-xml-parser';
+import {ValidationError, validationOptions, X2jOptions, XMLParser, XMLValidator} from 'fast-xml-parser';
 
 // types
 import type {Json} from '~/types/json.types';
+import {renderTemplate} from '~/utils/template';
 
 export type {ValidationError};
 
@@ -62,4 +63,13 @@ export const xmlToJson = (xml: string, options: Partial<X2jOptions> = {}): Json 
  */
 export const formatXml = (str: string, options: XMLFormatterOptions = {}): string => {
   return xmlFormatter(str, {indentation: '  ', ...options});
+};
+
+/** Generate root xml code */
+export const toRootTemplate = (name: string, templates: string[], formatOptions: Partial<XMLFormatterOptions> = {}): string => {
+  const xml: string = `
+		<?xml version="1.0" encoding="utf-8"?>
+		${renderTemplate(name, null, [], templates.join(''))}`;
+
+  return formatXml(xml, formatOptions);
 };
