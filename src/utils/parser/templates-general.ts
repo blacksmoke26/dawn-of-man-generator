@@ -12,7 +12,6 @@ import {formatPeriod} from '~/utils/scenario/format';
 
 // types
 import {scenario} from '~/data/scenario/parser/types';
-import {environment} from '~/data/environments/parser/types';
 
 export const toCategoryTemplate = (value: string, allowRender: boolean = true): string => {
   return allowRender && toString(value).trim()
@@ -74,18 +73,17 @@ export const toShowCompletionIconTemplate = (value: boolean = false, allowRender
     : '';
 };
 
-export const toStartingConditionTemplate = (values: {
-  seasonId: environment.SeasonName,
-  visualSetupId?: string
-}, allowRender: boolean = true): string => {
+export const toStartingConditionTemplate = (values: scenario.StartingConditions, allowRender: boolean = true): string => {
   if (!allowRender) {
     return '';
   }
 
-  const props: string[] = [];
+  const props: string[] = [
+    `season_id="${values.seasonId}"`
+  ];
 
   if (values?.visualSetupId?.trim()) {
-    props.push(`visual_setup_id="${values?.visualSetupId?.trim()}"`);
+    props.push(`visual_setup_id="${values?.visualSetupId}"`);
   }
 
   return renderTemplate('starting_conditions', null, props);
