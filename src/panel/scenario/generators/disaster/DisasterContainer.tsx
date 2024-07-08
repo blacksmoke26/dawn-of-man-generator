@@ -10,74 +10,41 @@
 import React from 'react';
 import * as PropTypes from 'prop-types';
 import cn from 'classname';
-import {nanoid} from 'nanoid';
 import merge from 'deepmerge';
-import {Button, Form, Tab, Tabs} from 'react-bootstrap';
+import {Form, Tab, Tabs} from 'react-bootstrap';
+
+// elemental components
+import TabTitle from '~/components/ui/TabTitle';
+import Select, {Option} from '~/components/ui/Select';
 
 // components
-import Slider from '~/components/ui/Slider';
-import Select, {Option} from '~/components/ui/Select';
-import SeasonAttributeSlider from '~/panel/environment/generators/seasons/elements/SeasonAttributeSlider';
+import Disaster from './Disaster';
+
+// icons
+import {IconCheck} from '~/components/icons/app';
 
 // utils
 import * as random from '~/utils/random';
-import * as Defaults from '~/utils/defaults';
-import {isObject} from '~/helpers/object';
 import {toDisastersTemplate} from '~/utils/parser/templates-general';
 
-// icons
-import {COLOR_DISABLED, COLOR_REDDISH, IconClear, IconShuffle} from '~/components/icons/app';
-
 // redux
-import {useAppSelector} from '~redux/hooks';
+import {useAppDispatch, useAppSelector} from '~redux/hooks';
+import {clearProperty} from '~redux/slices/scenario/reducers';
 
 // types
-import type {Json, KVDocument} from '~/types/json.types';
-import type {Disasters} from '~/types/scenario.types';
-import type {DisasterNode} from '~/utils/parser/templates-general';
-
-export interface Attributes {
-  enabled?: boolean;
-  period?: string;
-  variance?: string;
-}
-
-export type Registry = KVDocument<Attributes>;
-
-/** Get randomized initial values */
-const getInitialValues = (): Attributes => {
-  return {
-    enabled: true,
-    period: random.randomPeriod(),
-    variance: random.randomPeriod(),
-  };
-};
-
-/** Transform extended value into a selection object */
-const extValueToSelection = (data: Json = {}): Registry => {
-  const selection: Registry = {};
-
-  for (const [name, attr] of Object.entries(data)) {
-    selection[name] = {
-      enabled: true,
-      period: attr?.period,
-      variance: attr?.variance,
-    } as Attributes;
-  }
-
-  return selection;
-};
+import type {scenario} from '~/data/scenario/parser/types';
 
 /** DisasterContainer `props` type */
 export interface Props {
-  enabled?: boolean;
-  attributes?: Registry;
-
-  onChange?(template: string, values?: Registry): void;
+  onChange?(template: string): void;
 }
+
+type DisasterState = Record<string, scenario.Disaster>;
 
 /** DisasterContainer functional component */
 const DisasterContainer = (props: Props) => {
+  const dispatch = useAppDispatch();
+
   props = merge({
     enabled: true,
     attributes: {},
@@ -85,244 +52,92 @@ const DisasterContainer = (props: Props) => {
     },
   }, props);
 
-  const [enabled, setEnabled] = React.useState<boolean>(props.enabled as boolean);
-  const [selection, setSelection] = React.useState<Registry>(props.attributes as Registry);
+  const [checked, setChecked] = React.useState<boolean>(false);
+  const [records, setRecords] = React.useState<DisasterState>({});
   const [activeKey, setActiveKey] = React.useState<string>('');
 
-  const disastersAttribute = useAppSelector(({scenario}) => scenario?.values?.disasters);
+  const reduxState = useAppSelector(({scenario}) => scenario?.values?.disasters);
 
-  // Reflect attributes changes
+  // Reflect redux-specific changes
   React.useEffect(() => {
-    const extValue = disastersAttribute ?? null;
-    if (isObject(extValue)) {
-      setEnabled(true);
-      setSelection(extValueToSelection(extValue as Json));
-    } else {
-      setEnabled(false);
+    if (reduxState === null) {
+      setChecked(true);
+      setRecords({});
+      setActiveKey('');
+      dispatch(clearProperty('disasters'));
+    } else if (Array.isArray(reduxState)) {
+      setChecked(true);
+      setRecords(reduxState.reduce((accum, current) => {
+        accum[current.disasterType] = current;
+        return accum;
+      }, {} as DisasterState));
+      setActiveKey(reduxState[0].disasterType);
+      dispatch(clearProperty('disasters'));
     }
-  }, [disastersAttribute]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reduxState]);
 
-  // Reflect state changes
   React.useEffect(() => {
-    typeof props.onChange === 'function' && props.onChange(toTemplateText(), selection);
+    props?.onChange?.(toDisastersTemplate(Object.values(records), checked));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selection, enabled]);
+  }, [checked, records]);
+  const removeTab = React.useCallback((tabId: string): void => {
+    const ids = Object.keys(records);
 
-  /** Generate xml code */
-  const toTemplateText = React.useCallback((): string => {
-    if (!enabled) {
-      return '';
+    const newRecords = {...records};
+
+    let tabIdIndex: number = ids.findIndex(id => id === tabId) || 0;
+
+    let curValue: string = activeKey;
+
+    if (curValue === tabId) {
+      curValue = tabIdIndex === 0
+        ? ids[tabIdIndex + 1]
+        : ids[tabIdIndex - 1];
     }
 
-    const disasters: DisasterNode[] = [];
+    delete newRecords[tabId];
 
-    for (const [name, attr] of Object.entries(selection)) {
-      disasters.push({
-        name: name as unknown as Disasters,
-        period: attr?.period || '',
-        variance: attr?.variance || '',
-        allowRender: attr.enabled,
-      });
-    }
-
-    return toDisastersTemplate(disasters);
-  }, [enabled, selection]);
-
-  /** Get react-select options */
-  const renderSelectOptions = React.useCallback((): Json[] => {
-    const excludes: string[] = Object.keys(selection);
-
-    return random.disasters
-      .filter(v => !excludes.includes(v))
-      .map(v => ({label: v, value: v}));
-  }, [selection]);
-
-  /** Update given selection data */
-  const modifySelection = (name: string, attr: Attributes): void => {
-    setSelection(current => ({
-      ...current,
-      [name]: {...(current[name] ?? {}), ...attr},
-    }));
-  };
-
-  /** Remove existing selection */
-  const removeFromSelection = (name: string): void => {
-    setSelection(current => {
-      name in current && (delete current[name]);
-      return {...current};
-    });
-  };
-
-  const removeTab = (tabId: string): void => {
-    let nextActiveKey: string = activeKey;
-    const tabsId: string[] = Object.keys(selection);
-    const currentIndex: number = tabsId.findIndex(name => name === nextActiveKey);
-
-    if (nextActiveKey === tabId) {
-      nextActiveKey = currentIndex !== 0
-        ? tabsId[currentIndex + 1]
-        : tabsId[currentIndex - 1];
-      setActiveKey(nextActiveKey);
-    }
-
-    removeFromSelection(tabId);
-  };
-
-  /** Generate selection based nodes */
-  const selectionNodes = React.useCallback((): React.ReactElement[] => {
-    const nodes: React.ReactElement[] = [];
-
-    for (const [name, attr] of Object.entries(selection)) {
-      const isEnabled = attr.enabled && enabled;
-
-      nodes.push(
-        <Tab
-          disabled={!isEnabled}
-          eventKey={name}
-          key={name}
-          title={
-            <>
-              <span
-                className={cn('text-size-sm font mr-1', {
-                  'text-muted text-line-through': !isEnabled,
-                  'pr-2': !attr.enabled,
-                })}>
-                {name}
-              </span>
-              <a aria-disabled={!isEnabled} href="#tab-close" hidden={!isEnabled}
-                 className="text-muted text-size-sm text-decoration-none p-0"
-                 style={{
-                   lineHeight: '10px',
-                   position: 'relative',
-                   top: 0,
-                 }}
-                 onClick={e => {
-                   e.preventDefault();
-                   e.stopPropagation();
-                   removeTab(name);
-                 }}
-              >&times;</a>
-            </>
-          }
-          as="div">
-          <div className="mb-3">
-            <div className="float-right text-right position-relative" style={{height: 15}}>
-              <Button
-                variant="link"
-                disabled={!isEnabled}
-                title="Randomize all values"
-                style={{fontSize: '1.6rem', top: -9}}
-                className={cn('p-0 text-decoration-none position-relative', {'text-white': isEnabled})} size="sm"
-                onClick={() => {
-                  attr.enabled && modifySelection(name, {
-                    period: random.randomPeriod(), variance: random.randomPeriod(),
-                  });
-                }}>
-                <IconShuffle width="14" height="14"/>
-              </Button>
-              <Form.Check
-                disabled={!enabled}
-                className="d-inline-block position-relative"
-                style={{top: -4, marginRight: 2}}
-                type="switch"
-                id={`enable-disaster-${name}`}
-                label=""
-                checked={attr.enabled}
-                onChange={e => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  modifySelection(name, {enabled: e.target.checked});
-                }}
-              />
-              {' '}
-              <Button
-                variant="link" disabled={!enabled}
-                onClick={() => removeTab(name)}
-                style={{fontSize: '1.2rem', top: -8, color: !enabled ? COLOR_DISABLED : COLOR_REDDISH}}
-                className="p-0 text-decoration-none position-relative" size="sm">
-                <IconClear width="18" height="18"/>
-              </Button>
-            </div>
-            <div className="clearfix"></div>
-          </div>
-
-          <SeasonAttributeSlider
-            disabled={!enabled}
-            value={parseFloat(attr?.period ?? '0')}
-            onChange={(value: any) => modifySelection(name, {period: value})}
-            allowNumberInput
-            caption="Period"
-            title="How long this disater lasts (year)"
-            allowShuffle
-            numberInputProps={{
-              formatValue: value => `${value}y`,
-              decimals: 1,
-              min: Defaults.PERIOD_MIN,
-              max: Defaults.PERIOD_MAX,
-              inputProps: {labelAfter: 'y'},
-            }}
-            onShuffle={() => modifySelection(name, {period: random.randomPeriod()})}>
-            <Slider
-              disabled={!isEnabled}
-              step={0.1} min={Defaults.PERIOD_MIN} max={Defaults.PERIOD_MAX}
-              value={parseFloat(attr?.period ?? '0')}
-              onChange={(value: any) => modifySelection(name, {period: value})}/>
-          </SeasonAttributeSlider>
-
-          <SeasonAttributeSlider
-            disabled={!enabled}
-            value={parseFloat(attr?.variance ?? '0')}
-            onChange={(value: any) => modifySelection(name, {variance: value})}
-            allowNumberInput
-            caption="Variance"
-            title="How long this variance lasts (year)"
-            allowShuffle
-            numberInputProps={{
-              formatValue: value => `${value}y`,
-              decimals: 1,
-              min: Defaults.PERIOD_MIN,
-              max: Defaults.PERIOD_MAX,
-              inputProps: {labelAfter: 'y'},
-            }}
-            onShuffle={() => modifySelection(name, {variance: random.randomPeriod()})}>
-            <Slider
-              disabled={!isEnabled}
-              step={0.1} min={Defaults.PERIOD_MIN} max={Defaults.PERIOD_MAX}
-              value={parseFloat(attr?.variance ?? '0')}
-              onChange={(value: any) => modifySelection(name, {variance: value})}/>
-          </SeasonAttributeSlider>
-        </Tab>,
-      );
-    }
-
-    return nodes;
+    setRecords(newRecords);
+    setActiveKey(curValue);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [enabled, selection]);
+  }, [records, activeKey]);
+
 
   /** Total tabs count */
-  const total: number = Object.keys(selection).length;
+  const total: number = Object.keys(records).length;
+  const excludedNames: string[] = Object.keys(records);
 
   return (
     <div className="mt-0 checkbox-align">
       <Form.Check
         className="pull-right"
         type="switch"
-        id={`allow_disasters-switch-${nanoid(5)}`}
+        id={`allow_disasters-switch`}
         label="Allow disasters throughout the gameplay"
-        checked={enabled}
-        onChange={e => setEnabled(e.target.checked)}
+        checked={checked}
+        onChange={e => setChecked(e.target.checked)}
       />
       <div className="mt-2">
         <Select
           isSearchable={false}
-          isDisabled={!enabled}
+          isDisabled={!checked}
           value={null}
           menuPortalTarget={document.body}
-          options={renderSelectOptions()}
+          noOptionsMessage={() => <><IconCheck/> All disasters are added</>}
+          options={random.disasters
+            .filter(v => !excludedNames.includes(v))
+            .map(v => ({label: v, value: v}))}
           placeholder="Choose disaster..."
           onChange={(option: Option | any, {action}): void => {
             if (action === 'select-option' && option) {
-              modifySelection(option.value, getInitialValues());
+              setRecords(current => ({
+                ...current, [option.value]: {
+                  disasterType: option.value,
+                  period: +random.randomPeriod(),
+                  variance: +random.randomPeriod(),
+                },
+              }));
               setActiveKey(option.value);
             }
           }}
@@ -334,7 +149,22 @@ const DisasterContainer = (props: Props) => {
           activeKey={activeKey}
           className={cn('nav-tabs-bottom mt-1 mb-1', {'border-0': !total})}
           onSelect={k => setActiveKey(k as string)}>
-          {selectionNodes()}
+          {Object.entries(records).map(([id, disaster]) => (
+            <Tab
+              disabled={!checked} eventKey={id} key={id}
+              title={<TabTitle disabled={!checked} title={id} onRemove={() => removeTab(id)}/>}>
+              <Disaster
+                disabled={!checked}
+                initialValues={disaster}
+                onValuesChange={values => {
+                  setRecords(current => {
+                    const newList = {...current};
+                    newList[id] = {...values};
+                    return newList;
+                  });
+                }}/>
+            </Tab>
+          ))}
         </Tabs>
       )}
     </div>
@@ -343,8 +173,6 @@ const DisasterContainer = (props: Props) => {
 
 // Properties validation
 DisasterContainer.propTypes = {
-  enabled: PropTypes.bool,
-  attributes: PropTypes.object,
   onChange: PropTypes.func,
 };
 

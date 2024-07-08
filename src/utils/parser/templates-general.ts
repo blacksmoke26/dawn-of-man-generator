@@ -7,124 +7,122 @@
 
 // utils
 import {toString} from '~/helpers/string';
-import {Season} from '~/utils/seasons.types';
-import {Disasters} from '~/types/scenario.types';
+import {renderTemplate} from '~/utils/template';
 import {formatPeriod} from '~/utils/scenario/format';
+
+// types
+import {scenario} from '~/data/scenario/parser/types';
+import {environment} from '~/data/environments/parser/types';
 
 export const toCategoryTemplate = (value: string, allowRender: boolean = true): string => {
   return allowRender && toString(value).trim()
-    ? `<category value="${value}"/>`
+    ? renderTemplate('category', null, [`value="${value}"`])
     : '';
 };
 
 export const toCustomSettlementNameAllowedTemplate = (value: boolean = false, allowRender: boolean = true): string => {
   return allowRender
-    ? `<custom_settlement_name_allowed value="${String(value)}"/>`
+    ? renderTemplate('custom_settlement_name_allowed', null, [`value="${''+value}"`])
     : '';
 };
 
 export const toGroupIDTemplate = (value: string, allowRender: boolean = true): string => {
   return allowRender && toString(value).trim()
-    ? `<group_id value="${value}"/>`
+    ? renderTemplate('group_id', null, [`value="${value}"`])
     : '';
 };
 
 export const toHardcoreModeAllowedTemplate = (value: boolean = false, allowRender: boolean = true): string => {
   return allowRender
-    ? `<hardcore_mode_allowed value="${String(value)}"/>`
+    ? renderTemplate('hardcore_mode_allowed', null, [`value="${''+value}"`])
     : '';
 };
 
 export const toLoadingScreenTemplate = (value: string, allowRender: boolean = true): string => {
   return allowRender && toString(value).trim()
-    ? `<loading_screens values="${value}"/>`
+    ? renderTemplate('loading_screens', null, [`values="${value}"`])
     : '';
 };
 
 export const toSizeTemplate = (value: number, allowRender: boolean = true): string => {
-  return allowRender && value > 0
-    ? `<size value="${value}"/>`
+  return allowRender && value
+    ? renderTemplate('size', null, [`value="${value}"`])
     : '';
 };
 
 export const toNomadModeAllowedTemplate = (value: boolean = false, allowRender: boolean = true): string => {
   return allowRender
-    ? `<nomad_mode_allowed value="${String(value)}"/>`
+    ? renderTemplate('nomad_mode_allowed', null, [`value="${'' + value}"`])
     : '';
 };
 
 export const toRequiredMilestoneTemplate = (value: number = 0, allowRender: boolean = true): string => {
-  return allowRender && value > 0
-    ? `<required_milestones value="${value}"/>`
+  return allowRender && value
+    ? renderTemplate('required_milestones', null, [`value="${value}"`])
     : '';
 };
 
 export const toRequiredScenarioTemplate = (value: string, allowRender: boolean = true): string => {
   return allowRender && toString(value).trim()
-    ? `<required_scenario values="${value}"/>`
+    ? renderTemplate('required_scenario', null, [`values="${value}"`])
     : '';
 };
 
 export const toShowCompletionIconTemplate = (value: boolean = false, allowRender: boolean = true): string => {
   return allowRender
-    ? `<show_completion_icon value="${String(value)}"/>`
+    ? renderTemplate('show_completion_icon', null, [`value="${'' + value}"`])
     : '';
 };
 
 export const toStartingConditionTemplate = (values: {
-  seasonId: Season,
+  seasonId: environment.SeasonName,
   visualSetupId?: string
 }, allowRender: boolean = true): string => {
   if (!allowRender) {
     return '';
   }
 
-  const visualSetupId = values?.visualSetupId?.trim()
-    ? ` visual_setup_id="${values?.visualSetupId?.trim()}"` : '';
+  const props: string[] = [];
 
-  return `<starting_conditions season_id="${values.seasonId}"${visualSetupId}/>`;
+  if (values?.visualSetupId?.trim()) {
+    props.push(`visual_setup_id="${values?.visualSetupId?.trim()}"`);
+  }
+
+  return renderTemplate('starting_conditions', null, props);
 };
 
 export const toVisualTemplate = (value: boolean = false, allowRender: boolean = true): string => {
   return allowRender
-    ? `<visible value="${String(value)}"/>`
+    ? renderTemplate('visible', null, [`value="${'' + value}"`])
     : '';
 };
 
-export const toDisasterTemplate = (name: Disasters, values: {
-  period: number | string;
-  variance: number | string;
-}, allowRender: boolean = true): string => {
-  return !allowRender || !String(name || '').trim()
+export const toDisasterTemplate = (values: scenario.Disaster, allowRender: boolean = true): string => {
+  return !allowRender
     ? ''
-    : `<disaster ${[
-      `disaster_type="${name}"`,
+    : renderTemplate('disaster', null, [
+      `disaster_type="${values.disasterType}"`,
       `period="${formatPeriod(values.period)}"`,
       `variance="${formatPeriod(values.variance)}"`,
-    ].join(' ')}/>`;
+    ]);
 };
 
-export interface DisasterNode {
-  name: Disasters;
-  period: number | string;
-  variance: number | string;
-  allowRender?: boolean;
-}
-
-export const toDisastersTemplate = (disasters: DisasterNode[], allowRender: boolean = true): string => {
-  if (!allowRender || disasters.length === 0) {
+export const toDisastersTemplate = (disasters: (string | scenario.Disaster)[], allowRender: boolean = true): string => {
+  if (!allowRender || !disasters) {
     return '';
   }
 
   const templates: string[] = [];
 
   disasters.forEach(disaster => {
-    const {name, variance, period, allowRender: shouldRender = true} = disaster;
-    const template = toDisasterTemplate(name, {period, variance}, shouldRender).trim();
-    template && templates.push(template);
+    templates.push(
+      'string' === typeof disaster
+        ? disaster
+        : toDisasterTemplate(disaster),
+    );
   });
 
   return templates.length
-    ? `<disasters>${templates.join('')}</disasters>`
+    ? renderTemplate('disasters', null, [], templates.join(''))
     : '';
 };

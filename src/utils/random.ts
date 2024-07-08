@@ -26,6 +26,7 @@ import {
 import {DisasterType} from '~/types/scenario.types';
 import {EraFactor} from '~/types/action.types';
 import {environment} from '~/data/environments/parser/types';
+import {scenario} from '~/data/scenario/parser/types';
 
 /** Deposits types */
 export const deposits: string[] = [
@@ -293,8 +294,12 @@ export const randomPeriod = (): string => {
 };
 
 /** Random disaster */
-export const randomDisaster = (): DisasterType => {
-  return uniqueRandomArray(Defaults.DEFAULT_DISASTER)() as DisasterType;
+export const randomDisaster = (disasterType: scenario.DisasterName): scenario.Disaster => {
+  return {
+    disasterType,
+    period: +randomPeriod(),
+    variance: +randomPeriod(),
+  }
 };
 
 /** Random performers (condition) */
