@@ -4,18 +4,33 @@
  * @since 2024-07-08
  * @version 2.5.0
  */
-import {scenario} from '~/data/scenario/parser/types';
-import * as random from '~/utils/random';
-import {IconShuffle} from '~/components/icons/app';
+
 import React from 'react';
-import SeasonAttributeSlider from '~/panel/environment/generators/seasons/elements/SeasonAttributeSlider';
-import * as Defaults from '~/utils/defaults';
+
+// elemental components
 import Slider from '~/components/ui/Slider';
-import useValues from '~/hooks/use-values';
 import LinkButton from '~/components/ui/LinkButton';
+
+// components
+import SeasonAttributeSlider from '~/panel/environment/generators/seasons/elements/SeasonAttributeSlider';
+
+// icons
+import {IconShuffle} from '~/components/icons/app';
+
+// hooks
+import useValues from '~/hooks/use-values';
+
+// utils
+import * as random from '~/utils/random';
+import * as Defaults from '~/utils/defaults';
+
+// parsers
 import {toDisasterTemplate} from '~/utils/parser/templates-general';
 
-interface Props {
+// types
+import {scenario} from '~/data/scenario/parser/types';
+
+export interface Props {
   disabled?: boolean;
   initialValues?: scenario.Disaster;
 
