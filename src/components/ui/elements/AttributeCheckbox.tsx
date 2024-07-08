@@ -7,6 +7,7 @@
 
 import React from 'react';
 import merge from 'deepmerge';
+import cn from 'classname';
 import {Col, ColProps, Form} from 'react-bootstrap';
 
 // components
@@ -56,7 +57,7 @@ const AttributeCheckbox = (props: Props) => {
         <span
           title={newProps.hint}
           style={{top: -4, textDecoration: newProps.hint.trim() ? 'underline dotted' : ''}}
-          className="d-inline-block position-relative">
+          className={cn('d-inline-block position-relative', {'text-muted-deep': props?.disabled})}>
           {newProps.caption}
         </span>
       </Form.Label>
