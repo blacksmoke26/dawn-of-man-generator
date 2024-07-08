@@ -117,12 +117,14 @@ export namespace scenario {
     conditions: (condition.GeneralCondition | condition.LogicalCondition)[];
   }
 
+  export type LocationPosition = [number, number];
+
   export interface Location {
     id: Lowercase<string>;
     seed: number;
     environment: Lowercase<string>;
-    mapLocation: [number, number];
-    position?: [number, number];
+    mapLocation: LocationPosition;
+    position?: LocationPosition;
     river?: boolean;
     lakes?: number;
   }

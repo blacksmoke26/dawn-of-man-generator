@@ -5,31 +5,22 @@
  */
 
 import slugify from 'slugify';
-import {nanoid} from 'nanoid';
 import randomInt from 'random-int';
 import {faker} from '@faker-js/faker';
 import randomFloat from 'random-float';
 import uniqueRandomArray from 'unique-random-array';
 
 // utils
-import {POSITION_MIN, POSITION_MAX} from '~/utils/defaults';
-import {LOCATION_LAKES_MAX, LOCATION_LAKES_MIN} from '~/utils/scenario/defaults';
-
-// Location properties
-export interface LocationProps {
-  _id: string;
-  name: string;
-  slug: string;
-  seed: string;
-  environment: string;
-  coordinates: [number, number];
-  positionEnabled?: boolean;
-  position?: [number, number];
-  riverEnabled?: boolean;
-  river?: boolean;
-  lakesEnabled?: boolean;
-  lakes?: number;
-}
+import {
+  LOCATION_LAKES_MAX,
+  LOCATION_LAKES_MIN,
+  LOCATION_POSITION_MAX,
+  LOCATION_POSITION_MIN,
+} from '~/utils/scenario/defaults';
+import {scenario} from '~/data/scenario/parser/types';
+import {capitalCase, snakeCase} from 'change-case';
+import {LangStrings} from '~/utils/strings';
+import {onlyKeys} from '~/helpers/object';
 
 /** Builtin environments */
 export const environments: string[] = [
@@ -60,15 +51,14 @@ export const randomCoordinates = (): [number, number] => [
  * Random Name */
 export const randomName = (): { name: string, slug: string } => {
   const name: string = faker.location.city();
-  const slug: string = slugify(name.toLowerCase(), {replacement: '_'});
-  return {name, slug};
+  return {name, slug: snakeCase(name)};
 };
 
 /**
  * @public
  * @static
  * Random Seed */
-export const randomSeed = (): string => String(randomInt(0, 99999999)).padStart(8, '0');
+export const randomSeed = (): number => randomInt(0, 99999999);
 
 /**
  * @public
@@ -92,69 +82,39 @@ export const randomLakes = (): number => randomInt(LOCATION_LAKES_MIN, LOCATION_
 export const randomRiver = (): boolean => uniqueRandomArray([true, false])();
 
 export const randomPosition = (): [number, number] => [
-  randomInt(POSITION_MIN, POSITION_MAX),
-  randomInt(POSITION_MIN, POSITION_MAX),
+  randomInt(LOCATION_POSITION_MIN, LOCATION_POSITION_MAX),
+  randomInt(LOCATION_POSITION_MIN, LOCATION_POSITION_MAX),
 ];
 
 /**
  * @public
  * @static
  * @param [customEnvironments] - List of custom environments
+ * @param [filterKeys] - List of keys to exclude
  * Randomize location values */
-export const randomizeLocation = (customEnvironments: string[] = []): LocationProps => {
-  const coordinates = randomCoordinates();
-  const name = randomName();
-
-  return {
-    _id: nanoid(7),
-    ...name,
+export const randomizeLocation = (customEnvironments: string[] = [], filterKeys: (keyof scenario.Location)[] = []): scenario.Location => {
+  const data = {
+    id: snakeCase(randomName().slug) as scenario.Location['id'],
     seed: randomSeed(),
-    coordinates,
-    river: randomRiver(),
-    environment: randomEnvironment(customEnvironments),
-    lakes: randomLakes(),
+    environment: randomEnvironment(customEnvironments).toLowerCase() as scenario.Location['environment'],
+    mapLocation: randomCoordinates(),
     position: randomPosition(),
+    river: randomRiver(),
+    lakes: randomLakes(),
   };
+
+  return !filterKeys.length
+    ? data
+    : onlyKeys(data, filterKeys, true);
 };
 
-/**
- * @public
- * @static
- * Convert a location object into template */
-export const nodeToTemplate = (location: LocationProps): string => {
-  if (!location?.slug?.trim()
-    || !location?.seed?.trim()
-    || !location?.environment?.trim()
-    || !location?.coordinates?.length
-  ) return '';
+/** Convert location nodes into language strings */
+export const locationToStrings = (locations: scenario.Location[], disabled: boolean = false): LangStrings => {
+  if (disabled || !locations.length) return {};
 
-  const attributes: string[] = [
-    `id="${location?.slug}"`,
-    `seed="${String(location?.seed).padStart(8, '0')}"`,
-    `environment="${location?.environment}"`,
-    `map_location="${location?.coordinates[0]},${location?.coordinates[1]}"`,
-  ];
-
-  location?.riverEnabled && attributes.push(`river="${'' + location?.river}"`);
-  (location?.lakesEnabled && !!location?.lakes) && attributes.push(`lakes="${location?.lakes}"`);
-  location?.positionEnabled && attributes.push(`position="${location?.position?.[0] as number},${location?.position?.[1] as number}"`);
-
-  return (
-    `<location ${attributes.join(' ')}/>`
-  );
-};
-
-/**
- * @public
- * @static
- * Convert location nodes into language strings */
-export const nodesToLanguageStrings = (nodes: LocationProps[]): Record<string, string> => {
-  const list: Record<string, string> = {};
-
-  for (const {name, slug} of nodes) {
-    list[slug] = name;
-  }
-
-  return list;
+  return locations.reduce((accum, {id}) => {
+    accum[id] = capitalCase(id);
+    return accum;
+  }, {} as LangStrings);
 };
 
