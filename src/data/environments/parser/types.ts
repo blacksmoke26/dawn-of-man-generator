@@ -5,10 +5,9 @@
  * @version 2.3.0
  */
 
-// types
-import {DepositType, DetailType, PropType, TreeType} from '~/utils/objects';
-
 export namespace environment {
+  export type NoiseAmplitudes = [number, number?, number?, number?, number?, number?, number?, number?];
+
   export interface Environment {
     noiseAmplitudes?: null | NoiseAmplitudes;
     resourceFactor?: null | number;
@@ -16,18 +15,16 @@ export namespace environment {
     fordDistanceFactor?: null | number;
     sunAngleFactor?: null | number;
     backdropScale?: null | [number, number, number];
-    deposits?: null | DepositType[];
-    depositOverridePrototypes?: null | OverridePrototypes<DepositType>;
-    detailOverridePrototypes?: null | OverridePrototypes<DetailType>;
-    propOverridePrototypes?: null | OverridePrototypes<PropType>;
+    deposits?: null | prototypes.DepositType[];
+    depositOverridePrototypes?: null | prototypes.OverridePrototypes<prototypes.DepositType>;
+    detailOverridePrototypes?: null | prototypes.OverridePrototypes<prototypes.DetailType>;
+    propOverridePrototypes?: null | prototypes.OverridePrototypes<prototypes.PropType>;
     globalTreeDensity?: null | number;
     treesEverywhere?: null | boolean;
-    trees?: null | TreeType[];
-    treeOverridePrototypes?: null | OverridePrototypes<TreeType>;
+    trees?: null | prototypes.TreeType[];
+    treeOverridePrototypes?: null | prototypes.OverridePrototypes<prototypes.TreeType>;
     seasons?: null | Seasons;
   }
-
-  export type NoiseAmplitudes = [number, number?, number?, number?, number?, number?, number?, number?];
 
   export type SeasonName = keyof Seasons;
 
@@ -72,13 +69,37 @@ export namespace environment {
     temperature: [number, number];
   }
 
-  export type OverridePrototypes<T extends string> = {
-    [key in T]?: {
+  export namespace prototypes {
+    export type ObjectType = 'tree' | 'detail' | 'prop' | 'deposit';
+
+    export type DepositType =
+      'Flint' | 'Tin' | 'Copper' | 'Iron';
+
+    /** Props types */
+    export type PropType =
+      'BigRocks' | 'MediumRocks' | 'Megalith' |
+      'Flint' | 'SmallRocks' | 'RiverRocks';
+
+    /** Details types */
+    export type DetailType =
+      'DetailGrass' | 'DetailReeds' | 'DetailFlowers' |
+      'GroundPlant' | 'DetailStick';
+
+    export type TreeType =
+      'Pear' | 'Cherry' | 'Service' | 'Chestnut' | 'Oak' |
+      'Fir' | 'Pine' | 'Spruce' | 'Beech' | 'Birch' |
+      'Barley' | 'Rye' | 'Einkorn' | 'Emmer' | 'Flax' |
+      'BitterVetch' | 'Chickpeas' | 'Lentils' | 'Peas' |
+      'Blackberry' | 'Blueberry' | 'Raspberry' | 'Strawberry';
+
+    export interface OverridePrototype {
       density?: number;
       altitude?: [number, number];
       humidity?: [number, number];
       angle?: [number, number];
-    };
+    }
+
+    export type OverridePrototypes<Type extends string = string> = Record<Type, OverridePrototype>;
   }
 }
 

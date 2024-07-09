@@ -30,7 +30,7 @@ const DetailPanel = (props: Props) => {
   }, [detailOverride]);
 
   return (
-    <DetailOverride onChange={template => setDetailOverride(template)}/>
+    <DetailOverride onTemplate={template => setDetailOverride(template)}/>
   );
 };
 

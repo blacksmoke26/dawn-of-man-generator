@@ -5,67 +5,12 @@
  * @version 2.1.1
  */
 
-import {DeepPartial} from 'utility-types';
-import {DeepOmit} from '~/types/utility.types';
-
-export interface DensityObject {
-  disabled: boolean;
-  value: number;
-}
-
-export interface AltitudeObject {
-  disabled: boolean;
-  min: number;
-  max: number;
-}
-
-export interface AngleObject {
-  disabled: boolean;
-  min: number;
-  max: number;
-}
-
-export interface HumidityObject {
-  disabled: boolean;
-  min: number;
-  max: number;
-}
-
-export interface ObjectAttributes {
-  density?: Partial<DensityObject>;
-  altitude?: Partial<AltitudeObject>;
-  angle?: Partial<AngleObject>;
-  humidity?: Partial<HumidityObject>;
-}
-
 export interface ObjectTemplateAttributes {
   density?: number;
   altitude?: [number, number];
   angle?: [number, number];
   humidity?: [number, number];
 }
-
-export type ObjectAttributesCasual = DeepPartial<DeepOmit<ObjectAttributes, 'disabled'>>;
-
-export type ObjectType = typeof objects[number];
-
-export type DetailType = typeof details[number];
-export type DepositType = typeof deposits[number];
-export type PropType = typeof props[number];
-export type TreeType = typeof trees[number];
-
-type KeysOfType<T extends ObjectType> = (
-  T extends 'deposit'
-    ? DepositType
-    : T extends 'tree'
-      ? TreeType
-      : T extends 'prop'
-        ? PropType
-        : T extends 'detail'
-          ? DetailType
-          : never);
-
-export type ObjectPrototype<T extends ObjectType> = DeepPartial<Record<KeysOfType<T>, ObjectAttributes>>;
 
 export const objects = [
   'tree', 'detail', 'prop', 'deposit',
