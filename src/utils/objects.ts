@@ -5,13 +5,6 @@
  * @version 2.1.1
  */
 
-export interface ObjectTemplateAttributes {
-  density?: number;
-  altitude?: [number, number];
-  angle?: [number, number];
-  humidity?: [number, number];
-}
-
 export const objects = [
   'tree', 'detail', 'prop', 'deposit',
 ] as const;

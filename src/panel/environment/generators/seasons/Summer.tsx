@@ -34,9 +34,10 @@ import useValues from '~/hooks/use-values';
 
 // utils
 import * as random from '~/utils/random';
-import {isObject} from '~/helpers/object';
 import * as Defaults from '~/utils/defaults';
 import {invokeHandler} from '~/utils/callback';
+import {cloneObject, isObject} from '~/helpers/object';
+import {SummerFullConfig} from '~/utils/randomizer/seasons';
 import {temperatureNumberInputProps} from './utils/params';
 
 // parsers
@@ -52,21 +53,21 @@ import type {environment} from '~/data/environments/parser/types';
 export interface SummerProps {
   disabled?: boolean,
 
-  onValuesChange?(values: environment.SummerSeason): void,
+  onValuesChange?(values: environment.season.Summer): void,
 
   onTemplate?(template: string): void,
 }
 
-const DEFAULT_VALUES = Defaults.SEASONS_DEFAULT.Summer;
+const DEFAULT_VALUES = cloneObject(SummerFullConfig);
 
 /** Summer functional component */
 const Summer = (props: SummerProps) => {
-  const valuer = useValues<environment.SummerSeason>(DEFAULT_VALUES);
+  const valuer = useValues<environment.season.Summer>(DEFAULT_VALUES);
 
   const [disabled, setDisabled] = React.useState<boolean>(props?.disabled ?? false);
   const [windEnabled, setWindEnabled] = React.useState<boolean>(false);
 
-  const reduxState = useAppSelector(({environment}) => environment?.values?.seasons) as environment.Seasons;
+  const reduxState = useAppSelector(({environment}) => environment?.values?.seasons) as environment.season.Seasons;
 
   // Reflect attributes changes
   React.useEffect(() => {
@@ -78,7 +79,7 @@ const Summer = (props: SummerProps) => {
       setDisabled(false);
       setWindEnabled(false);
       Array.isArray(reduxState?.Summer?.wind) && setWindEnabled(true);
-      valuer.setAll({...reduxState?.Summer});
+      valuer.setAll(cloneObject(reduxState?.Summer));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reduxState]);
@@ -213,8 +214,8 @@ const Summer = (props: SummerProps) => {
               formatValue={value => <>{value}°</>}
               value={valuer.data.temperature[0]}
               onSave={value => {
-                const maxValue = valuer.data.temperature[1] as number;
-                valuer.set('temperature.0', value > maxValue ? maxValue : value);
+                const maxValue = Number(valuer.data.temperature[1]);
+                valuer.overwrite('temperature.0', value > maxValue ? maxValue : value);
               }}/>
             <strong style={{marginRight: 5, marginLeft: 3, color: COLOR_WHITISH}}>,</strong>
             <PopoverNumberInput
@@ -225,7 +226,7 @@ const Summer = (props: SummerProps) => {
               value={valuer.data.temperature[1]}
               onSave={value => {
                 const minValue = valuer.data.temperature[0] as number;
-                valuer.set('temperature.1', value < minValue ? minValue : value);
+                valuer.overwrite('temperature.1', value < minValue ? minValue : value);
               }}/>
           </>
         )}

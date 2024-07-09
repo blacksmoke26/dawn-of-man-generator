@@ -8,7 +8,6 @@ import op from 'object-path';
 
 // helpers
 import {isObject} from '~/helpers/object';
-import {FallConfig, toFallSeasonParsed} from '~/utils/seasons';
 
 // utils
 import {
@@ -18,6 +17,7 @@ import {
   normalizeSeasonVeryWindyChance,
   normalizeSeasonWindyChance,
 } from '~/utils/parser/environment/normalizer-season';
+import {SeasonsDefault, FallConfig} from '~/utils/randomizer/seasons';
 
 // types
 import type {Json} from '~/types/json.types';
@@ -27,7 +27,7 @@ export const jsonToRedux = (seasons: Json[]): Json => {
   const node = seasons.find(s => s.id === FallConfig.id) as Json;
 
   if (!isObject(node)) {
-    return {[FallConfig.id]: toFallSeasonParsed()};
+    return {[FallConfig.id]: SeasonsDefault.Fall};
   }
 
   const duration = normalizeSeasonDuration(
@@ -37,17 +37,17 @@ export const jsonToRedux = (seasons: Json[]): Json => {
 
   const precipitationChance = normalizeSeasonPrecipitationChance(
     op.get(node, 'precipitation_chance'),
-    FallConfig.precipitation_chance,
+    FallConfig.precipitationChance,
   );
 
   const windyChance = normalizeSeasonWindyChance(
     op.get(node, 'windy_chance'),
-    FallConfig.windy_chance,
+    FallConfig.windyChance,
   );
 
   const veryWindyChance = normalizeSeasonVeryWindyChance(
     op.get(node, 'very_windy_chance'),
-    FallConfig.very_windy_chance,
+    FallConfig.veryWindyChance,
   );
 
   return {
@@ -58,9 +58,9 @@ export const jsonToRedux = (seasons: Json[]): Json => {
       veryWindyChance,
       temperature: normalizeSeasonTemperatureMinMax({
         min: op.get(node, 'min_temperature.value'),
-        minDefault: FallConfig.min_temperature.value,
+        minDefault: FallConfig.temperature[0],
         max: op.get(node, 'max_temperature.value'),
-        maxDefault: FallConfig.max_temperature.value,
+        maxDefault: FallConfig.temperature[1],
       }),
     },
   };

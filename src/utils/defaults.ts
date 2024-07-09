@@ -6,7 +6,6 @@
 
 // types
 import {EraFactor} from '~/types/action.types';
-import {environment} from '~/data/environments/parser/types';
 
 export const HUMIDITY_MIN: number = 0;
 export const HUMIDITY_MAX: number = 1;
@@ -61,39 +60,6 @@ export const SEASON_VERY_WINDY_CHANCE_MAX = 1;
 
 export const SEASON_FISH_BOOST_MIN = 0;
 export const SEASON_FISH_BOOST_MAX = 1;
-
-export const SEASONS_DEFAULT: environment.Seasons = {
-  Spring: {
-    duration: 0.25,
-    precipitationChance: 0.25,
-    windyChance: 0.5,
-    veryWindyChance: 0.1,
-    fishBoost: 0.5,
-    temperature: [5, 25],
-  },
-  Fall: {
-    duration: 0.25,
-    precipitationChance: 0.25,
-    windyChance: 0.5,
-    veryWindyChance: 0.1,
-    temperature: [5, 25],
-  },
-  Summer: {
-    duration: 0.25,
-    precipitationChance: 0,
-    windyChance: 0.25,
-    wind: [0, 5],
-    temperature: [20, 35],
-  },
-  Winter: {
-    duration: 0.25,
-    precipitationChance: 0.25,
-    windyChance: 0.5,
-    veryWindyChance: 0.1,
-    reducedFauna: true,
-    temperature: [-15, 10],
-  },
-};
 
 export const FORD_DISTANCE_FACTOR_MIN: number = 0;
 export const FORD_DISTANCE_FACTOR_MAX: number = 20;

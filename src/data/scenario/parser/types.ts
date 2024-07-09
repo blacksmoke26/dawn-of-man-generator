@@ -58,7 +58,7 @@ export namespace scenario {
   export type Event = AnyEvent;
   export type Events = Event[];
 
-  export type SeasonName = environment.SeasonName;
+  export type SeasonName = environment.season.Name;
 
   export interface StartingConditions {
     seasonId: SeasonName;

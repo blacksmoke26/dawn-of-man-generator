@@ -34,10 +34,11 @@ import useValues from '~/hooks/use-values';
 
 // utils
 import * as random from '~/utils/random';
-import {randomSeasonSpring} from '~/utils/random';
-import {isObject} from '~/helpers/object';
 import * as Defaults from '~/utils/defaults';
 import {invokeHandler} from '~/utils/callback';
+import {randomSeasonSpring} from '~/utils/random';
+import {cloneObject, isObject} from '~/helpers/object';
+import {SeasonsDefault} from '~/utils/randomizer/seasons';
 import {temperatureNumberInputProps} from './utils/params';
 
 // parsers
@@ -53,19 +54,19 @@ import type {environment} from '~/data/environments/parser/types';
 export interface Props {
   disabled?: boolean,
 
-  onValuesChange?(values: environment.SpringSeason): void,
+  onValuesChange?(values: environment.season.Spring): void,
 
   onTemplate?(template: string): void,
 }
 
-const DEFAULT_VALUES = Defaults.SEASONS_DEFAULT.Spring;
+const DEFAULT_VALUES = cloneObject(SeasonsDefault.Spring);
 
 /** Spring functional component */
 const Spring = (props: Props) => {
   const [disabled, setDisabled] = React.useState<boolean>(props?.disabled ?? false);
-  const valuer = useValues<environment.SpringSeason>(DEFAULT_VALUES);
+  const valuer = useValues<environment.season.Spring>(DEFAULT_VALUES);
 
-  const reduxState = useAppSelector(({environment}) => environment?.values?.seasons) as environment.Seasons;
+  const reduxState = useAppSelector(({environment}) => environment?.values?.seasons) as environment.season.Seasons;
 
   // Reflect attributes changes
   React.useEffect(() => {
@@ -74,7 +75,7 @@ const Spring = (props: Props) => {
       valuer.setAll(DEFAULT_VALUES);
     } else if (isObject(reduxState?.Spring)) {
       setDisabled(false)
-      valuer.setAll({...reduxState?.Spring});
+      valuer.setAll(cloneObject(reduxState?.Spring));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reduxState]);

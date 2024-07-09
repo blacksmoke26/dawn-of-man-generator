@@ -32,7 +32,7 @@ import {
 // utils
 import {isObject} from '~/helpers/object';
 import {randomSeasons} from '~/utils/random';
-import {SEASONS_DEFAULT} from '~/utils/defaults';
+import {SeasonsDefault} from '~/utils/randomizer/seasons';
 
 // parsers
 import {toSeasonsTemplate} from '~/utils/parser/environment/templates';
@@ -118,7 +118,7 @@ const SeasonsPanel = (props: Props) => {
               style={{color: enabled ? COLOR_WHITISH : COLOR_DISABLED}}
               disabled={!enabled} variant="link" size="sm"
               onClick={() => {
-                dispatch(updateByPath({path: 'seasons', value: SEASONS_DEFAULT, overwrite: true}));
+                dispatch(updateByPath({path: 'seasons', value: SeasonsDefault, overwrite: true}));
               }}>
               <IconRestore color={enabled ? COLOR_ORANGE : COLOR_DISABLED}/> Restore All
             </Button>

@@ -23,50 +23,66 @@ export namespace environment {
     treesEverywhere?: null | boolean;
     trees?: null | prototypes.TreeType[];
     treeOverridePrototypes?: null | prototypes.OverridePrototypes<prototypes.TreeType>;
-    seasons?: null | Seasons;
+    seasons?: null | season.Seasons;
   }
 
-  export type SeasonName = keyof Seasons;
+  export namespace season {
+    export type Name = keyof Seasons;
 
-  export interface Seasons {
-    Spring: SpringSeason;
-    Fall: FallSeason;
-    Summer: SummerSeason;
-    Winter: WinterSeason;
-  }
+    export interface Seasons {
+      Spring: Spring;
+      Fall: Fall;
+      Summer: Summer;
+      Winter: Winter;
+    }
 
-  export interface SpringSeason {
-    duration: number;
-    precipitationChance: number;
-    windyChance: number;
-    veryWindyChance: number;
-    fishBoost: number;
-    temperature: [number, number];
-  }
+    export interface SpringConfig {
+      id: 'Spring';
+      setupId: 'Spring';
+      duration: number;
+      precipitationChance: number;
+      windyChance: number;
+      veryWindyChance: number;
+      fishBoost: number;
+      temperature: [number, number];
+    }
 
-  export interface FallSeason {
-    duration: number;
-    precipitationChance: number;
-    windyChance: number;
-    veryWindyChance: number;
-    temperature: [number, number];
-  }
+    export interface SummerConfig {
+      id: 'Summer';
+      setupId: 'Summer';
+      duration: number;
+      precipitationChance: number;
+      windyChance: number;
+      wind?: [number, number];
+      temperature: [number, number];
+    }
 
-  export interface SummerSeason {
-    duration: number;
-    precipitationChance: number;
-    windyChance: number;
-    wind?: [number, number];
-    temperature: [number, number];
-  }
+    export interface FallConfig {
+      id: 'Fall';
+      setupId: 'Fall';
+      duration: number;
+      precipitationChance: number;
+      windyChance: number;
+      veryWindyChance: number;
+      temperature: [number, number];
+    }
 
-  export interface WinterSeason {
-    duration: number;
-    precipitationChance: number;
-    windyChance: number;
-    veryWindyChance: number;
-    reducedFauna: boolean;
-    temperature: [number, number];
+    export interface WinterConfig {
+      id: 'Winter';
+      setupId: 'Winter';
+      snowSetupId: 'WinterSnow';
+      duration: number;
+      precipitationChance: number;
+      windyChance: number;
+      veryWindyChance: number;
+      reducedFauna: boolean;
+      temperature: [number, number];
+    }
+
+    export type Spring = Omit<SpringConfig, 'id' | 'setupId'>;
+    export type Summer = Omit<SummerConfig, 'id' | 'setupId'>;
+    export type Fall = Omit<FallConfig, 'id' | 'setupId'>;
+    export type Winter = Omit<WinterConfig, 'id' | 'setupId' | 'snowSetupId'>;
   }
 
   export namespace prototypes {

@@ -137,7 +137,7 @@ export const toOverridePrototypesTemplate = (
 };
 
 /** Generate `spring` season xml code */
-export const toSeasonSpringTemplate = (attributes: environment.SpringSeason, disabled: boolean = false): string => {
+export const toSeasonSpringTemplate = (attributes: environment.season.Spring, disabled: boolean = false): string => {
   return !disabled ? (
     `<season id="Spring" setup_id="Spring"
 				duration="${attributes.duration}"
@@ -151,7 +151,7 @@ export const toSeasonSpringTemplate = (attributes: environment.SpringSeason, dis
 };
 
 /** Generate `summer` season xml code */
-export const toSeasonSummerTemplate = (attributes: environment.SummerSeason, disabled: boolean = false): string => {
+export const toSeasonSummerTemplate = (attributes: environment.season.Summer, disabled: boolean = false): string => {
   if (disabled) {
     return '';
   }
@@ -173,7 +173,7 @@ export const toSeasonSummerTemplate = (attributes: environment.SummerSeason, dis
 };
 
 /** Generate `fall` season xml code */
-export const toSeasonFallTemplate = (attributes: environment.FallSeason, disabled: boolean = false): string => {
+export const toSeasonFallTemplate = (attributes: environment.season.Fall, disabled: boolean = false): string => {
   return !disabled ? (
     `<season id="Fall" setup_id="Fall"
 				duration="${attributes.duration}"
@@ -187,7 +187,7 @@ export const toSeasonFallTemplate = (attributes: environment.FallSeason, disable
 };
 
 /** Generate `winter` season xml code */
-export const toSeasonWinterTemplate = (attributes: environment.WinterSeason, disabled: boolean = false): string => {
+export const toSeasonWinterTemplate = (attributes: environment.season.Winter, disabled: boolean = false): string => {
   return !disabled ? (
     `<season id="Winter" setup_id="Winter"
 				snow_setup_id="WinterSnow"

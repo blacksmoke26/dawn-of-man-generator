@@ -32,10 +32,11 @@ import useValues from '~/hooks/use-values';
 
 // utils
 import * as random from '~/utils/random';
-import {randomSeasonFall} from '~/utils/random';
-import {isObject} from '~/helpers/object';
 import * as Defaults from '~/utils/defaults';
 import {invokeHandler} from '~/utils/callback';
+import {randomSeasonFall} from '~/utils/random';
+import {cloneObject, isObject} from '~/helpers/object';
+import {SeasonsDefault} from '~/utils/randomizer/seasons';
 import {temperatureNumberInputProps} from './utils/params';
 
 // parsers
@@ -51,19 +52,19 @@ import type {environment} from '~/data/environments/parser/types';
 interface Props {
   disabled?: boolean,
 
-  onValuesChange?(values: environment.FallSeason): void,
+  onValuesChange?(values: environment.season.Fall): void,
 
   onTemplate?(template: string): void,
 }
 
-const DEFAULT_VALUES = Defaults.SEASONS_DEFAULT.Fall;
+const DEFAULT_VALUES = cloneObject(SeasonsDefault.Fall);
 
 /** Fall functional component */
 const Fall = (props: Props) => {
   const [disabled, setDisabled] = React.useState<boolean>(props?.disabled ?? false);
-  const valuer = useValues<environment.FallSeason>(DEFAULT_VALUES);
+  const valuer = useValues<environment.season.Fall>({...SeasonsDefault.Fall});
 
-  const reduxState = useAppSelector(({environment}) => environment?.values?.seasons) as environment.Seasons;
+  const reduxState = useAppSelector(({environment}) => environment?.values?.seasons) as environment.season.Seasons;
 
   // Reflect attributes changes
   React.useEffect(() => {
@@ -72,7 +73,7 @@ const Fall = (props: Props) => {
       valuer.setAll(DEFAULT_VALUES);
     } else if (isObject(reduxState?.Fall)) {
       setDisabled(false)
-      valuer.setAll({...reduxState?.Fall});
+      valuer.setAll(cloneObject(reduxState?.Fall));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reduxState]);
