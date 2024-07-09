@@ -93,7 +93,7 @@ const SetFeatureEnabled = (props: Props) => {
   const isDisabled = state.get<boolean>('disabledCheckbox', false) || state.get<boolean>('disabled', false);
 
   return (
-    <div className={cn('mb-2', {'text-muted': isDisabled}, 'checkbox-align')}>
+    <div className={cn('mb-3', {'text-muted': isDisabled}, 'checkbox-align')}>
       {newProps?.showHeader && (
         <ActionHeader
           caption={ACTION_NAME}
@@ -106,7 +106,7 @@ const SetFeatureEnabled = (props: Props) => {
       )}
       {state.data.expanded && (
         <>
-          <Row className="mb-3 mt-2">
+          <Row className="mb-2 mt-2">
             <PropertyLabel caption="Feature"/>
             <AttributeSelect
               className="w-75"
@@ -126,7 +126,7 @@ const SetFeatureEnabled = (props: Props) => {
             noCard={true}
             header="Optional parameters"
             eventKey="spawn_optional_parameters">
-            <Row className="mb-1 mt-3">
+            <Row className="mt-2">
               <PropertyCheckboxLabel
                 caption="Value"
                 checked={state.get<boolean>('valueChecked', false)}

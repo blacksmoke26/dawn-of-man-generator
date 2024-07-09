@@ -96,7 +96,7 @@ const Unlock = (props: Props) => {
   const isDisabled = state.get<boolean>('disabledCheckbox', false) || state.get<boolean>('disabled', false);
 
   return (
-    <div className={cn('mb-2', {'text-muted': isDisabled}, 'checkbox-align')}>
+    <div className={cn('pb-2', {'text-muted': isDisabled}, 'checkbox-align')}>
       {newProps?.showHeader && (
         <ActionHeader
           caption={ACTION_NAME}
@@ -114,7 +114,7 @@ const Unlock = (props: Props) => {
             noCard={true}
             header="Optional parameters"
             eventKey="hide_ui_optional_parameters">
-            <Row className="mb-1 mt-2">
+            <Row className="mt-2">
               <PropertyCheckboxLabel
                 caption="Tech era"
                 checked={state.get<boolean>('techEraChecked', false)}
@@ -137,7 +137,7 @@ const Unlock = (props: Props) => {
                 }}
               />
             </Row>
-            <Row className="mb-1 mt-2">
+            <Row className=" mt-2">
               <PropertyCheckboxLabel
                 caption="Tech type"
                 checked={state.get<boolean>('techTypeChecked', false)}
@@ -160,18 +160,18 @@ const Unlock = (props: Props) => {
                 }}
               />
             </Row>
+
+            <RandomizeValuesButton
+              disabled={isDisabled}
+              onClick={() => {
+                state.get<boolean>('techEraChecked', false)
+                && valuer.set('techEra', uniqueRandomArray(ERAS));
+
+                state.get<boolean>('techTypeChecked', false)
+                && valuer.set('techType', uniqueRandomArray(techEntities));
+              }}
+            />
           </Accordion>
-
-          <RandomizeValuesButton
-            disabled={isDisabled}
-            onClick={() => {
-              state.get<boolean>('techEraChecked', false)
-              && valuer.set('techEra', uniqueRandomArray(ERAS));
-
-              state.get<boolean>('techTypeChecked', false)
-              && valuer.set('techType', uniqueRandomArray(techEntities));
-            }}
-          />
         </>
       )}
     </div>

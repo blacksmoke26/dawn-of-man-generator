@@ -38,6 +38,7 @@ import {toActionTemplate} from '~/utils/parser/templates-action';
 import type {
   ActionAttributesProps, ActionClearTrees, ActionName, ActionProps
 } from '~/types/action.types';
+import {LOCATION_POSITION_MAX, LOCATION_POSITION_MIN} from '~/utils/scenario/defaults';
 
 export interface Props extends ActionProps<ActionClearTrees> {
 }
@@ -105,7 +106,7 @@ const ClearTrees = (props: Props) => {
       )}
       {state.data.expanded && (
         <>
-          <Row className="mb-3 mt-3">
+          <Row className="mb-2 mt-2">
             <PropertyLabel caption="Radius"/>
             <Col sm="4">
               <NumberInput
@@ -130,7 +131,7 @@ const ClearTrees = (props: Props) => {
             noCard={true}
             header="Optional parameters"
             eventKey="clear_trees_optional_parameters">
-            <Row className="mt-3">
+            <Row className="mt-2">
               <PropertyCheckboxLabel
                 caption="Position"
                 checked={state.get<boolean>('positionChecked', false)}
@@ -146,8 +147,8 @@ const ClearTrees = (props: Props) => {
                 min={valuer.get('position.0', 0)}
                 max={valuer.get('position.1', 0)}
                 sliderProps={{
-                  min: POSITION_MIN,
-                  max: POSITION_MAX,
+                  min: LOCATION_POSITION_MIN,
+                  max: LOCATION_POSITION_MAX,
                 }}
                 allowRestore
                 onRestore={() => valuer.overwrite('position', [0, 0])}

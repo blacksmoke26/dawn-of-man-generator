@@ -118,7 +118,7 @@ const SetMigrationParameters = (props: Props) => {
   const minMaxDisabled: boolean = newProps.disabled || !state.get<boolean>('minMaxChecked', false);
 
   return (
-    <div className={cn('mb-2', {'text-muted': isDisabled}, 'checkbox-align')}>
+    <div className={cn('mb-3', {'text-muted': isDisabled}, 'checkbox-align')}>
       {newProps?.showHeader && (
         <ActionHeader
           caption={ACTION_NAME}
@@ -136,7 +136,7 @@ const SetMigrationParameters = (props: Props) => {
             noCard={true}
             header="Optional parameters"
             eventKey="optional_parameters">
-            <Row className="mb-1 mt-3">
+            <Row className="mt-2">
               <PropertyCheckboxLabel
                 caption="Migrators"
                 checked={state.get<boolean>('minMaxChecked', false)}
@@ -151,7 +151,7 @@ const SetMigrationParameters = (props: Props) => {
                 disabled={minMaxDisabled}
                 min={valuer.get('min', 1)}
                 max={valuer.get('max', 1)}
-                sliderProps={{min: MIGRATION_MIN, max: MIGRATION_MAX}}
+                sliderProps={{min: MIGRATION_MIN, max: MIGRATION_MAX, step:0}}
                 allowRestore
                 onRestore={(excludeMin, excludeMax) => {
                   !excludeMin && valuer.set('min', 1);
@@ -170,7 +170,7 @@ const SetMigrationParameters = (props: Props) => {
                 allowExcludeCheck
               />
             </Row>
-            <Row className="mb-1 mt-3">
+            <Row className="mt-2">
               <PropertyCheckboxLabel
                 caption="Period"
                 checked={state.get<boolean>('periodChecked', false)}
@@ -198,7 +198,7 @@ const SetMigrationParameters = (props: Props) => {
                 />
               </Col>
             </Row>
-            <Row className="mb-1 mt-3">
+            <Row className="mt-2">
               <PropertyCheckboxLabel
                 caption={<>Decrease start <i className="text-size-xxs text-muted">(population)</i></>}
                 checked={state.get<boolean>('decreaseStartPopulationChecked', false)}
@@ -224,7 +224,7 @@ const SetMigrationParameters = (props: Props) => {
                 />
               </Col>
             </Row>
-            <Row className="mb-1 mt-3">
+            <Row className="mt-2">
               <PropertyCheckboxLabel
                 caption={<>Decrease halfing <i className="text-size-xxs text-muted">(population)</i></>}
                 checked={state.get<boolean>('decreaseHalfingPopulationChecked', false)}
@@ -239,6 +239,7 @@ const SetMigrationParameters = (props: Props) => {
                   maxLength={3}
                   min={DECREASE_HALFING_POPULATION_MIN}
                   max={DECREASE_HALFING_POPULATION_MAX}
+                  decimals={0}
                   disabled={isDisabled || !state.get<boolean>('decreaseHalfingPopulationChecked', false)}
                   placeholder="e.g. 30"
                   value={valuer.get('decreaseHalfingPopulation', 50)}
@@ -250,30 +251,30 @@ const SetMigrationParameters = (props: Props) => {
                 />
               </Col>
             </Row>
+
+            <RandomizeValuesButton
+              disabled={isDisabled}
+              onClick={() => {
+                if (state.is('minMaxChecked', true)) {
+                  const [min, max] = randomMigrationMinMax();
+                  valuer.set('min', min);
+                  valuer.set('max', max);
+                }
+
+                if (state.is('periodChecked', true)) {
+                  valuer.set('period', randomPeriod());
+                }
+
+                if (state.is('decreaseHalfingPopulationChecked', true)) {
+                  valuer.set('decreaseStartPopulation', randomDecreaseStartPopulation());
+                }
+
+                if (state.is('decreaseHalfingPopulationChecked', true)) {
+                  valuer.set('decreaseHalfingPopulation', randomDecreaseHalfingPopulation());
+                }
+              }}
+            />
           </Accordion>
-
-          <RandomizeValuesButton
-            disabled={isDisabled}
-            onClick={() => {
-              if (state.is('minMaxChecked', true)) {
-                const [min, max] = randomMigrationMinMax();
-                valuer.set('min', min);
-                valuer.set('max', max);
-              }
-
-              if (state.is('periodChecked', true)) {
-                valuer.set('period', randomPeriod());
-              }
-
-              if (state.is('decreaseHalfingPopulationChecked', true)) {
-                valuer.set('decreaseStartPopulation', randomDecreaseStartPopulation());
-              }
-
-              if (state.is('decreaseHalfingPopulationChecked', true)) {
-                valuer.set('decreaseHalfingPopulation', randomDecreaseHalfingPopulation());
-              }
-            }}
-          />
         </>
       )}
     </div>

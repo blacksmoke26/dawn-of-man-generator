@@ -119,7 +119,7 @@ const SetLocationMarker = (props: Props) => {
   const isDisabled = state.get<boolean>('disabledCheckbox', false) || state.get<boolean>('disabled', false);
 
   return (
-    <div className={cn('mb-2', {'text-muted': isDisabled}, 'checkbox-align')}>
+    <div className={cn('mb-3', {'text-muted': isDisabled}, 'checkbox-align')}>
       {newProps?.showHeader && (
         <ActionHeader
           caption={ACTION_NAME}
@@ -132,7 +132,7 @@ const SetLocationMarker = (props: Props) => {
       )}
       {state.data.expanded && (
         <>
-          <Row className="mb-3 mt-2">
+          <Row className="mb-2 mt-2">
             <PropertyLabel caption="Work area ID"/>
             <Col sm="4">
               <TextInput
@@ -146,7 +146,7 @@ const SetLocationMarker = (props: Props) => {
                 onChange={value => valuer.set('workAreaId', value)}/>
             </Col>
           </Row>
-          <Row className="mb-3 mt-2">
+          <Row className="mb-2 mt-2">
             <PropertyLabel caption="Entity type"/>
             <AttributeSelect
               disabled={isDisabled}
@@ -165,7 +165,7 @@ const SetLocationMarker = (props: Props) => {
             noCard={true}
             header="Optional parameters"
             eventKey="optional_parameters">
-            <Row className="mb-3 mt-2">
+            <Row className="mb-2 mt-2">
               <PropertyCheckboxLabel
                 caption="Marker type"
                 checked={state.get<boolean>('markerTypeChecked', false)}
@@ -186,7 +186,7 @@ const SetLocationMarker = (props: Props) => {
                 }}
               />
             </Row>
-            <Row className="mb-3 mt-2">
+            <Row className="mb-2 mt-2">
               <PropertyCheckboxLabel
                 caption="Required goal"
                 checked={state.get<boolean>('requiredGoalChecked', false)}
@@ -208,7 +208,7 @@ const SetLocationMarker = (props: Props) => {
                   onChange={value => valuer.set('requiredGoal', value)}/>
               </Col>
             </Row>
-            <Row className="mb-3 mt-2">
+            <Row className="mb-2 mt-2">
               <PropertyCheckboxLabel
                 caption="Excluded goal"
                 checked={state.get<boolean>('excludedGoalChecked', false)}
@@ -230,7 +230,7 @@ const SetLocationMarker = (props: Props) => {
                   onChange={value => valuer.set('excludedGoal', value)}/>
               </Col>
             </Row>
-            <Row className="mb-3 mt-2">
+            <Row className="mb-2 mt-2">
               <PropertyCheckboxLabel
                 caption="Position"
                 checked={state.get<boolean>('positionChecked', false)}
@@ -261,7 +261,7 @@ const SetLocationMarker = (props: Props) => {
                 />
               </Col>
             </Row>
-            <Row className="mb-3 mt-2">
+            <Row className="mb-2 mt-2">
               <PropertyCheckboxLabel
                 caption="Scale"
                 checked={state.get<boolean>('scaleChecked', false)}
@@ -288,7 +288,7 @@ const SetLocationMarker = (props: Props) => {
                 />
               </Col>
             </Row>
-            <Row className="mb-3 mt-2">
+            <Row className="mb-2 mt-2">
               <PropertyCheckboxLabel
                 caption="Ref position"
                 checked={state.get<boolean>('refPositionChecked', false)}

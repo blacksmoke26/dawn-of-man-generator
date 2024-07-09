@@ -104,7 +104,7 @@ const HideUi = (props: Props) => {
   const isDisabled = state.get<boolean>('disabledCheckbox', false) || state.get<boolean>('disabled', false);
 
   return (
-    <div className={cn('mb-2', {'text-muted': isDisabled}, 'checkbox-align')}>
+    <div className={cn('mb-3', {'text-muted': isDisabled}, 'checkbox-align')}>
       {newProps?.showHeader && (
         <ActionHeader
           caption={ACTION_NAME}
@@ -122,118 +122,121 @@ const HideUi = (props: Props) => {
             noCard={true}
             header="Optional parameters"
             eventKey="hide_ui_optional_parameters">
-          <Row className="mb-3 mt-2">
-            <PropertyCheckboxLabel
-              caption="Entity types"
-              checked={state.get<boolean>('entityTypesChecked', false)}
+            <Row className="mb-2 mt-2">
+              <PropertyCheckboxLabel
+                caption="Entity types"
+                checked={state.get<boolean>('entityTypesChecked', false)}
+                disabled={isDisabled}
+                undefinedSetter={[valuer, 'entityTypes', []]}
+                onChange={isChecked => {
+                  state.set('entityTypesChecked', isChecked);
+                }}
+              />
+              <AttributeSelect
+                className="w-75"
+                colProps={{sm: '10'}}
+                disabled={isDisabled || !state.get<boolean>('entityTypesChecked', false)}
+                options={ENTITIES_OPTIONS as unknown as Option[]}
+                value={valuer.get<string[]>('entityTypes', [])?.map(value => ({
+                  label: capitalCase(value),
+                  value,
+                })) || []}
+                selectProps={{isSearchable: true, isMulti: true}}
+                onChange={(option, {action}) => {
+                  if (['select-option', 'remove-value', 'clear'].includes(action) && Array.isArray(option)) {
+                    valuer.overwrite('entityTypes', option?.map(({value}) => value) || []);
+                  }
+                }}
+                allowShuffle
+                onShuffle={() => {
+                  valuer.set('entityTypes', randomArray(ENTITIES, randomInt(1, 6), true));
+                }}
+                allowClear
+                onClear={() => valuer.set('entityTypes', [])}
+              />
+            </Row>
+            <Row className="mb-2">
+              <PropertyCheckboxLabel
+                caption="Buildable categories"
+                checked={state.get<boolean>('buildableCategoriesChecked', false)}
+                disabled={isDisabled}
+                undefinedSetter={[valuer, 'buildableCategories', 'Residence']}
+                onChange={isChecked => {
+                  state.set('buildableCategoriesChecked', isChecked);
+                }}
+              />
+              <AttributeSelect
+                disabled={isDisabled || !state.get<boolean>('buildableCategoriesChecked', false)}
+                options={BUILDABLE_CATEGORIES.map(value => ({label: capitalCase(value), value}))}
+                value={valuer.get('buildableCategories', 'Residence')}
+                onSelect={option => valuer.set('buildableCategories', option.value)}
+                allowShuffle
+                onShuffle={() => {
+                  valuer.set('buildableCategories', uniqueRandomArray(BUILDABLE_CATEGORIES));
+                }}
+              />
+            </Row>
+            <Row className="mb-1">
+              <PropertyCheckboxLabel
+                caption="Disabled UI"
+                checked={state.get<boolean>('hideDisabledUiChecked', false)}
+                disabled={isDisabled}
+                undefinedSetter={[valuer, 'hideDisabledUi', false]}
+                onChange={isChecked => {
+                  state.set('hideDisabledUiChecked', isChecked);
+                }}
+              />
+              <AttributeCheckbox
+                checked={valuer.get<boolean>('hideDisabledUi', false)}
+                caption="Yes"
+                disabled={isDisabled || !state.get<boolean>('hideDisabledUiChecked', false)}
+                onChange={isChecked => {
+                  valuer.set('hideDisabledUi', isChecked);
+                }}
+              />
+            </Row>
+            <Row>
+              <PropertyCheckboxLabel
+                caption="Quick panels"
+                checked={state.get<boolean>('hideQuickPanelsChecked', false)}
+                disabled={isDisabled}
+                undefinedSetter={[valuer, 'hideQuickPanels', false]}
+                onChange={isChecked => {
+                  state.set('hideQuickPanelsChecked', isChecked);
+                }}
+              />
+              <AttributeCheckbox
+                checked={valuer.get<boolean>('hideQuickPanels', false)}
+                caption="Hide"
+                disabled={isDisabled || !state.get<boolean>('hideQuickPanelsChecked', false)}
+                onChange={isChecked => {
+                  valuer.set('hideQuickPanels', isChecked);
+                }}
+              />
+            </Row>
+
+            <RandomizeValuesButton
               disabled={isDisabled}
-              undefinedSetter={[valuer, 'entityTypes', []]}
-              onChange={isChecked => {
-                state.set('entityTypesChecked', isChecked);
-              }}
-            />
-            <AttributeSelect
-              className="w-75"
-              colProps={{sm: '10'}}
-              disabled={isDisabled || !state.get<boolean>('entityTypesChecked', false)}
-              options={ENTITIES_OPTIONS as unknown as Option[]}
-              value={valuer.get<string[]>('entityTypes', [])?.map(value => ({label: capitalCase(value), value})) || []}
-              selectProps={{isSearchable: true, isMulti: true}}
-              onChange={(option, {action}) => {
-                if (['select-option', 'remove-value', 'clear'].includes(action) && Array.isArray(option)) {
-                  valuer.overwrite('entityTypes', option?.map(({value}) => value) || []);
+              onClick={() => {
+
+                if (state.is('entityTypesChecked', true)) {
+                  valuer.set('entityTypes', randomArray(ENTITIES, randomInt(1, 6), true));
+                }
+
+                if (state.is('buildableCategoriesChecked', true)) {
+                  valuer.set('buildableCategories', uniqueRandomArray(BUILDABLE_CATEGORIES));
+                }
+
+                if (state.is('hideDisabledUiChecked', true)) {
+                  valuer.set('hideDisabledUi', randomArray([true, false], 1)[0]);
+                }
+
+                if (state.is('hideQuickPanelsChecked', true)) {
+                  valuer.set('hideQuickPanels', randomArray([true, false], 1)[0]);
                 }
               }}
-              allowShuffle
-              onShuffle={() => {
-                valuer.set('entityTypes', randomArray(ENTITIES, randomInt(1, 6), true));
-              }}
-              allowClear
-              onClear={() => valuer.set('entityTypes', [])}
             />
-          </Row>
-          <Row className="mb-3 mt-2">
-            <PropertyCheckboxLabel
-              caption="Buildable categories"
-              checked={state.get<boolean>('buildableCategoriesChecked', false)}
-              disabled={isDisabled}
-              undefinedSetter={[valuer, 'buildableCategories', 'Residence']}
-              onChange={isChecked => {
-                state.set('buildableCategoriesChecked', isChecked);
-              }}
-            />
-            <AttributeSelect
-              disabled={isDisabled || !state.get<boolean>('buildableCategoriesChecked', false)}
-              options={BUILDABLE_CATEGORIES.map(value => ({label: capitalCase(value), value}))}
-              value={valuer.get('buildableCategories', 'Residence')}
-              onSelect={option => valuer.set('buildableCategories', option.value)}
-              allowShuffle
-              onShuffle={() => {
-                valuer.set('buildableCategories', uniqueRandomArray(BUILDABLE_CATEGORIES));
-              }}
-            />
-          </Row>
-          <Row className="mb-1 mt-2">
-            <PropertyCheckboxLabel
-              caption="Disabled UI"
-              checked={state.get<boolean>('hideDisabledUiChecked', false)}
-              disabled={isDisabled}
-              undefinedSetter={[valuer, 'hideDisabledUi', false]}
-              onChange={isChecked => {
-                state.set('hideDisabledUiChecked', isChecked);
-              }}
-            />
-            <AttributeCheckbox
-              checked={valuer.get<boolean>('hideDisabledUi', false)}
-              caption="Yes"
-              disabled={isDisabled || !state.get<boolean>('hideDisabledUiChecked', false)}
-              onChange={isChecked => {
-                valuer.set('hideDisabledUi', isChecked);
-              }}
-            />
-          </Row>
-          <Row className="mb-1 mt-2">
-            <PropertyCheckboxLabel
-              caption="Quick panels"
-              checked={state.get<boolean>('hideQuickPanelsChecked', false)}
-              disabled={isDisabled}
-              undefinedSetter={[valuer, 'hideQuickPanels', false]}
-              onChange={isChecked => {
-                state.set('hideQuickPanelsChecked', isChecked);
-              }}
-            />
-            <AttributeCheckbox
-              checked={valuer.get<boolean>('hideQuickPanels', false)}
-              caption="Hide"
-              disabled={isDisabled || !state.get<boolean>('hideQuickPanelsChecked', false)}
-              onChange={isChecked => {
-                valuer.set('hideQuickPanels', isChecked);
-              }}
-            />
-          </Row>
           </Accordion>
-
-          <RandomizeValuesButton
-            disabled={isDisabled}
-            onClick={() => {
-
-              if (state.is('entityTypesChecked', true)) {
-                valuer.set('entityTypes', randomArray(ENTITIES, randomInt(1, 6), true));
-              }
-
-              if (state.is('buildableCategoriesChecked', true)) {
-                valuer.set('buildableCategories', uniqueRandomArray(BUILDABLE_CATEGORIES));
-              }
-
-              if (state.is('hideDisabledUiChecked', true)) {
-                valuer.set('hideDisabledUi', randomArray([true, false], 1)[0]);
-              }
-
-              if (state.is('hideQuickPanelsChecked', true)) {
-                valuer.set('hideQuickPanels', randomArray([true, false], 1)[0]);
-              }
-            }}
-          />
         </>
       )}
     </div>

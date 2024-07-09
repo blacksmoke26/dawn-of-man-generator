@@ -81,7 +81,7 @@ const ShowMessage = (props: Props) => {
   const isDisabled = state.get<boolean>('disabledCheckbox', false) || state.get<boolean>('disabled', false);
 
   return (
-    <div className={cn('mb-2', {'text-muted': isDisabled}, 'checkbox-align')}>
+    <div className={cn('pb-2', {'text-muted': isDisabled}, 'checkbox-align')}>
       {newProps?.showHeader && (
         <ActionHeader
           caption={ACTION_NAME}
@@ -94,7 +94,7 @@ const ShowMessage = (props: Props) => {
       )}
       {state.data.expanded && (
         <>
-          <Row className="mb-3 mt-2">
+          <Row className="mb-2 mt-2">
             <PropertyLabel caption="Title"/>
             <Col sm="4">
               <TextInput
@@ -108,7 +108,7 @@ const ShowMessage = (props: Props) => {
             </Col>
           </Row>
 
-          <Row className="mb-3 mt-2">
+          <Row className="mt-2">
             <PropertyLabel caption="Text"/>
             <Col sm="4">
               <TextInput
