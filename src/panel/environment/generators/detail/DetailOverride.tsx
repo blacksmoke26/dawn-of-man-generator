@@ -15,34 +15,26 @@ import {Form, Tab, Tabs} from 'react-bootstrap';
 import TabTitle from '~/components/ui/TabTitle';
 import Accordion from '~/components/ui/Accordion';
 import Select, {Option} from '~/components/ui/Select';
-import ObjectOverridePrototype, {InitialValues} from '~/components/environment/ObjectOverridePrototype';
+import ObjectOverridePrototype from '~/components/environment/ObjectOverridePrototype';
 
 // icons
 import {IconPlant} from '~/components/icons/app';
 
 // utils
 import {isObject} from '~/helpers/object';
-import {findNextTabKey} from '~/helpers/ui';
-import {
-  optionsByType,
-  toTemplateText,
-  valuesToTemplates,
-  extValueToSelection,
-  type ObjectsList,
-  type Props as BaseProp,
-} from '~/components/environment/utils/object-override';
+import {optionsByType, Props} from '~/components/environment/utils/object-override';
+
+// parsers
+import {toOverridePrototypesTemplate} from '~/utils/parser/environment/templates';
 
 // redux
 import {useAppDispatch, useAppSelector} from '~redux/hooks';
 import {clearProperty} from '~redux/slices/environment/reducers';
 
 // types
-import type {ObjectType} from '~/utils/objects';
-import type {Json, KVDocument} from '~/types/json.types';
+import type {environment} from '~/data/environments/parser/types';
 
-export type Props = Omit<BaseProp, 'type' | 'checked' | 'noCard' | 'objectNoCard' | 'optionIcon' | 'values'>;
-
-const OBJECT_TYPE: ObjectType = 'detail';
+const OBJECT_TYPE: environment.prototypes.ObjectType = 'detail';
 const OPTION_ICON: React.ReactElement = <IconPlant width="16" height="16"/>;
 
 /** DetailOverride functional component */
@@ -50,29 +42,27 @@ const DetailOverride = (props: Props) => {
   const dispatch = useAppDispatch();
 
   const [checked, setChecked] = React.useState<boolean>(true);
-  const [values, setValues] = React.useState<ObjectsList>({});
-  const [templates, setTemplates] = React.useState<KVDocument<string>>({});
+  const [records, setRecords] = React.useState<environment.prototypes.OverridePrototypes>({});
   const [activeKey, setActiveKey] = React.useState<string>('');
 
-  const reduxState = useAppSelector(({environment}) => environment?.values?.detailOverridePrototypes);
+  const reduxState = useAppSelector(({environment}) => environment?.values?.treeOverridePrototypes);
 
-  const reflectValues = (values: ObjectsList) => {
-    setTemplates(valuesToTemplates(values));
-    setValues(values);
-    setActiveKey(Object.keys(values)[0]);
+  const reflectValues = (values: environment.prototypes.OverridePrototypes) => {
+    const names: string[] = Object.keys(values);
+    setRecords({...values});
+    setActiveKey(names[0]);
   };
 
   // Reflect redux-specific changes
   React.useEffect(() => {
     if (reduxState === null) {
       setChecked(true);
-      setValues({});
-      setTemplates({});
+      setRecords({});
       setActiveKey('');
       dispatch(clearProperty('detailOverridePrototypes'));
     } else if (isObject(reduxState)) {
       setChecked(true);
-      reflectValues(extValueToSelection(reduxState as Json));
+      reflectValues(reduxState as environment.prototypes.OverridePrototypes);
       dispatch(clearProperty('detailOverridePrototypes'));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -80,23 +70,31 @@ const DetailOverride = (props: Props) => {
 
   // Reflect state changes
   React.useEffect(() => {
-    typeof props.onChange === 'function' && props.onChange(toTemplateText(OBJECT_TYPE, templates));
+    props?.onTemplate?.(toOverridePrototypesTemplate(OBJECT_TYPE, records));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [templates]);
+  }, [records]);
 
-  const removeObject = (name: string) => {
-    setTemplates(current => {
-      const _current = {...current};
-      delete _current[name];
-      return _current;
-    });
-  };
-
-  const tabsList = Object.keys(templates);
+  const tabsList = Object.keys(records);
 
   const removeTab = (tabId: string): void => {
-    setActiveKey(findNextTabKey(tabsList, activeKey, tabId));
-    removeObject(tabId);
+    const ids: string[] = Object.keys(records);
+
+    const newRecords = {...records};
+
+    let tabIdIndex: number = ids.findIndex(id => id === tabId) || 0;
+
+    let curValue: string = activeKey;
+
+    if (curValue === tabId) {
+      curValue = tabIdIndex === 0
+        ? ids[tabIdIndex + 1]
+        : ids[tabIdIndex - 1];
+    }
+
+    delete newRecords[tabId];
+
+    setRecords(newRecords);
+    setActiveKey(curValue);
   };
 
   const total = tabsList.length;
@@ -137,11 +135,11 @@ const DetailOverride = (props: Props) => {
             isDisabled={!checked}
             menuPortalTarget={document.body}
             value={null}
-            options={optionsByType(OBJECT_TYPE, Object.keys(templates))}
+            options={optionsByType(OBJECT_TYPE, Object.keys(records))}
             placeholder={`Choose ${OBJECT_TYPE} to override`}
             onChange={(option: Option | any, {action}): void => {
               if (action === 'select-option' && option) {
-                setTemplates(current => ({...current, [option.value]: ''}));
+                setRecords(current => ({...current, [option.value]: {}}));
                 setActiveKey(option.value);
               }
             }}
@@ -153,7 +151,7 @@ const DetailOverride = (props: Props) => {
             activeKey={activeKey}
             className={cn('nav-tabs-bottom mt-1 mb-0', {'border-0': !total})}
             onSelect={k => setActiveKey(k as string)}>
-            {Object.keys(templates).map(id => (
+            {Object.entries(records).map(([id, initialValues]) => (
               <Tab
                 eventKey={id}
                 key={id}
@@ -161,13 +159,12 @@ const DetailOverride = (props: Props) => {
                 title={<TabTitle title={id} disabled={!checked} onRemove={() => removeTab(id)}/>}>
                 <ObjectOverridePrototype
                   name={id}
-                  initialValues={(values?.[id] ?? {}) as InitialValues}
+                  initialValues={initialValues}
                   type={OBJECT_TYPE}
                   disabled={!checked}
-                  onTemplate={(template: string) => {
-                    setTemplates(current => ({...current, [id]: template}));
+                  onValuesChange={(values) => {
+                    setRecords(current => ({...current, [id]: {...values}}));
                   }}
-                  onRemove={() => removeTab(id)}
                 />
               </Tab>
             ))}
@@ -180,7 +177,7 @@ const DetailOverride = (props: Props) => {
 
 // Properties validation
 DetailOverride.propTypes = {
-  onChange: PropTypes.func,
+  onTemplate: PropTypes.func,
 };
 
 export default DetailOverride;

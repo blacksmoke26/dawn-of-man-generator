@@ -22,29 +22,37 @@ export interface Props {
 
 /** TreesPanel functional component */
 const TreesPanel = (props: Props) => {
-  const [globalTreeDensity, setGlobalTreeDensity] = React.useState<string>('');
-  const [treesEverywhere, setTreesEverywhere] = React.useState<string>('');
-  const [trees, setTrees] = React.useState<string>('');
-  const [treesOverride, setTreesOverride] = React.useState<string>('');
+  const [templates, setTemplates] = React.useState<Record<string, string>>({
+    globalTreeDensity: '',
+    treesEverywhere: '',
+    trees: '',
+    treesOverride: '',
+  });
 
   // Reflect state changes
   React.useEffect(() => {
     typeof props.onChange === 'function'
-    && props.onChange(
-      globalTreeDensity + treesEverywhere + trees + treesOverride,
-    );
+    && props.onChange(Object.values(templates).join('').trim());
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [globalTreeDensity, treesEverywhere, trees, treesOverride]);
+  }, [templates]);
+
+  const setTemplate = (name: string, template: string) => {
+    setTemplates(current => ({...current, [name]: template}));
+  };
 
   return (
     <>
-      <GlobalTreeDensity onChange={v => setGlobalTreeDensity(v)}/>
+      <GlobalTreeDensity
+        onChange={template => setTemplate('globalTreeDensity', template)}/>
       <hr/>
-      <TreesEverywhere onChange={v => setTreesEverywhere(v)}/>
+      <TreesEverywhere
+        onChange={template => setTemplate('treesEverywhere', template)}/>
       <hr/>
-      <Trees onChange={v => setTrees(v)}/>
+      <Trees
+        onChange={template => setTemplate('trees', template)}/>
       <hr/>
-      <TreesOverride onChange={v => setTreesOverride(v)}/>
+      <TreesOverride
+        onTemplate={template => setTemplate('treesOverride', template)}/>
     </>
   );
 };

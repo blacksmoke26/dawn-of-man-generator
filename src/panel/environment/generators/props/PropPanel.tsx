@@ -29,7 +29,7 @@ const PropPanel = (props: Props) => {
   }, [propOverride]);
 
   return (
-    <PropOverride onChange={template => setPropOverride(template)}/>
+    <PropOverride onTemplate={template => setPropOverride(template)}/>
   );
 };
 

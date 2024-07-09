@@ -13,29 +13,34 @@ import DepositOverride from './DepositOverride';
 
 /**
  * DepositPanel `props` type
- * @type {Object}
  */
-type Props = {
+export type Props = {
   onChange(template: string): void,
 };
 
 /** DepositPanel functional component */
 const DepositPanel = (props: Props) => {
-  const [deposits, setDeposits] = React.useState<string>('');
-  const [depositOverride, setDepositOverride] = React.useState<string>('');
+  const [templates, setTemplates] = React.useState<Record<string, string>>({
+    deposits: '',
+    depositOverride: '',
+  });
 
   // Reflect state changes
   React.useEffect(() => {
     typeof props.onChange === 'function'
-    && props.onChange(deposits + depositOverride);
+    && props.onChange(Object.values(templates).join(''));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [deposits, depositOverride]);
+  }, [templates]);
+
+  const setTemplate = (name: string, template: string) => {
+    setTemplates(current => ({...current, [name]: template}));
+  };
 
   return (
     <>
-      <Deposits onChange={v => setDeposits(v)}/>
+      <Deposits onChange={templates => setTemplate('deposits', templates)}/>
       <hr className="mt-1"/>
-      <DepositOverride onChange={v => setDepositOverride(v)}/>
+      <DepositOverride onTemplate={templates => setTemplate('depositOverride', templates)}/>
     </>
   );
 };

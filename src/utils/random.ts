@@ -23,10 +23,9 @@ import {
 } from '~/utils/condition';
 
 // types
-import {DisasterType} from '~/types/scenario.types';
-import {EraFactor} from '~/types/action.types';
-import {environment} from '~/data/environments/parser/types';
-import {scenario} from '~/data/scenario/parser/types';
+import type {EraFactor} from '~/types/action.types';
+import type {environment} from '~/data/environments/parser/types';
+import type {scenario} from '~/data/scenario/parser/types';
 
 /** Deposits types */
 export const deposits: string[] = [
@@ -234,6 +233,26 @@ export const randomAltitude = (): [number, number] => {
   return randomMinMaxTuple(Defaults.ALTITUDE_MIN, Defaults.ALTITUDE_MAX);
 };
 
+/** Random Object override prototype */
+export const randomObjectOverridePrototype = (): environment.prototypes.OverridePrototype => {
+  return {
+    density: randomDensity(true),
+    altitude: randomAltitude(),
+    angle: randomAngle(),
+    humidity: randomHumidity(),
+  };
+}
+
+/** Random Object override prototype */
+export const defaultObjectOverridePrototype = (): environment.prototypes.OverridePrototype => {
+  return {
+    density: Defaults.DENSITY_DEFAULT,
+    altitude: [Defaults.ALTITUDE_MIN_DEFAULT, Defaults.ALTITUDE_MAX_DEFAULT],
+    angle: [Defaults.ANGLE_MIN_DEFAULT, Defaults.ANGLE_MAX_DEFAULT],
+    humidity: [Defaults.HUMIDITY_MIN_DEFAULT, Defaults.HUMIDITY_MAX_DEFAULT],
+  };
+}
+
 /** Random River */
 export const randomRiver = (): boolean => {
   return uniqueRandomArray([true, false])() as boolean;
@@ -261,31 +280,13 @@ export const randomFrequencies = <T extends string = string>(value: number | nul
 };
 
 /** Random Deposits */
-export const randomDeposits = <T = string>(counts: number = 0): T[] => {
-  const rand: Function = uniqueRandomArray(deposits);
-  const list: T[] = [];
-
-  counts = !counts ? randomInt(1, deposits.length) : counts;
-
-  for (let i = 1; i <= counts; i++) {
-    list.push(rand());
-  }
-
-  return list;
+export const randomDeposits = <T = string>(counts: number = 4): T[] => {
+  return randomArray(deposits, counts, true) as T[];
 };
 
 /** Random Trees */
 export const randomTrees = <T = string>(counts: number = 0): T[] => {
-  const rand: Function = uniqueRandomArray(trees) as RandomArrayFunc<T>;
-  const list: T[] = [];
-
-  counts = !counts ? randomInt(1, trees.length) : counts;
-
-  for (let i = 1; i <= counts; i++) {
-    list.push(rand());
-  }
-
-  return list;
+  return randomArray(trees, counts || trees.length, true) as T[];
 };
 
 /** Random period */

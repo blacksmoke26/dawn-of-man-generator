@@ -7,11 +7,10 @@
 
 // utils
 import {isNumeric} from '~/helpers/number';
+import {renderTemplate} from '~/utils/template';
 
 // types
-import {KVDocument} from '~/types/json.types';
 import {environment} from '~/data/environments/parser/types';
-import {ObjectTemplateAttributes, ObjectType} from '~/utils/objects';
 
 /** Render `noise_amplitudes` xml template */
 export const toNoiseAmplitudesTemplate = (values: number[], disabled: boolean = false): string => {
@@ -81,41 +80,43 @@ export const toDepositsTemplate = (names: string[], disabled: boolean = false): 
     : '';
 };
 export const toOverridePrototypeTemplate = (
-  type: ObjectType, name: string, values: ObjectTemplateAttributes, allowRender: boolean = true,
+  type: environment.prototypes.ObjectType, name: string, values: environment.prototypes.OverridePrototype, allowRender: boolean = true,
 ): string => {
-  if (!allowRender || !Object.keys(values).length || !name.trim()) {
+  if (!allowRender || !Object.keys(values).length) {
     return '';
   }
 
-  const template: string[] = [];
+  const templates: string[] = [
+    `<id value="${name}"/>`,
+  ];
 
-  isNumeric(values?.density) && template.push(`<density value="${values?.density}" />`);
+  isNumeric(values?.density) && templates.push(`<density value="${values?.density}" />`);
 
   (Array.isArray(values?.altitude) && values?.altitude?.length === 2)
-  && template.push(
-    `<min_altitude value="${values?.altitude[0]}" />`
-    + `<max_altitude value="${values?.altitude[1]}"/>`,
+  && templates.push(
+    renderTemplate('min_altitude', null, [`value="${values.altitude[0]}"`])
+    + renderTemplate('max_altitude', null, [`value="${values.altitude[1]}"`]),
   );
 
   (Array.isArray(values?.angle) && values?.angle?.length === 2)
-  && template.push(
-    `<min_angle value="${values?.angle[0]}" />`
-    + `<max_angle value="${values?.angle[1]}"/>`,
+  && templates.push(
+    renderTemplate('min_angle', null, [`value="${values.angle[0]}"`])
+    + renderTemplate('max_angle', null, [`value="${values.angle[1]}"`]),
   );
 
   (Array.isArray(values?.humidity) && values?.humidity?.length === 2)
-  && template.push(
-    `<min_humidity value="${values?.humidity[0]}" />`
-    + `<max_humidity value="${values?.humidity[1]}"/>`,
+  && templates.push(
+    renderTemplate('min_humidity', null, [`value="${values.humidity[0]}"`])
+    + renderTemplate('max_humidity', null, [`value="${values.humidity[1]}"`]),
   );
 
-  return !template.length ? '' : (
-    `<${type}_override_prototype><id value="${name}"/>${template.join('')}</${type}_override_prototype>`
-  );
+  return templates.length
+    ? renderTemplate(`${type}_override_prototype`, null, [], templates.join(''))
+    : '';
 };
 
 export const toOverridePrototypesTemplate = (
-  type: ObjectType, values: KVDocument<ObjectTemplateAttributes>, allowRender: boolean = true,
+  type: environment.prototypes.ObjectType, values: environment.prototypes.OverridePrototypes, allowRender: boolean = true,
 ): string => {
   if (!allowRender || !Object.keys(values).length) {
     return '';
@@ -128,9 +129,11 @@ export const toOverridePrototypesTemplate = (
     template && templates.push(template);
   }
 
-  return !templates.length ? '' : (
-    `<${type}_override_prototypes>${templates.join('')}</${type}_override_prototypes>`
-  );
+  renderTemplate(`${type}_override_prototypes`, null, [], templates.join(''));
+
+  return templates.length
+    ? renderTemplate(`${type}_override_prototypes`, null, [], templates.join(''))
+    : '';
 };
 
 /** Generate `spring` season xml code */
