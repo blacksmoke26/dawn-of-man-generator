@@ -8,7 +8,6 @@ import op from 'object-path';
 
 // helpers
 import {isObject} from '~/helpers/object';
-import {SummerConfig, toSummerSeasonParsed} from '~/utils/seasons';
 
 // utils
 import {
@@ -18,31 +17,32 @@ import {
   normalizeSeasonWindMinMax,
   normalizeSeasonWindyChance,
 } from '~/utils/parser/environment/normalizer-season';
+import {SeasonsDefault, SummerFullConfig} from '~/utils/randomizer/seasons';
 
 // types
 import type {Json} from '~/types/json.types';
 
 /** Convert a season object into redux data */
 export const jsonToRedux = (seasons: Json[]): Json => {
-  const node = seasons.find(s => s.id === SummerConfig.id) as Json;
+  const node = seasons.find(s => s.id === SummerFullConfig.id) as Json;
 
   if (!isObject(node)) {
-    return {[SummerConfig.id]: toSummerSeasonParsed()};
+    return {[SummerFullConfig.id]: SeasonsDefault.Summer};
   }
 
   const duration = normalizeSeasonDuration(
     op.get(node, 'duration'),
-    SummerConfig.duration,
+    SummerFullConfig.duration,
   );
 
   const precipitationChance = normalizeSeasonPrecipitationChance(
     op.get(node, 'precipitation_chance'),
-    SummerConfig.precipitation_chance,
+    SummerFullConfig.precipitationChance,
   );
 
   const windyChance = normalizeSeasonWindyChance(
     op.get(node, 'windy_chance'),
-    SummerConfig.windy_chance,
+    SummerFullConfig.windyChance,
   );
 
   const attributes: Json = {
@@ -51,21 +51,21 @@ export const jsonToRedux = (seasons: Json[]): Json => {
     windyChance,
     wind: normalizeSeasonWindMinMax({
       min: op.get(node, 'min_wind.value'),
-      minDefault: SummerConfig.min_wind,
+      minDefault: SummerFullConfig.wind[0],
       max: op.get(node, 'max_wind.value'),
-      maxDefault: SummerConfig.max_wind,
+      maxDefault: SummerFullConfig.wind[1],
     }),
     temperature: normalizeSeasonTemperatureMinMax({
       min: op.get(node, 'min_temperature.value'),
-      minDefault: SummerConfig.min_temperature.value,
+      minDefault: SummerFullConfig.temperature[0],
       max: op.get(node, 'max_temperature.value'),
-      maxDefault: SummerConfig.max_temperature.value,
+      maxDefault: SummerFullConfig.temperature[1],
     }),
   };
 
   !('min_wind' in node) && delete attributes.wind;
 
   return {
-    [SummerConfig.id]: attributes,
+    [SummerFullConfig.id]: attributes,
   };
 };

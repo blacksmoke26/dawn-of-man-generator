@@ -8,7 +8,6 @@ import op from 'object-path';
 
 // helpers
 import {isObject} from '~/helpers/object';
-import {SpringConfig, toSpringSeasonParsed} from '~/utils/seasons';
 
 // utils
 import {
@@ -19,6 +18,7 @@ import {
   normalizeSeasonVeryWindyChance,
   normalizeSeasonWindyChance,
 } from '~/utils/parser/environment/normalizer-season';
+import {SpringConfig, SeasonsDefault} from '~/utils/randomizer/seasons';
 
 // types
 import type {Json} from '~/types/json.types';
@@ -28,7 +28,7 @@ export const jsonToRedux = (seasons: Json[]): Json => {
   const node = seasons.find(s => s.id === SpringConfig.id) as Json;
 
   if (!isObject(node)) {
-    return {[SpringConfig.id]: toSpringSeasonParsed()};
+    return {[SpringConfig.id]: SeasonsDefault.Spring};
   }
 
   const duration = normalizeSeasonDuration(
@@ -38,22 +38,22 @@ export const jsonToRedux = (seasons: Json[]): Json => {
 
   const precipitationChance = normalizeSeasonPrecipitationChance(
     op.get(node, 'precipitation_chance'),
-    SpringConfig.precipitation_chance,
+    SpringConfig.precipitationChance,
   );
 
   const windyChance = normalizeSeasonWindyChance(
     op.get(node, 'windy_chance'),
-    SpringConfig.windy_chance,
+    SpringConfig.windyChance,
   );
 
   const veryWindyChance = normalizeSeasonVeryWindyChance(
     op.get(node, 'very_windy_chance'),
-    SpringConfig.very_windy_chance,
+    SpringConfig.veryWindyChance,
   );
 
   const fishBoost = normalizeSeasonFishBoost(
     op.get(node, 'fish_boost'),
-    SpringConfig.fish_boost,
+    SpringConfig.fishBoost,
   );
 
   return {
@@ -65,9 +65,9 @@ export const jsonToRedux = (seasons: Json[]): Json => {
       fishBoost,
       temperature: normalizeSeasonTemperatureMinMax({
         min: op.get(node, 'min_temperature.value'),
-        minDefault: SpringConfig.min_temperature.value,
+        minDefault: SpringConfig.temperature[0],
         max: op.get(node, 'max_temperature.value'),
-        maxDefault: SpringConfig.max_temperature.value,
+        maxDefault: SpringConfig.temperature[1],
       }),
     },
   };

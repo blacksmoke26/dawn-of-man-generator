@@ -131,7 +131,7 @@ const SetAnimalPopulation = (props: Props) => {
       )}
       {state.data.expanded && (
         <>
-          <Row className="mb-2 mt-3">
+          <Row className="mb-2 mt-2">
             <PropertyLabel caption="Animal type(s)"/>
             <AttributeSelect
               className="w-75"
@@ -156,7 +156,7 @@ const SetAnimalPopulation = (props: Props) => {
             noCard={true}
             header="Optional parameters"
             eventKey="set_animal_population_optional_parameters">
-            <Row className="mb-1 mt-3">
+            <Row className="mt-3">
               <PropertyCheckboxLabel
                 caption="Population"
                 checked={state.get<boolean>('minMaxChecked', false)}
@@ -196,7 +196,7 @@ const SetAnimalPopulation = (props: Props) => {
                 allowExcludeCheck
               />
             </Row>
-            <Row className="mb-1 mt-3">
+            <Row className="mb-1 mt-1">
               <PropertyCheckboxLabel
                 caption="Era factors"
                 checked={state.get<boolean>('eraFactorsChecked', false)}

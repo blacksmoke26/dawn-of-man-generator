@@ -164,7 +164,7 @@ export const randomSeasonFishBoost = (): number => {
   return randomFloat(2, Defaults.SEASON_FISH_BOOST_MIN, Defaults.SEASON_FISH_BOOST_MAX);
 };
 
-export const randomSeasonSpring = (): environment.SpringSeason => {
+export const randomSeasonSpring = (): environment.season.Spring => {
   return {
     duration: randomSeasonDuration(),
     precipitationChance: randomSeasonPrecipitationChance(),
@@ -175,7 +175,7 @@ export const randomSeasonSpring = (): environment.SpringSeason => {
   };
 };
 
-export const randomSeasonSummer = (): environment.SummerSeason => {
+export const randomSeasonSummer = (): environment.season.Summer => {
   return {
     duration: randomSeasonDuration(),
     precipitationChance: randomSeasonPrecipitationChance(),
@@ -185,7 +185,7 @@ export const randomSeasonSummer = (): environment.SummerSeason => {
   };
 };
 
-export const randomSeasonFall = (): environment.FallSeason => {
+export const randomSeasonFall = (): environment.season.Fall => {
   return {
     duration: randomSeasonDuration(),
     precipitationChance: randomSeasonPrecipitationChance(),
@@ -195,7 +195,7 @@ export const randomSeasonFall = (): environment.FallSeason => {
   };
 };
 
-export const randomSeasonWinter = (): environment.WinterSeason => {
+export const randomSeasonWinter = (): environment.season.Winter => {
   return {
     duration: randomSeasonDuration(),
     precipitationChance: randomSeasonPrecipitationChance(),
@@ -206,7 +206,7 @@ export const randomSeasonWinter = (): environment.WinterSeason => {
   };
 };
 
-export const randomSeasons = (): environment.Seasons => {
+export const randomSeasons = (): environment.season.Seasons => {
   return {
     Spring: randomSeasonSpring(),
     Summer: randomSeasonSummer(),
@@ -281,12 +281,12 @@ export const randomFrequencies = <T extends string = string>(value: number | nul
 
 /** Random Deposits */
 export const randomDeposits = <T = string>(counts: number = 4): T[] => {
-  return randomArray(deposits, counts, true) as T[];
+  return randomArray(deposits, counts || randomInt(1, deposits.length), true) as T[];
 };
 
 /** Random Trees */
 export const randomTrees = <T = string>(counts: number = 0): T[] => {
-  return randomArray(trees, counts || trees.length, true) as T[];
+  return randomArray(trees, counts || randomInt(1, trees.length), true) as T[];
 };
 
 /** Random period */

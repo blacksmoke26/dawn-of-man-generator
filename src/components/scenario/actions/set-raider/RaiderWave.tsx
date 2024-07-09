@@ -87,7 +87,7 @@ const RaiderWave = (props: Props = {}) => {
 
   return (
     <div className={cn('mt-0 checkbox-align', {'text-muted-deep': newProps.disabled})}>
-      <Row className="mb-3 mt-2">
+      <Row className="mt-2">
         <PropertyLabel caption="Shield ratio"/>
         <Col sm="4">
           <NumberInput
@@ -106,7 +106,7 @@ const RaiderWave = (props: Props = {}) => {
           />
         </Col>
       </Row>
-      <Row className="mb-3 mt-2">
+      <Row className="mb-2 mt-2">
         <PropertyLabel caption="Armor ratio"/>
         <Col sm="4">
           <NumberInput
@@ -130,7 +130,7 @@ const RaiderWave = (props: Props = {}) => {
         noCard={true}
         header="Optional parameters"
         eventKey="optional_parameters">
-        <Row className="mt-3">
+        <Row className="mt-2">
           <PropertyCheckboxLabel
             caption="Disabled techs"
             checked={state.data.disabledTechsCheckbox}

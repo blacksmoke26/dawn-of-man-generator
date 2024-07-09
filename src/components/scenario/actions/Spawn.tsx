@@ -140,7 +140,7 @@ const Spawn = (props: Props) => {
   const isDisabled = state.get<boolean>('disabledCheckbox', false) || state.get<boolean>('disabled', false);
 
   return (
-    <div className={cn('mb-2', {'text-muted': isDisabled}, 'checkbox-align')}>
+    <div className={cn('mb-3', {'text-muted': isDisabled}, 'checkbox-align')}>
       {newProps?.showHeader && (
         <ActionHeader
           caption={ACTION_NAME}
@@ -153,7 +153,7 @@ const Spawn = (props: Props) => {
       )}
       {state.data.expanded && (
         <>
-          <Row className="mb-3 mt-2">
+          <Row className="mt-2">
             <PropertyLabel caption="Entity type"/>
             <AttributeSelect
               disabled={isDisabled}
@@ -166,7 +166,7 @@ const Spawn = (props: Props) => {
               }}
             />
           </Row>
-          <Row className="mb-3 mt-2">
+          <Row className="mt-2">
             <PropertyLabel caption="Placement"/>
             <Col sm="5">
               <SuggestionInput
@@ -183,7 +183,7 @@ const Spawn = (props: Props) => {
               />
             </Col>
           </Row>
-          <Row className="mb-3 mt-2">
+          <Row className="mb-2 mt-2">
             <PropertyLabel caption="Amount"/>
             <Col sm="4">
               <NumberInput
@@ -206,7 +206,7 @@ const Spawn = (props: Props) => {
             noCard={true}
             header="Optional parameters"
             eventKey="optional_parameters">
-            <Row className="mb-3 mt-3">
+            <Row className="mt-2">
               <PropertyCheckboxLabel
                 caption="Position"
                 checked={state.data.positionChecked}
@@ -231,7 +231,7 @@ const Spawn = (props: Props) => {
                 }}
               />
             </Row>
-            <Row className="mb-3 mt-2">
+            <Row className="mt-2">
               <PropertyCheckboxLabel
                 caption="Angle"
                 checked={state.data.angleChecked}
@@ -256,7 +256,7 @@ const Spawn = (props: Props) => {
                 />
               </Col>
             </Row>
-            <Row className="mb-3 mt-2">
+            <Row className="mt-2">
               <PropertyCheckboxLabel
                 caption="Radius"
                 checked={state.get<boolean>('radiusChecked', false)}
@@ -283,7 +283,7 @@ const Spawn = (props: Props) => {
                 />
               </Col>
             </Row>
-            <Row className="mb-3 mt-2">
+            <Row className="mt-2">
               <PropertyCheckboxLabel
                 caption="Age"
                 checked={state.data.ageChecked}
@@ -302,7 +302,7 @@ const Spawn = (props: Props) => {
                 }}
               />
             </Row>
-            <Row className="mb-3 mt-2">
+            <Row className="mt-2">
               <PropertyCheckboxLabel
                 caption="Years old"
                 checked={state.data.yearsOldChecked}
@@ -326,7 +326,7 @@ const Spawn = (props: Props) => {
                 />
               </Col>
             </Row>
-            <Row className="mb-3 mt-2">
+            <Row className="mt-2">
               <PropertyCheckboxLabel
                 caption="Gender"
                 checked={state.data.genderChecked}
@@ -345,7 +345,7 @@ const Spawn = (props: Props) => {
                 }}
               />
             </Row>
-            <Row className="mb-3 mt-2">
+            <Row className="mt-2">
               <PropertyCheckboxLabel
                 caption="Name"
                 checked={state.data.nameChecked}
@@ -362,7 +362,7 @@ const Spawn = (props: Props) => {
                   onChange={value => valuer.set('name', value)}/>
               </Col>
             </Row>
-            <Row className="mb-3 mt-2">
+            <Row className="mt-2">
               <PropertyCheckboxLabel
                 caption="Spawn type"
                 checked={state.data.spawnTypeChecked}
@@ -383,7 +383,7 @@ const Spawn = (props: Props) => {
                 onRestore={() => valuer.set('spawnType', 'Auto')}
               />
             </Row>
-            <Row className="mb-3 mt-2">
+            <Row className="mt-2">
               <PropertyCheckboxLabel
                 caption="Behaviour"
                 checked={state.data.behaviourChecked}
@@ -405,7 +405,6 @@ const Spawn = (props: Props) => {
               />
             </Row>
           </Accordion>
-          <div className="mt-4"></div>
         </>
       )}
     </div>

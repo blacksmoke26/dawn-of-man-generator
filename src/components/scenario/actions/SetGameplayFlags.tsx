@@ -94,7 +94,7 @@ const SetGameplayFlags = (props: Props) => {
   const isDisabled = state.get<boolean>('disabledCheckbox', false) || state.get<boolean>('disabled', false);
 
   return (
-    <div className={cn('mb-2', {'text-muted': isDisabled}, 'checkbox-align')}>
+    <div className={cn('mb-3', {'text-muted': isDisabled}, 'checkbox-align')}>
       {newProps?.showHeader && (
         <ActionHeader
           caption={ACTION_NAME}
@@ -107,7 +107,7 @@ const SetGameplayFlags = (props: Props) => {
       )}
       {state.data.expanded && (
         <>
-          <Row className="mb-3 mt-2">
+          <Row className="mb-2 mt-2">
             <PropertyLabel caption="Flags"/>
             <AttributeSelect
               className="w-75"
@@ -127,7 +127,7 @@ const SetGameplayFlags = (props: Props) => {
             noCard={true}
             header="Optional parameters"
             eventKey="optional_parameters">
-            <Row className="mb-1 mt-3">
+            <Row className="mt-2">
               <PropertyCheckboxLabel
                 caption="Controllable animal"
                 checked={state.data.controllableAnimalChecked}

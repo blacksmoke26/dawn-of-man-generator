@@ -193,7 +193,7 @@ const SetRaider = (props: Props) => {
   };
 
   return (
-    <div className={cn('mb-2', {'text-muted': isDisabled}, 'checkbox-align')}>
+    <div className={cn('mb-3', {'text-muted': isDisabled}, 'checkbox-align')}>
       {newProps?.showHeader && (
         <ActionHeader
           caption={ACTION_NAME}
@@ -207,7 +207,7 @@ const SetRaider = (props: Props) => {
       {state.data.expanded && (
         <>
           <div className="pl-3 pr-3">
-            <Row className="mb-1 mt-3">
+            <Row className="mt-3">
               <PropertyLabel caption="Era"/>
               <AttributeSelect
                 className="w-75"
@@ -222,7 +222,7 @@ const SetRaider = (props: Props) => {
                 }}
               />
             </Row>
-            <Row className="mb-1  mt-3">
+            <Row className="mt-2">
               <PropertyLabel caption="Entity types"/>
               <AttributeSelect
                 className="w-75"
@@ -247,7 +247,7 @@ const SetRaider = (props: Props) => {
                 onClear={() => valuer.set('entityTypes', [])}
               />
             </Row>
-            <Row className="mb-1 mt-3">
+            <Row className="mt-2">
               <PropertyLabel caption="Population"/>
               <AttributeRangeValue
                 colProps={{sm: '6'}}
@@ -272,7 +272,7 @@ const SetRaider = (props: Props) => {
                 }}
               />
             </Row>
-            <Row className="mb-3 mt-3">
+            <Row className="mb-2 mt-2">
               <PropertyLabel caption="Period"/>
               <Col sm="4">
                 <NumberInput
@@ -332,9 +332,9 @@ const SetRaider = (props: Props) => {
                 />
               </>
             )}
-            eventKey="optional_parameters">
+            eventKey="set_raider_optional_parameters">
             <div className="pl-3 pr-3">
-              <Row className="mb-1 mt-3">
+              <Row className="mt-2">
                 <PropertyCheckboxLabel
                   caption="Hardcore timer"
                   checked={state.data.hardcoreTimerChecked}
@@ -359,7 +359,7 @@ const SetRaider = (props: Props) => {
                   />
                 </Col>
               </Row>
-              <Row className="mb-1 mt-3">
+              <Row className="mt-2">
                 <PropertyCheckboxLabel
                   caption="Mins"
                   checked={state.data.minsChecked}
@@ -386,7 +386,7 @@ const SetRaider = (props: Props) => {
                   </Form.Text>
                 </Col>
               </Row>
-              <Row className="mb-3 mt-3">
+              <Row className="mb-2">
                 <PropertyCheckboxLabel
                   caption="Maxes"
                   checked={state.data.maxesChecked}
@@ -413,7 +413,7 @@ const SetRaider = (props: Props) => {
                   </Form.Text>
                 </Col>
               </Row>
-              <Row className="mb-3 mt-2">
+              <Row className="mt-2">
                 <PropertyCheckboxLabel
                   caption="Extra raiders"
                   tooltip="Additional raiders per population"
@@ -438,7 +438,7 @@ const SetRaider = (props: Props) => {
                   />
                 </Col>
               </Row>
-              <Row className="mb-3 mt-2">
+              <Row className="mt-2">
                 <PropertyCheckboxLabel
                   caption="Grace period"
                   checked={state.data.gracePeriodChecked}
@@ -464,7 +464,7 @@ const SetRaider = (props: Props) => {
                   />
                 </Col>
               </Row>
-              <Row className="mb-3 mt-2">
+              <Row className="mb-2 mt-2">
                 <PropertyCheckboxLabel
                   caption="Variance"
                   checked={state.data.varianceChecked}
@@ -493,7 +493,7 @@ const SetRaider = (props: Props) => {
             </div>
           </Accordion>
 
-          <div className="mb-3"></div>
+          <div className="mb-2"></div>
           <Accordion
             noBodyPad={true}
             noCard={true}

@@ -114,20 +114,21 @@ const FocusCamera = (props: Props) => {
       )}
       {state.data.expanded && (
         <>
-          <Row className="mb-3 mt-2">
+          <Row className="mb-1 mt-2">
             <PropertyLabel caption="Location"/>
             <AttributeSelect
               disabled={isDisabled}
               options={LOCATION_TYPE.map(value => ({label: capitalCase(value), value}))}
               value={valuer.get('location', 'LastMarker')}
               onSelect={option => valuer.set('location', option.value)}
+              selectProps={{isSearchable: false}}
               allowShuffle={true}
               onShuffle={() => {
                 valuer.set('location', uniqueRandomArray(LOCATION_TYPE));
               }}
             />
           </Row>
-          <Row className="mb-3 mt-2">
+          <Row className="mb-2 mt-2">
             <PropertyLabel caption="Entity name"/>
             <Col sm="4">
               <TextInput
@@ -145,8 +146,8 @@ const FocusCamera = (props: Props) => {
             noBodyPad={true}
             noCard={true}
             header="Optional parameters"
-            eventKey="spawn_optional_parameters">
-            <Row className="mb-1 mt-3">
+            eventKey="focus_optional_parameters">
+            <Row className="mt-2">
               <PropertyCheckboxLabel
                 caption="Distance"
                 checked={state.get<boolean>('distanceChecked', false)}
@@ -173,7 +174,7 @@ const FocusCamera = (props: Props) => {
                 />
               </Col>
             </Row>
-            <Row className="mb-1 mt-3">
+            <Row className="mt-1">
               <PropertyCheckboxLabel
                 caption="Rotation"
                 checked={state.get<boolean>('rotationChecked', false)}

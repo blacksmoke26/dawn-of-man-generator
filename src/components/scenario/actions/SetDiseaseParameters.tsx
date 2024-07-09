@@ -108,7 +108,7 @@ const SetDiseaseParameters = (props: Props) => {
   // variance
   // individualDiseaseChance
   return (
-    <div className={cn('mb-2 checkbox-align', {'text-muted': isDisabled})}>
+    <div className={cn('mb-3 checkbox-align', {'text-muted': isDisabled})}>
       {newProps?.showHeader && (
         <ActionHeader
           caption={ACTION_NAME}
@@ -126,7 +126,7 @@ const SetDiseaseParameters = (props: Props) => {
             noCard={true}
             header="Optional parameters"
             eventKey="optional_parameters">
-            <Row className="mb-1 mt-3">
+            <Row className="mt-2">
               <PropertyCheckboxLabel
                 caption="Period"
                 checked={state.get<boolean>('periodChecked', false)}
@@ -154,7 +154,7 @@ const SetDiseaseParameters = (props: Props) => {
                 />
               </Col>
             </Row>
-            <Row className="mb-1 mt-3">
+            <Row className="mt-2">
               <PropertyCheckboxLabel
                 caption="Variance"
                 checked={state.get<boolean>('varianceChecked', false)}
@@ -182,7 +182,7 @@ const SetDiseaseParameters = (props: Props) => {
                 />
               </Col>
             </Row>
-            <Row className="mb-1 mt-3">
+            <Row className="mt-2">
               <PropertyCheckboxLabel
                 caption="Disease chance (individual)"
                 checked={state.data.individualDiseaseChanceChecked}
@@ -207,20 +207,20 @@ const SetDiseaseParameters = (props: Props) => {
                 />
               </Col>
             </Row>
+            <RandomizeValuesButton
+              disabled={isDisabled}
+              onClick={() => {
+                state.is('periodChecked', true)
+                && valuer.set('period', randomPeriod());
+
+                state.is('varianceChecked', true)
+                && valuer.set('variance', randomPeriod());
+
+                state.is('individualDiseaseChanceChecked', true)
+                && valuer.set('individualDiseaseChance', randomIndividualDiseaseChance());
+              }}
+            />
           </Accordion>
-          <RandomizeValuesButton
-            disabled={isDisabled}
-            onClick={() => {
-              state.is('periodChecked', true)
-              && valuer.set('period', randomPeriod());
-
-              state.is('varianceChecked', true)
-              && valuer.set('variance', randomPeriod());
-
-              state.is('individualDiseaseChanceChecked', true)
-              && valuer.set('individualDiseaseChance', randomIndividualDiseaseChance());
-            }}
-          />
         </>
       )}
     </div>

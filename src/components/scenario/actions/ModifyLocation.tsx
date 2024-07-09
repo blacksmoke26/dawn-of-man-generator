@@ -112,7 +112,7 @@ const ModifyLocation = (props: Props) => {
       )}
       {state.data.expanded && (
         <>
-          <Row className="mb-3 mt-2">
+          <Row className="mb-2 mt-2">
             <PropertyLabel caption="Modification"/>
             <Col sm="4">
               <TextInput
@@ -121,7 +121,7 @@ const ModifyLocation = (props: Props) => {
                 value={valuer.get('modification', '')}
                 disabled={isDisabled}
                 placeholder="e.g., MakeNodeShallow"
-                caseType="SNAKE_CASE"
+                caseType="PASCAL_CASE"
                 onChange={value => valuer.set('modification', value)}/>
             </Col>
           </Row>
@@ -131,7 +131,7 @@ const ModifyLocation = (props: Props) => {
             noCard={true}
             header="Optional parameters"
             eventKey="modify_location_optional_parameters">
-            <Row className="mb-3 mt-3">
+            <Row className="mt-2">
               <PropertyCheckboxLabel
                 caption="Position"
                 checked={state.get<boolean>('positionChecked', false)}
@@ -164,7 +164,7 @@ const ModifyLocation = (props: Props) => {
                 }}
               />
             </Row>
-            <Row className="mb-3 mt-2">
+            <Row className="mt-2">
               <PropertyCheckboxLabel
                 caption="Location index"
                 checked={state.get<boolean>('locationIndexChecked', false)}

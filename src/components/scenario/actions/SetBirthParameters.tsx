@@ -104,7 +104,7 @@ const SetBirthParameters = (props: Props) => {
   const isDisabled = state.get<boolean>('disabledCheckbox', false) || state.get<boolean>('disabled', false);
 
   return (
-    <div className={cn('mb-2 checkbox-align', {'text-muted': isDisabled})}>
+    <div className={cn('mb-3 checkbox-align', {'text-muted': isDisabled})}>
       {newProps?.showHeader && (
         <ActionHeader
           caption={ACTION_NAME}
@@ -122,7 +122,7 @@ const SetBirthParameters = (props: Props) => {
             noCard={true}
             header="Optional parameters"
             eventKey="optional_parameters">
-            <Row className="mb-1 mt-3">
+            <Row className="mt-2">
               <PropertyCheckboxLabel
                 caption={<>Decrease start <i className="text-size-xxs text-muted">(population)</i></>}
                 checked={state.get<boolean>('decreaseStartPopulationChecked', false)}
@@ -148,7 +148,7 @@ const SetBirthParameters = (props: Props) => {
                 />
               </Col>
             </Row>
-            <Row className="mb-1 mt-3">
+            <Row className="mt-2">
               <PropertyCheckboxLabel
                 caption={<>Decrease halfing <i className="text-size-xxs text-muted">(population)</i></>}
                 checked={state.get<boolean>('decreaseHalfingPopulationChecked', false)}
@@ -174,20 +174,19 @@ const SetBirthParameters = (props: Props) => {
                 />
               </Col>
             </Row>
+            <RandomizeValuesButton
+              disabled={isDisabled}
+              onClick={() => {
+                if (state.is('decreaseHalfingPopulationChecked', true)) {
+                  valuer.set('decreaseStartPopulation', randomDecreaseStartPopulation());
+                }
+
+                if (state.is('decreaseHalfingPopulationChecked', true)) {
+                  valuer.set('decreaseHalfingPopulation', randomDecreaseHalfingPopulation());
+                }
+              }}
+            />
           </Accordion>
-
-          <RandomizeValuesButton
-            disabled={isDisabled}
-            onClick={() => {
-              if (state.is('decreaseHalfingPopulationChecked', true)) {
-                valuer.set('decreaseStartPopulation', randomDecreaseStartPopulation());
-              }
-
-              if (state.is('decreaseHalfingPopulationChecked', true)) {
-                valuer.set('decreaseHalfingPopulation', randomDecreaseHalfingPopulation());
-              }
-            }}
-          />
         </>
       )}
     </div>

@@ -91,7 +91,7 @@ const SetUiLocked = (props: Props) => {
   const isDisabled = state.get<boolean>('disabledCheckbox', false) || state.get<boolean>('disabled', false);
 
   return (
-    <div className={cn('mb-2', {'text-muted': isDisabled}, 'checkbox-align')}>
+    <div className={cn('pb-2', {'text-muted': isDisabled}, 'checkbox-align')}>
       {newProps?.showHeader && (
         <ActionHeader
           caption={ACTION_NAME}
@@ -108,7 +108,7 @@ const SetUiLocked = (props: Props) => {
           noCard={true}
           header="Optional parameters"
           eventKey="optional_parameters">
-          <Row className="mb-1 mt-3">
+          <Row className="mb-1 mt-2">
             <PropertyCheckboxLabel
               caption="Lock flags"
               checked={state.data.lockFlagsChecked}

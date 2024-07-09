@@ -105,7 +105,7 @@ const SetUiMarker = (props: Props) => {
   const isDisabled = state.get<boolean>('disabledCheckbox', false) || state.get<boolean>('disabled', false);
 
   return (
-    <div className={cn('mb-2', {'text-muted': isDisabled}, 'checkbox-align')}>
+    <div className={cn('pb-3', {'text-muted': isDisabled}, 'checkbox-align')}>
       {newProps?.showHeader && (
         <ActionHeader
           caption={ACTION_NAME}
@@ -118,7 +118,7 @@ const SetUiMarker = (props: Props) => {
       )}
       {state.data.expanded && (
         <>
-          <Row className="mb-3 mt-2">
+          <Row className="mt-2">
             <PropertyLabel caption="Work area ID"/>
             <Col sm="4">
               <TextInput
@@ -132,7 +132,7 @@ const SetUiMarker = (props: Props) => {
                 onChange={value => valuer.set('workAreaId', value)}/>
             </Col>
           </Row>
-          <Row className="mb-1 mt-3">
+          <Row className="mt-2">
             <PropertyLabel caption="Context action"/>
             <AttributeSelect
               className="w-75"
@@ -147,7 +147,7 @@ const SetUiMarker = (props: Props) => {
               }}
             />
           </Row>
-          <Row className="mb-3 mt-3">
+          <Row className="mb-2 mt-2">
             <PropertyLabel caption="Entity type"/>
             <AttributeSelect
               className="w-75"
@@ -170,7 +170,7 @@ const SetUiMarker = (props: Props) => {
             noCard={true}
             header="Optional parameters"
             eventKey="optional_parameters">
-            <Row className="mb-2 mt-3">
+            <Row className="mt-2">
               <PropertyCheckboxLabel
                 caption="Marker type"
                 checked={state.data.markerTypeChecked}
@@ -189,7 +189,7 @@ const SetUiMarker = (props: Props) => {
                 }}
               />
             </Row>
-            <Row className="mb-2 mt-3">
+            <Row className="mt-2">
               <PropertyCheckboxLabel
                 caption="Excluded goal"
                 checked={state.data.excludedGoalChecked}
@@ -211,7 +211,7 @@ const SetUiMarker = (props: Props) => {
                   onChange={value => valuer.set('excludedGoal', value)}/>
               </Col>
             </Row>
-            <Row className="mb-2 mt-3">
+            <Row className="mt-2">
               <PropertyCheckboxLabel
                 caption="Required goal"
                 checked={state.data.requiredGoalChecked}
@@ -231,7 +231,7 @@ const SetUiMarker = (props: Props) => {
                   onChange={value => valuer.set('requiredGoal', value)}/>
               </Col>
             </Row>
-            <Row className="mb-1 mt-3">
+            <Row className="mt-2">
               <PropertyCheckboxLabel
                 caption={<>Danger level <i className="text-size-xxs text-muted">(max)</i></>}
                 checked={state.data.maxDangerLevelChecked}
@@ -241,7 +241,7 @@ const SetUiMarker = (props: Props) => {
               />
               <AttributeSelect
                 className="w-75"
-                colProps={{sm: '6'}}
+                colProps={{sm: 6}}
                 disabled={isDisabled || !state.data.maxDangerLevelChecked}
                 options={DANGER_LEVEL_TYPES.map(value => ({label: capitalCase(value), value}))}
                 value={valuer.get('maxDangerLevel', 'VeryHigh')}
