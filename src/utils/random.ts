@@ -261,31 +261,13 @@ export const randomFrequencies = <T extends string = string>(value: number | nul
 };
 
 /** Random Deposits */
-export const randomDeposits = <T = string>(counts: number = 0): T[] => {
-  const rand: Function = uniqueRandomArray(deposits);
-  const list: T[] = [];
-
-  counts = !counts ? randomInt(1, deposits.length) : counts;
-
-  for (let i = 1; i <= counts; i++) {
-    list.push(rand());
-  }
-
-  return list;
+export const randomDeposits = <T = string>(counts: number = 4): T[] => {
+  return randomArray(deposits, counts, true) as T[];
 };
 
 /** Random Trees */
 export const randomTrees = <T = string>(counts: number = 0): T[] => {
-  const rand: Function = uniqueRandomArray(trees) as RandomArrayFunc<T>;
-  const list: T[] = [];
-
-  counts = !counts ? randomInt(1, trees.length) : counts;
-
-  for (let i = 1; i <= counts; i++) {
-    list.push(rand());
-  }
-
-  return list;
+  return randomArray(trees, counts || trees.length, true) as T[];
 };
 
 /** Random period */
