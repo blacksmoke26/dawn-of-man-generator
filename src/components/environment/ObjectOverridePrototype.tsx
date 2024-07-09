@@ -262,8 +262,8 @@ const ObjectOverridePrototype = (props: Props) => {
             !meta.data.altitudeChecked && delete shuffled.altitude;
             !meta.data.angleChecked && delete shuffled.angle;
             !meta.data.humidityChecked && delete shuffled.humidity;
-
-            valuer.setAll(shuffled);
+            
+            Object.keys(shuffled).length && valuer.setAll(shuffled);
           }}>
           <IconShuffle/> Randomize all
         </LinkButton>
@@ -278,8 +278,8 @@ const ObjectOverridePrototype = (props: Props) => {
             !meta.data.altitudeChecked && delete original.altitude;
             !meta.data.angleChecked && delete original.angle;
             !meta.data.humidityChecked && delete original.humidity;
-
-            valuer.setAll(original);
+            
+            Object.keys(original).length && valuer.setAll(original);
           }}>
           <IconRestore/> Restore all
         </LinkButton>
