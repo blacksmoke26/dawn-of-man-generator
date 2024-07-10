@@ -26,6 +26,7 @@ import {
 import type {EraFactor} from '~/types/action.types';
 import type {environment} from '~/data/environments/parser/types';
 import type {scenario} from '~/data/scenario/parser/types';
+import {MILESTONES_MAX, MILESTONES_MIN} from '~/utils/scenario/defaults';
 
 /** Deposits types */
 export const deposits: string[] = [
@@ -131,6 +132,10 @@ export const randomAngle = (): [number, number] => {
 /** Random Angle */
 export const randomAngleSingle = (): number => {
   return randomIntMinMax(Defaults.ANGLE_MIN, Defaults.ANGLE_MAX);
+};
+
+export const randomMilestone = (): number => {
+  return randomIntMinMax(MILESTONES_MIN, MILESTONES_MAX);
 };
 
 /** Random season temperature */

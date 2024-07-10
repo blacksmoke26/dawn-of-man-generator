@@ -7,91 +7,87 @@
 import React from 'react';
 import * as PropTypes from 'prop-types';
 import cn from 'classname';
-import merge from 'deepmerge';
-import { nanoid } from 'nanoid';
-import { Form } from 'react-bootstrap';
+import {Form} from 'react-bootstrap';
 
 // elemental components
 import PanelToolbar from '~/components/environment/PanelToolbar';
 
 // redux
-import {useAppSelector} from '~redux/hooks';
+import {useAppDispatch, useAppSelector} from '~redux/hooks';
+import {clearProperty} from '~redux/slices/scenario/reducers';
 
 // parsers
 import {toVisualTemplate} from '~/utils/parser/templates-general';
 
 /** Visible `props` type */
 interface Props {
-	enabled?: boolean,
-	value?: boolean,
+  disabled?: boolean,
+  initialValues?: {
+    value: boolean;
+  };
 
-	onChange?(template: string, value: boolean): void,
+  onChange?(template: string): void;
 }
 
 /** Visible functional component */
-const Visible = ( props: Props ) => {
-	props = merge({
-		value: false,
-		enabled: false,
-		onChange: () => {},
-	}, props);
+const Visible = (props: Props) => {
+  const dispatch = useAppDispatch();
 
-	const [value, setValue] = React.useState<boolean>(props.value as boolean);
-	const [enabled, setEnabled] = React.useState<boolean>(props.enabled as boolean);
+  const [value, setValue] = React.useState<boolean>(props?.initialValues?.value ?? false);
+  const [checked, setChecked] = React.useState<boolean>(!(props?.disabled ?? true));
 
-	const visibleAttribute = useAppSelector(({scenario}) => scenario.values?.visible);
-	
-	// Reflect attributes changes
-	React.useEffect(() => {
-		const extValue = visibleAttribute ?? null;
-		
-		if ( typeof extValue === 'boolean' ) {
-			setEnabled(extValue);
-			setValue(extValue);
-		}
-	}, [visibleAttribute]);
-	
-	// Reflect attributes changes
-	React.useEffect(() => {
-		setEnabled(props.enabled as boolean);
-	}, [props.enabled]);
-	
-	// Reflect state changes
-	React.useEffect(() => {
-		typeof props.onChange === 'function' && props.onChange(
-			toVisualTemplate(value, enabled), value
-		);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [value, enabled]);
+  const reduxState = useAppSelector(({scenario}) => scenario.values?.visible) as null | boolean | undefined;
 
-	return (
-		<div className={cn('mb-2', {'text-muted': !enabled}, 'checkbox-align')}>
-			<PanelToolbar
-				checked={enabled}
-				heading="Visible"
-				checkboxPosition="right"
-				description="Whatever to display the previous scenario(s)."
-				onCheckboxChange={state => setEnabled(state)}
-				value={<span className={cn({'text-line-through': !enabled})}>{value ? 'Yes' : 'No'}</span>}
-				disabled={!enabled}/>
-			<Form.Check
-				type="switch"
-				className="pull-right"
-				disabled={!enabled}
-				id={`visible-${nanoid(5)}`}
-				label="Display previous scenarios?"
-				checked={value}
-				onChange={e => setValue(e.target.checked)}
-			/>
-		</div>
-	);
+  // Reflect attributes changes
+  React.useEffect(() => {
+    if (reduxState === null) {
+      setChecked(false);
+      setValue(false);
+      dispatch(clearProperty('visible'));
+    } else if ('boolean' === typeof reduxState) {
+      setChecked(true);
+      setValue(reduxState);
+      dispatch(clearProperty('visible'));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reduxState]);
+
+  // Reflect state changes
+  React.useEffect(() => {
+    props?.onChange?.(toVisualTemplate(value, checked));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value, checked]);
+
+  return (
+    <div className={cn('mb-2', {'text-muted-deep': !checked}, 'checkbox-align')}>
+      <PanelToolbar
+        checked={checked}
+        heading="Visible"
+        checkboxPosition="right"
+        description="Whatever to display the previous scenario(s)."
+        onCheckboxChange={isChecked => setChecked(isChecked)}
+        value={<span className={cn({'text-line-through': !checked})}>{value ? 'Yes' : 'No'}</span>}
+        disabled={!checked}/>
+      <Form.Check
+        type="switch"
+        className="pull-right"
+        disabled={!checked}
+        id="visible"
+        label="Display previous scenarios?"
+        checked={value}
+        onChange={e => setValue(e.target.checked)}
+      />
+    </div>
+  );
 };
 
 // Properties validation
 Visible.propTypes = {
-	value: PropTypes.bool,
-	enabled: PropTypes.bool,
-	onChange: PropTypes.func,
+  disabled: PropTypes.bool,
+  initialValues: PropTypes.exact({
+    value: PropTypes.bool,
+  }),
+  onChange: PropTypes.func,
 };
 
 export default Visible;

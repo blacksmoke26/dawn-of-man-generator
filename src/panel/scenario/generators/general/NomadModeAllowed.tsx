@@ -9,91 +9,87 @@
 import React from 'react';
 import * as PropTypes from 'prop-types';
 import cn from 'classname';
-import merge from 'deepmerge';
-import {nanoid} from 'nanoid';
 import {Form} from 'react-bootstrap';
 
 // elemental components
 import PanelToolbar from '~/components/environment/PanelToolbar';
 
 // redux
-import {useAppSelector} from '~redux/hooks';
+import {useAppDispatch, useAppSelector} from '~redux/hooks';
+import {clearProperty} from '~redux/slices/scenario/reducers';
 
 // parsers
 import {toNomadModeAllowedTemplate} from '~/utils/parser/templates-general';
 
 /** NomadModeAllowed `props` type */
 interface Props {
-	enabled?: boolean,
-	value?: boolean,
+  disabled?: boolean,
+  initialValues?: {
+    value: boolean;
+  };
 
-	onChange?(template: string, value: boolean): void,
+  onChange?(template: string): void;
 }
 
 /** NomadModeAllowed functional component */
-function NomadModeAllowed ( props: Props ) {
-	props = merge({
-		value: false,
-		enabled: false,
-		onChange: () => {},
-	}, props);
+function NomadModeAllowed(props: Props) {
+  const dispatch = useAppDispatch();
 
-	const [value, setValue] = React.useState<boolean>(props.value as boolean);
-	const [enabled, setEnabled] = React.useState<boolean>(props.enabled as boolean);
+  const [value, setValue] = React.useState<boolean>(props?.initialValues?.value ?? false);
+  const [checked, setChecked] = React.useState<boolean>(!(props?.disabled ?? true));
 
-	const nomadModeAllowedAttribute = useAppSelector(({scenario}) => scenario.values?.nomadModeAllowed);
-	
-	// Reflect attributes changes
-	React.useEffect(() => {
-		const extValue = nomadModeAllowedAttribute ?? null;
-		
-		if ( typeof extValue === 'boolean' ) {
-			setEnabled(extValue);
-			setValue(extValue);
-		}
-	}, [nomadModeAllowedAttribute]);
-	
-	// Reflect attributes changes
-	React.useEffect(() => {
-		setEnabled(props.enabled as boolean);
-	}, [props.enabled]);
-	
-	// Reflect state changes
-	React.useEffect(() => {
-		typeof props.onChange === 'function' && props.onChange(
-			toNomadModeAllowedTemplate(value, enabled), value
-		);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [value, enabled]);
+  const reduxState = useAppSelector(({scenario}) => scenario.values?.nomadModeAllowed) as null | boolean | undefined;
 
-	return (
-		<div className={cn('mb-2', {'text-muted': !enabled}, 'checkbox-align')}>
-			<PanelToolbar
-        checked={enabled}
+  // Reflect attributes changes
+  React.useEffect(() => {
+    if (reduxState === null) {
+      setChecked(false);
+      setValue(false);
+      dispatch(clearProperty('nomadModeAllowed'));
+    } else if ('boolean' === typeof reduxState) {
+      setChecked(true);
+      setValue(reduxState);
+      dispatch(clearProperty('nomadModeAllowed'));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reduxState]);
+
+  // Reflect state changes
+  React.useEffect(() => {
+    props?.onChange?.(toNomadModeAllowedTemplate(value, checked));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value, checked]);
+
+  return (
+    <div className={cn('mb-2', {'text-muted-deep': !checked}, 'checkbox-align')}>
+      <PanelToolbar
+        checked={checked}
         heading="Nomad Mode"
-				checkboxPosition="right"
+        checkboxPosition="right"
         description="Player whether this scenario can be played in nomad mode or not."
-        onCheckboxChange={state => setEnabled(state)}
-				value={<span className={cn({'text-line-through': !enabled})}>{value ? 'Yes' : 'No'}</span>}
-        disabled={!enabled}/>
-			<Form.Check
-				type="switch"
-				className="pull-right"
-				disabled={!enabled}
-				id={`nomad_mode_allowed-${nanoid(5)}`}
-				label="Allowed?"
-				checked={value}
-				onChange={e => setValue(e.target.checked)}
-			/>
-		</div>
-	);
+        onCheckboxChange={isChecked => setChecked(isChecked)}
+        value={<span className={cn({'text-line-through': !checked})}>{value ? 'Yes' : 'No'}</span>}
+        disabled={!checked}/>
+      <Form.Check
+        type="switch"
+        className="pull-right"
+        disabled={!checked}
+        id="nomad_mode_allowed"
+        label="Allowed?"
+        checked={value}
+        onChange={e => setValue(e.target.checked)}
+      />
+    </div>
+  );
 }
 
 // Properties validation
 NomadModeAllowed.propTypes = {
-	value: PropTypes.bool,
-	enabled: PropTypes.bool,
-	onChange: PropTypes.func,
+  disabled: PropTypes.bool,
+  initialValues: PropTypes.exact({
+    value: PropTypes.bool,
+  }),
+  onChange: PropTypes.func,
 };
 
 export default NomadModeAllowed;

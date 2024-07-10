@@ -14,6 +14,8 @@ export const MILESTONES_MIN: number = 1;
 
 export const MILESTONES_MAX: number = 20;
 
+export const MILESTONES_DEFAULT: number = 3;
+
 export const PRESTIGE_MIN: number = 1;
 
 export const PRESTIGE_MAX: number = 1500;

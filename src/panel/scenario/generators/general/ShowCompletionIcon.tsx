@@ -7,92 +7,88 @@
 import React from 'react';
 import * as PropTypes from 'prop-types';
 import cn from 'classname';
-import merge from 'deepmerge';
-import {nanoid} from 'nanoid';
 import {Form} from 'react-bootstrap';
 
 // elemental components
 import PanelToolbar from '~/components/environment/PanelToolbar';
 
 // redux
-import {useAppSelector} from '~redux/hooks';
+import {useAppDispatch, useAppSelector} from '~redux/hooks';
+import {clearProperty} from '~redux/slices/scenario/reducers';
 
 // parsers
 import {toShowCompletionIconTemplate} from '~/utils/parser/templates-general';
 
 /** ShowCompletionIcon `props` type */
 interface Props {
-	enabled?: boolean,
-	value?: boolean,
+  disabled?: boolean,
+  initialValues?: {
+    value: boolean;
+  };
 
-	onChange(template: string, value: boolean): void,
+  onChange?(template: string): void;
 }
 
 /** ShowCompletionIcon functional component */
-const ShowCompletionIcon = ( props: Props ) => {
-	props = merge({
-		value: true,
-		enabled: false,
-		onChange: () => {},
-	}, props);
+const ShowCompletionIcon = (props: Props) => {
+  const dispatch = useAppDispatch();
 
-	const [value, setValue] = React.useState<boolean>(props.value as boolean);
-	const [enabled, setEnabled] = React.useState<boolean>(props.enabled as boolean);
+  const [value, setValue] = React.useState<boolean>(props?.initialValues?.value ?? false);
+  const [checked, setChecked] = React.useState<boolean>(!(props?.disabled ?? true));
 
-	const showCompletionIconAttribute = useAppSelector(({scenario}) => scenario.values?.showCompletionIcon)
+  const reduxState = useAppSelector(({scenario}) => scenario.values?.showCompletionIcon) as null | boolean | undefined;
 
-	// Reflect attributes changes
-	React.useEffect(() => {
-		const extValue = showCompletionIconAttribute ?? null;
+  // Reflect attributes changes
+  React.useEffect(() => {
+    if (reduxState === null) {
+      setChecked(false);
+      setValue(false);
+      dispatch(clearProperty('showCompletionIcon'));
+    } else if ('boolean' === typeof reduxState) {
+      setChecked(true);
+      setValue(reduxState);
+      dispatch(clearProperty('showCompletionIcon'));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reduxState]);
 
-		if ( typeof extValue === 'boolean' ) {
-			setEnabled(extValue);
-			setValue(extValue);
-		}
-	}, [showCompletionIconAttribute]);
+  // Reflect state changes
+  React.useEffect(() => {
+    props?.onChange?.(toShowCompletionIconTemplate(value, checked));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value, checked]);
 
-	// Reflect attributes changes
-	React.useEffect(() => {
-		setEnabled(props.enabled as boolean);
-	}, [props.enabled]);
-
-	// Reflect state changes
-	React.useEffect(() => {
-		typeof props.onChange === 'function' && props.onChange(
-			toShowCompletionIconTemplate(value, enabled), value
-		);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [value, enabled]);
-
-	return (
-		<div className={cn('mb-2', {'text-muted': !enabled}, 'checkbox-align')}>
-			<PanelToolbar
-        checked={enabled}
+  return (
+    <div className={cn('mb-2', {'text-muted-deep': !checked}, 'checkbox-align')}>
+      <PanelToolbar
+        checked={checked}
         heading="Show Completion Icon"
-				checkboxPosition="right"
+        checkboxPosition="right"
         description="Defines whether a small icon will appear next to the scenario indicating it's completion status."
-        onCheckboxChange={state => setEnabled(state)}
-				value={<span className={cn({'text-line-through': !enabled})}>{value ? 'Yes' : 'No'}</span>}
-        disabled={!enabled}/>
+        onCheckboxChange={state => setChecked(state)}
+        value={<span className={cn({'text-line-through': !checked})}>{value ? 'Yes' : 'No'}</span>}
+        disabled={!checked}/>
 
-			<Form.Check
-				type="switch"
-				className="pull-right"
-				disabled={!enabled}
-				id={`show_completion_icon-${nanoid(5)}`}
-				label="Display icon?"
-				checked={value}
-				onChange={e => setValue(e.target.checked)}
-			/>
-		</div>
-	);
+      <Form.Check
+        type="switch"
+        className="pull-right"
+        disabled={!checked}
+        id="show_completion_icon"
+        label="Display icon?"
+        checked={value}
+        onChange={e => setValue(e.target.checked)}
+      />
+    </div>
+  );
 };
 
 // Properties validation
 ShowCompletionIcon.propTypes = {
-	value: PropTypes.bool,
-	enabled: PropTypes.bool,
-	onChange: PropTypes.func,
+  disabled: PropTypes.bool,
+  initialValues: PropTypes.exact({
+    value: PropTypes.bool,
+  }),
+  onChange: PropTypes.func,
 };
 
 export default ShowCompletionIcon;

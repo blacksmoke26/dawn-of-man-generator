@@ -7,79 +7,72 @@
 import React from 'react';
 import * as PropTypes from 'prop-types';
 import cn from 'classname';
-import merge from 'deepmerge';
-import {nanoid} from 'nanoid';
 import {Form} from 'react-bootstrap';
 
 // elemental components
 import PanelToolbar from '~/components/environment/PanelToolbar';
 
 // redux
-import {useAppSelector} from '~redux/hooks';
+import {useAppDispatch, useAppSelector} from '~redux/hooks';
+import {clearProperty} from '~redux/slices/scenario/reducers';
 
 // parsers
 import {toHardcoreModeAllowedTemplate} from '~/utils/parser/templates-general';
 
 /** HardcoreModeAllowed `props` type */
 interface Props {
-  enabled?: boolean,
-  value?: boolean,
+  disabled?: boolean,
+  initialValues?: {
+    value: boolean;
+  };
 
-  onChange(template: string, value: boolean): void,
+  onChange?(template: string): void;
 }
 
 /** HardcoreModeAllowed functional component */
 const HardcoreModeAllowed = (props: Props) => {
-  props = merge({
-    value: true,
-    enabled: false,
-    onChange: () => {
-    },
-  }, props);
+  const dispatch = useAppDispatch();
 
-  const [value, setValue] = React.useState<boolean>(props.value as boolean);
-  const [enabled, setEnabled] = React.useState<boolean>(props.enabled as boolean);
+  const [value, setValue] = React.useState<boolean>(props?.initialValues?.value ?? false);
+  const [checked, setChecked] = React.useState<boolean>(!(props?.disabled ?? true));
 
-  const hardcoreModeAllowedAttribute = useAppSelector(({scenario}) => scenario?.values?.hardcoreModeAllowed);
+  const reduxState = useAppSelector(({scenario}) => scenario?.values?.hardcoreModeAllowed) as null | boolean | undefined;
 
   // Reflect attributes changes
   React.useEffect(() => {
-    const extValue = hardcoreModeAllowedAttribute ?? null;
-
-    if (typeof extValue === 'boolean') {
-      setEnabled(extValue);
-      setValue(extValue);
+    if (reduxState === null) {
+      setChecked(false);
+      setValue(false);
+      dispatch(clearProperty('hardcoreModeAllowed'));
+    } else if ('boolean' === typeof reduxState) {
+      setChecked(true);
+      setValue(reduxState);
+      dispatch(clearProperty('hardcoreModeAllowed'));
     }
-  }, [hardcoreModeAllowedAttribute]);
-
-  // Reflect attributes changes
-  React.useEffect(() => {
-    setEnabled(props.enabled as boolean);
-  }, [props.enabled]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reduxState]);
 
   // Reflect state changes
   React.useEffect(() => {
-    typeof props.onChange === 'function' && props.onChange(
-      toHardcoreModeAllowedTemplate(value, enabled), value
-    );
+    props?.onChange?.(toHardcoreModeAllowedTemplate(value, checked));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value, enabled]);
+  }, [value, checked]);
 
   return (
-    <div className={cn('mb-2', {'text-muted': !enabled}, 'checkbox-align')}>
+    <div className={cn('mb-2', {'text-muted-deep': !checked}, 'checkbox-align')}>
       <PanelToolbar
-        checked={enabled}
+        checked={checked}
         heading="Hardcore Mode"
-				checkboxPosition="right"
+        checkboxPosition="right"
         description="Player whether this scenario can be played in hardcore mode or not."
-        onCheckboxChange={state => setEnabled(state)}
-				value={<span className={cn({'text-line-through': !enabled})}>{value ? 'Yes' : 'No'}</span>}
-        disabled={!enabled}/>
+        onCheckboxChange={isChecked => setChecked(isChecked)}
+        value={<span className={cn({'text-line-through': !checked})}>{value ? 'Yes' : 'No'}</span>}
+        disabled={!checked}/>
       <Form.Check
         type="switch"
         className="pull-right"
-        disabled={!enabled}
-        id={`hardcore_mode_allowed-${nanoid(5)}`}
+        disabled={!checked}
+        id="hardcore_mode_allowed"
         label="Allowed?"
         checked={value}
         onChange={e => setValue(e.target.checked)}
@@ -90,8 +83,10 @@ const HardcoreModeAllowed = (props: Props) => {
 
 // Properties validation
 HardcoreModeAllowed.propTypes = {
-  value: PropTypes.bool,
-  enabled: PropTypes.bool,
+  disabled: PropTypes.bool,
+  initialValues: PropTypes.exact({
+    value: PropTypes.bool,
+  }),
   onChange: PropTypes.func,
 };
 
