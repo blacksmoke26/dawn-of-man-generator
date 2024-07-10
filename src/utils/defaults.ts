@@ -167,3 +167,5 @@ export const LOCATIONS_CREATE_MAX: number = 15;
 export const STARTING_CONDITIONS: scenario.StartingConditions = {
   seasonId: 'Spring',
 };
+
+export const MILESTONES_CREATE_MAX: number = 20;

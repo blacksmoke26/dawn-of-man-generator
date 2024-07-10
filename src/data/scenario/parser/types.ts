@@ -105,16 +105,22 @@ export namespace scenario {
       type: LogicalCondition;
       conditions: GeneralCondition[];
     }
+
+    export type Condition = (condition.GeneralCondition | condition.LogicalCondition);
+    export type Conditions = Condition[];
   }
 
   export interface Milestone {
-    id: Lowercase<string>;
-    conditions: (condition.GeneralCondition | condition.LogicalCondition)[];
+    id: string;
+    description?: string;
+    conditions: condition.Conditions;
   }
 
   export interface Goal {
-    id: Lowercase<string>;
-    conditions: (condition.GeneralCondition | condition.LogicalCondition)[];
+    id: string;
+    description?: string;
+    showStatus?: boolean;
+    conditions: condition.Conditions;
   }
 
   export type LocationPosition = [number, number];
