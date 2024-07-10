@@ -100,7 +100,7 @@ const StartingCondition = (props: Props) => {
         value=""
         disabled={!attributes.enabled}/>
 
-      <Row className="mb-1 mt-3">
+      <Row className="mt-2">
         <PropertyLabel disabled={!attributes.enabled} caption="Season"/>
         <AttributeSelect
           className="w-75"
@@ -116,7 +116,7 @@ const StartingCondition = (props: Props) => {
           }}
         />
       </Row>
-      <Row className="mb-1 mt-3">
+      <Row className="mt-2">
         <PropertyLabel disabled={!attributes.enabled} caption="Visual Setup"/>
         <Col xs="6">
           <TextInput
