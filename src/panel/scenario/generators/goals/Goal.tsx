@@ -1,192 +1,126 @@
 /**
  * @author Junaid Atari <mj.atari@gmail.com>
  * @see https://github.com/blacksmoke26/dawn-of-man-generator
- * @since 2024-06-23
- * @version 2.4
+ * @since 2024-07-10
  */
 
 import React from 'react';
-//import * as PropTypes from 'prop-types';
 import cn from 'classname';
-import merge from 'deepmerge';
 import {nanoid} from 'nanoid';
 import {Col, Row} from 'react-bootstrap';
 
 // elemental components
+import Accordion from '~/components/ui/Accordion';
 import TextInput from '~/components/ui/TextInput';
 import Select, {Option} from '~/components/ui/Select';
+import PropertyLabel from '~/components/ui/PropertyLabel';
+import Condition from '~/components/scenario/generic/Condition';
 
 // components
 import {GoalCheck, GoalRemove, GoalToggle} from './utils/elements';
-import Condition from '~/components/scenario/generic/Condition';
 
 // icons
-import {COLOR_REDDISH, IconCondition, IconConditionLogical, IconGoal} from '~/components/icons/app';
+import {COLOR_REDDISH, IconCondition, IconConditionLogical} from '~/components/icons/app';
 
 // utils
-import {toString} from '~/helpers/string';
+import {cloneObject, onlyKeys} from '~/helpers/object';
+import {CONDITIONS_OPTIONS} from '~/utils/condition';
+
+// parsers
 import {buildStrings, LangStrings} from '~/utils/strings';
-import {CONDITIONS_OPTIONS, LOGICAL_CONDITION} from '~/utils/condition';
-import {
-  conditionsToChangedValues,
-  defaultValues,
-  propToConditionsAttributes,
-  toGoalTemplate,
-} from './utils/general';
+import {toGoalTemplate} from '~/utils/parser/template-goal';
 
 // hooks
-import useAttributes from '~/hooks/use-attributes';
+import useValues from '~/hooks/use-values';
 
 // types
-import type {Required} from 'utility-types';
-import type {KVDocument} from '~/types/json.types';
-import type {
-  GoalChangedConditions,
-  GoalChangedValues,
-  GoalConditionsAttributes,
-  GoalPropConditions,
-} from './types/goal.types';
-import {onlyKeys} from '~/helpers/object';
+import {scenario} from '~/data/scenario/parser/types';
+import {ConditionName} from '~/types/condition.types';
+import AttributeCheckbox from '~/components/ui/elements/AttributeCheckbox';
+import PropertyCheckboxLabel from '~/components/ui/PropertyCheckboxLabel';
 
 export interface Props {
-  id?: string;
-  description?: string;
   disabled?: boolean;
   disabledCheckbox?: boolean;
   expanded?: boolean;
-  conditions?: GoalPropConditions;
+
+  initialValues?: scenario.Goal;
 
   /** A callback triggers when metadata values are updated */
-  onValuesChange?(values: GoalChangedValues): void;
-
-  /** A callback triggers when conditions are updated */
-  onConditionsChange?(values: GoalChangedConditions): void;
+  onValuesChange?(values: scenario.Goal): void;
 
   /** A callback triggers when language strings are updated */
   onStringsChange?(strings: LangStrings): void;
 
   /** A callback triggers when xml template is rendered */
   onTemplate?(value: string): void;
-
-  /** A callback triggers when the remove icon button is clicked */
-  onRemoveClick?(): void,
 }
 
-/** Goal functional component */
+type ConditionAttribute = Record<string, scenario.condition.Condition>;
+
+interface GoalAttributes {
+  disabled: boolean;
+  disabledCheckbox: boolean;
+  expanded: boolean;
+  showStatusChecked: boolean;
+}
+
+interface ValueAttributes extends Omit<scenario.Goal, 'conditions'> {
+  conditions: ConditionAttribute;
+}
+
 const Goal = (props: Props) => {
-  const newProps = merge<Required<Props>>(defaultValues, props);
+  const valuer = useValues<ValueAttributes>(onlyKeys(
+    props?.initialValues ?? {}, ['conditions'], true,
+  ) as ValueAttributes);
 
-  const [attributes, setAttr, getAttr] = useAttributes<{
-    id: string, desc: string,
-    disabled: boolean;
-    disabledCheckbox: boolean;
-    expanded: boolean;
-  }>({
-    id: toString(newProps.id),
-    desc: toString(newProps.description),
-    disabled: newProps.disabled,
-    disabledCheckbox: newProps.disabledCheckbox,
-    expanded: newProps.expanded,
-  });
-
-  const [conditions, setCond, , remCond, clearCond, setAllCond] = useAttributes<GoalConditionsAttributes>(
-    propToConditionsAttributes(newProps?.conditions),
+  const condition = useValues<ConditionAttribute>(
+    valuesToConditionAttributes(props?.initialValues)
   );
 
-  //<editor-fold desc="Reflect strings(language texts) changes">
+  const meta = useValues<GoalAttributes>({
+    disabled: props?.disabled ?? false,
+    disabledCheckbox: props?.disabledCheckbox ?? false,
+    expanded: props?.expanded ?? true,
+    showStatusChecked: !valuer.is('showStatus', undefined),
+  });
+
   React.useEffect(() => {
-    const strings: KVDocument<string> = {};
-
-    if (!attributes.disabled) {
-      strings[attributes.id] = attributes.desc;
-    }
-
-    newProps.onStringsChange(buildStrings(strings));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [attributes.id, attributes.desc, attributes.disabled]);
-  //</editor-fold>
-
-  //<editor-fold desc="Reflect values changes">
-  React.useEffect(() => {
-    newProps.onValuesChange(attributes.disabled ? {} : {
-      id: attributes.id,
-      description: attributes.desc,
+    const changedValues = cloneObject({
+      ...valuer.data,
+      conditions: Object.values(condition.data),
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [attributes.id, attributes.desc, attributes.disabled]);
-  //</editor-fold>
 
-  //<editor-fold desc="Reflect conditions/xml-template changes">
-  React.useEffect(() => {
-    newProps.onTemplate(attributes.disabled ? '' : toGoalTemplate(attributes.id, conditions));
-    newProps.onConditionsChange(attributes.disabled ? [] : conditionsToChangedValues(conditions));
+    !meta.data.showStatusChecked && delete changedValues.showStatus;
+
+    const isDisabled = meta.data.disabled || meta.data.disabledCheckbox;
+
+    props?.onTemplate?.(toGoalTemplate(changedValues, isDisabled));
+    props?.onStringsChange?.(!isDisabled && changedValues?.conditions.length ? createStrings(changedValues) : {});
+    props?.onValuesChange?.(isDisabled ? {} as scenario.Goal : changedValues);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [conditions, attributes.disabled, attributes.id]);
+  }, [condition.data, valuer.data,
+    meta.data.disabled, meta.data.showStatusChecked, meta.data.disabledCheckbox
+  ]);
   //</editor-fold>
 
   //<editor-fold desc="Reflect prop changes">
   React.useEffect(() => {
-    setAttr('id', props?.id, true);
-    setAttr('desc', props?.description, true);
-    setAttr('expanded', props?.expanded, true);
-    setAttr('disabled', props?.disabled, true);
-    setAttr('disabledCheckbox', props?.disabledCheckbox, true);
-
-    if (Array.isArray(props?.conditions)) {
-      clearCond();
-      setAllCond(propToConditionsAttributes(props?.conditions || []));
-    }
+    meta.set('expanded', props?.expanded, true);
+    meta.set('disabled', props?.disabled, true);
+    meta.set('disabledCheckbox', props?.disabledCheckbox, true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props?.id, props?.description, props?.expanded, props?.disabled, props?.disabledCheckbox, props?.conditions]);
+  }, [props?.expanded, props?.disabled, props?.disabledCheckbox]);
   //</editor-fold>
 
-  const isDisabled =
-    getAttr<boolean>('disabledCheckbox')
-    || getAttr<boolean>('disabled');
-
-  /** Generate selection based nodes */
-  const renderConditions = (): React.ReactElement[] => {
-    const elements: React.ReactElement[] = [];
-
-    const totalCount = Object.keys(conditions).length;
-    let index = 0;
-
-    for (const [_id, condition] of Object.entries(conditions)) {
-      const {type, ...initialValues} = condition;
-
-      elements.push(
-        <React.Fragment key={_id}>
-          <div
-            className="ml-2 pl-3"
-            style={{borderLeft: '2px solid rgb(97 137 97)'}}>
-            <Condition
-              type={type}
-              disabledCheckbox={isDisabled}
-              enabled={!isDisabled}
-              initialValues={initialValues}
-              onRemoveClick={() => remCond(_id)}
-              onValuesChange={values => {
-                setCond(_id, {type, ...onlyKeys(values, ['type'], true)});
-              }}
-            />
-          </div>
-          {index < totalCount - 1 && <hr className="mt-2 mb-2"/>}
-        </React.Fragment>,
-      );
-      index++;
-    }
-
-    return elements;
-  };
+  const isDisabled = meta.data.disabled || meta.data.disabledCheckbox;
+  const conditions = Object.entries(condition.data);
+  const conditionsCount = conditions.length;
 
   return (
-    <div className={cn('mt-0 checkbox-align', {'text-muted': isDisabled})}>
+    <div className={cn('mt-0 checkbox-align', {'text-muted-deep': isDisabled})}>
       <Row className="mb-2 mt-2">
-        <Col sm="2">
-          <div className="position-relative" style={{top: 7}}>
-            <IconGoal width="16" height="16"/> Goal ID
-          </div>
-        </Col>
+        <PropertyLabel caption="Goal ID" disabled={isDisabled}/>
         <Col sm="10">
           <Row>
             <Col sm="7" className="text-left">
@@ -195,98 +129,134 @@ const Goal = (props: Props) => {
                 focusOnLoad={true}
                 caseType="SNAKE_CASE"
                 disabled={isDisabled}
-                value={getAttr<string>('id')}
-                placeholder="e.g., 150people"
-                onChange={value => setAttr('id', value as string)}/>
+                value={valuer.get('id', 'untitled')}
+                placeholder="e.g., survival_5_weeks"
+                onChange={value => valuer.set('id', value as string)}/>
             </Col>
             <Col sm="5" className="text-right">
-              <div className="float-right">
-                <GoalToggle
-                  disabled={getAttr<boolean>('disabledCheckbox')}
-                  expanded={getAttr<boolean>('expanded')}
-                  onClick={() => setAttr('expanded', !getAttr<boolean>('expanded'))}/>
-                <GoalCheck
-                  disabled={getAttr<boolean>('disabledCheckbox')} checked={getAttr<boolean>('disabled')}
-                  onChange={isChecked => setAttr('disabled', !isChecked)}/>
-                <GoalRemove
-                  disabled={getAttr<boolean>('disabledCheckbox')}
-                  onClick={() => newProps.onRemoveClick()}/>
-              </div>
-              <div className="clearfix"></div>
+              <GoalToggle
+                disabled={meta.data.disabledCheckbox}
+                expanded={meta.data.expanded}
+                onClick={() => meta.set('expanded', isExpanded => !isExpanded)}/>
+              <GoalRemove
+                disabled={meta.data.disabledCheckbox}
+                onClick={() => condition.setAll({})}/>
+              <GoalCheck
+                disabled={meta.data.disabledCheckbox}
+                checked={meta.data.disabled}
+                onChange={isChecked => meta.set('disabled', !isChecked)}/>
             </Col>
           </Row>
         </Col>
       </Row>
-      <div className={cn({'d-none invisible': !getAttr<boolean>('expanded')})}>
-        <Row className="mb-2 mt-2">
-          <Col sm="2">
-            <div
-              className="position-relative ml-3"
-              style={{top: 7}}>
-              <span
-                title="Displayed as the name of the goal, stores in a language file"
-                style={{textDecoration: 'underline dotted', cursor: 'default'}}>
-                Description
+
+      <div className={cn({'d-none invisible': !meta.data.expanded})}>
+        <Accordion
+          noBodyPad={true}
+          noCard={true}
+          header="Optional parameters"
+          eventKey="optional_parameters">
+          <Row className="mt-2">
+            <PropertyLabel
+              disabled={isDisabled}
+              caption="Description"
+              tooltip="Displayed as the name of the milestone, stores in a language file"
+            />
+            <Col sm="7">
+              <TextInput
+                caseType="DEFAULT"
+                allowClear={true}
+                disabled={isDisabled}
+                value={valuer.get('description', '')}
+                inputProps={{as: 'textarea', style: {height: 32, overflow: 'auto'}, 'aria-disabled': isDisabled}}
+                placeholder="e.g., Survive the long and cold winters..."
+                onChange={value => valuer.set('description', String(value))}/>
+            </Col>
+          </Row>
+          <Row className="mt-2">
+            <PropertyCheckboxLabel
+              disabled={isDisabled} caption="Show status"
+              checked={meta.data.showStatusChecked}
+              undefinedSetter={[valuer, 'showStatus', false]}
+              onChange={isChecked => meta.set('showStatusChecked', isChecked)}
+            />
+            <AttributeCheckbox
+              disabled={isDisabled || !meta.data.showStatusChecked}
+              caption="Display notification upon completed"
+              checked={valuer.get('showStatus', false)}
+              onChange={isChecked => valuer.set('showStatus', isChecked)}
+            />
+          </Row>
+        </Accordion>
+
+        <Row className="mt-3 mb-3">
+          <Col sm="9">
+            <Select
+              isDisabled={isDisabled}
+              menuPortalTarget={document.body}
+              options={CONDITIONS_OPTIONS}
+              value={null}
+              formatOptionLabel={(option: Option | any) => (
+                <span>
+                {option.type === 'logical' && <IconConditionLogical width="17" height="17" color={COLOR_REDDISH}/>}
+                  {option.type === 'general' && <IconCondition width="17" height="17" color={COLOR_REDDISH}/>}
+                  {' '} {option?.label}
               </span>
-            </div>
-          </Col>
-          <Col sm="10">
-            <Row>
-              <Col sm="10" className="text-left">
-                <TextInput
-                  caseType="DEFAULT"
-                  allowClear={true}
-                  disabled={isDisabled}
-                  value={getAttr<string>('desc')}
-                  inputProps={{as: 'textarea', style: {height: 50, overflow: 'auto'}, 'aria-disabled': isDisabled}}
-                  placeholder="e.g., Reach a population of 150."
-                  onChange={value => setAttr('desc', value as string)}/>
-              </Col>
-            </Row>
+              )}
+              placeholder="Add milestone condition..."
+              onChange={(option: Option | any): void => {
+                const conditionId: string = nanoid(10).toLowerCase();
+                condition.set(conditionId, {type: option.value});
+              }}
+            />
           </Col>
         </Row>
-        <div className="mt-2 mb-3">
-          <Select
-            isDisabled={isDisabled}
-            menuPortalTarget={document.body}
-            options={CONDITIONS_OPTIONS}
-            value={null}
-            formatOptionLabel={(option: Option | any) => (
-              <span>
-                {option.type === 'logical' && <IconConditionLogical width="17" height="17" color={COLOR_REDDISH}/>}
-                {option.type === 'general' && <IconCondition width="17" height="17" color={COLOR_REDDISH}/>}
-                {' '} {option?.label}
-              </span>
-            )}
-            placeholder="Add goal condition..."
-            onChange={(option: Option | any, {action}): void => {
-              if (action === 'select-option' && option) {
-                const conditionId: string = nanoid(10).toLowerCase();
-                const params: KVDocument = {type: option.value};
+        {conditions.map(([id, data], index) => {
+          const {type, ...initialValues} = cloneObject(data as Record<string, any>);
 
-                if (LOGICAL_CONDITION.includes(option.value)) {
-                  params.conditions = [];
-                }
-
-                setCond(conditionId, params);
-              }
-            }}
-          />
-        </div>
-        {renderConditions()}
+          return (
+            <React.Fragment key={id}>
+              <div
+                className="ml-2 pl-3"
+                style={{borderLeft: '2px solid rgb(97 137 97)'}}>
+                <Condition
+                  type={type as ConditionName}
+                  disabledCheckbox={isDisabled}
+                  enabled={!isDisabled}
+                  initialValues={initialValues}
+                  onRemoveClick={() => condition.remove(id)}
+                  onValuesChange={changedValues => {
+                    condition.overwrite(id, cloneObject({type, ...changedValues}));
+                  }}
+                />
+              </div>
+              {index < conditionsCount - 1 && <hr className="mt-2 mb-2"/>}
+            </React.Fragment>
+          );
+        })}
+        <div className="mb-3"></div>
       </div>
-      <div className="mb-3"></div>
     </div>
   );
 };
 
-// Properties validation
-Goal.propTypes = {
-  /*id: PropTypes.string,
-  disabledCheckbox: PropTypes.bool,
-  disabled: PropTypes.bool,
-  conditions: PropTypes.object,
-  onRemoveClick: PropTypes.func,*/
+const valuesToConditionAttributes = (initialValues?: scenario.Goal) => {
+  return cloneObject(initialValues?.conditions ?? []).reduce((accum, condition) => {
+    accum[nanoid(10).toLowerCase()] = condition;
+    return accum;
+  }, {} as ConditionAttribute);
+};
+
+const createStrings = (values: scenario.Goal, disabled: boolean = false) => {
+  const strings: LangStrings = {};
+
+  if (disabled) return strings;
+
+  if (values?.description?.trim()) {
+    strings[values.id] = values.description;
+  }
+
+  return buildStrings(strings);
 };
 
 export default Goal;
