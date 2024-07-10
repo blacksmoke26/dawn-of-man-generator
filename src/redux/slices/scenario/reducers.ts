@@ -100,6 +100,7 @@ export const {
   updateName,
   updateByPath,
   clearProperty,
+  resetValues,
 } = scenarioSlice.actions;
 
 export const reducer = scenarioSlice.reducer;

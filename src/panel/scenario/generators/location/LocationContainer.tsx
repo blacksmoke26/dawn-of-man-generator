@@ -25,10 +25,12 @@ import {locationToStrings} from '~/utils/location';
 import {LOCATIONS_CREATE_MAX} from '~/utils/defaults';
 
 // redux
-import {useAppSelector} from '~redux/hooks';
+import {useAppDispatch, useAppSelector} from '~redux/hooks';
+import {clearProperty} from '~redux/slices/scenario/reducers';
 
 // types
 import type {scenario} from '~/data/scenario/parser/types';
+import {cloneObject} from '~/helpers/object';
 
 /** LocationContainer `props` type */
 interface Props {
@@ -39,11 +41,33 @@ interface Props {
 
 /** LocationContainer functional component */
 const LocationContainer = (props: Props) => {
+  const dispatch = useAppDispatch();
+
   const initiated = useAppSelector(({config}) => config.initiated);
 
   const [checked, setChecked] = React.useState<boolean>(true);
   const [locations, setLocations] = React.useState<Record<string, scenario.Location>>({});
   const [activeKey, setActiveKey] = React.useState<string>('');
+
+  const reduxState = useAppSelector(({scenario}) => scenario?.values?.locations) as null | scenario.Location[] | undefined;
+
+  // Reflect attributes changes
+  React.useEffect(() => {
+    if (reduxState === null) {
+      setChecked(true);
+      setLocations({});
+      dispatch(clearProperty('locations'));
+    } else if (Array.isArray(reduxState)) {
+      setChecked(true);
+      const cloned = cloneObject<scenario.Location[]>(reduxState);
+      setLocations(cloned.reduce((accum, item) => {
+        accum[nanoid(10)] = item;
+        return accum;
+      }, {} as Record<string, scenario.Location>))
+      dispatch(clearProperty('locations'));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reduxState]);
 
   React.useEffect(() => {
     if (initiated) newLocation();
@@ -63,9 +87,6 @@ const LocationContainer = (props: Props) => {
   const removeLocation = React.useCallback((tabId: string): void => {
     const ids = Object.keys(locations);
 
-    if (ids.length === 1) {
-      return;
-    }
     const newLocations = {...locations};
 
     let tabIdIndex: number = ids.findIndex(id => id === tabId) || 0;
@@ -114,7 +135,7 @@ const LocationContainer = (props: Props) => {
             onChange={e => setChecked(e.target.checked)}
           />
         </div>
-        <div className="mb-3">
+        <div className="pb-3">
           <ButtonToolbar
             className="justify-content-between"
             aria-label="Toolbar with Button groups">
@@ -125,9 +146,8 @@ const LocationContainer = (props: Props) => {
                 onClick={() => newLocation()}>
                 <IconNew/> New Location
               </Button>
-              <Button variant="danger" size="sm" disabled={!checked || total <= 1} onClick={() => {
+              <Button variant="danger" size="sm" disabled={!checked} onClick={() => {
                 setLocations({});
-                newLocation();
               }}><IconClear/> Remove All</Button>
             </ButtonGroup>
             <InputGroup>
@@ -135,51 +155,55 @@ const LocationContainer = (props: Props) => {
                 as="span"
                 className={cn('text-size-sm border-0 pl-2 pr-4 pt-0 pb-0 bg-transparent', {
                   'text-muted text-line-through': !checked,
-                })}>{!total ? <>&nbsp;</> : <>{total} / {LOCATIONS_CREATE_MAX}</>}
+                })}>{!total ? <></> : <>{total} / {LOCATIONS_CREATE_MAX}</>}
               </InputGroup.Text>
             </InputGroup>
           </ButtonToolbar>
         </div>
       </div>
-      <Tabs
-        activeKey={activeKey} id="locations-tab"
-        className="nav-tabs-bottom"
-        onSelect={k => setActiveKey(k as string)}>
-        {Object.entries(locations).map(([id, location], i: number) => (
-          <Tab
-            disabled={!checked}
-            eventKey={id}
-            key={id} as="div" className="mb-3"
-            title={
-              <>
+      {!Boolean(total) ? (
+        <div className="mb-2"></div>
+      ) : (
+        <Tabs
+          activeKey={activeKey} id="locations-tab"
+          className="nav-tabs-bottom"
+          onSelect={k => setActiveKey(k as string)}>
+          {Object.entries(locations).map(([id, location], i: number) => (
+            <Tab
+              disabled={!checked}
+              eventKey={id}
+              key={id} as="div" className="mb-3"
+              title={
+                <>
                  <span className={cn('text-size-sm pr-2', {
                    'text-muted text-line-through': !checked,
                  })}>{capitalCase(location.id)}</span>
-                <a aria-disabled={!checked} hidden={i === 0}
-                   href="#tab-close"
-                   className="text-color-default text-decoration-none p-0"
-                   style={{
-                     lineHeight: '10px',
-                     position: 'relative',
-                     top: '-2px',
-                   }} onClick={e => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  removeLocation(id);
-                }}>&times;</a>
-              </>
-            }>
-            <div style={{marginTop: '1rem'}} className="pl-3 pr-3">
-              <Location
-                disabled={!checked}
-                initialValues={location}
-                onValuesChange={updated => {
-                  setLocations(current => ({...current, [id]: {...updated}}));
-                }}/>
-            </div>
-          </Tab>
-        ))}
-      </Tabs>
+                  <a aria-disabled={!checked} hidden={i === 0}
+                     href="#tab-close"
+                     className="text-color-default text-decoration-none p-0"
+                     style={{
+                       lineHeight: '10px',
+                       position: 'relative',
+                       top: '-2px',
+                     }} onClick={e => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    removeLocation(id);
+                  }}>&times;</a>
+                </>
+              }>
+              <div style={{marginTop: '1rem'}} className="pl-3 pr-3">
+                <Location
+                  disabled={!checked}
+                  initialValues={location}
+                  onValuesChange={updated => {
+                    setLocations(current => ({...current, [id]: {...updated}}));
+                  }}/>
+              </div>
+            </Tab>
+          ))}
+        </Tabs>
+      )}
     </>
   );
 };
