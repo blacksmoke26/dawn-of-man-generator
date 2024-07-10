@@ -7,7 +7,6 @@
 import React from 'react';
 import * as PropTypes from 'prop-types';
 import cn from 'classname';
-import merge from 'deepmerge';
 
 // Components
 import Slider from '~/components/ui/Slider';
@@ -18,61 +17,56 @@ import * as random from '~/utils/scenario/random';
 import * as Defaults from '~/utils/scenario/defaults';
 
 // redux
-import {useAppSelector} from '~redux/hooks';
+import {useAppDispatch, useAppSelector} from '~redux/hooks';
+import {clearProperty} from '~redux/slices/scenario/reducers';
 
 // parsers
 import {toSizeTemplate} from '~/utils/parser/templates-general';
 
 /** MapSize `props` type */
 interface Props {
-  enabled?: boolean,
-  value?: number,
+  disabled?: boolean,
+  initialValues?: {
+    value: number;
+  };
 
-  onChange?(template: string, value: number): void,
+  onChange?(template: string): void;
 }
 
 /** MapSize functional component */
 const MapSize = (props: Props) => {
-  props = merge({
-    enabled: true,
-    value: Defaults.MAP_SIZE_DEFAULT,
-    onChange: () => {
-    },
-  }, props);
+  const dispatch = useAppDispatch();
 
-  const [enabled, setEnabled] = React.useState<boolean>(props.enabled as boolean);
-  const [value, setValue] = React.useState<number>(props.value as number);
+  const [value, setValue] = React.useState<number>(props?.initialValues?.value ?? Defaults.MAP_SIZE_DEFAULT);
+  const [checked, setChecked] = React.useState<boolean>(!(props?.disabled ?? true));
 
-  const sizeAttribute = useAppSelector(({scenario}) => scenario.values?.size);
+  const reduxState = useAppSelector(({scenario}) => scenario.values?.size) as null | number | undefined;
 
   // Reflect attributes changes
   React.useEffect(() => {
-    const extValue = sizeAttribute ?? null;
-
-    // noinspection SuspiciousTypeOfGuard
-    if (typeof extValue === 'boolean') {
-      setEnabled(extValue);
+    if (reduxState === null) {
+      setChecked(false);
+      setValue(Defaults.MAP_SIZE_DEFAULT);
+      dispatch(clearProperty('size'));
+    } else if ('number' === typeof reduxState) {
+      setChecked(true);
+      setValue(reduxState);
+      dispatch(clearProperty('size'));
     }
-
-    if (typeof extValue === 'number') {
-      setEnabled(true);
-      setValue(extValue);
-    }
-  }, [sizeAttribute]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reduxState]);
 
   // Reflect state changes
   React.useEffect(() => {
-    typeof props.onChange === 'function' && props.onChange(
-      toSizeTemplate(value, enabled), value
-    );
+    props?.onChange?.(toSizeTemplate(value, checked));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value, enabled]);
+  }, [value, checked]);
 
   return (
-    <div className={cn('mb-2', {'text-muted': !enabled})}>
+    <div className={cn('mb-2', {'text-muted-deep': !checked})}>
       <PanelToolbar
         value={value}
-        checked={enabled}
+        checked={checked}
         checkboxPosition="right"
         heading="Map size"
         description="Defines the size of the map, beware that big maps can drain performance."
@@ -82,17 +76,17 @@ const MapSize = (props: Props) => {
           max: Defaults.MAP_SIZE_MAX,
           decimals: 0,
         }}
-        onCheckboxChange={state => setEnabled(state)}
+        onCheckboxChange={isChecked => setChecked(isChecked)}
         onChange={(val: number) => setValue(+val)}
         allowShuffle
         onShuffle={() => setValue(random.randomMapSize())}
         allowRestore
         onRestore={() => setValue(Defaults.MAP_SIZE_DEFAULT)}
-        disabled={!enabled}/>
+        disabled={!checked}/>
       <Slider
         min={Defaults.MAP_SIZE_MIN}
         max={Defaults.MAP_SIZE_MAX}
-        step={1} disabled={!enabled}
+        step={1} disabled={!checked}
         value={Number(value)} onChange={v => setValue(v as number)}/>
     </div>
   );
@@ -100,8 +94,10 @@ const MapSize = (props: Props) => {
 
 // Properties validation
 MapSize.propTypes = {
-  enabled: PropTypes.bool,
-  value: PropTypes.number,
+  disabled: PropTypes.bool,
+  initialValues: PropTypes.exact({
+    value: PropTypes.number,
+  }),
   onChange: PropTypes.func,
 };
 

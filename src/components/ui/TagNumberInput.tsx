@@ -57,9 +57,18 @@ const TagNumberInput = (props: Props = {}) => {
       control: (styles: any) => ({
         ...styles, backgroundColor: 'rgb(42 50 66)',
         borderColor: '#2b3345',
-        minHeight: 39,
+        height: 32,
+        minHeight: 32,
         paddingLeft: 2,
         paddingTop: 0,
+      }),
+      indicatorsContainer: (styles: any, {isDisabled}) => ({
+        ...styles,
+        height: 32,
+      }),
+      multiValueRemove: (styles: any, {isDisabled}) => ({
+        ...styles,
+        height: 22,
       }),
       valueContainer: (styles: any) => ({
         ...styles,

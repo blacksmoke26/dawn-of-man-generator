@@ -7,9 +7,7 @@
 import React from 'react';
 import * as PropTypes from 'prop-types';
 import cn from 'classname';
-import merge from 'deepmerge';
 import {Col, Row} from 'react-bootstrap';
-import uniqueRandomArray from 'unique-random-array';
 
 // elemental components
 import TextInput from '~/components/ui/TextInput';
@@ -17,115 +15,94 @@ import PropertyLabel from '~/components/ui/PropertyLabel';
 import PanelToolbar from '~/components/environment/PanelToolbar';
 import AttributeSelect from '~/components/ui/elements/AttributeSelect';
 
-// redux
-import {useAppSelector} from '~redux/hooks';
-
 // utils
-import {DEFAULT_SEASONS} from '~/utils/defaults';
+import useValues from '~/hooks/use-values';
+import {randomSeasonName} from '~/utils/random';
+import {cloneObject, isObject} from '~/helpers/object';
+import {DEFAULT_SEASONS, STARTING_CONDITIONS} from '~/utils/defaults';
 
 // parsers
 import {toStartingConditionTemplate} from '~/utils/parser/templates-general';
 
-// types
-import type {Season} from '~/utils/seasons.types';
+// redux
+import {useAppDispatch, useAppSelector} from '~redux/hooks';
+import {clearProperty} from '~redux/slices/scenario/reducers';
 
-/** StartingCondition `props` type */
-interface Attributes {
-  enabled: boolean;
-  seasonId: Season;
-  visualSetupId: string;
-}
+// types
+import {scenario} from '~/data/scenario/parser/types';
 
 /** StartingCondition `props` type */
 interface Props {
-  enabled?: boolean;
-  seasonId?: Season;
-  visualSetupId?: string;
+  disabled?: boolean;
+  initialValues?: scenario.StartingConditions;
 
-  onChange?(template: string, values: Attributes): void;
+  onChange?(template: string): void;
 }
 
 /** StartingCondition functional component */
 const StartingCondition = (props: Props) => {
-  props = merge({
-    enabled: true,
-    seasonId: 'Spring',
-    visualSetupId: '',
-    onChange: () => {
-    },
-  }, props);
+  const dispatch = useAppDispatch();
 
-  const startingConditionAttribute = useAppSelector(({scenario}) => scenario.values?.startingConditions);
+  const valuer = useValues<scenario.StartingConditions>(props?.initialValues ?? STARTING_CONDITIONS as scenario.StartingConditions);
 
-  const [attributes, setAttributes] = React.useState<Attributes>({
-    seasonId: props.seasonId as Season,
-    enabled: props.enabled as boolean,
-    visualSetupId: props.visualSetupId as string,
-  });
+  const [checked, setChecked] = React.useState<boolean>(!(props?.disabled ?? true));
 
-  const setAttribute = <T = any>(name: keyof Attributes, value: T) => {
-    setAttributes(current => {
-      return ({...current, [name]: value as T});
-    });
-  };
+  const reduxState = useAppSelector(({scenario}) => scenario.values?.startingConditions) as scenario.StartingConditions;
 
   // Reflect attributes changes
   React.useEffect(() => {
-    const extValue = startingConditionAttribute ?? null;
-    const isEnabled = !!extValue;
-    setAttribute<boolean>('enabled', isEnabled);
-
-    if (isEnabled) {
-      setAttribute<Season>('seasonId', extValue?.seasonId as Season);
+    if (reduxState === null) {
+      setChecked(false);
+      valuer.setAll(cloneObject(STARTING_CONDITIONS));
+      dispatch(clearProperty('startingConditions'));
+    } else if (isObject(reduxState)) {
+      setChecked(true);
+      valuer.setAll(cloneObject(reduxState));
+      dispatch(clearProperty('startingConditions'));
     }
-  }, [startingConditionAttribute]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reduxState]);
 
   // Reflect state changes
   React.useEffect(() => {
-    const {enabled, ...attrs} = attributes;
-    typeof props.onChange === 'function' && props.onChange(
-      toStartingConditionTemplate(attrs, enabled), attributes,
-    );
+    props?.onChange?.(toStartingConditionTemplate(valuer.data, checked));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [attributes]);
+  }, [checked, valuer.data]);
 
   return (
-    <div className={cn('mb-2 checkbox-align', {'text-muted-deep': !attributes.enabled})}>
+    <div className={cn('mb-2 checkbox-align', {'text-muted-deep': !checked})}>
       <PanelToolbar
-        checked={attributes.enabled}
+        checked={checked}
         heading="Starting conditions"
         checkboxPosition="right"
         description="Defines the conditions when game is started."
-        onCheckboxChange={state => setAttribute('enabled', state)}
-        value=""
-        disabled={!attributes.enabled}/>
+        onCheckboxChange={setChecked}
+        value=""/>
 
-      <Row className="mb-1 mt-3">
-        <PropertyLabel disabled={!attributes.enabled} caption="Season"/>
+      <Row className="mt-2">
+        <PropertyLabel disabled={!checked} caption="Season"/>
         <AttributeSelect
           className="w-75"
           colProps={{sm: 6}}
-          disabled={!attributes.enabled}
+          disabled={!checked}
           selectProps={{isSearchable: false}}
           options={DEFAULT_SEASONS.map(value => ({label: value, value}))}
-          value={attributes?.seasonId}
-          onSelect={option => setAttribute('seasonId', option.value)}
+          value={valuer.get('seasonId', 'Spring')}
+          onSelect={option => valuer.set('seasonId', option.value)}
           allowShuffle
-          onShuffle={() => {
-            setAttribute('seasonId', uniqueRandomArray(DEFAULT_SEASONS)());
-          }}
+          onShuffle={() => valuer.set('seasonId', randomSeasonName())}
         />
       </Row>
-      <Row className="mb-1 mt-3">
-        <PropertyLabel disabled={!attributes.enabled} caption="Visual Setup"/>
+      <Row className="mt-2">
+        <PropertyLabel disabled={!checked} caption="Visual Setup"/>
         <Col xs="6">
           <TextInput
             caseType="PASCAL_CASE"
-            disabled={!attributes.enabled}
-            value={attributes?.visualSetupId ?? ''}
+            disabled={!checked}
+            value={valuer.get('visualSetupId', '')}
             placeholder="e.g., WinterSnow"
             allowClear
-            onChange={theValue => setAttribute('visualSetupId', theValue as string)}/>
+            onChange={value => valuer.set('visualSetupId', value)}/>
         </Col>
       </Row>
     </div>
@@ -134,8 +111,11 @@ const StartingCondition = (props: Props) => {
 
 // Properties validation
 StartingCondition.propTypes = {
-  value: PropTypes.bool,
-  enabled: PropTypes.bool,
+  disabled: PropTypes.bool,
+  initialValues: PropTypes.exact({
+    seasonId: PropTypes.oneOf(DEFAULT_SEASONS).isRequired,
+    visualSetupId: PropTypes.string,
+  }),
   onChange: PropTypes.func,
 };
 

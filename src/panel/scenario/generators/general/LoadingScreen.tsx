@@ -9,82 +9,75 @@
 import React from 'react';
 import * as PropTypes from 'prop-types';
 import cn from 'classname';
-import merge from 'deepmerge';
 
 // elemental components
 import TextInput from '~/components/ui/TextInput';
 import PanelToolbar from '~/components/environment/PanelToolbar';
 
 // redux
-import {useAppSelector} from '~redux/hooks';
+import {useAppDispatch, useAppSelector} from '~redux/hooks';
+import {clearProperty} from '~redux/slices/scenario/reducers';
 
 // parsers
 import {toLoadingScreenTemplate} from '~/utils/parser/templates-general';
 
 /** LoadingScreen `props` type */
 interface Props {
-  enabled?: boolean,
-  value?: string,
+  disabled?: boolean,
+  initialValues?: {
+    value: string;
+  };
 
-  onChange?(template: string, value: string): void,
+  onChange?(template: string): void;
 }
 
 /** LoadingScreen functional component */
 const LoadingScreen = (props: Props) => {
-  props = merge({
-    value: 'map_the_northlands',
-    enabled: false,
-    onChange: () => {
-    },
-  }, props);
+  const dispatch = useAppDispatch();
 
-  const [value, setValue] = React.useState<string>(props.value as string);
-  const [enabled, setEnabled] = React.useState<boolean>(props.enabled as boolean);
+  const [value, setValue] = React.useState<string>(props?.initialValues?.value ?? 'map_the_northlands');
+  const [checked, setChecked] = React.useState<boolean>(!(props?.disabled ?? true));
 
-  const loadingScreenAttribute = useAppSelector(({scenario}) => scenario?.values?.loadingScreens);
+  const reduxState = useAppSelector(({scenario}) => scenario?.values?.loadingScreens) as null | string | undefined;
 
   // Reflect attributes changes
   React.useEffect(() => {
-    const extValue = loadingScreenAttribute ?? null;
-
-    if (!extValue) {
-      setEnabled(false);
-    } else {
-      setValue(extValue as string);
+    if (reduxState === null) {
+      setChecked(false);
+      setValue('map_the_northlands');
+      dispatch(clearProperty('loadingScreens'));
+    } else if ('string' === typeof reduxState) {
+      setChecked(true);
+      setValue(reduxState);
+      dispatch(clearProperty('loadingScreens'));
     }
-  }, [loadingScreenAttribute]);
-
-  // Reflect attributes changes
-  React.useEffect(() => {
-    setEnabled(props.enabled as boolean);
-  }, [props.enabled]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reduxState]);
 
   // Reflect state changes
   React.useEffect(() => {
-    typeof props.onChange === 'function' && props.onChange(
-      toLoadingScreenTemplate(value, enabled), value,
-    );
+    props?.onChange?.(toLoadingScreenTemplate(value, checked));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value, enabled]);
+  }, [value, checked]);
 
   return (
-    <div className={cn('mb-2 checkbox-align', {'text-muted': !enabled})}>
+    <div className={cn('mb-2 checkbox-align', {'text-muted-deep': !checked})}>
       <PanelToolbar
-        checked={enabled}
+        checked={checked}
         heading="Loading Screens"
         checkboxPosition="right"
         description="Referees to the loading screen images"
-        onCheckboxChange={state => setEnabled(state)}
+        onCheckboxChange={isChecked => setChecked(isChecked)}
         value=""
-        disabled={!enabled}/>
+        disabled={!checked}/>
       <div className="w-75">
         <TextInput
           caseType="SNAKE_CASE"
-          disabled={!enabled}
+          disabled={!checked}
           value={value}
           maxLength={100}
           placeholder="e.g., map_the_northlands"
-          onChange={theValue => setValue(theValue as string)}/>
+          onChange={changedValue => setValue(String(changedValue))}/>
       </div>
     </div>
   );
@@ -92,8 +85,10 @@ const LoadingScreen = (props: Props) => {
 
 // Properties validation
 LoadingScreen.propTypes = {
-  value: PropTypes.string,
-  enabled: PropTypes.bool,
+  disabled: PropTypes.bool,
+  initialValues: PropTypes.exact({
+    value: PropTypes.string,
+  }),
   onChange: PropTypes.func,
 };
 

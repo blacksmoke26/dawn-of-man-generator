@@ -28,7 +28,7 @@ import {randomRadius} from '~/utils/random';
 import {defaultsParams} from '~/utils/action';
 import {randomPosition} from '~/utils/location';
 import {actionDefaultProps} from './utils/default';
-import {POSITION_MAX, POSITION_MIN, RADIUS_MAX, RADIUS_MIN} from '~/utils/defaults';
+import {RADIUS_MAX, RADIUS_MIN} from '~/utils/defaults';
 
 // parsers
 import {filterEmpty} from '~/utils/template';

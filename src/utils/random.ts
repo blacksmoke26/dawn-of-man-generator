@@ -26,6 +26,7 @@ import {
 import type {EraFactor} from '~/types/action.types';
 import type {environment} from '~/data/environments/parser/types';
 import type {scenario} from '~/data/scenario/parser/types';
+import {MILESTONES_MAX, MILESTONES_MIN} from '~/utils/scenario/defaults';
 
 /** Deposits types */
 export const deposits: string[] = [
@@ -133,6 +134,10 @@ export const randomAngleSingle = (): number => {
   return randomIntMinMax(Defaults.ANGLE_MIN, Defaults.ANGLE_MAX);
 };
 
+export const randomMilestone = (): number => {
+  return randomIntMinMax(MILESTONES_MIN, MILESTONES_MAX);
+};
+
 /** Random season temperature */
 export const randomSeasonTemperature = (): [number, number] => [
   randomIntMinMax(Defaults.SEASON_TEMPERATURE_MIN, -1),
@@ -162,6 +167,10 @@ export const randomSeasonVeryWindyChance = (): number => {
 
 export const randomSeasonFishBoost = (): number => {
   return randomFloat(2, Defaults.SEASON_FISH_BOOST_MIN, Defaults.SEASON_FISH_BOOST_MAX);
+};
+
+export const randomSeasonName = (): environment.season.Name => {
+  return randomArray(Defaults.DEFAULT_SEASONS, 1).at(0) as environment.season.Name;
 };
 
 export const randomSeasonSpring = (): environment.season.Spring => {
@@ -213,7 +222,7 @@ export const randomSeasons = (): environment.season.Seasons => {
     Fall: randomSeasonFall(),
     Winter: randomSeasonWinter(),
   };
-}
+};
 
 /** Random Humidity */
 export const randomHumidity = (): [number, number] => [
@@ -241,7 +250,7 @@ export const randomObjectOverridePrototype = (): environment.prototypes.Override
     angle: randomAngle(),
     humidity: randomHumidity(),
   };
-}
+};
 
 /** Random Object override prototype */
 export const defaultObjectOverridePrototype = (): environment.prototypes.OverridePrototype => {
@@ -251,7 +260,7 @@ export const defaultObjectOverridePrototype = (): environment.prototypes.Overrid
     angle: [Defaults.ANGLE_MIN_DEFAULT, Defaults.ANGLE_MAX_DEFAULT],
     humidity: [Defaults.HUMIDITY_MIN_DEFAULT, Defaults.HUMIDITY_MAX_DEFAULT],
   };
-}
+};
 
 /** Random River */
 export const randomRiver = (): boolean => {
@@ -300,7 +309,7 @@ export const randomDisaster = (disasterType: scenario.DisasterName): scenario.Di
     disasterType,
     period: +randomPeriod(),
     variance: +randomPeriod(),
-  }
+  };
 };
 
 /** Random performers (condition) */

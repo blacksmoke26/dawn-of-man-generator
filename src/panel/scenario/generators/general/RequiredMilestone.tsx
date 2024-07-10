@@ -9,101 +9,100 @@
 import React from 'react';
 import * as PropTypes from 'prop-types';
 import cn from 'classname';
-import merge from 'deepmerge';
 
 // elemental components
+import NumberInput from '~/components/ui/NumberInput';
 import PanelToolbar from '~/components/environment/PanelToolbar';
 
-// redux
-import {useAppSelector} from '~redux/hooks';
+// utils
+import {randomMilestone} from '~/utils/random';
+import * as Defaults from '~/utils/scenario/defaults';
 
 // parsers
 import {toRequiredMilestoneTemplate} from '~/utils/parser/templates-general';
-import NumberInput from '~/components/ui/NumberInput';
-import {randomIntMinMax} from '~/utils/random';
+
+// redux
+import {useAppDispatch, useAppSelector} from '~redux/hooks';
+import {clearProperty} from '~redux/slices/scenario/reducers';
 
 /** RequiredMilestone `props` type */
 interface Props {
-	enabled?: boolean,
-	value?: number,
+  disabled?: boolean,
+  initialValues?: {
+    value: number;
+  };
 
-	onChange?(template: string, value: number): void,
+  onChange?(template: string): void;
 }
 
 /** RequiredMilestone functional component */
-const RequiredMilestone = ( props: Props ) => {
-	props = merge({
-		value: 3,
-		enabled: false,
-		onChange: () => {},
-	}, props);
+const RequiredMilestone = (props: Props) => {
+  const dispatch = useAppDispatch();
 
-	const [value, setValue] = React.useState<number>(props.value as number);
-	const [enabled, setEnabled] = React.useState<boolean>(props.enabled as boolean);
+  const [value, setValue] = React.useState<number>(props?.initialValues?.value ?? Defaults.MILESTONES_DEFAULT);
+  const [checked, setChecked] = React.useState<boolean>(!(props?.disabled ?? true));
 
-	const requiredMilestonesAttribute = useAppSelector(({scenario}) => scenario.values?.requiredMilestones);
-	
-	// Reflect attributes changes
-	React.useEffect(() => {
-		const extValue = requiredMilestonesAttribute ?? null;
-		
-		if ( !extValue || !parseInt(String(extValue)) ) {
-			setEnabled(!!extValue);
-		} else {
-			setValue(extValue as number);
-		}
-	}, [requiredMilestonesAttribute]);
-	
-	// Reflect attributes changes
-	React.useEffect(() => {
-		setEnabled(props.enabled as boolean);
-	}, [props.enabled]);
-	
-	// Reflect state changes
-	React.useEffect(() => {
-		typeof props.onChange === 'function' && props.onChange(
-			toRequiredMilestoneTemplate(value, enabled), value
-		);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [value, enabled]);
-	
-	return (
-		<div className={cn('mb-2', {'text-muted': !enabled}, 'checkbox-align')}>
-			<PanelToolbar
-        checked={enabled}
+  const reduxState = useAppSelector(({scenario}) => scenario.values?.requiredMilestones) as null | number | undefined;
+
+  // Reflect attributes changes
+  React.useEffect(() => {
+    if (reduxState === null) {
+      setChecked(false);
+      setValue(Defaults.MILESTONES_DEFAULT);
+      dispatch(clearProperty('requiredMilestones'));
+    } else if ('number' === typeof reduxState) {
+      setChecked(true);
+      setValue(reduxState);
+      dispatch(clearProperty('requiredMilestones'));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reduxState]);
+
+  // Reflect state changes
+  React.useEffect(() => {
+    props?.onChange?.(toRequiredMilestoneTemplate(value, checked));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value, checked]);
+
+  return (
+    <div className={cn('mb-2', {'text-muted-deep': !checked}, 'checkbox-align')}>
+      <PanelToolbar
+        checked={checked}
         heading="Required Milestones"
-				checkboxPosition="right"
+        checkboxPosition="right"
         description="Milestones needed for the scenario to count as
         completed, so that depending scenarios can be started."
-        onCheckboxChange={state => setEnabled(state)}
-				value=""
-        disabled={!enabled}/>
+        onCheckboxChange={isChecked => setChecked(isChecked)}
+        value=""
+        disabled={!checked}/>
 
-			<div className="w-50">
-				<NumberInput
-					disabled={!enabled}
-					value={value}
-					min={1}
-					max={20}
-					maxLength={2}
-					placeholder="0"
-					shuffle
-					onShuffle={() => setValue(randomIntMinMax(1,20))}
-					onChange={num => {
-						num = +num;
-						setValue(!num ? 0 : (num > 20 ? 20 : num))
-					}}
-				/>
-			</div>
-		</div>
-	);
+      <div className="w-50">
+        <NumberInput
+          disabled={!checked}
+          value={value}
+          min={1}
+          max={20}
+          maxLength={2}
+          placeholder="3"
+          shuffle
+          onShuffle={() => setValue(randomMilestone())}
+          onChange={num => {
+            num = +num;
+            setValue(!num ? 0 : (num > 20 ? 20 : num));
+          }}
+        />
+      </div>
+    </div>
+  );
 };
 
 // Properties validation
 RequiredMilestone.propTypes = {
-	value: PropTypes.bool,
-	enabled: PropTypes.bool,
-	onChange: PropTypes.func,
+  disabled: PropTypes.bool,
+  initialValues: PropTypes.exact({
+    value: PropTypes.number,
+  }),
+  onChange: PropTypes.func,
 };
 
 export default RequiredMilestone;

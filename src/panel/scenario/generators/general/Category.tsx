@@ -7,82 +7,74 @@
 import React from 'react';
 import * as PropTypes from 'prop-types';
 import cn from 'classname';
-import merge from 'deepmerge';
 
 // elemental components
 import TextInput from '~/components/ui/TextInput';
 import PanelToolbar from '~/components/environment/PanelToolbar';
 
 // redux
-import {useAppSelector} from '~redux/hooks';
+import {useAppDispatch, useAppSelector} from '~redux/hooks';
+import {clearProperty} from '~redux/slices/scenario/reducers';
 
 // parsers
 import {toCategoryTemplate} from '~/utils/parser/templates-general';
 
-/** Category `props` type */
 interface Props {
-  enabled?: boolean,
-  value?: string,
+  disabled?: boolean,
+  initialValues?: {
+    value: string;
+  };
 
-  onChange?(template: string, value: string): void,
+  onChange?(template: string): void;
 }
 
 /** Category functional component */
 const Category = (props: Props) => {
-  props = merge({
-    value: 'Freeplay',
-    enabled: false,
-    onChange: () => {
-    },
-  }, props);
+  const dispatch = useAppDispatch();
 
-  const [value, setValue] = React.useState<string>(props.value as string);
-  const [enabled, setEnabled] = React.useState<boolean>(props.enabled as boolean);
+  const [value, setValue] = React.useState<string>(props?.initialValues?.value ?? 'Freeplay');
+  const [checked, setChecked] = React.useState<boolean>(!(props?.disabled ?? true));
 
-  const categoryAttribute = useAppSelector(({scenario}) => scenario?.values?.category);
+  const reduxState = useAppSelector(({scenario}) => scenario?.values?.category) as null | string | undefined;
 
   // Reflect attributes changes
   React.useEffect(() => {
-    const extValue = categoryAttribute ?? null;
-
-    if (!extValue) {
-      setEnabled(!!extValue);
-    } else {
-      setValue(extValue as string);
+    if (reduxState === null) {
+      setChecked(false);
+      setValue('Freeplay');
+      dispatch(clearProperty('category'));
+    } else if ('string' === typeof reduxState) {
+      setChecked(true);
+      setValue(reduxState);
+      dispatch(clearProperty('category'));
     }
-  }, [categoryAttribute]);
-
-  // Reflect attributes changes
-  React.useEffect(() => {
-    setEnabled(props.enabled as boolean);
-  }, [props.enabled]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reduxState]);
 
   // Reflect state changes
   React.useEffect(() => {
-    typeof props.onChange === 'function' && props.onChange(
-      toCategoryTemplate(value, enabled), value,
-    );
+    props?.onChange?.(toCategoryTemplate(value, checked));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value, enabled]);
+  }, [value, checked]);
 
   return (
-    <div className={cn('mb-2', {'text-muted': !enabled})}>
+    <div className={cn('mb-2', {'text-muted-deep': !checked})}>
       <PanelToolbar
-        checked={enabled}
+        checked={checked}
         heading="Category"
         checkboxPosition="right"
         description="Defines the category for the scenario."
-        onCheckboxChange={state => setEnabled(state)}
+        onCheckboxChange={isChecked => setChecked(isChecked)}
         value=""
-        disabled={!enabled}/>
+        disabled={!checked}/>
       <div className="w-75">
         <TextInput
           caseType="CAPITAL_CASE"
-          disabled={!enabled}
+          disabled={!checked}
           value={value}
           maxLength={80}
           placeholder="e.g., Freeplay"
-          onChange={theValue => setValue(theValue as string)}/>
+          onChange={changedValue => setValue(String(changedValue))}/>
       </div>
     </div>
   );
@@ -90,8 +82,10 @@ const Category = (props: Props) => {
 
 // Properties validation
 Category.propTypes = {
-  value: PropTypes.string,
-  enabled: PropTypes.bool,
+  disabled: PropTypes.bool,
+  initialValues: PropTypes.exact({
+    value: PropTypes.string,
+  }),
   onChange: PropTypes.func,
 };
 

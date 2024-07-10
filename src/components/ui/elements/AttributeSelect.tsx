@@ -75,10 +75,14 @@ const valueToOption = (value: null | string | string[] | Option | Option[]): Opt
 };
 
 export const STYLES_MULTI = {
-  control: (styles: any) => ({
-    ...styles, backgroundColor: 'rgb(42 50 66)',
-    borderColor: '#2b3345',
-    minHeight: 35,
+  control: (styles: any, {isDisabled}: {isDisabled: boolean}) => ({
+    ...styles,
+    backgroundColor: isDisabled ? '#30394b' : '#2a3242',
+    borderColor: isDisabled ? '#30394b' : '#2a3242',
+    height: 32,
+    minHeight: 32,
+    paddingTop: 0,
+    paddingBottom: 0,
   }),
 };
 /** AttributeSelect functional component */
