@@ -1,35 +1,40 @@
 /**
  * @author Junaid Atari <mj.atari@gmail.com>
  * @see https://github.com/blacksmoke26/dawn-of-man-generator
- * @since 2024-06-23
- * @version 2.4
+ * @since 2024-06-13
  */
 
 import React from 'react';
-import merge from 'deepmerge';
-import {nanoid} from 'nanoid';
-import {Button, ButtonGroup, ButtonToolbar, Form, InputGroup, Tab, Tabs} from 'react-bootstrap';
-import type {Required} from 'utility-types';
-import useValues from '~/hooks/use-values';
 import cn from 'classname';
-import {IconClear, IconNew} from '~/components/icons/app';
-import {toLanguageString} from '~/utils/strings';
-import {capitalCase} from 'change-case';
+import {Button, ButtonGroup, ButtonToolbar, Form, InputGroup, Tab, Tabs} from 'react-bootstrap';
+
+// elemental components
 import TabTitle from '~/components/ui/TabTitle';
-import Goal from '~/panel/scenario/generators/goals/Goal';
-import {findNextTabKey} from '~/helpers/ui';
 
-/** Maximum limit of tabs */
-const MAX_COUNT: number = 20;
+// icons
+import {IconClear, IconNew} from '~/components/icons/app';
 
-export interface GoalsState {
-  [key: string]: {
-    template: string;
-    strings: string;
-    name: string;
-    disabled: boolean;
-  };
-}
+// components
+import Goal from './Goal';
+
+// utils
+import useValues from '~/hooks/use-values';
+import {MILESTONES_CREATE_MAX} from '~/utils/defaults';
+import {LangStrings, toLanguageString} from '~/utils/strings';
+
+// parsers
+import {cloneObject} from '~/helpers/object';
+import {toGoalsTemplate} from '~/utils/parser/template-goal';
+
+// types
+import {scenario} from '~/data/scenario/parser/types';
+
+// redux
+import {useAppDispatch, useAppSelector} from '~redux/hooks';
+import {clearProperty} from '~redux/slices/scenario/reducers';
+
+type GoalAttributes = Record<string, scenario.Goal>;
+type LangAttributes = Record<string, LangStrings>;
 
 interface Props {
   checked?: boolean;
@@ -39,54 +44,70 @@ interface Props {
   onStrings?(text: string): void;
 }
 
-const toTemplateText = (goals: GoalsState): string => {
-  const template = Object
-    .values(goals)
-    .filter(attr => !attr.disabled)
-    .map((attr => attr.template)).join('').trim();
-
-  return !template ? '' : (
-    `<goals>`
-    + Object.values(goals).map((attr => attr.template)).join('')
-    + '</goals>'
-  );
-};
-
-const toStringsText = (goals: GoalsState): string => {
-  return Object.values(goals)
-    .filter(attr => !attr.disabled)
-    .map((attr => attr.strings)).join('').trim();
-};
-
+/** GoalContainer functional component */
 const GoalContainer = (props: Props) => {
-  const newProps = merge<Required<Props>>({
-    checked: false,
-    onTemplate() {
-    },
-    onStrings() {
-    },
-  }, props);
+  const dispatch = useAppDispatch();
 
-  const [checked, setChecked] = React.useState<boolean>(newProps.checked);
+  const counter = React.useRef<{ count: number }>({count: 0});
+
+  const valuer = useValues<GoalAttributes>({});
+  const strings = useValues<LangAttributes>({});
+
+  const [checked, setChecked] = React.useState<boolean>(props?.checked ?? true);
   const [activeKey, setActiveKey] = React.useState<string>('');
 
-  const goals = useValues<GoalsState>({});
-  const allGoals = goals.getAll();
+
+  const reduxState = useAppSelector(({scenario}) => scenario?.values?.locations) as null | scenario.Goal[] | undefined;
+
+  // Reflect redux-specific changes
+  React.useEffect(() => {
+    if (reduxState === null) {
+      setChecked(true);
+      valuer.setAll({});
+      strings.setAll({});
+      setActiveKey('');
+      counter.current.count = 0;
+      dispatch(clearProperty('goals'));
+    } else if (Array.isArray(reduxState)) {
+      setChecked(true);
+      const initial = createInitialValues(reduxState);
+      valuer.setAll(initial.goals);
+      strings.setAll(initial.strings);
+      setActiveKey(initial.tabId);
+      counter.current.count = initial.count;
+      dispatch(clearProperty('goals'));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reduxState]);
 
   // Reflect state changes
   React.useEffect(() => {
-    //setMile((milestones: MilestonesState) => merge(milestones, newProps.milestones));
-    newProps.onTemplate(!checked ? '' : toTemplateText(allGoals));
-    newProps.onStrings(!checked ? '' : toStringsText(allGoals));
+    //setGoal((goals: GoalsState) => merge(goals, newProps.goals));
+    props?.onTemplate?.(toGoalsTemplate(Object.values(valuer.data), !checked));
+    props?.onStrings?.(renderStrings(Object.values(strings.data)));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [checked, allGoals]);
+  }, [checked, valuer.data, strings.data]);
 
-  /** Total tabs count */
-  const total: number = Object.keys(allGoals).length;
+  const goalsList = Object.entries(valuer.data);
+  const total: number = goalsList.length;
 
   const removeTab = (tabId: string): void => {
-    setActiveKey(findNextTabKey(Object.keys(allGoals), activeKey, tabId));
-    goals.remove(tabId);
+    const ids = Object.keys(valuer.data);
+
+    let tabIdIndex: number = ids.findIndex(id => id === tabId) || 0;
+
+    let curValue: string = activeKey;
+
+    if (curValue === tabId) {
+      curValue = tabIdIndex === 0
+        ? ids[tabIdIndex + 1]
+        : ids[tabIdIndex - 1];
+    }
+
+    valuer.remove(tabId);
+    strings.remove(tabId);
+
+    setActiveKey(curValue);
   };
 
   return (
@@ -95,86 +116,118 @@ const GoalContainer = (props: Props) => {
         <Form.Check
           className="pull-right"
           type="switch"
-          id={`goals-switch-${nanoid(5)}`}
-          label="Allow goals throughout the whole gameplay"
+          id="goals_container_toggle"
+          label="Allow goals throughout the whole scenario"
           checked={checked}
           onChange={e => setChecked(e.target.checked)}
         />
-        <div className="mb-3">
-          <ButtonToolbar
-            className="justify-content-between"
-            aria-label="Toolbar with Button groups">
-            <ButtonGroup>
-              <Button
-                variant="secondary" size="sm"
-                disabled={!checked || total >= MAX_COUNT}
-                className={cn({'cursor-disabled': !checked || total >= MAX_COUNT})}
-                onClick={() => {
-                  const uniqueId = nanoid(10).toLowerCase();
-                  goals.set(uniqueId, {
-                    template: '', strings: '', name: 'Untitled', disabled: false,
-                  });
-                  setActiveKey(uniqueId);
-                }}><IconNew/> New Goal</Button>
-              <Button
-                variant="danger"
-                size="sm"
-                className={cn({'cursor-disabled': !checked || total < 1})}
-                disabled={!checked || total < 1}
-                onClick={() => goals.clear()}>
-                <IconClear/> Remove All
-              </Button>
-            </ButtonGroup>
-            <InputGroup>
+      </div>
+      <div className="mb-3">
+        <ButtonToolbar
+          className="justify-content-between"
+          aria-label="Toolbar with Button groups">
+          <ButtonGroup>
+            <Button
+              variant="secondary" size="sm"
+              disabled={!checked || total >= MILESTONES_CREATE_MAX}
+              className={cn({'cursor-disabled': !checked || total >= MILESTONES_CREATE_MAX})}
+              onClick={() => {
+                const count = ++counter.current.count;
+                const uniqueId = 'Goal_' + count;
+                valuer.set(uniqueId, {id: `untitled${count}`});
+                strings.set(uniqueId, {});
+                setActiveKey(uniqueId);
+              }}><IconNew/> New Goal</Button>
+            <Button
+              variant="danger"
+              size="sm"
+              className={cn({'cursor-disabled': !checked || total < 1})}
+              disabled={!checked || total < 1}
+              onClick={() => {
+                valuer.setAll({});
+                strings.setAll({});
+                counter.current.count = 0;
+              }}>
+              <IconClear/> Remove All
+            </Button>
+          </ButtonGroup>
+          <InputGroup>
             <InputGroup.Text
               as="span"
               className={cn('text-size-sm border-0 pl-2 pr-2 pt-0 pb-0 bg-transparent', {
                 'text-muted text-line-through': !checked,
-              })}>{!total ? <>&nbsp;</> : <>{total} / {MAX_COUNT}</>}
+              })}>{!total ? <>&nbsp;</> : <>{total} / {MILESTONES_CREATE_MAX}</>}
             </InputGroup.Text>
           </InputGroup>
-          </ButtonToolbar>
-        </div>
-        <Tabs
-          id="goals-tab"
-          activeKey={activeKey}
-          className={cn('nav-tabs-bottom mb-0', {'border-0': !total})}
-          onSelect={k => setActiveKey(k as string)}>
-          {Object.entries(goals.getAll()).map(([id, goal]) => {
-            // noinspection HtmlUnknownAnchorTarget
-            return (
-              <Tab
-                disabled={!checked}
-                eventKey={id}
-                key={id}
-                as="div"
-                title={
-                  <TabTitle
-                    title={goal?.name?.trim() || 'Untitled'} disabled={goal.disabled}
-                    onRemove={() => removeTab(id)}/>
-                }>
-                <Goal
-                  disabledCheckbox={!checked}
-                  onTemplate={(template: string) => {
-                    goals.set(`${id}.template`, template);
-                  }}
-                  onStringsChange={strings => {
-                    goals.set(`${id}.strings`, toLanguageString(strings));
-                  }}
-                  onValuesChange={changedValues => {
-                    const _name = capitalCase(changedValues?.id?.trim() || '').substring(0, 15);
-                    goals.set(`${id}.disabled`, !Boolean(_name));
-                    goals.set(`${id}.name`, value => _name || value);
-
-                  }}
-                  onRemoveClick={() => goals.remove(id)}/>
-              </Tab>
-            );
-          })}
-        </Tabs>
+        </ButtonToolbar>
       </div>
+      <Tabs
+        id="goals-container-tab"
+        activeKey={activeKey}
+        className={cn('nav-tabs-bottom mb-0', {'border-0': !total})}
+        onSelect={k => setActiveKey(k as string)}>
+        {goalsList.map(([id, initialValues]) => (
+          <Tab
+            disabled={!checked} eventKey={id} key={id} as="div"
+            title={
+              <TabTitle
+                disabled={!checked}
+                title={id.replace('_', ' ')}
+                onRemove={() => removeTab(id)}/>
+            }>
+            <Goal
+              initialValues={initialValues}
+              disabledCheckbox={!checked}
+              onStringsChange={values => {
+                strings.overwrite(id, cloneObject(values));
+              }}
+              onValuesChange={changedValues => {
+                valuer.overwrite(id, cloneObject(changedValues));
+              }}/>
+          </Tab>
+        ))}
+      </Tabs>
     </>
   );
+};
+
+const createInitialValues = (goals: scenario.Goal[] = []) => {
+  let index = 0;
+  let tabId: string = '';
+
+  const milestoneAttr: GoalAttributes = {};
+  const stringsAttr: LangAttributes = {};
+
+  for (const milestone of goals) {
+    const key: string = `Goal_${++index}`;
+
+    !tabId.trim() && (tabId = key);
+
+    milestoneAttr[key] = cloneObject(milestone);
+    stringsAttr[key] = {
+      [milestone.id]: milestone?.description?.trim() ?? '',
+    };
+  }
+
+  return {
+    goals: milestoneAttr,
+    strings: stringsAttr,
+    count: index,
+    tabId,
+  };
+};
+
+const renderStrings = (strings: LangStrings[], disabled: boolean = false): string => {
+  if (disabled || !strings.length) return '';
+
+  let stringsList: LangStrings = {};
+
+  for (const string of strings) {
+    if (!Object.keys(strings).length) continue;
+    stringsList = {...stringsList, ...string};
+  }
+
+  return !Object.keys(strings).length ? '' : toLanguageString(stringsList);
 };
 
 export default GoalContainer;

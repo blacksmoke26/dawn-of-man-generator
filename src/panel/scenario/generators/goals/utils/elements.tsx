@@ -10,10 +10,10 @@ import {nanoid} from 'nanoid';
 import {Button, Form} from 'react-bootstrap';
 
 // icons
-import {COLOR_REDDISH, IconChevronDown, IconChevronUp, IconClear} from '~/components/icons/app';
+import {COLOR_REDDISH, IconChevronDown, IconChevronUp, IconEraser} from '~/components/icons/app';
 
 export const GoalToggle = (props: { disabled: boolean, expanded: boolean, onClick: () => void }) => (
-  <div className="d-inline-block p-0">
+  <div className="d-inline-block ml-2">
     <Button
       disabled={props.disabled}
       title={props.expanded ? 'Collapse milestone panel' : 'Expand milestone panel'}
@@ -27,7 +27,7 @@ export const GoalToggle = (props: { disabled: boolean, expanded: boolean, onClic
 );
 
 export const GoalCheck = (props: { disabled: boolean, checked: boolean, onChange: (state: boolean) => void }) => (
-  <div className="d-inline-block mr-1" title="Allow milestone for a current scenerio">
+  <div className="d-inline-block" title="Allow goals for a current scenerio">
     <Form.Check
       type="switch"
       style={{top: 7}}
@@ -41,14 +41,14 @@ export const GoalCheck = (props: { disabled: boolean, checked: boolean, onChange
 );
 
 export const GoalRemove = (props: { disabled: boolean, onClick: () => void }) => (
-  <div className="d-inline-block">
+  <div className="d-inline-block ml-2">
     <Button
       variant="link" className="p-0"
       style={{top: 2, color: props.disabled ? 'rgba(255, 255, 255, .4)' : COLOR_REDDISH}}
-      title="Remove milestone"
+      title="Remove all conditions"
       disabled={props.disabled}
       onClick={props.onClick}>
-      <IconClear width="20" height="20" style={{top: 0}}/>
+      <IconEraser width="16" height="16" style={{top: 0}}/>
     </Button>
   </div>
 );
