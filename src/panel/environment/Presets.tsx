@@ -10,17 +10,18 @@ import React from 'react';
 import Select, {Option} from '~/components/ui/Select';
 
 // icons
-import {IconEnvironment} from '~/components/icons/app';
+import {COLOR_GRAYED, COLOR_ORANGE, COLOR_WHITISH, IconEnvironment} from '~/components/icons/app';
 
 // utils
 import {EnvironmentName, presetOptions, presetsXmlToJson} from '~/data/environments/builtin';
 
 // redux
 import {useAppDispatch} from '~redux/hooks';
-import {updateValuesRaw} from '~redux/slices/environment/reducers';
+import {overwriteValues, resetValues} from '~redux/slices/environment/reducers';
 
 // types
-import type {Json} from '~/types/json.types';
+import {components, OptionProps, SingleValueProps} from 'react-select';
+
 
 /**
  * Presets functional component
@@ -29,23 +30,39 @@ const Presets = () => {
   const dispatch = useAppDispatch();
 
   return (
-    <div className="mb-2">
+    <div className="mb-2" style={{marginLeft: '0.10em', marginRight: '0.10em'}}>
       <Select
         isSearchable={false}
-        formatOptionLabel={(option: Option | any, {selectValue}) => {
-          return (
-            <>
-              <div className="text-info" style={{color: '#8dccff'}}>
-                <IconEnvironment width="13" height="13"/> {option?.label}
+        components={{
+          Option: ({children, ...props}: OptionProps<any>) => (
+            <components.Option {...props}>
+              <div className="d-flex">
+                <div style={{color: !props.isSelected ? (!props.isFocused ? '#fff' : '#8dccff') : COLOR_ORANGE, minWidth: 160}}>
+                <IconEnvironment width="13" height="13"/> {props.data?.label}
               </div>
-              <div className="text-size-xxs text-muted">{option?.description}</div>
-            </>
-          );
+                <div style={{color: props.isSelected ? COLOR_WHITISH : (!props.isFocused ? COLOR_GRAYED : COLOR_WHITISH)}}
+                  className="text-size-xxs font-italic font-weight-light">{props.data?.description}</div>
+              </div>
+            </components.Option>
+          ),
+          SingleValue: ({children, ...props}: SingleValueProps<any>) => (
+            <components.SingleValue {...props}>
+              <IconEnvironment width="13" height="13"/> {props.data?.label}
+            </components.SingleValue>
+          ),
         }}
         isClearable={true}
         getOptionValue={(option: Option | any) => option.value}
         styles={{
-          control: styles => ({...styles, paddingTop: 5, paddingBottom: 5}),
+          control: styles => ({
+            ...styles,
+            paddingTop: 1,
+            paddingBottom: 0,
+            minHeight: 32,
+            height: 32,
+            borderWidth: 0,
+            outline: 0,
+          }),
         }}
         menuPortalTarget={document.body}
         options={presetOptions}
@@ -53,7 +70,8 @@ const Presets = () => {
         onChange={(option: Option | any, {action}): void => {
           if (action === 'select-option' && option) {
             const {environment} = presetsXmlToJson(option.value as EnvironmentName);
-            dispatch(updateValuesRaw(environment as Json));
+            dispatch(resetValues());
+            setTimeout(() => dispatch(overwriteValues(environment)), 30);
           }
         }}
       />
