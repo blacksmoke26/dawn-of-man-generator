@@ -6,6 +6,7 @@
 
 // types
 import {EraFactor} from '~/types/action.types';
+import {scenario} from '~/data/scenario/parser/types';
 
 export const HUMIDITY_MIN: number = 0;
 export const HUMIDITY_MAX: number = 1;
@@ -162,3 +163,7 @@ export const ACTIONS_CREATE_MAX: number = 20;
 export const WAVES_CREATE_MAX: number = 5;
 
 export const LOCATIONS_CREATE_MAX: number = 15;
+
+export const STARTING_CONDITIONS: scenario.StartingConditions = {
+  seasonId: 'Spring',
+};
