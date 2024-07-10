@@ -45,7 +45,7 @@ const DepositOverride = (props: Props) => {
   const [records, setRecords] = React.useState<environment.prototypes.OverridePrototypes>({});
   const [activeKey, setActiveKey] = React.useState<string>('');
 
-  const reduxState = useAppSelector(({environment}) => environment?.values?.treeOverridePrototypes);
+  const reduxState = useAppSelector(({environment}) => environment?.values?.depositOverridePrototypes);
 
   const reflectValues = (values: environment.prototypes.OverridePrototypes) => {
     const names: string[] = Object.keys(values);
