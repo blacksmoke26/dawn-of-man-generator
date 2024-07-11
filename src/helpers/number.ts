@@ -86,28 +86,29 @@ export const normalizeMinMax = (value: number, options: NumberNormalizeOptions):
 };
 
 export const normalizeMinMaxRange = (min: number, max: number): [number, number] => {
-  if ( min > max ) return [max, max];
-  if ( max < min ) return [min, min];
+  if (min > max) return [max, max];
+  if (max < min) return [min, min];
   return [min, max];
 };
-export const normalizeInt = (value: number, options: WithCallback<NumberNormalizeOptions, number>): false | number => {
-  if (!isInt(value)) {
+
+const normalizeNum = (value: number | undefined, options: WithCallback<NumberNormalizeOptions, number>) => {
+  if (value === undefined) {
     return false;
   }
 
-  const _value = normalizeMinMax(value, options);
-  'function' === typeof options?.callback && options?.callback(_value);
-  return _value;
+  const normalized = normalizeMinMax(value, options);
+  'function' === typeof options?.callback && options?.callback(normalized);
+  return normalized;
 };
 
-export const normalizeFloat = (value: number, options: WithCallback<NumberNormalizeOptions, number> & {
-  decimals?: number
-}): false | number => {
-  if (!isNumeric(value)) {
-    return false;
-  }
+/** Normalize an integer value based on mix/max values */
+export const normalizeInt = (value: number | string, options: WithCallback<NumberNormalizeOptions, number>): false | number => {
+  return normalizeNum(toInteger(value, undefined), options);
+};
 
-  const _value = toFloat(normalizeMinMax(value, options), options?.decimals || 1);
-  'function' === typeof options?.callback && options?.callback(_value);
-  return _value;
+/** Normalize a float value based on mix/max values */
+export const normalizeFloat = (value: number | string, options: WithCallback<NumberNormalizeOptions & {
+  decimals?: number
+}, number>): false | number => {
+  return normalizeNum(toFloat(value, options?.decimals ?? 1, undefined), options);
 };
