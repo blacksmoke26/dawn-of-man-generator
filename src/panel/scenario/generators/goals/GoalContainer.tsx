@@ -57,7 +57,7 @@ const GoalContainer = (props: Props) => {
   const [activeKey, setActiveKey] = React.useState<string>('');
 
 
-  const reduxState = useAppSelector(({scenario}) => scenario?.values?.locations) as null | scenario.Goal[] | undefined;
+  const reduxState = useAppSelector(({scenario}) => scenario?.values?.goals) as null | scenario.Goal[] | undefined;
 
   // Reflect redux-specific changes
   React.useEffect(() => {

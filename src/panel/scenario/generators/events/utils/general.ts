@@ -6,38 +6,15 @@
  */
 
 // types
-import type {DeepPartial} from 'utility-types';
-import type {ActionName, AnyAction} from '~/types/action.types';
 import type {KVDocument, MapDocument} from '~/types/json.types';
+import type {scenario} from '~/data/scenario/parser/types';
 
-// local types
-import type {EventState, Props} from '../Event';
-
-// noinspection JSUnusedGlobalSymbols
-export const defaultValues: DeepPartial<Props> = {
-  initialValues: {
-    flags: [],
-    condition: {},
-    actions: [],
-  },
-  disabled: false,
-  disabledCheckbox: false,
-  expanded: true,
-  onValuesChange: () => {
-  },
-  onRemoveClick: () => {
-  },
-  onTemplate: () => {
-  },
-  onConditionChange: () => {
-  },
-  onActionChange: () => {
-  },
-};
-
-export const actionTypesCounter = (actions: EventState['actions']): MapDocument<ActionName> => {
-  return Object.values(actions as KVDocument).reduce((accum: KVDocument, current: AnyAction) => {
-    accum[current.type] = (accum?.[current.type] || 0) + 1;
-    return accum;
-  }, {}) as MapDocument<ActionName>;
+// public types
+export type ActionsState = Record<string, scenario.action.Action>;
+export const actionTypesCounter = (actions: ActionsState): MapDocument<scenario.action.Name> => {
+  return Object.values(actions as KVDocument)
+    .reduce((accum: KVDocument, current: scenario.action.Action) => {
+      accum[current.type] = (accum?.[current.type] || 0) + 1;
+      return accum;
+    }, {});
 };

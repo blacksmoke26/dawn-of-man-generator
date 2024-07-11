@@ -17,24 +17,26 @@ import {IconClear, IconNew} from '~/components/icons/app';
 // components
 import Milestone from './Milestone';
 
-// utils
+// hooks
 import useValues from '~/hooks/use-values';
+
+// utils
+import {cloneObject} from '~/helpers/object';
 import {MILESTONES_CREATE_MAX} from '~/utils/defaults';
-import {LangStrings, toLanguageString} from '~/utils/strings';
 
 // parsers
-import {cloneObject} from '~/helpers/object';
+import {LangStrings, toLanguageString} from '~/utils/strings';
 import {toMilestonesTemplate} from '~/utils/parser/template-milestone';
-
-// types
-import {scenario} from '~/data/scenario/parser/types';
 
 // redux
 import {useAppDispatch, useAppSelector} from '~redux/hooks';
 import {clearProperty} from '~redux/slices/scenario/reducers';
 
-type MilestoneAttributes = Record<string, scenario.Milestone>;
-type LangAttributes = Record<string, LangStrings>;
+// types
+import {scenario} from '~/data/scenario/parser/types';
+
+type MilestonesState = Record<string, scenario.Milestone>;
+type StringsState = Record<string, LangStrings>;
 
 interface Props {
   checked?: boolean;
@@ -50,14 +52,14 @@ const MilestoneContainer = (props: Props) => {
 
   const counter = React.useRef<{ count: number }>({count: 0});
 
-  const valuer = useValues<MilestoneAttributes>({});
-  const strings = useValues<LangAttributes>({});
+  const valuer = useValues<MilestonesState>({});
+  const strings = useValues<StringsState>({});
 
   const [checked, setChecked] = React.useState<boolean>(props?.checked ?? true);
   const [activeKey, setActiveKey] = React.useState<string>('');
 
 
-  const reduxState = useAppSelector(({scenario}) => scenario?.values?.locations) as null | scenario.Milestone[] | undefined;
+  const reduxState = useAppSelector(({scenario}) => scenario?.values?.milestones) as null | scenario.Milestone[] | undefined;
 
   // Reflect redux-specific changes
   React.useEffect(() => {
@@ -193,8 +195,8 @@ const createInitialValues = (milestones: scenario.Milestone[] = []) => {
   let index = 0;
   let tabId: string = '';
 
-  const milestoneAttr: MilestoneAttributes = {};
-  const stringsAttr: LangAttributes = {};
+  const milestoneAttr: MilestonesState = {};
+  const stringsAttr: StringsState = {};
 
   for (const milestone of milestones) {
     const key: string = `Mile_${++index}`;

@@ -15,21 +15,21 @@ import {toActionsTemplate} from '~/utils/parser/templates-action';
 // types
 import type {Event as EventType} from '~/types/event.types';
 
-export const toEventTemplate = (attributes: EventType, disabled: boolean = false): string => {
-  if (disabled || !Object.keys(attributes?.condition || {}).length || !attributes?.actions.length) {
+export const toEventTemplate = (event: EventType, disabled: boolean = false): string => {
+  if (disabled || !Object.keys(event?.condition || {}).length || !event?.actions.length) {
     return '';
   }
 
   const eventProps: string[] = [];
 
-  attributes?.id?.length
-  && eventProps.push(`id="${attributes?.id}"`);
+  event?.id?.length
+  && eventProps.push(`id="${event?.id}"`);
 
-  attributes?.flags?.length
-  && eventProps.push(`flags="${attributes?.flags?.join(',')}"`);
+  event?.flags?.length
+  && eventProps.push(`flags="${event?.flags?.join(',')}"`);
 
-  const conditionTemplate = toAnyConditionTemplate(attributes.condition);
-  const actionsTemplate = toActionsTemplate(attributes.actions);
+  const conditionTemplate = toAnyConditionTemplate(event.condition);
+  const actionsTemplate = toActionsTemplate(event.actions);
 
   return renderTemplate(
     'event', null, eventProps,
@@ -37,8 +37,20 @@ export const toEventTemplate = (attributes: EventType, disabled: boolean = false
   );
 };
 
-export const toEventsTemplate = (templates: string[], disabled: boolean = false): string => {
-  return !disabled && templates.length
-    ? renderTemplate('events', null, [], templates.join(''))
-    : '';
+export const toEventsTemplate = (events: (string | EventType)[], disabled: boolean = false): string => {
+  if (disabled || !events?.length) return '';
+
+  const templates: string[] = [];
+
+  for (const event of events) {
+    if ('string' === typeof event) {
+      event.trim() && templates.push(event);
+      continue;
+    }
+
+    const template = toEventTemplate(event);
+    template.trim() && templates.push(template);
+  }
+
+  return templates.length ? renderTemplate('events', null, [], templates.join('')) : '';
 };
