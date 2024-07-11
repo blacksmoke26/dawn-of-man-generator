@@ -8,6 +8,7 @@
 // types
 import {environment} from '~/data/environments/parser/types';
 import {Event as AnyEvent} from '~/types/event.types';
+import {ActionName, AnyAction} from '~/types/action.types';
 import {
   ConditionAnyTasksActive,
   ConditionAnyWorkAreasActive,
@@ -53,6 +54,11 @@ export namespace scenario {
     goals?: null | Goal[];
     events?: null | AnyEvent[];
     locations?: null | Location[];
+  }
+
+  export namespace action {
+    export type Name = ActionName
+    export type Action = AnyAction;
   }
 
   export type Event = AnyEvent;
@@ -106,7 +112,7 @@ export namespace scenario {
       conditions: GeneralCondition[];
     }
 
-    export type Condition = (condition.GeneralCondition | condition.LogicalCondition);
+    export type Condition = | condition.GeneralCondition | condition.LogicalCondition;
     export type Conditions = Condition[];
   }
 
