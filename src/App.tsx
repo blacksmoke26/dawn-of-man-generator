@@ -9,7 +9,6 @@ import {Col, Container, Row, Tabs, Tab} from 'react-bootstrap';
 
 // components
 import Header from '~/elements/Header';
-import Footer from '~/elements/Footer';
 
 // environment components
 import EnvironmentPresets from '~/panel/environment/Presets';
@@ -54,7 +53,7 @@ const App = () => {
             </div>
           }>
             <Row>
-              <Col sm="6" className="pr-1" style={{height: '75vh', overflowY: 'scroll'}}>
+              <Col sm="6" className="pr-1" style={{height: '85vh', overflowY: 'scroll'}}>
                 <EnvironmentContainer/>
               </Col>
               <Col sm="6">
@@ -69,7 +68,7 @@ const App = () => {
             </div>
           }>
             <Row>
-              <Col sm="6" className="pr-1" style={{height: '75vh', overflowY: 'scroll'}}>
+              <Col sm="6" className="pr-1" style={{height: '85vh', overflowY: 'scroll'}}>
                 <ScenarioContainer/>
               </Col>
               <Col sm="6">
@@ -128,7 +127,6 @@ const App = () => {
             </Tab>
           )}
         </Tabs>
-        <Footer/>
       </Container>
     </div>
   );

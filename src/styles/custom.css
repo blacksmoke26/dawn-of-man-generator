@@ -214,10 +214,10 @@
 .text-underline-dotted { text-decoration: underline dotted; }
 
 .ui-json-editor {
-    min-height: 69.9vh;
-    height: 69.9vh;
-    max-height: 69.9vh;
-    font-size: 15px;
+    min-height: 85vh;
+    height: 85vh;
+    max-height: 85vh;
+    font-size: 14px;
     overflow-y: auto;
     padding-top: .5rem;
     border-radius: 2px;

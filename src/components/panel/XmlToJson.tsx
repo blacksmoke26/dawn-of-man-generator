@@ -90,6 +90,10 @@ const XmlToJson = (props: XmlToJsonProps) => {
           value={value}
           placeholder={newProps.placeholder}
           onChange={setValue}
+          editorProps={{
+            height: '85vh', fontSize: 14,
+            showPrintMargin: false,
+          }}
         />
       </Col>
       <Col sm="5">
