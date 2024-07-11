@@ -80,9 +80,8 @@ const SetRaider = (props: Props) => {
   const waveCount = React.useRef<{ uid: number }>({uid: 1});
 
   const newProps = merge<Required<Props>>(actionDefaultProps, props);
-
   const valuer = useValues<Partial<ActionSetRaider>>(
-    merge(defaultsParams?.setRaider || {}, props?.initialValues || {}),
+    {...defaultsParams?.setRaider, ...(props?.initialValues || {})} as ActionSetRaider
   );
 
   const state = useValues<SetRaiderActionAttributesProps>({

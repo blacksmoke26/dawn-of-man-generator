@@ -7,6 +7,7 @@
 
 // utils
 import {isObject} from '~/helpers/object';
+import {filterUnique} from '~/helpers/array';
 import {isInt, toFloat} from '~/helpers/number';
 import {isString, toString} from '~/helpers/string';
 import {ENTITIES_LIVING, techEntities} from '~/utils/entities';
@@ -71,9 +72,11 @@ const normalizeOptionalWaves = (node: Json, action: ActionParams) => {
     } as RaidWaveParameters;
 
     if (isString(wave?.disabled_techs)) {
-      raidWave.disabledTechs = toString(wave?.disabled_techs)
-        .split(' ')
-        .filter(name => techEntities.includes(name.trim())) as TechEntityType[];
+      raidWave.disabledTechs = filterUnique(
+        toString(wave?.disabled_techs)
+          .split(' ')
+          .filter(name => techEntities.includes(name.trim())),
+      ) as TechEntityType[];
 
       // clear if none
       !raidWave.disabledTechs.length && delete raidWave.disabledTechs;
@@ -93,9 +96,11 @@ export const jsonToRedux = (node: Json | any): Json | null => {
 
   const entityTypesAttr = !isString(node?.entity_types, true)
     ? []
-    : node.entity_types.split(' ')
-      .map((name: string) => name.trim())
-      .filter((name: string) => ENTITIES_LIVING.includes(name));
+    : filterUnique(
+      node.entity_types.split(' ')
+        .map((name: string) => name.trim())
+        .filter((name: string) => ENTITIES_LIVING.includes(name)),
+    );
 
   if (!entityTypesAttr.length) {
     return null;

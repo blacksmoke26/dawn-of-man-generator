@@ -8,7 +8,6 @@
 import React from 'react';
 import * as PropTypes from 'prop-types';
 import cn from 'classname';
-import merge from 'deepmerge';
 import {nanoid} from 'nanoid';
 import {Tab, Tabs} from 'react-bootstrap';
 
@@ -25,36 +24,32 @@ import ActionDropdown from './elements/ActionDropdown';
 import ConditionDropdown from './elements/ConditionDropdown';
 
 // utils
-import {onlyKeys} from '~/helpers/object';
-import {findNextTabKey} from '~/helpers/ui';
 import {filterEmpty} from '~/utils/template';
 import {ACTIONS_CREATE_MAX} from '~/utils/defaults';
+import {cloneObject, onlyKeys} from '~/helpers/object';
 import {toEventTemplate} from '~/utils/parser/templates-event';
-import {actionTypesCounter, defaultValues} from './utils/general';
+import {ActionsState, actionTypesCounter} from './utils/general';
 
 // hooks
 import useValues from '~/hooks/use-values';
 
 // types
-import type {Required} from 'utility-types';
-import type {Event as EventType} from '~/types/event.types';
-import type {AnyCondition} from '~/types/condition.types';
-import type {ActionName, AnyAction} from '~/types/action.types';
+import type {scenario} from '~/data/scenario/parser/types';
 
 export interface Props {
   disabled?: boolean;
   disabledCheckbox?: boolean;
   expanded?: boolean;
-  initialValues?: EventType;
+  initialValues?: scenario.Event;
 
   /** A callback triggers when condition is updated */
-  onConditionChange?(condition: AnyCondition): void;
+  onConditionChange?(condition: scenario.condition.Condition): void;
 
   /** A callback triggers when action is updated */
-  onActionChange?(action: AnyAction): void;
+  onActionChange?(action: scenario.action.Action): void;
 
   /** A callback triggers when metadata values are updated */
-  onValuesChange?(values: Partial<EventType>): void;
+  onValuesChange?(values: scenario.Event): void;
 
   /** A callback triggers when xml template is rendered */
   onTemplate?(value: string): void;
@@ -63,52 +58,51 @@ export interface Props {
   onRemoveClick?(value: string): void;
 }
 
-export interface EventState extends Omit<EventType, 'actions'> {
-  actions: Record<string, AnyAction>;
-}
-
-export const changedValuesToEventValues = (data: EventState): EventType => {
-  const {flags, condition, actions, id = ''} = data;
-
-  return {
-    id,
-    flags,
-    condition,
-    actions: Object.values(actions),
-  };
-};
+type EventState = Omit<scenario.Event, 'actions'>;
 
 /** Event functional component */
 const Event = (props: Props) => {
-  const newProps = merge<Required<Props>>(defaultValues as Props, props);
-
   const [actionActiveKey, setActionActiveKey] = React.useState<string>('');
+  const valuer = useValues<EventState>({} as EventState);
 
-  const valuer = useValues<EventState>(merge({
-    id: '',
-    flags: [],
-    condition: {} as AnyCondition,
-    actions: {},
-  }, (props?.initialValues || {}) as EventState));
+  const action = useValues<ActionsState>({});
+
+  const [initiated, setInitiated] = React.useState<boolean>(false);
+
+  React.useEffect(() => {
+    valuer.setAll(onlyKeys(props?.initialValues ?? {}, ['actions'], true) as EventState);
+    const initActions = normalizeActions(props?.initialValues?.actions ?? []);
+    const keys = Object.keys(initActions);
+    action.setAll(initActions);
+    keys.length && setActionActiveKey(keys[keys.length - 1]);
+
+    setInitiated(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const meta = useValues<{
     disabled: boolean;
     disabledCheckbox: boolean;
     actionsExpanded: boolean;
   }>({
-    disabled: newProps.disabled,
-    disabledCheckbox: newProps.disabledCheckbox,
+    disabled: props?.disabled ?? false,
+    disabledCheckbox: props?.disabledCheckbox ?? false,
     actionsExpanded: true,
   });
 
   //<editor-fold desc="Reflect values changes">
   React.useEffect(() => {
-    const changedValues = filterEmpty(changedValuesToEventValues(valuer.data));
+    if (initiated) {
+      const changedValues = filterEmpty({
+        ...valuer.data,
+        actions: Object.values(action.data),
+      } as scenario.Event);
 
-    newProps.onValuesChange(changedValues);
-    newProps.onTemplate(toEventTemplate(changedValues, meta.data.disabled));
+      props?.onValuesChange?.(changedValues);
+      props?.onTemplate?.(toEventTemplate(changedValues, meta.data.disabled));
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [meta.data.disabled, valuer.data]);
+  }, [meta.data.disabled, valuer.data, action.data]);
   //</editor-fold>
 
   //<editor-fold desc="Reflect prop changes">
@@ -120,20 +114,19 @@ const Event = (props: Props) => {
   //</editor-fold>
 
   const isDisabled = meta.get<boolean>('disabledCheckbox') || meta.get<boolean>('disabled');
-  const conditionInitialValues = (props?.initialValues?.condition || {}) as AnyCondition;
-  const actionTypesCountMap = actionTypesCounter(valuer.get<EventState['actions']>('actions', {}));
+  const actionTypesCountMap = actionTypesCounter(action.data);
 
   /** Generate selection based nodes */
   const renderActions = (): React.ReactNode[] => {
     const elements: React.ReactNode[] = [];
-    const actions = Object.entries(valuer.get('actions', {})) as [string, AnyAction][];
+    const actions = Object.entries(action.data);
 
     let index = 0;
 
-    for (const [id, action] of actions) {
+    for (const [id, actionData] of actions) {
       ++index;
 
-      const {type, ...initialValues} = action;
+      const {type, ...initialValues} = actionData;
 
       elements.push(
         <Tab
@@ -147,7 +140,7 @@ const Event = (props: Props) => {
               className="text-size-xs"
               title={(
                 <>
-                  {action?.type ?? ''}
+                  {actionData?.type ?? ''}
                   {' '} <i className="text-grey">{index}</i>
                 </>
               )} disabled={isDisabled}
@@ -155,23 +148,19 @@ const Event = (props: Props) => {
           }>
           <div className={cn('mt-3', {'pl-3 pr-3': type !== 'SetRaider'})}>
             <Action
-              type={type as ActionName}
+              type={type as scenario.action.Name}
               showHeader={false}
               disabledCheckbox={isDisabled}
               disabled={isDisabled}
               initialValues={initialValues}
               onRemoveClick={() => {
-                valuer.remove(`actions.${id}`);
+                action.remove(id);
               }}
               onValuesChange={values => {
-                valuer.set<EventState['actions']>(`actions`, (state) => {
-                  const currentActions = {...state} as EventState['actions'];
-                  const actionPrev = state[id] as AnyAction;
-                  currentActions[id] = {type: actionPrev.type, ...values} as AnyAction;
-
-                  newProps.onActionChange(currentActions[id]);
-                  return currentActions;
-                });
+                const prevAction = action.get(id);
+                const changedValues = cloneObject({type: prevAction.type, ...values});
+                action.overwrite(id, changedValues);
+                props?.onActionChange?.(changedValues);
               }}
             />
           </div>
@@ -185,11 +174,23 @@ const Event = (props: Props) => {
   const hasCondition = valuer.hasPath('condition.type');
 
   /** Total tabs count */
-  const tabsCount: number = Object.keys(valuer?.data?.actions || {}).length;
+  const tabsCount: number = Object.keys(action.data).length;
 
   const removeTab = (tabId: string): void => {
-    setActionActiveKey(findNextTabKey(Object.keys(valuer?.data?.actions || {}), actionActiveKey, tabId));
-    valuer.remove(`actions.${tabId}`);
+    const ids = Object.keys(action.data);
+
+    let tabIdIndex: number = ids.findIndex(id => id === tabId) || 0;
+
+    let curValue: string = actionActiveKey;
+
+    if (curValue === tabId) {
+      curValue = tabIdIndex === 0
+        ? ids[tabIdIndex + 1]
+        : ids[tabIdIndex - 1];
+    }
+
+    action.remove(tabId);
+    setActionActiveKey(curValue);
   };
 
   return (
@@ -200,17 +201,17 @@ const Event = (props: Props) => {
           noCard={true}
           header="Optional parameters"
           eventKey="clear_trees_optional_parameters">
-        <EventId
-          disabled={isDisabled}
-          value={valuer.get('id', '')}
-          onChange={value => valuer.set('id', value as string)}/>
-        <FlagsDropdown
-          value={valuer.get('flags', [])}
-          disabled={isDisabled}
-          onChange={(flags: string[]) => {
-            valuer.overwrite('flags', flags);
-          }}
-        />
+          <EventId
+            disabled={isDisabled}
+            value={valuer.get('id', '')}
+            onChange={value => valuer.set('id', value as string)}/>
+          <FlagsDropdown
+            value={valuer.get('flags', [])}
+            disabled={isDisabled}
+            onChange={(flags: string[]) => {
+              valuer.overwrite('flags', flags);
+            }}
+          />
         </Accordion>
         <div className="mb-3"></div>
 
@@ -228,15 +229,15 @@ const Event = (props: Props) => {
             type={valuer.get('condition').type}
             disabledCheckbox={isDisabled}
             enabled={!isDisabled}
-            initialValues={onlyKeys(conditionInitialValues, ['type'], true)}
+            initialValues={onlyKeys(valuer.get('condition'), ['type'], true)}
             onRemoveClick={() => valuer.set('condition', {})}
             onValuesChange={values => {
               const changedValues = {
                 type: valuer.get('condition.type'),
                 ...values,
-              } as AnyCondition;
+              } as scenario.condition.Condition;
               valuer.overwrite('condition', changedValues);
-              newProps.onConditionChange(changedValues);
+              props?.onConditionChange?.(changedValues);
             }}
           />
         )}
@@ -254,7 +255,7 @@ const Event = (props: Props) => {
             onChange={type => {
               meta.set('actionsExpanded', true);
               const uniqueId = nanoid(10).toLowerCase();
-              valuer.set(`actions.${uniqueId}`, {type});
+              action.set(uniqueId, {type});
               setActionActiveKey(uniqueId);
             }}/>
         </div>
@@ -285,6 +286,14 @@ Event.propTypes = {
   onValuesChange: PropTypes.func,
   onTemplate: PropTypes.func,
   onRemoveClick: PropTypes.func,
+};
+
+const normalizeActions = (actions: scenario.Event['actions']): ActionsState => {
+  return actions
+    .reduce((accum, current) => {
+      accum[nanoid(10).toLowerCase()] = current;
+      return accum;
+    }, {} as ActionsState);
 };
 
 export default Event;

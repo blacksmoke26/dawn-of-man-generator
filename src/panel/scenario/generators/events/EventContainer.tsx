@@ -7,7 +7,6 @@
 
 import React from 'react';
 import cn from 'classname';
-import merge from 'deepmerge';
 import {nanoid} from 'nanoid';
 import {Button, ButtonGroup, ButtonToolbar, Form, InputGroup, Tab, Tabs} from 'react-bootstrap';
 
@@ -24,20 +23,20 @@ import {IconClear, IconNew} from '~/components/icons/app';
 import useValues from '~/hooks/use-values';
 
 // utils
-import {findNextTabKey} from '~/helpers/ui';
+import {cloneObject} from '~/helpers/object';
 import {EVENTS_CREATE_MAX} from '~/utils/defaults';
 
 // parsers
 import {toEventsTemplate} from '~/utils/parser/templates-event';
 
-// types
-import type {Required} from 'utility-types';
-import type {KVDocument} from '~/types/json.types';
+// redux
+import {useAppDispatch, useAppSelector} from '~redux/hooks';
+import {clearProperty} from '~redux/slices/scenario/reducers';
 
-export type EventsState = KVDocument<{
-  template: string;
-  disabled: boolean;
-}>
+// types
+import type {scenario} from '~/data/scenario/parser/types';
+
+export type EventsState = Record<string, scenario.Event>;
 
 interface Props {
   checked?: boolean;
@@ -45,39 +44,70 @@ interface Props {
   onTemplate?(template: string): void;
 }
 
-const listTemplates = (events: EventsState): string[] => {
-  return Object
-    .values(events)
-    .filter(attr => !attr.disabled && attr.template.trim())
-    .map((attr => attr.template));
-};
-
 const EventContainer = (props: Props) => {
-  const newProps = merge<Required<Props>>({
-    checked: false,
-    onTemplate() {
-    },
-  }, props);
+  const dispatch = useAppDispatch();
 
   const counter = React.useRef<{ event: number }>({event: 0});
 
-  const [checked, setChecked] = React.useState<boolean>(newProps.checked);
+  const [checked, setChecked] = React.useState<boolean>(props?.checked ?? true);
   const [activeKey, setActiveKey] = React.useState<string>('');
 
   const events = useValues<EventsState>({});
 
+  const reduxState = useAppSelector(({scenario}) => scenario?.values?.events) as null | scenario.Events | undefined;
+
+  // Reflect redux-specific changes
+  React.useEffect(() => {
+    if (reduxState === null) {
+      setChecked(true);
+      events.clear();
+      setActiveKey('');
+      dispatch(clearProperty('events'));
+    } else if (Array.isArray(reduxState)) {
+      counter.current.event = 0;
+      setChecked(true);
+      events.clear();
+      if (reduxState.length) {
+        counter.current.event = 0;
+        const list = cloneObject(reduxState).reduce((accum, current) => {
+          const key = 'Event_' + (++counter.current.event);
+          accum[key] = current;
+          return accum;
+        }, {} as EventsState);
+
+        events.setAll(list);
+        setActiveKey('Event_' + 1);
+      }
+      dispatch(clearProperty('events'));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reduxState]);
+
   // Reflect state changes
   React.useEffect(() => {
-    newProps.onTemplate(!checked ? '' : toEventsTemplate(listTemplates(events.data)));
+    props?.onTemplate?.(toEventsTemplate(Object.values(events.data), !checked));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checked, events.data]);
 
   /** Total tabs count */
-  const total: number = Object.keys(events.data).length;
+  const eventsList = Object.entries(events.data);
+  const total: number = eventsList.length;
 
   const removeTab = (tabId: string): void => {
-    setActiveKey(findNextTabKey(Object.keys(events.data), activeKey, tabId));
+    const ids = Object.keys(events.data);
+
+    let tabIdIndex: number = ids.findIndex(id => id === tabId) || 0;
+
+    let curValue: string = activeKey;
+
+    if (curValue === tabId) {
+      curValue = tabIdIndex === 0
+        ? ids[tabIdIndex + 1]
+        : ids[tabIdIndex - 1];
+    }
+
     events.remove(tabId);
+    setActiveKey(curValue);
   };
 
   return (
@@ -102,9 +132,7 @@ const EventContainer = (props: Props) => {
                 className={cn({'cursor-disabled': !checked || total >= EVENTS_CREATE_MAX})}
                 onClick={() => {
                   const uniqueId = 'Event_' + (++counter.current.event);
-                  events.set(uniqueId, {
-                    template: '', abled: false,
-                  });
+                  events.set(uniqueId, {});
                   setActiveKey(uniqueId);
                 }}><IconNew/> New Event</Button>
               <Button
@@ -135,28 +163,31 @@ const EventContainer = (props: Props) => {
         activeKey={activeKey}
         className={cn('nav-tabs-bottom mb-0', {'border-0': !total})}
         onSelect={k => setActiveKey(k as string)}>
-        {Object.entries(events.data).map(([id, event]) => (
-          <Tab
-            disabled={!checked}
-            eventKey={id}
-            key={id}
-            as="div"
-            title={
-              <TabTitle
-                title={id.replace('_', ' ')}
-                disabled={event.disabled}
-                onRemove={() => removeTab(id)}
-              />
-            }>
-            <Event
-              disabledCheckbox={!checked}
-              onTemplate={(template: string) => {
-                events.set(`${id}.template`, template);
-              }}
+        {eventsList.map(([id, initialValues]) => {
+          return (
+            <Tab
               disabled={!checked}
-              onRemoveClick={() => events.remove(id)}/>
-          </Tab>
-        ))}
+              eventKey={id}
+              key={id}
+              as="div"
+              title={
+                <TabTitle
+                  title={id.replace('_', ' ')}
+                  disabled={!checked}
+                  onRemove={() => removeTab(id)}
+                />
+              }>
+              <Event
+                initialValues={initialValues}
+                disabledCheckbox={!checked}
+                onValuesChange={changedValues => {
+                  events.overwrite(id, cloneObject(changedValues));
+                }}
+                disabled={!checked}
+                onRemoveClick={() => removeTab(id)}/>
+            </Tab>
+          );
+        })}
       </Tabs>
     </div>
   );

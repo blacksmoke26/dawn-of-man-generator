@@ -23,35 +23,32 @@ import type {Json} from '~/types/json.types';
 import type {JsonToReduxOptions} from '~/utils/parser/index.types';
 
 const transform = (name: string, value: any): any => {
-  if ('seed' === name) {
-    return Number(value).toFixed(0).padStart(9, '0');
+  switch (name) {
+    case 'seed':
+      return +value;
+    case 'id':
+    case 'environment':
+      return snakeCase(value);
+    case 'map_location':
+    case 'position':
+      return String(value).split(',').map(Number);
+    case 'lakes':
+      return +Number(value).toFixed(0);
+    default:
+      return value;
   }
-
-  if (['id', 'environment'].includes(name)) {
-    return snakeCase(value);
-  }
-
-  if (['map_location', 'position'].includes(name)) {
-    return String(value).split(',').map(Number);
-  }
-
-  if ('lakes' === name) {
-    return +Number(value).toFixed(0);
-  }
-
-  return value;
 };
 
 const filterRequired = (name: string, value: any): boolean => {
   if (['id', 'environment'].includes(name) && (!value.trim() || value.length < 3)) {
     return false;
-  } else if ( name === 'seed' && !validateLocationSeed(value)) {
+  } else if (name === 'seed' && !validateLocationSeed(value)) {
     return false;
-  } else if ( name === 'map_location' && !validateLocationCoordinates(value)) {
+  } else if (name === 'map_location' && !validateLocationCoordinates(value)) {
     return false;
-  } else if ( name === 'position' && !validateLocationPosition(value)) {
+  } else if (name === 'position' && !validateLocationPosition(value)) {
     return false;
-  } else if ( name === 'lakes' && !validateLocationLakes(value)) {
+  } else if (name === 'lakes' && !validateLocationLakes(value)) {
     return false;
   }
 
