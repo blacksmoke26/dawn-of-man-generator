@@ -9,11 +9,13 @@
 import {isInt} from '~/helpers/number';
 import {isObject} from '~/helpers/object';
 import {isString} from '~/helpers/string';
+import {filterUnique} from '~/helpers/array';
 import {animalEntities} from '~/utils/entities';
-import {validateEraFactors} from '~/utils/scenario/validator';
 import {ENTITY_COUNT_MAX, ENTITY_COUNT_MIN} from '~/utils/condition';
 
 // validators
+import {validateEraFactors} from '~/utils/scenario/validator';
+
 // types
 import type {Json} from '~/types/json.types';
 import type {ActionName, ActionSetAnimalPopulation, ActionWithType, EraFactor} from '~/types/action.types';
@@ -49,9 +51,9 @@ const normalizeAnimalTypes = (node: Json, action: ActionParams): void => {
 
   if (isString(node?.animal_types, true)) {
     delete action?.animalType;
-    const animals = node
+    const animals = filterUnique(node
       .animal_types.trim().split(' ')
-      .map((name: string) => name.trim())
+      .map((name: string) => name.trim()))
       .filter((name: string) => animalEntities.includes(name));
 
     animals.length && (action.animalTypes = animals);
