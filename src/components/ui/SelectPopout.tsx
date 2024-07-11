@@ -25,6 +25,7 @@ import type {Json} from '~/types/json.types';
 import type {Option, Options} from './Select';
 import type {ActionMeta, FormatOptionLabelMeta, Props as SelectProps} from 'react-select';
 import {Property} from 'csstype';
+import {capitalCase} from 'change-case';
 
 // public types
 export type {Option, Options};
@@ -38,6 +39,9 @@ export interface SelectPopoutProps {
 
   /** Whatever the component is disabled or not */
   disabled?: boolean;
+
+  /** Whatever the component is disabled or not */
+  value?: Option | string | null;
 
   /** Hide the arrow icon right after display value */
   hideArrow?: boolean;
@@ -69,7 +73,7 @@ export interface SelectPopoutProps {
 /** SelectPopout functional component */
 export const SelectPopout = (props: SelectPopoutProps) => {
   const [isOpen, setIsOpen] = React.useState<boolean>(false);
-  const [value, setValue] = React.useState<Option | null>();
+  const [value, setValue] = React.useState<Option | null>(valueToOption(props?.value ?? null));
 
   const formatTextHandler = 'function' === typeof props?.formatText
     ? props?.formatText
@@ -128,6 +132,14 @@ export const SelectPopout = (props: SelectPopoutProps) => {
     </Dropdown>
   );
 };
+
+const valueToOption = (value: Option | string | null): Option | null => {
+  if ( 'string' === typeof value ) {
+    return {value,  label: capitalCase(value)}
+  }
+
+  return value;
+}
 
 const Menu = (props: JSX.IntrinsicElements['div']) => (
   <div style={{marginTop: -7, position: 'absolute', zIndex: 2}} {...props}/>

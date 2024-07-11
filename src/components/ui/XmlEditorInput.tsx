@@ -19,13 +19,17 @@ import {formatXml, validate, ValidationError} from '~/helpers/xml';
 import {invokeHandler} from '~/utils/callback';
 import {ButtonGroup, ButtonToolbar, InputGroup} from 'react-bootstrap';
 import LinkButton from '~/components/ui/LinkButton';
-import {IconClear, IconCopy, IconWandSparkles} from '~/components/icons/app';
+import {IconCopy, IconEraser, IconWandSparkles} from '~/components/icons/app';
 import copyClipboard from 'clipboard-copy';
 
 interface Props {
   placeholder?: string;
   editorProps?: Omit<IAceEditorProps, 'onChange' | 'onPaste' | 'value' | 'placeholder'>;
   value?: string;
+  hideButtons?: boolean;
+  rightButtons?: React.ReactNode;
+  hideClearButton?: boolean;
+  hidePrettierButton?: boolean;
   buttons?: React.ReactNode;
 
   onChange?(value: string): void;
@@ -74,6 +78,8 @@ const XmlEditorInput = (props: Props) => {
     && setEditorProps(current => merge(current, props.editorProps || {}));
   }, [props?.editorProps, props?.value]);
 
+  const displayError = !props?.editorProps?.readOnly && Boolean(value);
+
   return (
     <>
       <AceEditor
@@ -87,48 +93,54 @@ const XmlEditorInput = (props: Props) => {
         name={nanoid(10)}
         className="font-family-code w-100"
         value={value}/>
-      <div className="mt-2 mb-2" style={{marginLeft: 0}}>
-        <ButtonToolbar
-          className="d-flex justify-content-between text-orange"
-          aria-label="Toolbar with Button groups">
-          <ButtonGroup size="sm">
-            <LinkButton
-              disabled={!props?.value?.trim() || !isXmlValid}
-              title="Prettify xml"
-              color="WHITISH"
-              className="ml-0 pl-0"
-              onClick={() => {
-                invokeHandler(props, 'onChange', formatXmlString(value));
-              }}>
-              <IconWandSparkles/> Prettify
-            </LinkButton>
-            <LinkButton
-              disabled={!value}
-              title="Copy to Clipboard"
-              onClick={() => copyClipboard(value)}>
-              <IconCopy/> Copy
-            </LinkButton>
-            <LinkButton
-              disabled={!value?.trim()}
-              title="Clear"
-              color="REDDISH"
-              onClick={() => {
-                invokeHandler(props, 'onChange', '');
-              }}>
-              <IconClear/> Clear
-            </LinkButton>
-            {props?.buttons}
-          </ButtonGroup>
-          {Boolean(value) && !isXmlValid && (
-            <InputGroup>
-              <InputGroup.Text
-                className="bg-transparent font-family-code border-0 p-0 text-orange">
-                {xmlError}
-              </InputGroup.Text>
-            </InputGroup>
-          )}
-        </ButtonToolbar>
-      </div>
+      {!props?.hideButtons && (
+        <div className="mt-2 mb-2" style={{marginLeft: 0}}>
+          <ButtonToolbar
+            className="d-flex justify-content-between">
+            <ButtonGroup size="sm">
+              {!props?.hidePrettierButton && (
+                <LinkButton
+                  disabled={!props?.value?.trim() || !isXmlValid}
+                  title="Prettify xml"
+                  color="WHITISH"
+                  className="ml-0 pl-0 pt-0 pb-0"
+                  onClick={() => {
+                    invokeHandler(props, 'onChange', formatXmlString(value));
+                  }}>
+                  <IconWandSparkles/> Prettify
+                </LinkButton>
+              )}
+              <LinkButton
+                disabled={!value}
+                title="Copy to Clipboard"
+                className="pt-0 pb-0"
+                onClick={() => copyClipboard(value)}>
+                <IconCopy/> Copy
+              </LinkButton>
+              {!props?.hideClearButton && (
+                <LinkButton
+                  disabled={!value?.trim()}
+                  title="Clear"
+                  className="pt-0 pb-0"
+                  color="REDDISH"
+                  onClick={() => invokeHandler(props, 'onChange', '')}>
+                  <IconEraser/> Clear
+                </LinkButton>
+              )}
+              {props?.buttons}
+            </ButtonGroup>
+            {props?.rightButtons}
+            {(displayError && !isXmlValid) && (
+              <InputGroup>
+                <InputGroup.Text
+                  className="bg-transparent font-family-code border-0 p-0 text-orange">
+                  {xmlError}
+                </InputGroup.Text>
+              </InputGroup>
+            )}
+          </ButtonToolbar>
+        </div>
+      )}
     </>
   );
 };

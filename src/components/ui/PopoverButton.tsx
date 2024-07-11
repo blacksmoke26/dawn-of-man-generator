@@ -33,6 +33,10 @@ export interface CommonProps {
   /** Popover should place over the value or not
    * @default false */
   isCovered?: boolean;
+
+  /** Popover position
+   * @default 'bottom-start' */
+  placement?: OverlayTriggerProps['placement'];
 }
 
 export interface PopoverButtonProps extends CommonProps, React.PropsWithChildren {
@@ -79,7 +83,7 @@ const PopoverButton = (props: PopoverButtonProps) => {
       </Popover.Body>
     </Popover>
   );
-
+console.log('props?.placement;', props?.placement);
   return (
     <>
       <OverlayTrigger
@@ -87,7 +91,7 @@ const PopoverButton = (props: PopoverButtonProps) => {
         rootClose
         show={showPopup}
         trigger="click"
-        placement="bottom-start"
+        placement={props?.placement ?? 'bottom-start'}
         overlay={popover} onToggle={(show: boolean) => {
         setShowPopup(show);
       }}>

@@ -1,9 +1,8 @@
-// noinspection com.intellij.reactbuddy.ExhaustiveDepsInspection
-
 /**
  * @author Junaid Atari <mj.atari@gmail.com>
  * @see https://github.com/blacksmoke26/dawn-of-man-generator
- * @since 2020-08-29
+ * @since 2024-07-11
+ * @version 2.5.0
  */
 
 import React from 'react';
@@ -18,11 +17,11 @@ import {IconCheck, IconCodeXml} from '~/components/icons/app';
 
 // utils
 import {validate, ValidationError} from '~/helpers/xml';
-import {xmlToReduxJson} from '~/data/environments/loader';
+import {xmlToReduxJson} from '~/data/scenario/loader';
 
 // redux
 import {useAppDispatch} from '~redux/hooks';
-import {overwriteValues, resetValues} from '~redux/slices/environment/reducers';
+import {overwriteValues, resetValues} from '~redux/slices/scenario/reducers';
 
 /** XmlTextLoader functional component */
 function XmlTextLoader() {
@@ -37,7 +36,7 @@ function XmlTextLoader() {
   /** Import button click handler */
   const onImportClick = () => {
     try {
-      const json = xmlToReduxJson(value)?.environment ?? {};
+      const json = xmlToReduxJson(value)?.scenario ?? {};
       dispatch(resetValues());
       setTimeout(() => dispatch(overwriteValues(json)), 30);
       setShowModel(false);
@@ -63,7 +62,7 @@ function XmlTextLoader() {
         keyboard={false}>
         <Modal.Header>
           <Modal.Title>
-            <IconCodeXml width="20" height="20"/> Import Environment XML
+            <IconCodeXml width="20" height="20"/> Import Scenario XML
           </Modal.Title>
           <button
             onClick={() => setShowModel(false)}
