@@ -20,8 +20,9 @@ export const Header = () => {
         {' - '}
         <a href="https://steamcommunity.com/app/858810/discussions/1/"
            rel="noopener noreferrer" target="_blank">
-          Environment/Scenario Generator 2.5
+          Mod Generator v2.6
         </a>
+        <em className="pl-1 position-relative" style={{fontSize: 14, top: -8}}>(alpha)</em>
       </h2>
       <div className="mt-2 text-size-xs d-flex align-items-center">
         <a href="https://github.com/blacksmoke26" className="text-size-sm"
