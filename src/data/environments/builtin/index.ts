@@ -14,6 +14,8 @@ import generalEurasiaNorth from '!!raw-loader!./general/eurasia-north.xml';
 import generalEurasiaWarm from '!!raw-loader!./general/eurasia-warm.xml';
 import generalFlat from '!!raw-loader!./general/flat.xml';
 
+import {presets as schwiftykPresets, presetOptions as schwiftykPresetOptions} from './schwiftyk';
+
 // parsers
 import {xmlToReduxJson} from '~/data/environments/loader';
 
@@ -29,6 +31,7 @@ export const presets = {
   'general/eurasia_north': generalEurasiaNorth,
   'general/eurasia_warm': generalEurasiaWarm,
   'general/flat': generalFlat,
+  ...schwiftykPresets,
 };
 
 export type EnvironmentName = keyof typeof presets;
@@ -74,7 +77,7 @@ export const presetOptions: Options = [{
     description: 'Flat land with specific resources',
     type: 'environment',
   }],
-}];
+}, ...schwiftykPresetOptions];
 
 export const presetsXmlToJson = (name: EnvironmentName) => {
   return xmlToReduxJson(presets[name]);
