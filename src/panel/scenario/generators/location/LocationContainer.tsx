@@ -11,6 +11,9 @@ import {nanoid} from 'nanoid';
 import {capitalCase} from 'change-case';
 import {Button, ButtonGroup, ButtonToolbar, Form, InputGroup, Tab, Tabs} from 'react-bootstrap';
 
+// elemental components
+import TabTitle from '~/components/ui/TabTitle';
+
 // components
 import Location from './Location';
 
@@ -19,7 +22,9 @@ import {IconClear, IconNew} from '~/components/icons/app';
 import {toLocationsTemplate} from '~/utils/parser/templates-location';
 
 // utils
+import {findNextTab} from '~/helpers/ui';
 import * as location from '~/utils/location';
+import {cloneObject} from '~/helpers/object';
 import {toLanguageString} from '~/utils/strings';
 import {locationToStrings} from '~/utils/location';
 import {LOCATIONS_CREATE_MAX} from '~/utils/defaults';
@@ -30,7 +35,6 @@ import {clearProperty} from '~redux/slices/scenario/reducers';
 
 // types
 import type {scenario} from '~/data/scenario/parser/types';
-import {cloneObject} from '~/helpers/object';
 
 /** LocationContainer `props` type */
 interface Props {
@@ -38,6 +42,7 @@ interface Props {
 
   onStrings(strings: string): void,
 }
+
 
 /** LocationContainer functional component */
 const LocationContainer = (props: Props) => {
@@ -59,11 +64,17 @@ const LocationContainer = (props: Props) => {
       dispatch(clearProperty('locations'));
     } else if (Array.isArray(reduxState)) {
       setChecked(true);
-      const cloned = cloneObject<scenario.Location[]>(reduxState);
-      setLocations(cloned.reduce((accum, item) => {
-        accum[nanoid(10)] = item;
-        return accum;
-      }, {} as Record<string, scenario.Location>))
+
+      const mapping = cloneObject<scenario.Location[]>(reduxState)
+        .reduce((accum, item) => {
+          accum[nanoid(10)] = item;
+          return accum;
+        }, {} as Record<string, scenario.Location>);
+
+      setLocations(mapping);
+      const keys = Object.keys(mapping);
+
+      setActiveKey(keys[keys.length - 1]);
       dispatch(clearProperty('locations'));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -82,30 +93,6 @@ const LocationContainer = (props: Props) => {
     setActiveKey(uid);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  /** Remove location */
-  const removeLocation = React.useCallback((tabId: string): void => {
-    const ids = Object.keys(locations);
-
-    const newLocations = {...locations};
-
-    let tabIdIndex: number = ids.findIndex(id => id === tabId) || 0;
-
-    let curValue: string = activeKey;
-
-    if (curValue === tabId) {
-      curValue = tabIdIndex === 0
-        ? ids[tabIdIndex + 1]
-        : ids[tabIdIndex - 1];
-    }
-
-    delete newLocations[tabId];
-
-    setLocations(newLocations);
-
-    setActiveKey(curValue);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [locations, activeKey]);
 
   // Reflect state changes
   React.useEffect(() => {
@@ -129,7 +116,7 @@ const LocationContainer = (props: Props) => {
           <Form.Check
             className="pull-right"
             type="switch"
-            id={`locations_override-switch-${nanoid(5)}`}
+            id="locations_enabled"
             label="Enable locations"
             checked={checked}
             onChange={e => setChecked(e.target.checked)}
@@ -168,30 +155,22 @@ const LocationContainer = (props: Props) => {
           activeKey={activeKey} id="locations-tab"
           className="nav-tabs-bottom"
           onSelect={k => setActiveKey(k as string)}>
-          {Object.entries(locations).map(([id, location], i: number) => (
+          {Object.entries(locations).map(([id, location]) => (
             <Tab
               disabled={!checked}
               eventKey={id}
               key={id} as="div" className="mb-3"
               title={
-                <>
-                 <span className={cn('text-size-sm pr-2', {
-                   'text-muted text-line-through': !checked,
-                 })}>{capitalCase(location.id)}</span>
-                  <a aria-disabled={!checked} hidden={i === 0}
-                     href="#tab-close"
-                     className="text-color-default text-decoration-none p-0"
-                     style={{
-                       lineHeight: '10px',
-                       position: 'relative',
-                       top: '-2px',
-                     }} onClick={e => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    removeLocation(id);
-                  }}>&times;</a>
-                </>
-              }>
+                <TabTitle
+                  title={capitalCase(location.id)}
+                  disabled={!checked}
+                  onRemove={() => {
+                    findNextTab(locations, id, activeKey, (nextTab, newLocations) => {
+                      setLocations(newLocations);
+                      setActiveKey(nextTab);
+                    });
+                  }}
+                />}>
               <div style={{marginTop: '1rem'}} className="pl-3 pr-3">
                 <Location
                   disabled={!checked}
