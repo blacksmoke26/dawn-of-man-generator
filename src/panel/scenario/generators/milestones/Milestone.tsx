@@ -26,7 +26,6 @@ import {COLOR_REDDISH, IconCondition, IconConditionLogical} from '~/components/i
 import useValues from '~/hooks/use-values';
 
 // utils
-import {findNextTab} from '~/helpers/ui';
 import {cloneObject, onlyKeys} from '~/helpers/object';
 import {CONDITIONS_OPTIONS} from '~/utils/condition';
 

@@ -6,32 +6,31 @@
  */
 
 import React from 'react';
+import FileSaver from 'file-saver';
 
 // elemental components
+import LinkButton from '~/components/ui/LinkButton';
 import XmlEditorInput from '~/components/ui/XmlEditorInput';
+import PopoverTextInput from '~/components/ui/PopoverTextInput';
 import SelectPopout, {Option, Options} from '~/components/ui/SelectPopout';
 
 // icons
 import {
   COLOR_REDDISH,
-  IconChevronSimpleDown,
   IconCodeXml,
-  IconDownload,
-  IconEnvironment,
-  IconPencilLine,
   IconScenario,
+  IconDownload,
+  IconPencilLine,
+  IconEnvironment,
+  IconChevronSimpleDown,
 } from '~/components/icons/app';
 
 // hooks
 import {useAppSelector} from '~redux/hooks';
 
 // parsers
+import {ScenarioName, presetOptions as scnPresetOptions, presets as scnPresets} from '~/data/scenario/builtin';
 import {EnvironmentName, presetOptions as envPresetOptions, presets as envPresets} from '~/data/environments/builtin';
-import {presetOptions as scnPresetOptions, presets as scnPresets, ScenarioName} from '~/data/scenario/builtin';
-import FileSaver from 'file-saver';
-import LinkButton from '~/components/ui/LinkButton';
-import PopoverTextInput from '~/components/ui/PopoverTextInput';
-import {updateName} from '~redux/slices/scenario/reducers';
 
 const getIcon = (option: Option): typeof IconCodeXml => {
   if (option?.type === 'environment' || option.value === 'environment') {
