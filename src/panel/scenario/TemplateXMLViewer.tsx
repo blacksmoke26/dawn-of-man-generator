@@ -41,7 +41,7 @@ const TemplateXMLViewer = () => {
           editorProps={{
             readOnly: true,
             highlightActiveLine: false,
-            height: '59vh', fontSize: 15,
+            height: '56vh', fontSize: 15,
             showPrintMargin: false,
             setOptions: {
               foldStyle: 'manual',
