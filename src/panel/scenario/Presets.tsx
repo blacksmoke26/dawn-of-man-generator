@@ -12,14 +12,14 @@ import {FilePlusIcon} from 'lucide-react';
 import Select, {Option} from '~/components/ui/Select';
 
 // icons
-import {COLOR_GRAYED, COLOR_ORANGE, COLOR_WHITISH, IconEnvironment} from '~/components/icons/app';
+import {COLOR_GRAYED, COLOR_ORANGE, COLOR_WHITISH, IconScenario} from '~/components/icons/app';
 
 // utils
-import {EnvironmentName, presetOptions, presetsXmlToJson} from '~/data/environments/builtin';
+import {presetOptions, presetsXmlToJson, ScenarioName} from '~/data/scenario/builtin';
 
 // redux
 import {useAppDispatch} from '~redux/hooks';
-import {overwriteValues, resetValues} from '~redux/slices/environment/reducers';
+import {overwriteValues, resetValues} from '~redux/slices/scenario/reducers';
 
 // types
 import {components, OptionProps, SingleValueProps} from 'react-select';
@@ -37,7 +37,7 @@ const Presets = () => {
         variant="secondary" size="sm"
         className="d-inline-flex align-items-center"
         onClick={() => dispatch(resetValues())}>
-        <FilePlusIcon className="d-inline-block mr-1" width="13" height="13"/> New Environment
+        <FilePlusIcon className="d-inline-block mr-1" width="13" height="13"/> New Scenario
       </Button>
       <Select
         isSearchable={false}
@@ -49,7 +49,7 @@ const Presets = () => {
                   color: !props.isSelected ? (!props.isFocused ? '#fff' : '#8dccff') : COLOR_ORANGE,
                   minWidth: 160,
                 }}>
-                  <IconEnvironment width="13" height="13"/> {props.data?.label}
+                  <IconScenario width="13" height="13"/> {props.data?.label}
                 </div>
                 <div
                   style={{color: props.isSelected ? COLOR_WHITISH : (!props.isFocused ? COLOR_GRAYED : COLOR_WHITISH)}}
@@ -59,7 +59,7 @@ const Presets = () => {
           ),
           SingleValue: ({children, ...props}: SingleValueProps<any>) => (
             <components.SingleValue {...props}>
-              <IconEnvironment width="13" height="13"/> {props.data?.label}
+              <IconScenario width="13" height="13"/> {props.data?.label}
             </components.SingleValue>
           ),
         }}
@@ -86,9 +86,9 @@ const Presets = () => {
         placeholder="Choose to load preset..."
         onChange={(option: Option | any, {action}): void => {
           if (action === 'select-option' && option) {
-            const {environment} = presetsXmlToJson(option.value as EnvironmentName);
+            const {scenario} = presetsXmlToJson(option.value as ScenarioName);
             dispatch(resetValues());
-            setTimeout(() => dispatch(overwriteValues(environment)), 30);
+            setTimeout(() => dispatch(overwriteValues(scenario)), 30);
           }
         }}
       />

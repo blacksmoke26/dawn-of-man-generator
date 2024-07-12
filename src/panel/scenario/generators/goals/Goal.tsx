@@ -70,13 +70,10 @@ interface ValueAttributes extends Omit<scenario.Goal, 'conditions'> {
 }
 
 const Goal = (props: Props) => {
-  const valuer = useValues<ValueAttributes>(onlyKeys(
-    props?.initialValues ?? {}, ['conditions'], true,
-  ) as ValueAttributes);
+  const valuer = useValues<ValueAttributes>({} as ValueAttributes);
+  const condition = useValues<ConditionAttribute>({});
 
-  const condition = useValues<ConditionAttribute>(
-    valuesToConditionAttributes(props?.initialValues)
-  );
+  const [init, setInit] = React.useState<boolean>(false);
 
   const meta = useValues<GoalAttributes>({
     disabled: props?.disabled ?? false,
@@ -86,6 +83,16 @@ const Goal = (props: Props) => {
   });
 
   React.useEffect(() => {
+    valuer.setAll(onlyKeys(
+      props?.initialValues ?? {}, ['conditions'], true,
+    ) as ValueAttributes);
+    condition.setAll(valuesToConditionAttributes(props?.initialValues));
+    setInit(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  React.useEffect(() => {
+    if (!init) return;
     const changedValues = cloneObject({
       ...valuer.data,
       conditions: Object.values(condition.data),
@@ -99,8 +106,8 @@ const Goal = (props: Props) => {
     props?.onStringsChange?.(!isDisabled && changedValues?.conditions.length ? createStrings(changedValues) : {});
     props?.onValuesChange?.(isDisabled ? {} as scenario.Goal : changedValues);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [condition.data, valuer.data,
-    meta.data.disabled, meta.data.showStatusChecked, meta.data.disabledCheckbox
+  }, [init, condition.data, valuer.data,
+    meta.data.disabled, meta.data.showStatusChecked, meta.data.disabledCheckbox,
   ]);
   //</editor-fold>
 

@@ -73,3 +73,32 @@ export const styleCn = (...style: StyleCnArg[]): CSSProperties => {
 
   return merge.all<CSSProperties>(allStyles);
 };
+
+/**
+ * Remove the tab from list
+ * @example
+ *
+ * findNextTab(tabs, 'removeTab', 'activeTab', (nextTab, newTabs) => {
+ *   setTabs(newTabs);
+ *   setActiveTab(nextTab);
+ * });
+ */
+export const findNextTab = (tabs: Record<string, any>, tabId: string, activeTab: string, onRemove?: ((nextTab: string, tabs: Record<string, any>) => void)) => {
+  const ids = Object.keys(tabs);
+
+  const newLocations = {...tabs};
+
+  let tabIdIndex: number = ids.findIndex(id => id === tabId) || 0;
+
+  let curValue: string = activeTab;
+
+  if (curValue === tabId) {
+    curValue = tabIdIndex === 0
+      ? ids[tabIdIndex + 1]
+      : ids[tabIdIndex - 1];
+  }
+
+  delete newLocations[tabId];
+
+  onRemove?.(curValue, {...newLocations});
+};

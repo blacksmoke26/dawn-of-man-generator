@@ -1,6 +1,6 @@
 [![GitHub release](https://img.shields.io/github/v/release/blacksmoke26/dawn-of-man-generator)](https://github.com/blacksmoke26/dawn-of-man-generator/releases/latest) [![GitHub issues](https://img.shields.io/github/issues/blacksmoke26/dawn-of-man-generator?style=plastic)](https://github.com/blacksmoke26/dawn-of-man-generator/issues) [![Netlify Status](https://api.netlify.com/api/v1/badges/d15bd739-2ab5-4f27-bd99-9cf624936425/deploy-status)](https://app.netlify.com/sites/dawn-of-man-mod-gen/deploys)
 
-## Dawn of Man - Environment/Scenario Generator v2.5
+## Dawn of Man - Environment/Scenario Generator v2.6
 
 I 😍 this game, Yeah! So that's why I 🖌️ created this utility in the first place. A really cool web app made on the top
 of TypeScript / [ReactJS](https://reactjs.org/docs/hooks-intro.html) to generate environment and location data. It
@@ -19,14 +19,15 @@ Yeah, it was a hassle 🥴, but here we go again.
 | Version                                              | Status  | EOL | Release    |
 |------------------------------------------------------|---------|-----|------------|
 | [2.x](https://dev--dawn-of-man-mod-gen.netlify.app/) | Nightly | No  | Next       |
-| [2.5](https://dawn-of-man-mod-gen.netlify.app/)      | Alpha   | No  | OnGoing    |
-| [2.4](https://2-4--dawn-of-man-mod-gen.netlify.app/) | Beta    | No  | 2024-06-30 |
+| [2.6](https://dawn-of-man-mod-gen.netlify.app/)      | Alpha   | No  | OnGoing    |
+| [2.5](https://2-5--dawn-of-man-mod-gen.netlify.app/) | Beta    | No  | 2024-07-11 |
 
 ### Stalled Versions
 
 | Version                                                       | Status | EOL | Release    |
 |---------------------------------------------------------------|--------|-----|------------|
-| [2.3](https://2-3--dawn-of-man-mod-gen.netlify.app/)          | Beta   | No  | 2024-06-23 |
+| [2.4](https://2-4--dawn-of-man-mod-gen.netlify.app/)          | Beta   | Yes | 2024-06-30 |
+| [2.3](https://2-3--dawn-of-man-mod-gen.netlify.app/)          | Beta   | Yes | 2024-06-23 |
 | [2.2](https://2-2--dawn-of-man-mod-gen.netlify.app/)          | Beta   | Yes | 2024-06-16 |
 | [2.1](https://2-1--dawn-of-man-mod-gen.netlify.app/)          | Beta   | Yes | 2024-06-13 |
 | [2.0](https://2-0-1-hotfix--dawn-of-man-mod-gen.netlify.app/) | Beta   | Yes | 2024-06-07 |
@@ -76,7 +77,6 @@ https://dawn-of-man-mod-gen.netlify.app/
 * [React Select](https://react-select.com/)
 * [Lucide (icons)](https://lucide.dev/icons)
 * [Fast XML Parser](https://naturalintelligence.github.io/fast-xml-parser/)
-* [React Syntax Highlighter](https://github.com/react-syntax-highlighter/react-syntax-highlighter)
 * [React Ace Editor](https://github.com/securingsincity/react-ace)
 * [Json Editor](https://github.com/CarlosNZ/json-edit-react)
 * [XML Formatter](https://github.com/chrisbottin/xml-formatter#readme)

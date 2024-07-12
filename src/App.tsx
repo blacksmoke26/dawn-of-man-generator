@@ -12,6 +12,7 @@ import Header from '~/elements/Header';
 
 // environment components
 import EnvironmentPresets from '~/panel/environment/Presets';
+import ScenarioPresets from '~/panel/scenario/Presets';
 import TemplateXMLViewer from '~/panel/environment/TemplateXMLViewer';
 import EnvironmentContainer from '~/panel/environment/EnvironmentContainer';
 
@@ -72,6 +73,7 @@ const App = () => {
                 <ScenarioContainer/>
               </Col>
               <Col sm="6">
+                <ScenarioPresets/>
                 <ScenarioTemplateXMLViewer/>
               </Col>
             </Row>

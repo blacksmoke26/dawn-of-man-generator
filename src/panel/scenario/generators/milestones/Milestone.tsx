@@ -22,16 +22,17 @@ import {MilestoneCheck, MilestoneRemove, MilestoneToggle} from './utils/elements
 // icons
 import {COLOR_REDDISH, IconCondition, IconConditionLogical} from '~/components/icons/app';
 
+// hooks
+import useValues from '~/hooks/use-values';
+
 // utils
-import {cloneObject} from '~/helpers/object';
+import {findNextTab} from '~/helpers/ui';
+import {cloneObject, onlyKeys} from '~/helpers/object';
 import {CONDITIONS_OPTIONS} from '~/utils/condition';
 
 // parsers
 import {buildStrings, LangStrings} from '~/utils/strings';
 import {toMilestoneTemplate} from '~/utils/parser/template-milestone';
-
-// hooks
-import useValues from '~/hooks/use-values';
 
 // types
 import {scenario} from '~/data/scenario/parser/types';
@@ -67,13 +68,10 @@ interface ValueAttributes extends Omit<scenario.Milestone, 'conditions'> {
 }
 
 const Milestone = (props: Props) => {
-  const valuer = useValues<ValueAttributes>({
-    id: props?.initialValues?.id ?? 'untitled',
-    description: props?.initialValues?.description ?? '',
-    conditions: valuesToConditionAttributes(props?.initialValues),
-  });
+  const valuer = useValues<ValueAttributes>({} as ValueAttributes);
+  const condition = useValues<ConditionAttribute>({});
 
-  const condition = useValues<ConditionAttribute>(valuesToConditionAttributes(props?.initialValues));
+  const [init, setInit] = React.useState<boolean>(false);
 
   const meta = useValues<MilestoneAttributes>({
     disabled: props?.disabled ?? false,
@@ -82,6 +80,17 @@ const Milestone = (props: Props) => {
   });
 
   React.useEffect(() => {
+    valuer.setAll(onlyKeys(
+      props?.initialValues ?? {}, ['conditions'], true,
+    ) as ValueAttributes);
+    condition.setAll(valuesToConditionAttributes(props?.initialValues));
+    setInit(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  React.useEffect(() => {
+    if (!init) return;
+
     const changedValues = cloneObject({
       ...valuer.data,
       conditions: Object.values(condition.data),
@@ -93,7 +102,7 @@ const Milestone = (props: Props) => {
     props?.onStringsChange?.(!isDisabled && changedValues?.conditions.length ? createStrings(changedValues) : {});
     props?.onValuesChange?.(isDisabled ? {} as scenario.Milestone : changedValues);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [condition.data, valuer.data, meta.data.disabled, meta.data.disabledCheckbox]);
+  }, [init, condition.data, valuer.data, meta.data.disabled, meta.data.disabledCheckbox]);
   //</editor-fold>
 
   //<editor-fold desc="Reflect prop changes">

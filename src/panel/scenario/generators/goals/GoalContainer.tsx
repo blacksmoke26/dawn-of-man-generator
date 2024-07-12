@@ -17,8 +17,11 @@ import {IconClear, IconNew} from '~/components/icons/app';
 // components
 import Goal from './Goal';
 
-// utils
+// hooks
 import useValues from '~/hooks/use-values';
+
+// utils
+import {findNextTab} from '~/helpers/ui';
 import {MILESTONES_CREATE_MAX} from '~/utils/defaults';
 import {LangStrings, toLanguageString} from '~/utils/strings';
 
@@ -27,7 +30,7 @@ import {cloneObject} from '~/helpers/object';
 import {toGoalsTemplate} from '~/utils/parser/template-goal';
 
 // types
-import {scenario} from '~/data/scenario/parser/types';
+import type {scenario} from '~/data/scenario/parser/types';
 
 // redux
 import {useAppDispatch, useAppSelector} from '~redux/hooks';
@@ -90,25 +93,6 @@ const GoalContainer = (props: Props) => {
 
   const goalsList = Object.entries(valuer.data);
   const total: number = goalsList.length;
-
-  const removeTab = (tabId: string): void => {
-    const ids = Object.keys(valuer.data);
-
-    let tabIdIndex: number = ids.findIndex(id => id === tabId) || 0;
-
-    let curValue: string = activeKey;
-
-    if (curValue === tabId) {
-      curValue = tabIdIndex === 0
-        ? ids[tabIdIndex + 1]
-        : ids[tabIdIndex - 1];
-    }
-
-    valuer.remove(tabId);
-    strings.remove(tabId);
-
-    setActiveKey(curValue);
-  };
 
   return (
     <>
@@ -173,7 +157,13 @@ const GoalContainer = (props: Props) => {
               <TabTitle
                 disabled={!checked}
                 title={id.replace('_', ' ')}
-                onRemove={() => removeTab(id)}/>
+                onRemove={() => {
+                  findNextTab(valuer.data, id, activeKey, (nextTab) => {
+                    valuer.remove(id);
+                    strings.remove(id);
+                    setActiveKey(nextTab);
+                  });
+                }}/>
             }>
             <Goal
               initialValues={initialValues}

@@ -21,6 +21,7 @@ import Milestone from './Milestone';
 import useValues from '~/hooks/use-values';
 
 // utils
+import {findNextTab} from '~/helpers/ui';
 import {cloneObject} from '~/helpers/object';
 import {MILESTONES_CREATE_MAX} from '~/utils/defaults';
 
@@ -33,7 +34,7 @@ import {useAppDispatch, useAppSelector} from '~redux/hooks';
 import {clearProperty} from '~redux/slices/scenario/reducers';
 
 // types
-import {scenario} from '~/data/scenario/parser/types';
+import type {scenario} from '~/data/scenario/parser/types';
 
 type MilestonesState = Record<string, scenario.Milestone>;
 type StringsState = Record<string, LangStrings>;
@@ -57,7 +58,6 @@ const MilestoneContainer = (props: Props) => {
 
   const [checked, setChecked] = React.useState<boolean>(props?.checked ?? true);
   const [activeKey, setActiveKey] = React.useState<string>('');
-
 
   const reduxState = useAppSelector(({scenario}) => scenario?.values?.milestones) as null | scenario.Milestone[] | undefined;
 
@@ -91,25 +91,6 @@ const MilestoneContainer = (props: Props) => {
 
   const milestonesList = Object.entries(valuer.data);
   const total: number = milestonesList.length;
-
-  const removeTab = (tabId: string): void => {
-    const ids = Object.keys(valuer.data);
-
-    let tabIdIndex: number = ids.findIndex(id => id === tabId) || 0;
-
-    let curValue: string = activeKey;
-
-    if (curValue === tabId) {
-      curValue = tabIdIndex === 0
-        ? ids[tabIdIndex + 1]
-        : ids[tabIdIndex - 1];
-    }
-
-    valuer.remove(tabId);
-    strings.remove(tabId);
-
-    setActiveKey(curValue);
-  };
 
   return (
     <>
@@ -173,7 +154,13 @@ const MilestoneContainer = (props: Props) => {
               <TabTitle
                 disabled={!checked}
                 title={id.replace('_', ' ')}
-                onRemove={() => removeTab(id)}/>
+                onRemove={() => {
+                  findNextTab(valuer.data, id, activeKey, (nextTab) => {
+                    valuer.remove(id);
+                    strings.remove(id);
+                    setActiveKey(nextTab);
+                  });
+                }}/>
             }>
             <Milestone
               initialValues={initialValues}
