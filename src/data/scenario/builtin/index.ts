@@ -17,6 +17,8 @@ import challengesBygoneTalesTheShepherds from '!!raw-loader!./challenges/bygone-
 import challengesCreativeModeMetalAge from '!!raw-loader!./challenges/creative-mode/metal-age.xml';
 import challengesCreativeModeStoneAge from '!!raw-loader!./challenges/creative-mode/stone-age.xml';
 
+import {presets as schwiftykPresets, presetOptions as schwiftykPresetOptions} from './schwiftyk';
+
 // parsers
 import {xmlToReduxJson} from '~/data/scenario/loader';
 
@@ -33,6 +35,8 @@ export const presets = {
   'challenges/bygone_tales/the_shepherds': challengesBygoneTalesTheShepherds,
   'challenges/creative_mode/metal_age': challengesCreativeModeMetalAge,
   'challenges/creative_mode/stone_age': challengesCreativeModeStoneAge,
+
+  ...schwiftykPresets,
 };
 
 export type ScenarioName = keyof typeof presets;
@@ -83,7 +87,7 @@ export const presetOptions = [{
     value: 'challenges/creative_mode/stone_age',
     type: 'scenario',
   }],
-}];
+}, ...schwiftykPresetOptions];
 
 export const presetsXmlToJson = (name: ScenarioName) => {
   return xmlToReduxJson(presets[name]);
