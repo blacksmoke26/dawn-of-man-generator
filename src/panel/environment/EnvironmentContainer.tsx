@@ -51,14 +51,18 @@ const toTemplateText = (templates: Json): string => {
 function EnvironmentContainer() {
   const dispatch = useAppDispatch();
 
+  const initiated = useAppSelector(({config}) => config.initiated);
   const environmentTemplate = useAppSelector(({environment}) => environment.template);
-  const panelNoiseAmplitudes = useAppSelector(({config}) => config?.session.environment.panelsShown?.noiseAmplitudes ?? true);
-  const panelTerrain = useAppSelector(({config}) => config?.session.environment.panelsShown?.terrain ?? false);
-  const panelDeposit = useAppSelector(({config}) => config?.session.environment.panelsShown?.deposit ?? false);
-  const panelDetail = useAppSelector(({config}) => config?.session.environment.panelsShown?.detail ?? false);
-  const panelProp = useAppSelector(({config}) => config?.session.environment.panelsShown?.prop ?? false);
-  const panelTrees = useAppSelector(({config}) => config?.session.environment.panelsShown?.trees ?? false);
-  const panelSeasons = useAppSelector(({config}) => config?.session.environment.panelsShown?.seasons ?? false);
+
+  const {
+    noiseAmplitudes: panelNoiseAmplitudes = true,
+    terrain: panelTerrain = false,
+    deposit: panelDeposit = false,
+    detail: panelDetail = false,
+    prop: panelProp = false,
+    trees: panelTrees = false,
+    seasons: panelSeasons = false,
+  } = useAppSelector(({config}) => config?.session.environment.panelsShown);
 
   const [templates, setTemplates] = React.useState<Json>({
     noiseAmplitudes: '',
@@ -75,10 +79,12 @@ function EnvironmentContainer() {
   });
 
   React.useEffect(() => {
+    if (!initiated) return;
+
     const text = toTemplateText(templates);
     if (text !== environmentTemplate) {
       dispatch(updateTemplate(text));
-      setTimeout(() => dispatch(updateByPath({path: 'session.environment.template', value: text})), 150);
+      dispatch(updateByPath({path: 'session.environment.template', value: text}));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [templates, environmentTemplate]);
@@ -96,14 +102,20 @@ function EnvironmentContainer() {
       <Accordion
         eventKey="environment_noise_amplitudes"
         activeKey={panelNoiseAmplitudes ? 'environment_noise_amplitudes' : ''}
-        onHeaderClick={() => dispatch(updateByPath({path: 'session.environment.panelsShown.noiseAmplitudes', value: !panelNoiseAmplitudes}))}
+        onHeaderClick={() => dispatch(updateByPath({
+          path: 'session.environment.panelsShown.noiseAmplitudes',
+          value: !panelNoiseAmplitudes,
+        }))}
         header={<span className="text-size-sm"><IconBlock width="17" height="17"/> Noise Amplitudes</span>}>
         <NoiseAmplitudes onChange={tpl => updateTemplateText('noiseAmplitudes', tpl)}/>
       </Accordion>
 
       <Accordion
         activeKey={panelTerrain ? 'environment_terrain' : ''}
-        onHeaderClick={() => dispatch(updateByPath({path: 'session.environment.panelsShown.terrain', value: !panelTerrain}))}
+        onHeaderClick={() => dispatch(updateByPath({
+          path: 'session.environment.panelsShown.terrain',
+          value: !panelTerrain,
+        }))}
         header={<span className="text-size-sm"><IconBlock width="17" height="17"/> Terrain Features</span>}
         eventKey="environment_terrain">
         <ResourceFactor onChange={v => updateTemplateText('resourceFactor', v)}/>
@@ -119,7 +131,10 @@ function EnvironmentContainer() {
 
       <Accordion
         activeKey={panelDeposit ? 'environment_deposit_terrain' : ''}
-        onHeaderClick={() => dispatch(updateByPath({path: 'session.environment.panelsShown.deposit', value: !panelDeposit}))}
+        onHeaderClick={() => dispatch(updateByPath({
+          path: 'session.environment.panelsShown.deposit',
+          value: !panelDeposit,
+        }))}
         header={<span className="text-size-sm"><IconBlock width="17" height="17"/> Deposit (terrain)</span>}
         eventKey="environment_deposit_terrain">
         <DepositPanel onChange={v => updateTemplateText('deposits', v)}/>
@@ -127,7 +142,10 @@ function EnvironmentContainer() {
 
       <Accordion
         activeKey={panelDetail ? 'environment_detail_panel' : ''}
-        onHeaderClick={() => dispatch(updateByPath({path: 'session.environment.panelsShown.detail', value: !panelDetail}))}
+        onHeaderClick={() => dispatch(updateByPath({
+          path: 'session.environment.panelsShown.detail',
+          value: !panelDetail,
+        }))}
         header={<span className="text-size-sm"><IconBlock width="17" height="17"/> Detail (terrain)</span>}
         eventKey="environment_detail_panel">
         <DetailPanel onChange={v => updateTemplateText('detail', v)}/>
@@ -143,7 +161,10 @@ function EnvironmentContainer() {
 
       <Accordion
         activeKey={panelTrees ? 'environment_trees_panel' : ''}
-        onHeaderClick={() => dispatch(updateByPath({path: 'session.environment.panelsShown.trees', value: !panelTrees}))}
+        onHeaderClick={() => dispatch(updateByPath({
+          path: 'session.environment.panelsShown.trees',
+          value: !panelTrees,
+        }))}
         header={<span className="text-size-sm"><IconBlock width="17" height="17"/> Tree (terrain)</span>}
         eventKey="environment_trees_panel">
         <TreesPanel onChange={v => updateTemplateText('trees', v)}/>
@@ -151,7 +172,10 @@ function EnvironmentContainer() {
 
       <Accordion
         activeKey={panelSeasons ? 'environment_seasons_panel' : ''}
-        onHeaderClick={() => dispatch(updateByPath({path: 'session.environment.panelsShown.seasons', value: !panelSeasons}))}
+        onHeaderClick={() => dispatch(updateByPath({
+          path: 'session.environment.panelsShown.seasons',
+          value: !panelSeasons,
+        }))}
         header={<span className="text-size-sm"><IconBlock width="17" height="17"/> Season (atmosphere)</span>}
         eventKey="environment_seasons_panel">
         <SeasonsPanel onChange={v => updateTemplateText('seasons', v)}/>
