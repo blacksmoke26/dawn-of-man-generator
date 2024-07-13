@@ -39,3 +39,11 @@ export type PartialDeepOmit<T, K> = T extends Primitive ? T : Partial<{
     : never
 }>
 //</editor-fold>
+
+//<editor-fold desc="Copied from: https://dev.to/pffigueiredo/typescript-utility-keyof-nested-object-2pa3">
+export type NestedKeyOf<ObjectType extends object> =
+  {[Key in keyof ObjectType & (string | number)]: ObjectType[Key] extends object
+    ? `${Key}` | `${Key}.${NestedKeyOf<ObjectType[Key]>}`
+    : `${Key}`
+  }[keyof ObjectType & (string | number)];
+//</editor-fold>

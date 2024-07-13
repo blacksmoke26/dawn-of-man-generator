@@ -19,4 +19,47 @@ export default {
     showXmlToScenario: true,
     showXmlToEnvironment: true,
   },
+  session: {
+    activeTab: 'environment',
+    environment: {
+      template: '',
+      strings: '',
+      filename: 'custom',
+      panelsShown: {
+        noiseAmplitudes: false,
+        terrain: false,
+        deposit: false,
+        detail: false,
+        prop: false,
+        trees: false,
+        seasons: false,
+      },
+    },
+    scenario: {
+      template: '',
+      strings: '',
+      filename: 'scenario',
+      panelsShown: {
+        general: false,
+        disasters: false,
+        milestones: false,
+        goals: false,
+        events: false,
+        locations: false,
+      },
+    },
+    xmlEditor: {
+      template: '',
+      filename: 'file',
+    },
+    xmlJson: {
+      template: '',
+    },
+    xmlEnvironment: {
+      template: '',
+    },
+    xmlScenario: {
+      template: '',
+    },
+  },
 } as ConfigurationState;

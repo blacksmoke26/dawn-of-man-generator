@@ -36,6 +36,7 @@
     "react-select": "^5.8.0",
     "react-syntax-highlighter": "^15.5.0",
     "redux": "^5.0.1",
+    "redux-persist": "^6.0.0",
     "slugify": "^1.6.6",
     "typescript": "^5.4.5",
     "unique-random-array": "^4.0.0",

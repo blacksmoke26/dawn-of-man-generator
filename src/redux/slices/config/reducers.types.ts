@@ -12,5 +12,48 @@ export interface ConfigurationState {
     showXmlToScenario?: boolean;
     showXmlToEnvironment?: boolean;
   };
+  session: {
+    activeTab: string;
+    environment: {
+      template: string;
+      strings: string;
+      filename: string;
+      panelsShown: {
+        noiseAmplitudes: boolean;
+        terrain: boolean;
+        deposit: boolean;
+        detail: boolean;
+        prop: boolean;
+        trees: boolean;
+        seasons: boolean;
+      }
+    };
+    scenario: {
+      template: string;
+      strings: string;
+      filename: string;
+      panelsShown: {
+        general: boolean;
+        disasters: boolean;
+        milestones: boolean;
+        goals: boolean;
+        events: boolean;
+        locations: boolean;
+      }
+    };
+    xmlEditor: {
+      template: string;
+      filename: string;
+    };
+    xmlJson: {
+      template: string;
+    };
+    xmlEnvironment: {
+      template: string;
+    };
+    xmlScenario: {
+      template: string;
+    };
+  };
 }
 

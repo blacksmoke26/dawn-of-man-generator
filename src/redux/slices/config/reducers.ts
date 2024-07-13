@@ -13,6 +13,8 @@ import type {PayloadAction} from '@reduxjs/toolkit';
 
 // redux
 import initialState from './initial-state';
+import {NestedKeyOf} from '~/types/utility.types';
+import {ConfigurationState} from '~redux/slices/config/reducers.types';
 
 const configSlice = createSlice({
   name: 'config',
@@ -21,9 +23,17 @@ const configSlice = createSlice({
     updateInit(state, action: PayloadAction<boolean>) {
       state.initiated = action.payload;
     },
-    updateByPath(state, action: PayloadAction<{ path: Path; value: any }>) {
-      const {path, value} = action.payload;
-      objPath.set(state, path, value);
+    /**
+     * Update config state value by the given path. No value will be set if the path does not exist.<br>
+     * **Warning:** It will overwrite the existing value.
+     */
+    updateByPath(state, action: PayloadAction<(
+      | { path: NestedKeyOf<ConfigurationState>; value: any, overwrite?: boolean }
+      | { path: Path; value: any, overwrite?: boolean }
+    )>) {
+      const path = action.payload.path;
+      action.payload?.overwrite && objPath.empty(state, path);
+      objPath.set(state, path, action.payload.value);
     },
   },
 });

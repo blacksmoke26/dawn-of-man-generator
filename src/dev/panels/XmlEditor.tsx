@@ -18,62 +18,51 @@ import SelectPopout, {Option, Options} from '~/components/ui/SelectPopout';
 import {
   COLOR_REDDISH,
   IconCodeXml,
-  IconScenario,
   IconDownload,
   IconPencilLine,
-  IconEnvironment,
   IconChevronSimpleDown,
 } from '~/components/icons/app';
 
 // hooks
-import {useAppSelector} from '~redux/hooks';
+import {useAppSelector, useAppDispatch} from '~redux/hooks';
+import {updateByPath} from '~redux/slices/config/reducers';
 
 // parsers
 import {ScenarioName, presetOptions as scnPresetOptions, presets as scnPresets} from '~/data/scenario/builtin';
 import {EnvironmentName, presetOptions as envPresetOptions, presets as envPresets} from '~/data/environments/builtin';
+import {getIcon, userlandOptions} from '~/components/panel/XmlToJson';
 
-const getIcon = (option: Option): typeof IconCodeXml => {
-  if (option?.type === 'environment' || option.value === 'environment') {
-    return IconEnvironment;
-  }
-
-  if (option?.type === 'scenario' || option.value === 'scenario') {
-    return IconScenario;
-  }
-
-  return IconCodeXml;
-};
-
-const userlandOptions: Options = [{
-  label: 'User-land',
-  options: [{
-    label: 'Environment',
-    value: 'environment',
-
-  }, {
-    label: 'Scenario',
-    value: 'scenario',
-
-  }, {
-    label: 'Scenario (Strings)',
-    value: 'scenario_strings',
-  }],
-}];
 
 /** XmlToEnvironmentJson functional component */
 const XmlToEnvironmentJson = () => {
+  const dispatch = useAppDispatch();
+
   const [xmlText, setXmlText] = React.useState<string>('');
   const [filename, setFilename] = React.useState<string>('file');
 
-  const scenarioTemplate = useAppSelector(({scenario}) => scenario.template);
-  const scenarioStrings = useAppSelector(({scenario}) => scenario.strings);
-  const environmentStrings = useAppSelector(({environment}) => environment.template);
+  const scenarioTemplate = useAppSelector(({scenario}) => scenario?.template ?? '');
+  const scenarioStrings = useAppSelector(({scenario}) => scenario?.strings ?? '');
+  const environmentStrings = useAppSelector(({environment}) => environment?.template ?? '');
+
+  const xmlEditorTemplate = useAppSelector(({config}) => config?.session?.xmlEditor?.template ?? '');
+  const xmlEditorFilename = useAppSelector(({config}) => config?.session?.xmlEditor?.filename ?? 'file');
+
+  React.useEffect(() => {
+    setXmlText(xmlEditorTemplate);
+    setFilename(xmlEditorFilename);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const updateXmlText = (value: string) => {
+    setXmlText(value);
+    dispatch(updateByPath({path: 'session.xmlEditor.template', value}));
+  }
 
   return (
     <XmlEditorInput
       value={xmlText}
       placeholder="Write or paste XML here"
-      onChange={setXmlText}
+      onChange={updateXmlText}
       editorProps={{
         height: '85vh', fontSize: 15,
         showPrintMargin: false,
@@ -99,37 +88,29 @@ const XmlToEnvironmentJson = () => {
               );
             }}
             onSelect={({value, type = null}) => {
-              if (type === 'scenario') {
-                setXmlText(scnPresets?.[value as ScenarioName] as '');
-                return;
-              }
-
-              if (type === 'environment') {
-                setXmlText(envPresets?.[value as EnvironmentName] as '');
-                return;
-              }
-
               switch (value) {
                 case 'environment':
-                  setXmlText(environmentStrings);
-                  break;
+                  return updateXmlText(environmentStrings);
                 case 'scenario':
-                  setXmlText(scenarioTemplate);
-                  break;
+                  return updateXmlText(scenarioTemplate);
                 case 'scenario_strings':
-                  setXmlText(scenarioStrings);
-                  break;
+                  return updateXmlText(scenarioStrings);
               }
+
+              if (type === 'scenario')
+                return updateXmlText(scnPresets?.[value as ScenarioName] as '');
+              if (type === 'environment')
+                return updateXmlText(envPresets?.[value as EnvironmentName] as '');
             }}/>
         </span>
-        <LinkButton style={{marginLeft: '.6rem'}}
-          disabled={!xmlText.trim()}
+        <LinkButton
+          style={{marginLeft: '.6rem'}}
+          disabled={!xmlText?.trim?.()}
           className="pt-0 pb-0"
           title={`Download xml file: '${filename}.xml'`}
-          onClick={() => {
-            const blob = new Blob([xmlText], {type: 'text/xml;charset=utf-8'});
-            FileSaver.saveAs(blob, `${filename}.xml`);
-          }}>
+          onClick={() => FileSaver.saveAs(
+            new Blob([xmlText], {type: 'text/xml;charset=utf-8'}), `${filename}.xml`
+          )}>
           <IconDownload/> Download
         </LinkButton>
       </>)}
@@ -155,7 +136,12 @@ const XmlToEnvironmentJson = () => {
                 </span>
               </>
             )}
-            onSave={value => value.trim() && setFilename(value)}
+            onSave={value => {
+              if (value.trim()) {
+                setFilename(value);
+                dispatch(updateByPath({path: 'session.xmlEditor.filename', value}));
+              }
+            }}
           />
         </div>
       )}

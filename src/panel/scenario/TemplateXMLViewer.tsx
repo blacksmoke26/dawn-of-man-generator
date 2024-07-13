@@ -20,8 +20,9 @@ import XmlImporter from '~/panel/scenario/XmlImporter';
 import {COLOR_REDDISH, IconDownload, IconPencilLine} from '~/components/icons/app';
 
 // redux
-import {updateName} from '~redux/slices/scenario/reducers';
 import {useAppDispatch, useAppSelector} from '~redux/hooks';
+import {updateName} from '~redux/slices/scenario/reducers';
+import {updateByPath} from '~redux/slices/config/reducers';
 
 const TemplateXMLViewer = () => {
   const dispatch = useAppDispatch();
@@ -85,7 +86,12 @@ const TemplateXMLViewer = () => {
                       </span>
                   </>
                 )}
-                onSave={value => value.trim() && dispatch(updateName(value))}
+                onSave={value => {
+                  if (value.trim()) {
+                    dispatch(updateName(value));
+                    dispatch(updateByPath({path: 'session.scenario.filename', value}));
+                  }
+                }}
               />
             </div>
           )}

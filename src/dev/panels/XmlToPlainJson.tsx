@@ -11,10 +11,12 @@ import React from 'react';
 import XmlToJson from '~/components/panel/XmlToJson';
 
 /** XmlToEnvironmentJson functional component */
-const XmlToEnvironmentJson = () => {
-  return <XmlToJson
+const XmlToEnvironmentJson = () => (
+  <XmlToJson
+    type="plain"
+    presets="all"
     placeholder="Write or paste XML here..."
-  />;
-};
+  />
+);
 
 export default XmlToEnvironmentJson;

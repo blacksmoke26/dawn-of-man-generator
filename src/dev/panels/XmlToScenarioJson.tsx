@@ -14,11 +14,13 @@ import {jsonToRedux} from '~/data/scenario/parser';
 import XmlToJson from '~/components/panel/XmlToJson';
 
 /** XmlToEnvironmentJson functional component */
-const XmlToEnvironmentJson = () => {
-  return <XmlToJson
+const XmlToEnvironmentJson = () => (
+  <XmlToJson
+    type="scenario"
+    presets="scenario"
     placeholder="Write or paste scenario XML here..."
     onTransformJson={json => jsonToRedux(json)}
-  />;
-};
+  />
+);
 
 export default XmlToEnvironmentJson;
