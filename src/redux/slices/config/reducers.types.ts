@@ -18,6 +18,7 @@ export interface ConfigurationState {
       template: string;
       strings: string;
       filename: string;
+      resizeLayout: [number, number];
       panelsShown: {
         noiseAmplitudes: boolean;
         terrain: boolean;
@@ -32,6 +33,8 @@ export interface ConfigurationState {
       template: string;
       strings: string;
       filename: string;
+      resizeLayout: [number, number];
+      resizeViewer: [number, number];
       panelsShown: {
         general: boolean;
         disasters: boolean;
@@ -47,12 +50,15 @@ export interface ConfigurationState {
     };
     xmlJson: {
       template: string;
+      resizeLayout: [number, number];
     };
     xmlEnvironment: {
       template: string;
+      resizeLayout: [number, number];
     };
     xmlScenario: {
       template: string;
+      resizeLayout: [number, number];
     };
   };
 }

@@ -6,6 +6,7 @@
 
 import React from 'react';
 import {Col, Container, Row, Tabs, Tab} from 'react-bootstrap';
+import {PanelGroup, Panel, PanelResizeHandle} from 'react-resizable-panels';
 
 // components
 import Header from '~/elements/Header';
@@ -54,6 +55,9 @@ const App = () => {
   const environmentFilename = useAppSelector(({config}) => config?.session?.environment?.filename ?? 'custom');
   const scenarioFilename = useAppSelector(({config}) => config?.session?.scenario?.filename ?? 'scenario');
 
+  const environmentLayout = useAppSelector(({config}) => config.session?.environment?.resizeLayout ?? [60, 40]);
+  const scenarioLayout = useAppSelector(({config}) => config.session?.scenario?.resizeLayout ?? [60, 40]);
+
   React.useEffect(() => initializeApp({
     dispatch, environmentTemplate, scenarioTemplate,
     environmentFilename, scenarioFilename,
@@ -82,30 +86,40 @@ const App = () => {
               <IconEnvironment width="16" height="16"/> Environment
             </div>
           }>
-            <Row>
-              <Col sm="6" className="pr-1" style={{height: '85vh', overflowY: 'scroll'}}>
+            <PanelGroup direction="horizontal" onLayout={sizes => {
+              dispatch(updateByPath({path: 'session.environment.resizeLayout', value: [...sizes]}));
+            }}>
+              <Panel
+                defaultSize={environmentLayout[0]} minSize={30} order={2}
+                style={{height: '85vh', overflowY: 'scroll'}}>
                 <EnvironmentContainer/>
-              </Col>
-              <Col sm="6">
+              </Panel>
+              <PanelResizeHandle style={{width: 5, height: '85vh'}}/>
+              <Panel defaultSize={environmentLayout[1]} minSize={30} order={2}>
                 <EnvironmentPresets/>
                 <TemplateXMLViewer/>
-              </Col>
-            </Row>
+              </Panel>
+            </PanelGroup>
           </Tab>
           <Tab as="div" eventKey="scenario" title={
             <div className="pl-4 pr-4" style={{fontSize: '0.95rem'}}>
               <IconScenario width="16" height="16"/> Scenario
             </div>
           }>
-            <Row>
-              <Col sm="6" className="pr-1" style={{height: '85vh', overflowY: 'scroll'}}>
+            <PanelGroup direction="horizontal" onLayout={sizes => {
+              dispatch(updateByPath({path: 'session.scenario.resizeLayout', value: [...sizes]}));
+            }}>
+              <Panel
+                defaultSize={scenarioLayout[0]} minSize={30} order={2}
+                style={{height: '85vh', overflowY: 'scroll'}}>
                 <ScenarioContainer/>
-              </Col>
-              <Col sm="6">
+              </Panel>
+              <PanelResizeHandle style={{width: 5, height: '85vh'}}/>
+              <Panel defaultSize={scenarioLayout[1]} minSize={30} order={2}>
                 <ScenarioPresets/>
                 <ScenarioTemplateXMLViewer/>
-              </Col>
-            </Row>
+              </Panel>
+            </PanelGroup>
           </Tab>
           <Tab as="div" eventKey="xml_editor" title={
             <div className="pl-4 pr-4" style={{fontSize: '0.95rem'}}>

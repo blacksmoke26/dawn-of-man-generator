@@ -25,6 +25,7 @@ export default {
       template: '',
       strings: '',
       filename: 'custom',
+      resizeLayout: [60, 40],
       panelsShown: {
         noiseAmplitudes: false,
         terrain: false,
@@ -39,6 +40,8 @@ export default {
       template: '',
       strings: '',
       filename: 'scenario',
+      resizeLayout: [70, 30],
+      resizeViewer: [60, 40],
       panelsShown: {
         general: false,
         disasters: false,
@@ -54,12 +57,15 @@ export default {
     },
     xmlJson: {
       template: '',
+      resizeLayout: [60, 40],
     },
     xmlEnvironment: {
       template: '',
+      resizeLayout: [60, 40],
     },
     xmlScenario: {
       template: '',
+      resizeLayout: [60, 40],
     },
   },
 } as ConfigurationState;

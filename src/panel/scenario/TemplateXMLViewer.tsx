@@ -7,6 +7,7 @@
 
 import React from 'react';
 import FileSaver from 'file-saver';
+import {PanelGroup, Panel, PanelResizeHandle} from 'react-resizable-panels';
 
 // elemental components
 import LinkButton from '~/components/ui/LinkButton';
@@ -32,17 +33,23 @@ const TemplateXMLViewer = () => {
   const strings = useAppSelector(({scenario}) => scenario.strings);
   const scenarioName = useAppSelector(({scenario}) => scenario.name);
 
+  const resizeViewer = useAppSelector(({config}) => config.session?.scenario?.resizeViewer ?? [60, 40]);
+
   const SCENARIO_FILENAME: string = `${scenarioName.trim() || 'scenario'}.xml`;
   const STRINGS_FILENAME: string = `${scenarioName.trim() || 'scenario'}.lng.xml`;
 
   return (
-    <>
-      <div className="mb-3">
+    <PanelGroup direction="vertical" onLayout={sizes => {
+      dispatch(updateByPath({path: 'session.scenario.resizeViewer', value: [...sizes]}));
+    }}>
+      <Panel
+        defaultSize={resizeViewer[0]} minSize={30} maxSize={90}>
         <XmlEditorInput
           editorProps={{
             readOnly: true,
             highlightActiveLine: false,
-            height: '56vh', fontSize: 15,
+            fontSize: 15,
+            height: '96%',
             showPrintMargin: false,
             setOptions: {
               foldStyle: 'manual',
@@ -96,31 +103,36 @@ const TemplateXMLViewer = () => {
             </div>
           )}
         />
-      </div>
-      <XmlEditorInput
-        editorProps={{
-          readOnly: true,
-          highlightActiveLine: false,
-          height: '20.3vh', fontSize: 15,
-        }}
-        hideClearButton
-        value={strings.trim()}
-        buttons={(
-          <>
-            <LinkButton
-              className="pt-0 pb-0"
-              disabled={!strings.trim()}
-              title={`Download strings xml File: '${STRINGS_FILENAME}'`}
-              onClick={() => {
-                const blob = new Blob([template], {type: 'text/xml;charset=utf-8'});
-                FileSaver.saveAs(blob, STRINGS_FILENAME);
-              }}>
-              <IconDownload/> Download
-            </LinkButton>
-          </>
-        )}
-      />
-    </>
+      </Panel>
+      <PanelResizeHandle style={{height: 5}}/>
+      <Panel defaultSize={resizeViewer[1]} minSize={1} maxSize={34}>
+        <XmlEditorInput
+          editorProps={{
+            readOnly: true,
+            highlightActiveLine: false,
+            showPrintMargin: false,
+            fontSize: 15,
+            height: '82.5%',
+          }}
+          hideClearButton
+          value={strings.trim()}
+          buttons={(
+            <>
+              <LinkButton
+                className="pt-0 pb-0"
+                disabled={!strings.trim()}
+                title={`Download strings xml File: '${STRINGS_FILENAME}'`}
+                onClick={() => {
+                  const blob = new Blob([template], {type: 'text/xml;charset=utf-8'});
+                  FileSaver.saveAs(blob, STRINGS_FILENAME);
+                }}>
+                <IconDownload/> Download
+              </LinkButton>
+            </>
+          )}
+        />
+      </Panel>
+    </PanelGroup>
   );
 };
 
