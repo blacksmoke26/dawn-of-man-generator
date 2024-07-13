@@ -83,7 +83,7 @@ const PopoverButton = (props: PopoverButtonProps) => {
       </Popover.Body>
     </Popover>
   );
-console.log('props?.placement;', props?.placement);
+
   return (
     <>
       <OverlayTrigger
