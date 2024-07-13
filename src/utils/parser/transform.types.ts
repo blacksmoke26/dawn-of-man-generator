@@ -196,7 +196,7 @@ export interface TransformObjectAttributesOptions {
    * @param value Attribute value
    * @returns True if attribute is valid, false otherwise
    */
-  filterRequired?(name: string, value: any): boolean;
+  filterRequired?(name: string, value: any): boolean | undefined;
 
   /** Optional attribute validator
    * @param name Attribute name
@@ -228,9 +228,9 @@ export interface NormalizeNodeAttributesOptions {
   /** Required attribute validator, Failing means node is invalid
    * @param name Attribute name
    * @param value Attribute value
-   * @returns True if attribute is valid, false otherwise
+   * @returns True if attribute is valid, false otherwise / undefined to exclude property
    */
-  filterRequired?(name: string, value: any): boolean;
+  filterRequired?(name: string, value: any): boolean | undefined;
 
   /** A callback executes when the parsing/validation is failed
    * @returns The value to be returned
@@ -242,12 +242,12 @@ export interface NormalizeNodeAttributesOptions {
    * @param value Attribute value
    * @returns True if attribute is valid, false otherwise
    */
-  filter?(name: string, value: any): boolean;
+  filter?(name: string, value: any): boolean | undefined;
 
   /** Transform attribute value
    * @param name Attribute name
    * @param value Attribute value
-   * @returns Transformed attribute value
+   * @returns Transformed attribute value / undefined to exclude property
    */
   transform?(name: string, value: any): any;
 }

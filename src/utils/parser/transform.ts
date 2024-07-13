@@ -315,7 +315,11 @@ export const normalizeNodeAttributes = (node: Json | null, options: NormalizeNod
   }
 
   for (const [name, value] of Object.entries(node)) {
-    if (!opt.filterRequired(name, value)) {
+    const filtered = opt.filterRequired(name, value);
+
+    if (filtered === undefined) continue;
+
+    if (!filtered) {
       return opt.failed();
     }
 
@@ -324,7 +328,11 @@ export const normalizeNodeAttributes = (node: Json | null, options: NormalizeNod
     }
 
     const _name = opt.camelKeys ? camelCase(name) : name;
-    container[_name] = opt.transform(name, value);
+
+    const finalValue = opt.transform(name, value);
+
+    if (finalValue !== undefined)
+      container[_name] = finalValue;
   }
 
   return container;
