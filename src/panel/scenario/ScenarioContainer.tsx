@@ -45,15 +45,17 @@ import {toStringsTemplate, toScenarioTemplate} from '~/utils/parser/templates-sc
 const ScenarioContainer = () => {
   const dispatch = useAppDispatch();
 
-  const templateText = useAppSelector(({scenario}) => scenario.template);
-  const stringsText = useAppSelector(({scenario}) => scenario.strings);
+  const initiated = useAppSelector(({config}) => config.initiated);
+  const {template: templateText, strings: stringsText} = useAppSelector(({scenario}) => scenario);
 
-  const panelGeneral = useAppSelector(({config}) => config?.session.scenario.panelsShown?.general ?? false);
-  const panelDisasters = useAppSelector(({config}) => config?.session.scenario.panelsShown?.disasters ?? false);
-  const panelMilestones = useAppSelector(({config}) => config?.session.scenario.panelsShown?.milestones ?? false);
-  const panelGoals = useAppSelector(({config}) => config?.session.scenario.panelsShown?.goals ?? false);
-  const panelEvents = useAppSelector(({config}) => config?.session.scenario.panelsShown?.events ?? false);
-  const panelLocations = useAppSelector(({config}) => config?.session.scenario.panelsShown?.locations ?? false);
+  const {
+    general: panelGeneral = true,
+    disasters: panelDisasters = false,
+    milestones: panelMilestones = false,
+    goals: panelGoals = false,
+    events: panelEvents = false,
+    locations: panelLocations = false,
+  } = useAppSelector(({config}) => config?.session.scenario.panelsShown ?? false);
 
   const [templateTexts, setTemplateTexts] = React.useState<KVDocument<string>>({
     hardcoreModeAllowed: '',
@@ -82,6 +84,8 @@ const ScenarioContainer = () => {
     events: '',
   });
   React.useEffect(() => {
+    if (!initiated) return;
+
     const text = toScenarioTemplate(Object.values(templateTexts));
     if (text !== templateText) {
       dispatch(updateTemplate(text));
@@ -91,6 +95,8 @@ const ScenarioContainer = () => {
   }, [templateTexts, templateText]);
 
   React.useEffect(() => {
+    if (!initiated) return;
+
     const text = toStringsTemplate(langStrings);
     if (text !== stringsText) {
       dispatch(updateString(text));
@@ -115,7 +121,10 @@ const ScenarioContainer = () => {
         header={<span className="text-size-sm"><IconBlock width="17" height="17"/> General</span>}
         eventKey="scenario_general"
         activeKey={panelGeneral ? 'scenario_general' : ''}
-        onHeaderClick={() => dispatch(updateByPath({path: 'session.scenario.panelsShown.general', value: !panelGeneral}))}>
+        onHeaderClick={() => dispatch(updateByPath({
+          path: 'session.scenario.panelsShown.general',
+          value: !panelGeneral,
+        }))}>
         <HardcoreModeAllowed onChange={v => updateText('hardcoreModeAllowed', v)}/>
         <hr className="mt-1"/>
         <NomadModeAllowed onChange={v => updateText('nomadModeAllowed', v)}/>
@@ -148,7 +157,10 @@ const ScenarioContainer = () => {
         )}
         eventKey="scenario_disasters"
         activeKey={panelDisasters ? 'scenario_disasters' : ''}
-        onHeaderClick={() => dispatch(updateByPath({path: 'session.scenario.panelsShown.disasters', value: !panelDisasters}))}>
+        onHeaderClick={() => dispatch(updateByPath({
+          path: 'session.scenario.panelsShown.disasters',
+          value: !panelDisasters,
+        }))}>
         <DisasterContainer onChange={(template: string) => updateText('disasters', template)}/>
       </Accordion>
       <Accordion
@@ -161,7 +173,10 @@ const ScenarioContainer = () => {
         )}
         eventKey="scenario_milestones"
         activeKey={panelMilestones ? 'scenario_milestones' : ''}
-        onHeaderClick={() => dispatch(updateByPath({path: 'session.scenario.panelsShown.milestones', value: !panelMilestones}))}>
+        onHeaderClick={() => dispatch(updateByPath({
+          path: 'session.scenario.panelsShown.milestones',
+          value: !panelMilestones,
+        }))}>
         <MilestoneContainer
           onTemplate={template => updateText('milestones', template)}
           onStrings={text => updateLangString('milestones', text)}/>
@@ -192,7 +207,10 @@ const ScenarioContainer = () => {
         eventKey="scenario_events"
         noBodyPad={true}
         activeKey={panelEvents ? 'scenario_events' : ''}
-        onHeaderClick={() => dispatch(updateByPath({path: 'session.scenario.panelsShown.events', value: !panelEvents}))}>
+        onHeaderClick={() => dispatch(updateByPath({
+          path: 'session.scenario.panelsShown.events',
+          value: !panelEvents,
+        }))}>
         <EventContainer
           onTemplate={template => updateText('events', template)}
         />
@@ -205,7 +223,10 @@ const ScenarioContainer = () => {
         noBodyPad={true}
         eventKey="scenario_locations"
         activeKey={panelLocations ? 'scenario_locations' : ''}
-        onHeaderClick={() => dispatch(updateByPath({path: 'session.scenario.panelsShown.locations', value: !panelLocations}))}>
+        onHeaderClick={() => dispatch(updateByPath({
+          path: 'session.scenario.panelsShown.locations',
+          value: !panelLocations,
+        }))}>
         <LocationContainer
           onStrings={strings => updateLangString('locations', strings)}
           onTemplate={template => updateText('locations', template)}/>

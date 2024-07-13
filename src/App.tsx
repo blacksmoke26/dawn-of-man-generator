@@ -38,7 +38,10 @@ import {useAppDispatch, useAppSelector} from '~redux/hooks';
 import {updateInit, updateByPath} from '~redux/slices/config/reducers';
 import {updateName as scenarioSetName} from '~redux/slices/scenario/reducers';
 import {updateName as environmentSetName} from '~redux/slices/environment/reducers';
-import {overwriteValues as environmentOverwriteValues} from '~redux/slices/environment/reducers';
+import {
+  overwriteValues as environmentOverwriteValues,
+  resetValues as envResetValues,
+} from '~redux/slices/environment/reducers';
 import {overwriteValues as scenarioOverwriteValues, resetValues} from '~redux/slices/scenario/reducers';
 
 const App = () => {
@@ -171,23 +174,26 @@ const initializeApp = (args: {
   dispatch(scenarioSetName(args.scenarioFilename));
   dispatch(environmentSetName(args.environmentFilename));
 
-  setTimeout(() => {
-    try {
-      if (scenarioTemplate.trim()) {
-        const json = scenarioXmlToJson(scenarioTemplate)?.scenario ?? {};
-        dispatch(resetValues());
-        dispatch(scenarioOverwriteValues(json));
-      }
-
-      if (environmentTemplate.trim()) {
-        const json = environmentXmlToJson(environmentTemplate)?.environment ?? {};
-        dispatch(environmentOverwriteValues(json));
-      }
-    } catch (e) {
+  try {
+    if (environmentTemplate.trim()) {
+      dispatch(envResetValues());
+      const json = environmentXmlToJson(environmentTemplate)?.environment ?? {};
+      dispatch(environmentOverwriteValues(json));
     }
+  } catch (e) {
+  }
 
-    dispatch(updateInit(true));
-  }, 50);
+  try {
+    if (scenarioTemplate.trim()) {
+      dispatch(resetValues());
+      const json = scenarioXmlToJson(scenarioTemplate)?.scenario ?? {};
+      dispatch(scenarioOverwriteValues(json));
+    }
+  } catch (e) {
+  }
+
+
+  dispatch(updateInit(true));
 };
 
 export default App;
