@@ -4,7 +4,6 @@
  * @since 2020-08-29
  */
 
-import slugify from 'slugify';
 import randomInt from 'random-int';
 import {faker} from '@faker-js/faker';
 import randomFloat from 'random-float';
