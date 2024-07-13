@@ -9,51 +9,21 @@ import {snakeCase} from 'change-case';
 
 // utils
 import {isBool} from '~/helpers/bool';
+import {isInt} from '~/helpers/number';
+import {isString} from '~/helpers/string';
 import {transformObjectAttributesArray} from '~/utils/parser/transform';
-import {LOCATION_COUNT_MIN, LOCATION_COUNT_MAX} from '~/utils/scenario/defaults';
+import {LOCATION_COUNT_MAX, LOCATION_COUNT_MIN} from '~/utils/scenario/defaults';
+import {isLocationCoordinates, isLocationPosition} from '~/utils/scenario/validator';
 import {
-  validateLocationSeed,
-  validateLocationLakes,
-  validateLocationPosition,
-  validateLocationCoordinates,
-} from '~/utils/scenario/validator';
+  normalizeSeed,
+  normalizeLakes,
+  normalizePosition,
+  normalizeCoordinates,
+} from '~/utils/scenario/normalizer-location';
 
 // types
 import type {Json} from '~/types/json.types';
 import type {JsonToReduxOptions} from '~/utils/parser/index.types';
-
-const transform = (name: string, value: any): any => {
-  switch (name) {
-    case 'seed':
-      return +value;
-    case 'id':
-    case 'environment':
-      return snakeCase(value);
-    case 'map_location':
-    case 'position':
-      return String(value).split(',').map(Number);
-    case 'lakes':
-      return +Number(value).toFixed(0);
-    default:
-      return value;
-  }
-};
-
-const filterRequired = (name: string, value: any): boolean => {
-  if (['id', 'environment'].includes(name) && (!value.trim() || value.length < 3)) {
-    return false;
-  } else if (name === 'seed' && !validateLocationSeed(value)) {
-    return false;
-  } else if (name === 'map_location' && !validateLocationCoordinates(value)) {
-    return false;
-  } else if (name === 'position' && !validateLocationPosition(value)) {
-    return false;
-  } else if (name === 'lakes' && !validateLocationLakes(value)) {
-    return false;
-  }
-
-  return !(name === 'river' && !isBool(value));
-};
 
 /** Convert `scenario` json into redux data */
 export const jsonToRedux = (json: Json, options: JsonToReduxOptions = {}): Json => {
@@ -72,4 +42,41 @@ export const jsonToRedux = (json: Json, options: JsonToReduxOptions = {}): Json 
     transform,
     camelKeys: true,
   }, options));
+};
+
+const transform = (name: string, value: any): any => {
+  switch (name) {
+    case 'seed':
+      return normalizeSeed(value);
+    case 'id':
+    case 'environment':
+      return snakeCase(value);
+    case 'map_location':
+      return normalizeCoordinates(value);
+    case 'position':
+      return normalizePosition(value);
+    case 'lakes':
+      return normalizeLakes(value);
+    default:
+      return value;
+  }
+};
+
+const filterRequired = (name: string, value: any): boolean | undefined => {
+  if (['id', 'environment'].includes(name) && !isString(value, true)) {
+    return false;
+  } else if (name === 'seed' && !isInt(value)) {
+    return false;
+  } else if (name === 'map_location' && !isLocationCoordinates(value, true)) {
+    return false;
+  } else if (name === 'position' && !isLocationPosition(value)) {
+    return undefined;
+  } else if (name === 'lakes' && !isInt(value)) {
+    return undefined;
+  }
+  if (name === 'river' && !isBool(value)) {
+    return undefined;
+  }
+  
+  return true;
 };

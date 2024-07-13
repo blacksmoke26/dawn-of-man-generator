@@ -38,7 +38,7 @@ import {
   LOCATION_LAKES_MAX, LOCATION_LAKES_MIN,
   LOCATION_POSITION_MAX, LOCATION_POSITION_MIN, KNOWLEDGE_MIN, KNOWLEDGE_MAX,
 } from '~/utils/scenario/defaults';
-import {isInt, isNumeric} from '~/helpers/number';
+import {isFloat, isInt, isNumeric} from '~/helpers/number';
 import {isString} from '~/helpers/string';
 import {DISTANCE_MAX, DISTANCE_MIN, ENTITY_COUNT_MAX, ENTITY_COUNT_MIN} from '~/utils/condition';
 
@@ -313,17 +313,27 @@ export const validateLocationLakes = (n: number | any): boolean => {
   return !isInt(n) ? false : !(n < LOCATION_LAKES_MIN || n > LOCATION_LAKES_MAX);
 };
 
+const REGEX_COORDINATES_STRICT = /^[01]+(\.\d{1,3})?,[01]+(\.\d{1,3})?$/;
+const REGEX_COORDINATES_LOSSY = /^\d+(\.\d+)?\s*,\s*\d+(\.\d+)?$/;
+export const isLocationCoordinates = (coords: string, lossy: boolean = false): boolean => {
+  if (!isString(coords, true)) return false;
+
+  return (
+    !lossy ? REGEX_COORDINATES_STRICT : REGEX_COORDINATES_LOSSY
+  ).test(coords);
+};
+
 /**
  * Checks if the number of lakes (location) is valid
  * @param cord - The coordinates (e.g., '0.1,0.6')
  * @returns True if valid, false otherwise
  */
 export const validateLocationCoordinates = (cord: string | any): boolean => {
-  if (!isString(cord) || !/^[01]+(\.\d{1,3})?,[01]+(\.\d{1,3})?$/.test(cord)) {
+  if (!isLocationCoordinates(cord)) {
     return false;
   }
 
-  const [x = 0, y = 0] = cord.split(',').map(Number);
+  const [x, y] = cord.split(',').map(Number);
 
   if (x < LOCATION_MAP_MIN || y < LOCATION_MAP_MIN) {
     return false;
@@ -334,21 +344,21 @@ export const validateLocationCoordinates = (cord: string | any): boolean => {
   return true;
 };
 
+export const isLocationPosition = (pos: string): boolean => {
+  return isString(pos) && /^\d+,\d+$/.test(pos);
+};
+
 /**
  * Checks if the position (location) is valid
  * @param pos - The position on the map (e.g., `'0,176'`)
  * @returns True if valid, false otherwise
  */
 export const validateLocationPosition = (pos: string | any): boolean => {
-  if (!isString(pos) || !/^\d+,\d+$/.test(pos)) {
+  if (!isLocationPosition(pos)) {
     return false;
   }
 
-  const [x = 0, y = 0] = pos.split(',').map(Number);
-
-  if (!isInt(x) || !isInt(y)) {
-    return false;
-  }
+  const [x, y] = pos.split(',').map(Number);
 
   if (x < LOCATION_POSITION_MIN || y < LOCATION_POSITION_MIN) {
     return false;
