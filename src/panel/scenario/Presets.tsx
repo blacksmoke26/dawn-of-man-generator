@@ -64,7 +64,7 @@ const Presets = () => {
           ),
         }}
         isClearable={true}
-        className="w-100"
+        className="flex-1"
         getOptionValue={(option: Option | any) => option.value}
         styles={{
           control: styles => ({

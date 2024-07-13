@@ -220,9 +220,13 @@
     font-size: 14px;
     overflow-y: auto;
     padding-top: .5rem;
-    border-radius: 2px;
+    border-radius: 0;
     font-family: SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
 }
 
 .mw-90 { max-width:90%!important }
 .mw-85 { max-width:85%!important }
+
+.flex-1 {
+    flex: 1;
+}

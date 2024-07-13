@@ -8,7 +8,8 @@
 import React, {useEffect} from 'react';
 import merge from 'deepmerge';
 import copyClipboard from 'clipboard-copy';
-import {ButtonGroup, Col, Row} from 'react-bootstrap';
+import {ButtonGroup} from 'react-bootstrap';
+import {PanelGroup, Panel, PanelResizeHandle} from 'react-resizable-panels';
 import {JsonEditor, JsonEditorProps, Theme, themes} from 'json-edit-react';
 
 // elemental components
@@ -39,7 +40,8 @@ import {EnvironmentName, presetOptions as envPresetOptions, presets as envPreset
 
 // types
 import type {Json} from '~/types/json.types';
-import {GroupOption} from '~/components/ui/Select';
+import type {GroupOption} from '~/components/ui/Select';
+import {ConfigurationState} from '~redux/slices/config/reducers.types';
 
 const editorTheme = merge<Theme>(themes.githubDark, {
   styles: {
@@ -48,6 +50,8 @@ const editorTheme = merge<Theme>(themes.githubDark, {
     },
   },
 });
+
+const DEFAULT_LAYOUT_SIZE: [number, number] = [60, 40];
 
 interface XmlToJsonProps {
   placeholder?: string;
@@ -71,9 +75,13 @@ const XmlToJson = (props: XmlToJsonProps) => {
   const xmlValidated: boolean | ValidationError = validate(value || '');
   const isXmlValid: boolean = xmlValidated === true;
 
-  const xmlJsonTemplate = useAppSelector(({config}) => config.session?.xmlJson?.template ?? '');
-  const xmlEnvironmentTemplate = useAppSelector(({config}) => config.session?.xmlEnvironment?.template ?? '');
-  const xmlScenarioTemplate = useAppSelector(({config}) => config.session?.xmlScenario?.template ?? '');
+
+  const session = useAppSelector(({config}) => config.session);
+
+  const layoutSize = getLayoutByType(props?.type, session);
+  const xmlJsonTemplate = session?.xmlJson?.template ?? '';
+  const xmlEnvironmentTemplate = session?.xmlEnvironment?.template ?? '';
+  const xmlScenarioTemplate = session?.xmlScenario?.template ?? '';
 
   useEffect(() => {
     props?.type === 'plain' && setValue(xmlJsonTemplate);
@@ -89,38 +97,8 @@ const XmlToJson = (props: XmlToJsonProps) => {
   }, [value, isXmlValid]);
 
   /** Generate xml code */
-  const parseJSON = (): Json => {
-    let json: Json = {};
 
-    if (!xmlText || !value) {
-      return {};
-    }
-
-    try {
-      json = xmlToJson(xmlText);
-    } catch (e: any) {
-      return e.message;
-    }
-
-    delete json['?xml'];
-    const [key] = Object.keys(json);
-    const parsed = props?.onTransformJson?.(json) ?? json;
-    return {key, json: parsed?.[key] ?? parsed};
-  };
-
-  let selecOptions: unknown[] = [];
-
-  if (props?.presets) {
-    selecOptions = ([] as unknown[]).concat(filterUserlandOptions(props?.presets));
-    if (['all', 'environment'].includes(props.presets)) {
-      selecOptions = selecOptions.concat(envPresetOptions);
-    }
-    if (['all', 'scenario'].includes(props.presets)) {
-      selecOptions = selecOptions.concat(scnPresetOptions);
-    }
-  }
-
-  const {key = 'root', json = {}} = parseJSON();
+  const {key = 'root', json = {}} = parseJSON(xmlText, value, props);
 
   const updateValue = (newValue: string) => {
     setValue(newValue);
@@ -136,8 +114,10 @@ const XmlToJson = (props: XmlToJsonProps) => {
   };
 
   return (
-    <Row className="mb-1">
-      <Col sm="7" className="pr-1">
+    <PanelGroup
+      direction="horizontal"
+      onLayout={size => updateLayoutByType(props?.type, size as [number, number], dispatch)}>
+      <Panel defaultSize={layoutSize[0]} minSize={30} order={2}>
         <XmlEditorInput
           value={value}
           placeholder={props?.placeholder ?? 'Write or paste XML here...'}
@@ -151,7 +131,7 @@ const XmlToJson = (props: XmlToJsonProps) => {
               <SelectPopout
                 dropdownWidth={250}
                 selectProps={{menuPlacement: 'top'}}
-                options={selecOptions as Options}
+                options={getPresetsBy(props?.presets) as Options}
                 hideArrow={true}
                 readOnly
                 placeholder={
@@ -185,8 +165,9 @@ const XmlToJson = (props: XmlToJsonProps) => {
             </div>
           )}
         />
-      </Col>
-      <Col sm="5">
+      </Panel>
+      <PanelResizeHandle style={{width: 5, height: '96%'}}/>
+      <Panel defaultSize={layoutSize[1]} minSize={20} order={2}>
         <div className="syntax-highlighter">
           <JsonEditor
             collapse={2}
@@ -247,8 +228,8 @@ const XmlToJson = (props: XmlToJsonProps) => {
             </LinkButton>
           </ButtonGroup>
         </div>
-      </Col>
-    </Row>
+      </Panel>
+    </PanelGroup>
   );
 };
 
@@ -272,21 +253,55 @@ export const userlandOptions: Options = [{
   }],
 }];
 
+const parseJSON = (xmlText: string, value: string, props: XmlToJsonProps): Json => {
+  let json: Json = {};
+
+  if (!xmlText || !value) {
+    return {};
+  }
+
+  try {
+    json = xmlToJson(xmlText);
+  } catch (e: any) {
+    return e.message;
+  }
+
+  delete json['?xml'];
+  const [key] = Object.keys(json);
+  const parsed = props?.onTransformJson?.(json) ?? json;
+  return {key, json: parsed?.[key] ?? parsed};
+};
+
+export const getPresetsBy = (presets?: XmlToJsonProps['presets']): unknown[] => {
+  let selectOptions: unknown[] = [];
+
+  if (presets) {
+    selectOptions = ([] as unknown[]).concat(filterUserlandOptions(presets));
+    if (['all', 'environment'].includes(presets)) {
+      selectOptions = selectOptions.concat(envPresetOptions);
+    }
+    if (['all', 'scenario'].includes(presets)) {
+      selectOptions = selectOptions.concat(scnPresetOptions);
+    }
+  }
+
+  return selectOptions;
+};
 export const filterUserlandOptions = (type: 'all' | 'environment' | 'scenario'): Options => {
-  if ( type === 'all') return userlandOptions;
+  if (type === 'all') return userlandOptions;
 
   const index = userlandOptions.findIndex((opt: Record<string, any>) => opt.type === 'userland');
 
   let node = userlandOptions[index] as GroupOption;
 
   const newOptions = [...userlandOptions];
-  newOptions[index] ={
+  newOptions[index] = {
     ...node,
-    options: node.options.filter((option: Option) => option.type === type)
-  }
+    options: node.options.filter((option: Option) => option.type === type),
+  };
 
   return newOptions;
-}
+};
 
 export const getIcon = (option: Option): typeof IconCodeXml => {
   if (option?.type === 'environment' || option.value === 'environment') {
@@ -298,6 +313,40 @@ export const getIcon = (option: Option): typeof IconCodeXml => {
   }
 
   return IconCodeXml;
+};
+
+const getLayoutByType = (type?: XmlToJsonProps['type'], state?: ConfigurationState['session']): [number, number] => {
+  switch (type) {
+    case 'plain':
+      return state?.xmlJson?.resizeLayout ?? DEFAULT_LAYOUT_SIZE;
+    case 'environment':
+      return state?.xmlEnvironment?.resizeLayout ?? DEFAULT_LAYOUT_SIZE;
+    case 'scenario':
+      return state?.xmlScenario?.resizeLayout ?? DEFAULT_LAYOUT_SIZE;
+    default:
+      return DEFAULT_LAYOUT_SIZE;
+  }
+};
+
+export const updateLayoutByType = (type: XmlToJsonProps['type'], size: [number, number], dispatch: ((func: unknown) => void)): void => {
+  let name = '';
+
+  switch (type) {
+    case 'plain':
+      name = 'xmlJson';
+      break;
+    case 'environment':
+      name = 'xmlEnvironment';
+      break;
+    case 'scenario':
+      name = 'xmlScenario';
+      break;
+  }
+
+  dispatch(updateByPath({
+    path: `session.${name}.resizeLayout`,
+    value: [...size],
+  }));
 };
 
 export default XmlToJson;
