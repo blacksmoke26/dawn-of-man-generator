@@ -14,11 +14,13 @@ import {jsonToRedux} from '~/data/environments/parser';
 import XmlToJson from '~/components/panel/XmlToJson';
 
 /** XmlToEnvironmentJson functional component */
-const XmlToEnvironmentJson = () => {
-  return <XmlToJson
+const XmlToEnvironmentJson = () => (
+  <XmlToJson
+    type="environment"
+    presets="environment"
     placeholder="Write or paste environment XML here..."
     onTransformJson={json => jsonToRedux(json)}
-  />;
-};
+  />
+);
 
 export default XmlToEnvironmentJson;

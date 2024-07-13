@@ -48,8 +48,6 @@ interface Props {
 const LocationContainer = (props: Props) => {
   const dispatch = useAppDispatch();
 
-  const initiated = useAppSelector(({config}) => config.initiated);
-
   const [checked, setChecked] = React.useState<boolean>(true);
   const [locations, setLocations] = React.useState<Record<string, scenario.Location>>({});
   const [activeKey, setActiveKey] = React.useState<string>('');
@@ -79,11 +77,6 @@ const LocationContainer = (props: Props) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reduxState]);
-
-  React.useEffect(() => {
-    if (initiated) newLocation();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initiated]);
 
   /** Add new location */
   const newLocation = React.useCallback(() => {

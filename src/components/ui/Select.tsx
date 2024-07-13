@@ -4,6 +4,8 @@ import ReactSelect, {Props, OptionsOrGroups, GroupBase} from 'react-select';
 
 import {styles, theme} from './libs/select';
 
+export type GroupOption = GroupBase<Option>;
+
 export interface Option {
   [key: string]: any;
 
@@ -13,7 +15,7 @@ export interface Option {
   isDisabled?: boolean;
 }
 
-export type Options = OptionsOrGroups<Option, GroupBase<Option>>;
+export type Options = OptionsOrGroups<Option, GroupOption>;
 
 const Select = (props: Props) => {
   return (

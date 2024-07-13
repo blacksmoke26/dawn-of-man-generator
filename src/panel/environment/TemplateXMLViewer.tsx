@@ -20,8 +20,9 @@ import XmlImporter from './XmlImporter';
 import {COLOR_REDDISH, IconDownload, IconPencilLine} from '~/components/icons/app';
 
 // redux
-import {updateName} from '~redux/slices/environment/reducers';
 import {useAppDispatch, useAppSelector} from '~redux/hooks';
+import {updateName} from '~redux/slices/environment/reducers';
+import {updateByPath} from '~redux/slices/config/reducers';
 
 const TemplateXMLViewer = () => {
   const dispatch = useAppDispatch();
@@ -80,7 +81,12 @@ const TemplateXMLViewer = () => {
                       </span>
                   </>
                 )}
-                onSave={value => value.trim() && dispatch(updateName(value))}
+                onSave={value => {
+                  if (value.trim()) {
+                    dispatch(updateName(value));
+                    dispatch(updateByPath({path: 'session.environment.filename', value}));
+                  }
+                }}
               />
             </div>
           )}

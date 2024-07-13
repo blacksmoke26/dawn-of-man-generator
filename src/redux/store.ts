@@ -5,6 +5,11 @@
  */
 
 import {configureStore, combineSlices} from '@reduxjs/toolkit';
+import {
+  persistStore, persistReducer,
+  FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER,
+} from 'redux-persist';
+import storage from 'redux-persist/lib/storage';
 
 // utils
 import {ENV_DEV} from '~/utils/env';
@@ -22,10 +27,25 @@ const rootReducer = combineSlices({
   scenario: scenarioReducer,
 });
 
+const persistedReducer = persistReducer({
+  key: 'dow-state',
+  version: 1,
+  storage,
+  whitelist: ['config'],
+}, rootReducer);
+
 export const store = configureStore({
-  reducer: rootReducer,
+  reducer: persistedReducer,
   devTools: ENV_DEV,
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+      },
+    }),
 });
+
+export const persistor = persistStore(store);
 
 // Infer the `RootState` and `AppDispatch` types from the store itself
 export type RootState = ReturnType<typeof store.getState>;

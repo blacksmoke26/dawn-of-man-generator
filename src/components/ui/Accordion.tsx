@@ -28,6 +28,8 @@ export interface AccordionProps {
   toggle?: Partial<AccordionHeaderProps>;
   item?: Partial<AccordionItemProps>;
   body?: Partial<AccordionBodyProps>;
+  onHeaderClick?(eventKey: string): void;
+  onStateChange?(isCollapsed: boolean): void;
 }
 
 export type {EventHandler};
@@ -59,12 +61,15 @@ const Accordion = (props: AccordionProps) => {
         <AccordionBootstrap.Item eventKey={props.eventKey} {...props.item}>
           <CardHeaderComponent {...(props?.headerProps || {})}
             bsPrefix={cn('card-header', {'card-header-dark': !!props?.darkHeader}, props?.headerProps?.className)}>
-              <AccordionHeader eventKey={props.eventKey} {...props.toggle}>
+              <AccordionHeader onClick={() => props?.onHeaderClick?.(props.eventKey)} eventKey={props.eventKey} {...props.toggle}>
                 {props.header}
               </AccordionHeader>
               {props.headerAfter}
           </CardHeaderComponent>
-          <AccordionBootstrap.Body {...props.body}>
+          <AccordionBootstrap.Body
+            onExited={() => props?.onStateChange?.(true)}
+            onEntered={() => props?.onStateChange?.(false)}
+            {...props.body}>
             <CardBodyComponent className={cn('pt-0', {'p-0': !!props?.noBodyPad})}>
               {props?.children}
             </CardBodyComponent>
