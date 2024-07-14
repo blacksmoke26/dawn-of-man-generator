@@ -16,6 +16,7 @@ import {BUILDABLE_CATEGORIES} from '~/utils/action';
 // types
 import type {Json} from '~/types/json.types';
 import type {ActionHideUi, ActionName, ActionWithType} from '~/types/action.types';
+import {isInList} from '~/helpers/array';
 
 const ACTION_NAME: ActionName = 'HideUi';
 type ActionParams = ActionWithType<'HideUi', ActionHideUi>;
@@ -37,10 +38,11 @@ export const jsonToRedux = (node: Json | any): Json | null => {
 
     entityTypes.length && (action.entityTypes = entityTypes);
   }
-
-  (isString(node?.buildable_categories, true)
-    && BUILDABLE_CATEGORIES.includes(node?.buildable_categories))
-  && (action.buildableCategories = node.buildable_categories);
+  
+  isInList(
+    node?.buildable_categories, BUILDABLE_CATEGORIES as unknown as string[],
+    value => action.buildableCategories = value,
+  );
 
   isBool(node?.hide_disabled_ui) && (action.hideDisabledUi = node.hide_disabled_ui);
   isBool(node?.hide_quick_panels) && (action.hideQuickPanels = node.hide_quick_panels);

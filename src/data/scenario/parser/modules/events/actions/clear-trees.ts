@@ -7,10 +7,11 @@
 
 // utils
 import {isObject} from '~/helpers/object';
-import {toFloat} from '~/helpers/number';
+import {RADIUS_MIN} from '~/utils/defaults';
 
-// validators
-import {validateLocationPosition, validateRadius} from '~/utils/scenario/validator';
+// normalizers
+import {normalizePosition} from '~/utils/scenario/normalizer-location';
+import {normalizeRadius} from '~/utils/scenario/normalizer-action';
 
 // types
 import type {Json} from '~/types/json.types';
@@ -25,17 +26,12 @@ export const jsonToRedux = (node: Json | any): Json | null => {
     return null;
   }
 
-  if (!validateRadius(node?.radius)) {
-    return null;
-  }
-
   const action = {
     type: ACTION_NAME,
-    radius: toFloat(node?.radius, 2),
+    radius: normalizeRadius(node?.radius) || RADIUS_MIN,
   } as ActionParams;
 
-  validateLocationPosition(node?.position)
-  && (action.position = node.position.split(',').map(Number));
+  normalizePosition(node?.position, position => action.position = position);
 
   return action;
 };

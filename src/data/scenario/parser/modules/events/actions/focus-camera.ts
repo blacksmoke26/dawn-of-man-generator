@@ -10,10 +10,9 @@ import {isString} from '~/helpers/string';
 import {ENTITIES} from '~/utils/entities';
 import {isObject} from '~/helpers/object';
 import {LOCATION_TYPE} from '~/utils/action';
-import {isNumeric, toFloat} from '~/helpers/number';
 
-// validators
-import {validateDistance, validateRotation} from '~/utils/scenario/validator';
+// normalizers
+import {normalizeDistance, normalizeRotation} from '~/utils/scenario/normalizer-action';
 
 // types
 import type {Json} from '~/types/json.types';
@@ -28,13 +27,13 @@ export const jsonToRedux = (node: Json | any): Json | null => {
     return null;
   }
 
-  const hasLocation = isString(node?.location, true)
-    && LOCATION_TYPE.includes(node?.location);
-
   const hasEntityName = isString(node?.entity_name, true)
     && ENTITIES.includes(node?.entity_name);
 
-  if (!hasLocation || !hasEntityName) {
+  const hasLocation = isString(node?.location, true)
+    && LOCATION_TYPE.includes(node?.location);
+
+  if (!hasEntityName || !hasLocation) {
     return null;
   }
 
@@ -44,11 +43,8 @@ export const jsonToRedux = (node: Json | any): Json | null => {
     location: node.location,
   } as ActionParams;
 
-  isNumeric(node?.distance) && validateDistance(node.distance)
-  && (action.distance = toFloat(node.distance, 2));
-
-  isNumeric(node?.rotation) && validateRotation(node.rotation)
-  && (action.rotation = toFloat(node.rotation, 2));
+  normalizeDistance(node?.distance, distance => action.distance = distance);
+  normalizeRotation(node?.rotation, rotation => action.rotation = rotation);
 
   return action;
 };

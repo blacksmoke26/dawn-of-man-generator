@@ -59,10 +59,14 @@ export const normalizeCoordinates = (position: string, callback?: Callable<numbe
  * Normalize position value
  * @returns The value, false if invalid
  */
-export const normalizePosition = (position: string, callback?: Callable<number>): false | [number, number] => {
+export const normalizePosition = (position: string, callback?: Callable<[number, number]>): false | [number, number] => {
   if (!isLocationPosition(position)) return false;
 
-  return position.split(',').map((value: string) => normalizeInt(value, {
-    min: LOCATION_POSITION_MIN, max: LOCATION_POSITION_MAX, callback,
+  const value = position.split(',').map((value: string) => normalizeInt(value, {
+    min: LOCATION_POSITION_MIN, max: LOCATION_POSITION_MAX,
   })) as [number, number];
+
+  callback && callback?.(value);
+
+  return value;
 };
