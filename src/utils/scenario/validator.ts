@@ -4,43 +4,14 @@
  * @since 2.3
  */
 
-import {
-  ANGLE_MAX,
-  ANGLE_MIN, ARMOR_RATIO_MAX, ARMOR_RATIO_MIN,
-  DECREASE_HALFING_POPULATION_MAX,
-  DECREASE_HALFING_POPULATION_MIN,
-  DECREASE_START_POPULATION_MAX,
-  DECREASE_START_POPULATION_MIN,
-  ERA_FACTORS_MAX,
-  ERA_FACTORS_MIN,
-  INDIVIDUAL_DISEASE_CHANCE_MAX,
-  INDIVIDUAL_DISEASE_CHANCE_MIN,
-  LOCATION_INDEX_MAX,
-  LOCATION_INDEX_MIN,
-  PERIOD_MAX,
-  PERIOD_MIN,
-  POSITION_VECTOR_MAX,
-  POSITION_VECTOR_MIN,
-  RADIUS_MAX,
-  RADIUS_MIN, RAIDER_ATTACK_AMOUNT_MAX, RAIDER_ATTACK_AMOUNT_MIN,
-  ROTATION_MAX,
-  ROTATION_MIN, SCALE_MAX, SCALE_MIN, SHIELD_RATIO_MAX, SHIELD_RATIO_MIN,
-  TECH_COST_MULTIPLIER_MAX,
-  TECH_COST_MULTIPLIER_MIN,
-  TIME_OF_YEAR_MAX,
-  TIME_OF_YEAR_MIN, TIME_SCALE_INDEX_MAX,
-  TIME_SCALE_INDEX_MIN, YEARS_OLD_MAX, YEARS_OLD_MIN,
-} from '~/utils/defaults';
-import {
-  MAP_SIZE_MAX, MAP_SIZE_MIN,
-  LOCATION_MAP_MAX, LOCATION_MAP_MIN,
-  LOCATION_SEED_MAX, LOCATION_SEED_MIN,
-  LOCATION_LAKES_MAX, LOCATION_LAKES_MIN,
-  LOCATION_POSITION_MAX, LOCATION_POSITION_MIN, KNOWLEDGE_MIN, KNOWLEDGE_MAX,
-} from '~/utils/scenario/defaults';
-import {isFloat, isInt, isNumeric} from '~/helpers/number';
+// helpers
 import {isString} from '~/helpers/string';
-import {DISTANCE_MAX, DISTANCE_MIN, ENTITY_COUNT_MAX, ENTITY_COUNT_MIN} from '~/utils/condition';
+import {isInt, isNumeric} from '~/helpers/number';
+
+// utils
+import * as Defaults from '~/utils/defaults';
+import * as ScnDefaults from '~/utils/scenario/defaults';
+import * as CondDefaults from '~/utils/condition';
 
 /**
  * Checks if the period is valid
@@ -64,7 +35,7 @@ export const validatePeriod = (value: string | number, checkUnit: boolean = true
     period = Number(parseFloat(value).toFixed(1));
   }
 
-  return !(period < PERIOD_MIN || period > PERIOD_MAX);
+  return !(period < Defaults.PERIOD_MIN || period > Defaults.PERIOD_MAX);
 };
 
 /**
@@ -73,7 +44,7 @@ export const validatePeriod = (value: string | number, checkUnit: boolean = true
  * @returns True if valid, false otherwise
  */
 export const validateMapSize = (size: number | any): boolean => {
-  return !isInt(size) ? false : !(size < MAP_SIZE_MIN || size > MAP_SIZE_MAX);
+  return !isInt(size) ? false : !(size < ScnDefaults.MAP_SIZE_MIN || size > ScnDefaults.MAP_SIZE_MAX);
 };
 
 /**
@@ -85,7 +56,7 @@ export const validateRadius = (value: number | any): boolean => {
   if (!isNumeric(value)) {
     return false;
   } else {
-    return !(value < RADIUS_MIN || value > RADIUS_MAX);
+    return !(value < Defaults.RADIUS_MIN || value > Defaults.RADIUS_MAX);
   }
 };
 
@@ -98,7 +69,7 @@ export const validateDistance = (value: number | any): boolean => {
   if (!isNumeric(value)) {
     return false;
   } else {
-    return !(value < DISTANCE_MIN || value > DISTANCE_MAX);
+    return !(value < CondDefaults.DISTANCE_MIN || value > CondDefaults.DISTANCE_MAX);
   }
 };
 
@@ -111,7 +82,7 @@ export const validateLocationIndex = (value: number | any): boolean => {
   if (!isInt(value)) {
     return false;
   } else {
-    return !(value < LOCATION_INDEX_MIN || value > LOCATION_INDEX_MAX);
+    return !(value < Defaults.LOCATION_INDEX_MIN || value > Defaults.LOCATION_INDEX_MAX);
   }
 };
 
@@ -124,7 +95,7 @@ export const validateRotation = (value: number | any): boolean => {
   if (!isNumeric(value)) {
     return false;
   } else {
-    return !(value < ROTATION_MIN || value > ROTATION_MAX);
+    return !(value < Defaults.ROTATION_MIN || value > Defaults.ROTATION_MAX);
   }
 };
 
@@ -137,7 +108,8 @@ export const validateDecreaseStartPopulation = (value: number | any): boolean =>
   if (!isInt(value)) {
     return false;
   } else {
-    return !(value < DECREASE_START_POPULATION_MIN || value > DECREASE_START_POPULATION_MAX);
+    return !(value < Defaults.DECREASE_START_POPULATION_MIN
+      || value > Defaults.DECREASE_START_POPULATION_MAX);
   }
 };
 
@@ -150,7 +122,8 @@ export const validateDecreaseHalfingPopulation = (value: number | any): boolean 
   if (!isInt(value)) {
     return false;
   } else {
-    return !(value < DECREASE_HALFING_POPULATION_MIN || value > DECREASE_HALFING_POPULATION_MAX);
+    return !(value < Defaults.DECREASE_HALFING_POPULATION_MIN
+      || value > Defaults.DECREASE_HALFING_POPULATION_MAX);
   }
 };
 
@@ -163,8 +136,8 @@ export const validateIndividualDiseaseChance = (value: number | any): boolean =>
   return !isNumeric(value)
     ? false
     : !(
-      value < INDIVIDUAL_DISEASE_CHANCE_MIN
-      || value > INDIVIDUAL_DISEASE_CHANCE_MAX
+      value < Defaults.INDIVIDUAL_DISEASE_CHANCE_MIN
+      || value > Defaults.INDIVIDUAL_DISEASE_CHANCE_MAX
     );
 };
 
@@ -176,7 +149,7 @@ export const validateIndividualDiseaseChance = (value: number | any): boolean =>
 export const validateKnowledge = (value: number | any): boolean => {
   return !isNumeric(value) // TODO: Validate
     ? false
-    : !(value < KNOWLEDGE_MIN || value > KNOWLEDGE_MAX);
+    : !(value < ScnDefaults.KNOWLEDGE_MIN || value > ScnDefaults.KNOWLEDGE_MAX);
 };
 
 /**
@@ -188,8 +161,8 @@ export const validateTechCostMultiplier = (value: number | any): boolean => {
   return !isNumeric(value)
     ? false
     : !(
-      value < TECH_COST_MULTIPLIER_MIN
-      || value > TECH_COST_MULTIPLIER_MAX
+      value < Defaults.TECH_COST_MULTIPLIER_MIN
+      || value > Defaults.TECH_COST_MULTIPLIER_MAX
     );
 };
 
@@ -201,7 +174,7 @@ export const validateTechCostMultiplier = (value: number | any): boolean => {
 export const validateTimeOfYear = (value: number | any): boolean => {
   return !isNumeric(value)
     ? false
-    : !(value < TIME_OF_YEAR_MIN || value > TIME_OF_YEAR_MAX);
+    : !(value < Defaults.TIME_OF_YEAR_MIN || value > Defaults.TIME_OF_YEAR_MAX);
 };
 
 /**
@@ -212,7 +185,7 @@ export const validateTimeOfYear = (value: number | any): boolean => {
 export const validateTimeScale = (value: number | any): boolean => {
   return !isInt(value)
     ? false
-    : !(value < TIME_SCALE_INDEX_MIN || value > TIME_SCALE_INDEX_MAX);
+    : !(value < Defaults.TIME_SCALE_INDEX_MIN || value > Defaults.TIME_SCALE_INDEX_MAX);
 };
 
 /**
@@ -224,8 +197,8 @@ export const validateRaiderAttackAmount = (value: number | any): boolean => {
   return !isInt(value)
     ? false
     : !(
-      value < RAIDER_ATTACK_AMOUNT_MIN
-      || value > RAIDER_ATTACK_AMOUNT_MAX
+      value < Defaults.RAIDER_ATTACK_AMOUNT_MIN
+      || value > Defaults.RAIDER_ATTACK_AMOUNT_MAX
     );
 };
 
@@ -237,7 +210,7 @@ export const validateRaiderAttackAmount = (value: number | any): boolean => {
 export const validateScale = (value: number | any): boolean => {
   return !isNumeric(value)
     ? false
-    : !(value < SCALE_MIN || value > SCALE_MAX);
+    : !(value < Defaults.SCALE_MIN || value > Defaults.SCALE_MAX);
 };
 
 /**
@@ -248,7 +221,7 @@ export const validateScale = (value: number | any): boolean => {
 export const validateEntityCount = (value: number | any): boolean => {
   return !isInt(value)
     ? false
-    : !(value < ENTITY_COUNT_MIN || value > ENTITY_COUNT_MAX);
+    : !(value < CondDefaults.ENTITY_COUNT_MIN || value > CondDefaults.ENTITY_COUNT_MAX);
 };
 
 /**
@@ -259,7 +232,7 @@ export const validateEntityCount = (value: number | any): boolean => {
 export const validateAngle = (value: number | any): boolean => {
   return !isNumeric(value)
     ? false
-    : !(value < ANGLE_MIN || value > ANGLE_MAX);
+    : !(value < Defaults.ANGLE_MIN || value > Defaults.ANGLE_MAX);
 };
 
 /**
@@ -270,7 +243,7 @@ export const validateAngle = (value: number | any): boolean => {
 export const validateAge = (value: number | any): boolean => {
   return !isInt(value)
     ? false
-    : !(value < YEARS_OLD_MIN || value > YEARS_OLD_MAX);
+    : !(value < Defaults.YEARS_OLD_MIN || value > Defaults.YEARS_OLD_MAX);
 };
 
 /**
@@ -281,7 +254,7 @@ export const validateAge = (value: number | any): boolean => {
 export const validateShieldRatio = (value: number | any): boolean => {
   return !isNumeric(value)
     ? false
-    : !(value < SHIELD_RATIO_MIN || value > SHIELD_RATIO_MAX);
+    : !(value < Defaults.SHIELD_RATIO_MIN || value > Defaults.SHIELD_RATIO_MAX);
 };
 
 /**
@@ -292,7 +265,7 @@ export const validateShieldRatio = (value: number | any): boolean => {
 export const validateArmorRatio = (value: number | any): boolean => {
   return !isNumeric(value)
     ? false
-    : !(value < ARMOR_RATIO_MIN || value > ARMOR_RATIO_MAX);
+    : !(value < Defaults.ARMOR_RATIO_MIN || value > Defaults.ARMOR_RATIO_MAX);
 };
 
 /**
@@ -301,7 +274,7 @@ export const validateArmorRatio = (value: number | any): boolean => {
  * @returns True if valid, false otherwise
  */
 export const validateLocationSeed = (value: number | any): boolean => {
-  return !isInt(value) ? false : !(value < LOCATION_SEED_MIN || value > LOCATION_SEED_MAX);
+  return !isInt(value) ? false : !(value < ScnDefaults.LOCATION_SEED_MIN || value > ScnDefaults.LOCATION_SEED_MAX);
 };
 
 /**
@@ -310,7 +283,7 @@ export const validateLocationSeed = (value: number | any): boolean => {
  * @returns True if valid, false otherwise
  */
 export const validateLocationLakes = (n: number | any): boolean => {
-  return !isInt(n) ? false : !(n < LOCATION_LAKES_MIN || n > LOCATION_LAKES_MAX);
+  return !isInt(n) ? false : !(n < ScnDefaults.LOCATION_LAKES_MIN || n > ScnDefaults.LOCATION_LAKES_MAX);
 };
 
 const REGEX_COORDINATES_STRICT = /^[01]+(\.\d{1,3})?,[01]+(\.\d{1,3})?$/;
@@ -335,9 +308,9 @@ export const validateLocationCoordinates = (cord: string | any): boolean => {
 
   const [x, y] = cord.split(',').map(Number);
 
-  if (x < LOCATION_MAP_MIN || y < LOCATION_MAP_MIN) {
+  if (x < ScnDefaults.LOCATION_MAP_MIN || y < ScnDefaults.LOCATION_MAP_MIN) {
     return false;
-  } else if (x > LOCATION_MAP_MAX || y > LOCATION_MAP_MAX) {
+  } else if (x > ScnDefaults.LOCATION_MAP_MAX || y > ScnDefaults.LOCATION_MAP_MAX) {
     return false;
   }
 
@@ -360,13 +333,17 @@ export const validateLocationPosition = (pos: string | any): boolean => {
 
   const [x, y] = pos.split(',').map(Number);
 
-  if (x < LOCATION_POSITION_MIN || y < LOCATION_POSITION_MIN) {
+  if (x < ScnDefaults.LOCATION_POSITION_MIN || y < ScnDefaults.LOCATION_POSITION_MIN) {
     return false;
-  } else if (x > LOCATION_POSITION_MAX || y > LOCATION_POSITION_MAX) {
+  } else if (x > ScnDefaults.LOCATION_POSITION_MAX || y > ScnDefaults.LOCATION_POSITION_MAX) {
     return false;
   }
 
   return true;
+};
+
+export const isVectorPosition = (pos: string | any): boolean => {
+  return isString(pos, true) && /^\d+(,\d+){2}$/.test(pos);
 };
 
 /**
@@ -375,7 +352,7 @@ export const validateLocationPosition = (pos: string | any): boolean => {
  * @returns True if valid, false otherwise
  */
 export const validateVectorPosition = (pos: string | any): boolean => {
-  if (!isString(pos) || !/^\d+,\d+,\d+$/.test(pos)) {
+  if (!isVectorPosition(pos)) {
     return false;
   }
 
@@ -385,9 +362,9 @@ export const validateVectorPosition = (pos: string | any): boolean => {
     return false;
   }
 
-  if (x < POSITION_VECTOR_MIN || y < POSITION_VECTOR_MIN || z < POSITION_VECTOR_MIN) {
+  if (x < Defaults.POSITION_VECTOR_MIN || y < Defaults.POSITION_VECTOR_MIN || z < Defaults.POSITION_VECTOR_MIN) {
     return false;
-  } else if (x > POSITION_VECTOR_MAX || y > POSITION_VECTOR_MAX || z > POSITION_VECTOR_MAX) {
+  } else if (x > Defaults.POSITION_VECTOR_MAX || y > Defaults.POSITION_VECTOR_MAX || z > Defaults.POSITION_VECTOR_MAX) {
     return false;
   }
 
@@ -407,7 +384,7 @@ export const validateEraFactors = (value: string | any): boolean => {
   const nums: number[] = isNumeric(value) ? [value] : value.split(' ').map(Number);
 
   for (const num of nums) {
-    if (num < ERA_FACTORS_MIN || num > ERA_FACTORS_MAX) {
+    if (num < Defaults.ERA_FACTORS_MIN || num > Defaults.ERA_FACTORS_MAX) {
       return false;
     }
   }

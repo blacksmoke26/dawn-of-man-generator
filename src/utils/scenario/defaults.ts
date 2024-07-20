@@ -44,7 +44,7 @@ export const LOCATION_LAKES_MIN: number = 1;
 
 export const LOCATION_LAKES_MAX: number = 20;
 
-export const LOCATION_POSITION_MIN: number = 1;
+export const LOCATION_POSITION_MIN: number = 0;
 
 export const LOCATION_POSITION_MAX: number = MAP_SIZE_MAX * 512;
 

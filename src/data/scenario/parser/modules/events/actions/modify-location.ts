@@ -10,10 +10,9 @@ import {snakeCase} from 'change-case';
 // utils
 import {isString} from '~/helpers/string';
 import {isObject} from '~/helpers/object';
-import {toFloat, toInteger} from '~/helpers/number';
 
-// validators
-import {validateLocationIndex, validateVectorPosition} from '~/utils/scenario/validator';
+// normalizers
+import {normalizeLocationIndex, normalizeVectorPosition} from '~/utils/scenario/normalizer-action';
 
 // types
 import type {Json} from '~/types/json.types';
@@ -28,16 +27,15 @@ export const jsonToRedux = (node: Json | any): Json | null => {
     return null;
   }
 
-  if (!isString(node?.modification, true)) {
-    return null;
-  }
+  if (!isString(node?.modification, true)) return null;
 
   const action = {
     type: ACTION_NAME,
   } as ActionParams;
 
-  validateLocationIndex(node?.location_index) && (action.locationIndex = toInteger(node.location_index));
-  validateVectorPosition(node?.position) && (action.position = node.position.split(',').map((n: string) => toFloat(n, 1)));
+  normalizeLocationIndex(node?.location_index, value => action.locationIndex = value);
+  normalizeVectorPosition(node?.position, value => action.position = value);
+
   action.modification = snakeCase(node.modification);
 
   return action;

@@ -32,7 +32,7 @@ export const environments: string[] = [
  * @static
  * Random Coordinate */
 export function randomCoordinate(): number {
-  return +randomFloat(0, 1).toFixed(2);
+  return +randomFloat(0, 1).toFixed(3);
 }
 
 /**
