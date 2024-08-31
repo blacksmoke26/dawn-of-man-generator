@@ -70,7 +70,7 @@
     "react-scripts": "^5.0.1",
     "storybook": "^8.1.9",
     "utility-types": "^3.11.0",
-    "webpack": "5.92.0"
+    "webpack": "5.94.0"
   },
   "eslintConfig": {
     "extends": [
